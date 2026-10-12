@@ -1,16 +1,16 @@
 {
  "hollywood": {
   "photo": "img/hollywood-empty.png",
-  "note": "Your photo of the empty Hollywood room, from the south end looking north along the coffer. Placed by eye from the column spacing; booths hidden (they were removed for the photo).",
+  "note": "Your photo of the empty Hollywood room, from just inside the entrance steps looking north along the coffer. Placed by eye; booths hidden.",
   "loc": [
    5.9,
-   -30.6,
-   1.55
+   -31.8,
+   1.6
   ],
   "look": [
    5.9,
    18.0,
-   1.4
+   2.0
   ],
   "fov_h": 70,
   "hide": [

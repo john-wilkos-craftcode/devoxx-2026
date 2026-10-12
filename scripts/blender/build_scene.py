@@ -270,7 +270,7 @@ def textured(name, tex, scale, tint=None, rough=None, normal=1.0, sheen=0.0, til
         nt.links.new(shift.outputs["Vector"], mot.inputs["Vector"])
         f1 = node(nt, "ShaderNodeMath")
         f1.operation = "MULTIPLY_ADD"
-        f1.inputs[1].default_value, f1.inputs[2].default_value = 1.8, -0.05
+        f1.inputs[1].default_value, f1.inputs[2].default_value = 2.4, -0.3
         nt.links.new(mot.outputs["Fac"], f1.inputs[0])
         f2 = node(nt, "ShaderNodeMath")
         f2.operation = "MULTIPLY_ADD"
@@ -335,10 +335,10 @@ M = {
     "hallColumn": material("hallColumn", 0xdedcd7, 0.6, bevel=0.012, grime=0.35),
     "hallWall": material("hallWall", 0xe4e2dd, 0.85, bevel=0.01, grime=0.25),
     "raft": material("raft", 0xf1f1ee, 0.9, bevel=0.01),
-    "plenum": material("plenum", 0x7d8086, 0.95, noise_bump=0.4),
+    "plenum": material("plenum", 0x15171d, 0.95, noise_bump=0.8),            # black sprayed ceiling
     "acoustic": material("acoustic", 0x10131c, 1.0, noise_bump=1.0),
     "curtain": textured("curtain", "curtain", 1.4, tint=0x8f8574, normal=0.7, sheen=0.5, uv=True),
-    "frostedGlass": material("frostedGlass", 0xdfeee8, 0.2),
+    "frostedGlass": material("frostedGlass", 0xbfe0da, 0.35),               # pale frosted teal
     "plinth": material("plinth", 0x8d8d8a, 0.6, bevel=0.005),
     "speaker": material("speaker", 0xe9e9e5, 0.45, bevel=0.01),
     "hexFrame": material("hexFrame", 0xd2d5d8, 0.3, 0.8),         # brushed aluminium: panel rims, mullions
@@ -774,8 +774,8 @@ B.box("raft", {"x": hall["x"], "y": entrance["y"] + entrance["h"] - 0.05, "w": h
 for (x0, x1) in ((hall["x"], coffer["x"] - 2.2), (coffer["x"] + coffer["w"] + 2.2, hall["x"] + hall["w"])):
     B.box("acoustic", {"x": x0, "y": entrance["y"], "w": x1 - x0, "h": entrance["h"] - 0.3}, NEAR_Z - 0.35, NEAR_Z)
 spots = []
-for sy in (entrance["y"] + 2.5, entrance["y"] + 5.0):
-    for k in range(-3, 4):
+for sy in (entrance["y"] + 2.5, entrance["y"] + 5.2, entrance["y"] + 7.9):
+    for k in range(-4, 5):
         sx = SX + k * 1.6
         B.box("tableFrame", {"x": sx - 0.02, "y": sy - 0.5, "w": 0.04, "h": 1.0}, NEAR_Z - 0.04, NEAR_Z)   # track
         cylinder("tableFrame", sx, sy, NEAR_Z - 0.32, NEAR_Z - 0.04, 0.055)
@@ -929,7 +929,8 @@ def curtain(name, x0, x1, y, z1, pleat=0.36, amp=0.065, face=-1):
     xs = [x0 + i * 0.025 for i in range(int((x1 - x0) / 0.025) + 1)]
     zs = [0.0, 0.04, 0.12, 0.5, 1.2, 2.0, z1]
     def depth(x, z):
-        k = (x - x0) / pleat
+        # fold widths wander between about 0.6 and 1.4 times the pleat
+        k = (x - x0) / pleat + 0.6 * math.sin(x * 1.3 + 0.4) + 0.35 * math.sin(x * 3.1 + 1.0)
         d = amp * math.sin(2 * math.pi * k) * folds[int(k) % 256] + 0.3 * amp * math.sin(2 * math.pi * k * 0.23 + 1.7)
         return d * (1 + 0.15 * max(0.0, 0.12 - z) / 0.12) + (0.012 if z < 0.05 else 0.0)
     verts, uvs = [], []
@@ -1071,16 +1072,16 @@ for (lx, ly, lz) in lights:
     ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", 0.8, 0.3
 for (lx, ly) in downlights:
     spot = bpy.data.lights.new(f"down-{lx:.1f}-{ly:.1f}", "SPOT")
-    spot.energy, spot.spot_size, spot.spot_blend, spot.color = 110, math.radians(34), 0.25, (1.0, 0.9, 0.78)
+    spot.energy, spot.spot_size, spot.spot_blend, spot.color = 190, math.radians(34), 0.25, (1.0, 0.9, 0.78)
     spot.shadow_soft_size = 0.04
     so = bpy.data.objects.new(spot.name, spot)
     so.location = (lx, ly, HALL_CEIL - 0.01)
     scene.collection.objects.link(so)
 for (tx, ty, tz) in spots:
     spot = bpy.data.lights.new(f"track-{tx:.1f}-{ty:.1f}", "SPOT")
-    spot.energy, spot.spot_size, spot.spot_blend, spot.color = 350, math.radians(40), 0.5, (1.0, 0.92, 0.8)
+    spot.energy, spot.spot_size, spot.spot_blend, spot.color = 900, math.radians(44), 0.5, (1.0, 0.92, 0.8)
     so = bpy.data.objects.new(spot.name, spot)
-    so.location, so.rotation_euler = (tx, ty, tz), (0.35, 0, 0)
+    so.location, so.rotation_euler = (tx, ty, tz), (0.2, 0, 0)
     scene.collection.objects.link(so)
 # the auditorium we walk to: dim house lights, the screen's own spill does the rest
 _room = doors[args.room]["room"]["bounds"] if args.room in doors else None
@@ -1287,10 +1288,10 @@ else:
     scene.cycles.use_denoising = True
     scene.cycles.max_bounces = 6
     scene.render.use_motion_blur = True
-    scene.render.motion_blur_shutter = 0.4
+    scene.render.motion_blur_shutter = 0.25
 scene.view_settings.view_transform = "AgX" if "AgX" in [v.name for v in bpy.types.ColorManagedViewSettings.bl_rna.properties["view_transform"].enum_items] else "Filmic"
 scene.view_settings.look = "None"
-scene.view_settings.exposure = -0.55
+scene.view_settings.exposure = -0.25
 try:
     scene.view_settings.look = "Medium High Contrast"
 except TypeError as e:
