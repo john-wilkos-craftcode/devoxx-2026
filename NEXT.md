@@ -40,11 +40,16 @@ Next:
      mullions, speakers and plinths on columns, extinguishers, exit signs, trusses, translucent ivy.
      Floor-1 cinema walls and rakes stop above the drop ceiling over the room (Ghost Light stacks the
      floors too close). Post: bloom, slight dispersion, vignette; AgX Medium High Contrast, -0.9 EV.
-     Still to do: the carpet's pebbly pattern is weaker than the photo's; fewer ivy clumps.
+     Reviewer scores 12/10 (fresh agent, render vs photo): ref view 4 -> 5, opening shot 3 -> 4,
+     walk to the stairwell 3.5 -> 5. Its remaining gaps, in order: light still too even (pools under
+     the downlights too weak, edges don't fall off); the ceiling over the entrance end should be a black
+     plenum with track spots, and the blue cove a softer lavender wash; surfaces too clean (dirt mask
+     from height x noise, roughness variation); carpet too beige and fine (cooler grey, stronger
+     quarter-turn sheen); curtains still too regular, screen needs a mount; ivy from planter troughs.
    - upstairs foyer: as before (sloped ceiling, LED lines, track spots, screen between dark columns,
      red side portals), but the tensile funnels are white fabric lit blue this year, not red
    - entrance: navy walls, blue "uitgang zaal 6/7" signs, glass front, white desks, stanchions
-   - side stair and corridor (older references, no 2026 photos): speckled grey treads, blue-lit wall,
+   - side stair (scored 2/10, next up) and corridor (older references, no 2026 photos): speckled grey treads, blue-lit wall,
      one grey rail, red door at the top; vaults, square columns, blue LEDs, orange backlit poster
      boxes, blue "uitgang zaal" signs
    - room door: red portal + ring handles, big white room numeral with red/orange streaks,

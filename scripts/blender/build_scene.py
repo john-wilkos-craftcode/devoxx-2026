@@ -242,11 +242,11 @@ def textured(name, tex, scale, tint=None, rough=None, normal=1.0, sheen=0.0, til
         nt.links.new(shift.outputs["Vector"], mot.inputs["Vector"])
         f1 = node(nt, "ShaderNodeMath")
         f1.operation = "MULTIPLY_ADD"
-        f1.inputs[1].default_value, f1.inputs[2].default_value = 2.6, -0.45
+        f1.inputs[1].default_value, f1.inputs[2].default_value = 1.8, -0.05
         nt.links.new(mot.outputs["Fac"], f1.inputs[0])
         f2 = node(nt, "ShaderNodeMath")
         f2.operation = "MULTIPLY_ADD"
-        f2.inputs[1].default_value = 0.4
+        f2.inputs[1].default_value = 0.2
         nt.links.new(rnd.outputs["Value"], f2.inputs[0])
         nt.links.new(f1.outputs["Value"], f2.inputs[2])
         # small dark specks, like the photos' carpet
@@ -832,27 +832,31 @@ while len(clumps) < 22:
     if all(abs(gx - lx) > 0.9 or abs(gy - ly) > 0.6 for lx, ly, _ in lights):
         clumps.append((gx, gy))
 for (gx, gy) in clumps:
-    for _ in range(40):                                   # strands of ivy, leaves every few centimetres
+    for _ in range(55):                                   # strands of ivy, a leaf every few centimetres
         x, y, z = gx + rng.uniform(-0.4, 0.4), gy + rng.uniform(-0.4, 0.4), HALL_CEIL - 0.01
-        for _ in range(int(rng.uniform(0.1, 0.8) ** 1.5 / 0.03) + 2):
-            x, y, z = x + rng.uniform(-0.02, 0.02), y + rng.uniform(-0.02, 0.02), z - 0.03
-            u = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-0.4, 0.4))).normalized()
-            v = u.cross(Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1)))).normalized()
-            c, a_, b_ = Vector((x, y, z)), 0.055 * rng.uniform(0.7, 1.2), 0.035 * rng.uniform(0.7, 1.2)
-            B.mesh("foliage", [c - u * a_, c - v * b_, c + u * a_, c + v * b_], [(0, 1, 2, 3)])
+        for _ in range(int(rng.uniform(0.1, 0.8) ** 1.5 / 0.025) + 2):
+            x, y, z = x + rng.uniform(-0.02, 0.02), y + rng.uniform(-0.02, 0.02), z - 0.025
+            # a leaf: a pointed kite folded a little along its midrib, hanging tip-down and turned outward
+            u = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1.6, -0.2))).normalized()
+            v = u.cross(Vector((0, 0, 1))).normalized() if abs(u.z) < 0.98 else Vector((1, 0, 0))
+            nrm = u.cross(v)
+            c, a_, b_ = Vector((x, y, z)), 0.045 * rng.uniform(0.7, 1.25), 0.026 * rng.uniform(0.7, 1.25)
+            fold = nrm * b_ * 0.35
+            B.mesh("foliage", [c, c + u * a_ * 0.35 + v * b_ + fold, c + u * a_, c + u * a_ * 0.35 - v * b_ + fold],
+                   [(0, 1, 2), (0, 2, 3)])
 
 
-def curtain(name, x0, x1, y, z1, pleat=0.3, amp=0.09, face=-1):
+def curtain(name, x0, x1, y, z1, pleat=0.36, amp=0.065, face=-1):
     """A pleated curtain along x at depth y, from just above the floor to z1: irregular folds (two frequencies plus
     a per-fold depth), the hem breaking a little outward on the floor, UVs in metres for the fabric texture."""
     rng_c = random.Random(name)
-    folds = [rng_c.uniform(0.6, 1.3) for _ in range(256)]
+    folds = [rng_c.uniform(0.8, 1.15) for _ in range(256)]
     xs = [x0 + i * 0.025 for i in range(int((x1 - x0) / 0.025) + 1)]
     zs = [0.0, 0.04, 0.12, 0.5, 1.2, 2.0, z1]
     def depth(x, z):
         k = (x - x0) / pleat
         d = amp * math.sin(2 * math.pi * k) * folds[int(k) % 256] + 0.3 * amp * math.sin(2 * math.pi * k * 0.23 + 1.7)
-        return d * (1 + 0.5 * max(0.0, 0.12 - z) / 0.12) + (0.03 if z < 0.05 else 0.0)
+        return d * (1 + 0.15 * max(0.0, 0.12 - z) / 0.12) + (0.012 if z < 0.05 else 0.0)
     verts, uvs = [], []
     run, prev = 0.0, None
     for x in xs:
