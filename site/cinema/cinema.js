@@ -1,20 +1,23 @@
 // The rendered cinema: Blender stills and walk clips (scripts/blender/build_scene.py), with the programme and the
-// talk as real HTML pinned onto the screens. shots.json says where each screen lands in each still; a CSS matrix3d
-// (a projective transform) maps the panel's rectangle onto that quad, so text stays crisp, clickable and
-// scrollable. Only the rooms with a rendered walk can be walked to; other sessions open on the hall screen.
+// talk as real HTML pinned onto the screens in them. shots.json says where each screen lands in each still; a CSS
+// matrix3d (a projective transform) maps a fixed canvas onto that quad, like a real display, so text stays crisp,
+// clickable and scrollable. Laptops get the landscape shots (the hall screen, the whole cinema screen); portrait
+// viewports get the phone shots (a schedule totem in the hall, the middle of the cinema screen from the seat). What
+// stands in front of the cinema screen (the "#DEVOXX" letters, the seats) is a separate cut-out laid over the talk.
 
 const TZ = "Europe/Brussels";
 const fmt = (o) => new Intl.DateTimeFormat("en-GB", { timeZone: TZ, ...o });
 const fTime = fmt({ hour: "2-digit", minute: "2-digit" });
+const fDayLong = fmt({ weekday: "long", day: "numeric", month: "long" });
 const fDay = fmt({ weekday: "long" });
 const fShort = fmt({ weekday: "short", day: "numeric" });
 const dayKey = (iso) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date(iso));
 const roomNo = (t) => { const m = /^Room (\d+)$/.exec(t.room || ""); return m ? Number(m[1]) : null; };
 const ytUrl = (t, sec = 0) => `https://www.youtube.com/watch?v=${t.videoId}${sec ? `&t=${sec}s` : ""}`;
-const EMBED = window.self === window.top;
+const EMBED = window.self === window.top;      // YouTube can't be embedded inside the artifact sandbox
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const SHEET = matchMedia("(max-width: 760px), (max-height: 520px)").matches;
-const IMG_W = 1920, IMG_H = 1080;
+const IMG = { laptop: [1920, 1080], phone: [1080, 2340] };
+const CANVAS = { hall: 1280, "hall-phone": 340, seat: 1600, "seat-phone": 360 };   // design widths in css px
 
 const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -22,15 +25,25 @@ const el = (tag, attrs = {}, ...kids) => {
     if (v == null || v === false) continue;
     if (k === "class") n.className = v;
     else if (k === "text") n.textContent = v;
+    else if (k === "style") n.style.cssText = v;
     else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
     else n.setAttribute(k, v === true ? "" : v);
   }
-  for (const kid of kids.flat()) if (kid != null && kid !== false) n.append(kid);
-  return n;
+  return put(n, kids);
 };
+function put(node, ...kids) { for (const k of kids.flat(Infinity)) if (k != null && k !== false) node.append(k); return node; }   // append() would print "null"
+
+// ---------- the data, tidied for the screens ----------
+const clean = (s) => String(s || "").replace(/[\p{Extended_Pictographic}️‍]/gu, "").replace(/\s{2,}/g, " ").trim();
+const capital = (name) => name.replace(/^\p{Ll}/u, (c) => c.toUpperCase());   // "yann Blazart" -> "Yann Blazart"; "van" mid-name untouched
+const talks = window.DEVOXX.talks.filter((t) => t.type !== "Keynote Overflow").map((t) => ({
+  ...t, title: clean(t.title), speakers: t.speakers.map((sp) => ({ ...sp, name: capital(clean(sp.name)) })) }));
+const speakers = (t, withCompany) => t.speakers.map((sp) => withCompany && sp.company ? `${sp.name} (${sp.company})` : sp.name).join(", ");
+const when = (t) => t.start ? `${fDay.format(new Date(t.start))} ${fTime.format(new Date(t.start))}` : null;
+const typeLabel = (t) => (t.type === "Conference" ? "" : t.type);   // a plain talk needs no label
+const titleSize = (title, big, small) => title.length > 90 ? small : title.length > 55 ? (big + small) / 2 : big;
 
 // ---------- projective pinning ----------
-// The 3x3 matrix taking the unit basis to four points, then src -> dst as dst * adj(src).
 function adj(m) {
   return [m[4] * m[8] - m[5] * m[7], m[2] * m[7] - m[1] * m[8], m[1] * m[5] - m[2] * m[4],
           m[5] * m[6] - m[3] * m[8], m[0] * m[8] - m[2] * m[6], m[2] * m[3] - m[0] * m[5],
@@ -42,17 +55,16 @@ const mul = (a, b) => {
   return c;
 };
 const mulv = (m, v) => [m[0] * v[0] + m[1] * v[1] + m[2] * v[2], m[3] * v[0] + m[4] * v[1] + m[5] * v[2], m[6] * v[0] + m[7] * v[1] + m[8] * v[2]];
-function basis(p) {
+function basis(p) {   // the matrix taking the unit basis to p[0..2], scaled so p[3] maps too
   const m = [p[0][0], p[1][0], p[2][0], p[0][1], p[1][1], p[2][1], 1, 1, 1];
   const v = mulv(adj(m), [p[3][0], p[3][1], 1]);
   return mul(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]]);
 }
-function matrix3d(w, h, dst) {
+function matrix3d(w, h, dst) {   // dst: top-left, top-right, bottom-left, bottom-right
   const t = mul(basis(dst), adj(basis([[0, 0], [w, 0], [0, h], [w, h]])));
   const n = t.map((x) => x / t[8]);
   return `matrix3d(${[n[0], n[3], 0, n[6], n[1], n[4], 0, n[7], 0, 0, 1, 0, n[2], n[5], 0, n[8]].join(",")})`;
 }
-// shots.json corners in any order -> [top-left, top-right, bottom-left, bottom-right]
 function ordered(quad) {
   const byY = [...quad].sort((a, b) => a[1] - b[1]);
   const [tl, tr] = byY.slice(0, 2).sort((a, b) => a[0] - b[0]);
@@ -60,214 +72,293 @@ function ordered(quad) {
   return [tl, tr, bl, br];
 }
 
-// ---------- state ----------
-const talks = window.DEVOXX.talks;
-const stage = document.getElementById("stage"), plate = document.getElementById("plate"), clip = document.getElementById("clip");
-const overlay = document.getElementById("overlay"), loading = document.getElementById("loading");
+// ---------- the stage ----------
+const stage = document.getElementById("stage");
+const plate = document.getElementById("plate"), clip = document.getElementById("clip"), overlay = document.getElementById("overlay");
+const front = document.getElementById("front");
+const loading = document.getElementById("loading"), statusBox = document.getElementById("status"), skipBtn = document.getElementById("skip");
 const shots = await fetch("media/shots.json").then((r) => r.json());
-const walkable = new Set(Object.keys(shots).filter((k) => k.startsWith("walk-")).map((k) => Number(k.slice(5))));
-const wallHeight = Math.round(1600 * shots.hall.size.programme[1] / shots.hall.size.programme[0]);
-let pinned = null;          // { el, quad, w, h }
-let busy = false;
+const walkable = new Set(Object.keys(shots).filter((k) => /^seat-\d+$/.test(k)).map((k) => Number(k.split("-")[1])));
+const form = () => (stage.clientWidth / stage.clientHeight < 0.8 ? "phone" : "laptop");
+let shape = form();
+// the phone version of a shot when there is one: "hall" -> "hall-phone", "seat-8" -> "seat-phone-8"
+const shotKey = (base) => {
+  if (shape !== "phone") return base;
+  const m = /^([a-z]+)-(\d+)$/.exec(base);
+  const k = m ? `${m[1]}-phone-${m[2]}` : `${base}-phone`;
+  return shots[k] ? k : base;
+};
+const canvasFor = (key) => CANVAS[key.replace(/-\d+$/, "")];
 
+let face = null;      // { el, key, overlayName, w, h }
 function place() {
-  if (!pinned || SHEET) return;
-  const W = stage.clientWidth, H = stage.clientHeight, s = Math.max(W / IMG_W, H / IMG_H);
-  const ox = (W - IMG_W * s) / 2, oy = (H - IMG_H * s) / 2;
-  const dst = ordered(pinned.quad).map(([x, y]) => [ox + x * IMG_W * s, oy + y * IMG_H * s]);
-  pinned.el.style.transform = matrix3d(pinned.w, pinned.h, dst);
+  if (!face) return;
+  const [iw, ih] = IMG[face.key.includes("phone") ? "phone" : "laptop"];
+  const W = stage.clientWidth, H = stage.clientHeight, s = Math.max(W / iw, H / ih);
+  const ox = (W - iw * s) / 2, oy = (H - ih * s) / 2;
+  const quad = shots[face.key].overlay[face.overlayName];
+  face.el.style.transform = matrix3d(face.w, face.h, ordered(quad).map(([x, y]) => [ox + x * iw * s, oy + y * ih * s]));
 }
-addEventListener("resize", place);
-
-function pin(panel, quad, w, h) {
-  if (pinned) pinned.el.remove();
-  if (SHEET) {
-    panel.classList.add("kx-sheet");
-    document.body.append(panel);
-  } else {
-    panel.classList.add("pinned");
-    panel.style.width = `${w}px`;
-    panel.style.height = `${h}px`;
-    overlay.append(panel);
-  }
-  pinned = { el: panel, quad, w, h };
+function mount(panel, key, overlayName) {
+  if (face) face.el.remove();
+  const [mw, mh] = shots[key].size[overlayName];
+  const w = canvasFor(key), h = Math.round(w * mh / mw);
+  panel.style.width = `${w}px`;
+  panel.style.height = `${h}px`;
+  if (shots[key].clear_bottom) panel.style.paddingBottom = `${Math.round(shots[key].clear_bottom * h)}px`;   // keep clear of the letters
+  overlay.append(panel);
+  face = { el: panel, key, overlayName, w, h };
   place();
+  for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s);
 }
-const unpin = () => { if (pinned) { pinned.el.remove(); pinned = null; } };
-
-const showStill = (name) => new Promise((resolve) => {
-  plate.onload = () => resolve();
-  plate.src = `media/${name}.jpg`;
-  if (plate.complete && plate.naturalWidth) resolve();
+const unmount = () => { if (face) { face.el.remove(); face = null; } front.hidden = true; };
+let resizeTimer = 0;
+addEventListener("resize", () => {
+  place();
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { const next = form(); if (next !== shape && !busy) { shape = next; rerender(); } }, 180);
 });
 
+// fade the edge of anything that scrolls, on the side where there's more
+function watchScroll(s) {
+  const update = () => {
+    if (s.classList.contains("strip")) {
+      s.classList.toggle("more-l", s.scrollLeft > 4);
+      s.classList.toggle("more-r", s.scrollLeft + s.clientWidth < s.scrollWidth - 4);
+    } else s.classList.toggle("more-b", s.scrollTop + s.clientHeight < s.scrollHeight - 4);
+  };
+  s.addEventListener("scroll", update, { passive: true });
+  requestAnimationFrame(update);
+}
+function centre(strip) {   // bring the pressed chip into view without scrolling the page
+  const on = strip.querySelector('[aria-pressed="true"]');
+  if (on) strip.scrollLeft = on.offsetLeft - (strip.clientWidth - on.offsetWidth) / 2;
+}
+
+const showStill = (key) => new Promise((resolve) => {
+  const src = `media/${key}.jpg`;
+  const done = () => {
+    plate.src = src;
+    const fr = shots[key] && shots[key].front;
+    if (fr) { front.src = `media/${fr}.webp`; front.hidden = false; } else front.hidden = true;
+    resolve();
+  };
+  if (plate.getAttribute("src") === src) { done(); return; }
+  const img = new Image();
+  img.onload = img.onerror = done;
+  img.src = src;
+});
+
+let skipWalk = null;
 function playClip(name) {
   return new Promise((resolve) => {
     if (reduceMotion) { resolve(); return; }
+    const done = () => { clip.onended = clip.onerror = null; skipWalk = null; skipBtn.hidden = true; resolve(); };
+    skipWalk = done;
     clip.src = `media/${name}.mp4`;
     clip.hidden = false;
-    const done = () => { clip.onended = clip.onerror = null; resolve(); };
     clip.onended = done;
-    clip.onerror = done;                     // a missing clip is a cut, not a dead end
-    clip.play().catch(done);
+    clip.onerror = done;                       // a missing clip is a cut, not a dead end
+    clip.play().then(() => { skipBtn.hidden = false; }).catch(done);
   });
 }
-const hideClip = () => { clip.hidden = true; clip.removeAttribute("src"); clip.load(); };
+const hideClip = () => { clip.pause(); clip.hidden = true; clip.removeAttribute("src"); clip.load(); };
+skipBtn.addEventListener("click", () => skipWalk && skipWalk());
+const say = (text) => { statusBox.textContent = text || ""; statusBox.hidden = !text; };
 
-// ---------- the programme on the hall screen ----------
+// ---------- the programme ----------
 const days = [...new Set(talks.filter((t) => t.start).map((t) => dayKey(t.start)))].sort();
+const startsOn = (d) => [...new Set(talks.filter((t) => t.start && dayKey(t.start) === d).map((t) => t.start))].sort();
+const inSlot = (s) => talks.filter((t) => t.start === s).sort((a, b) => (roomNo(a) || 99) - (roomNo(b) || 99));
 let day = days.includes("2026-10-07") ? "2026-10-07" : days[0];
+let slot = startsOn(day).find((s) => inSlot(s).length >= 6) || startsOn(day)[0];
 let query = "";
-const slotsBox = el("div", { class: "kx-slots" });
-const dayBox = el("div", { class: "kx-days", role: "group", "aria-label": "Day" });
-const search = el("input", { class: "kx-search", type: "search", placeholder: "Search talks, speakers, tools", "aria-label": "Search talks" });
-search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); renderWall(); });
-for (const d of days) {
-  const iso = talks.find((t) => t.start && dayKey(t.start) === d).start;
-  dayBox.append(el("button", { type: "button", text: fShort.format(new Date(iso)), "data-day": d,
-    onclick: () => { day = d; renderWall(); slotsBox.scrollTop = 0; } }));
-}
-const wall = el("div", { class: "kx-panel kx-wall" },
-  el("div", { class: "kx-wall-head" }, el("h1", { text: "Devoxx Belgium 2026" }),
-    el("span", { class: "kx-wall-sub", text: `Choose a session. Room ${[...walkable].join(", ")} has a seat to walk you to.` })),
-  el("div", { class: "kx-wall-head" }, dayBox, search),
-  slotsBox);
-const blob = (t) => [t.title, ...t.speakers.map((s) => s.name), t.s && t.s.tldr, ...((t.s && t.s.tech) || [])].join(" ").toLowerCase();
+const blob = (t) => [t.title, ...t.speakers.map((s) => s.name), t.room, t.track, t.s && t.s.tldr, ...((t.s && t.s.tech) || []), ...(t.keywords || [])]
+  .join(" ").toLowerCase();
 
-function renderWall() {
-  for (const b of dayBox.children) b.setAttribute("aria-pressed", String(b.dataset.day === day));
-  slotsBox.textContent = "";
-  const terms = query.split(/\s+/).filter(Boolean);
-  const list = talks.filter((t) => t.start && t.type !== "Keynote Overflow" && (terms.length ? true : dayKey(t.start) === day) && terms.every((w) => blob(t).includes(w)))
-    .sort((a, b) => a.start.localeCompare(b.start) || (roomNo(a) || 99) - (roomNo(b) || 99));
-  if (!list.length) { slotsBox.append(el("p", { class: "kx-empty", text: "No session matches. Try another word or day." })); return; }
-  const slots = new Map();
-  for (const t of list) { const key = terms.length ? `${dayKey(t.start)} ${t.start}` : t.start; if (!slots.has(key)) slots.set(key, []); slots.get(key).push(t); }
-  for (const group of slots.values()) {
-    const iso = group[0].start;
-    slotsBox.append(el("div", { class: "kx-slot" },
-      el("div", { class: "kx-slot-time" }, fTime.format(new Date(iso)), terms.length ? el("div", { style: "font-size:20px;color:#9aa3c9;margin-top:6px", text: fShort.format(new Date(iso)) }) : null),
-      el("div", { class: "kx-slot-talks" }, group.map((t) => {
-        const n = roomNo(t);
-        return el("button", { class: "kx-talk", type: "button", onclick: () => goTalk(t) },
-          el("span", { class: `kx-room${n ? "" : " is-bof"}`, text: n ? String(n) : (t.room || "?") }),
-          el("span", {}, el("b", { text: t.title }), el("span", { text: t.speakers.map((s) => s.name).join(", ") })));
-      }))));
+function card(t, { withWhen = false, next = false } = {}) {
+  const n = roomNo(t), on = walkable.has(n);
+  const label = withWhen ? `${fShort.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : typeLabel(t);
+  return el("button", { class: `card${on ? "" : " is-off"}${next ? " is-next" : ""}`, type: "button", onclick: () => goTalk(t),
+      "aria-label": [t.title, speakers(t), t.room, withWhen ? when(t) : null, on ? "walks you to your seat" : null].filter(Boolean).join(", ") },
+    el("span", { class: "room" }, el("b", { text: n ? String(n) : (t.room || "TBC") }), el("span", { text: label })),
+    el("span", { class: "title", text: t.title }),
+    el("span", { class: "who", text: speakers(t) }));
+}
+
+function programme(tall) {
+  const search = el("input", { class: "search", type: "search", placeholder: "Search talks, speakers, topics", "aria-label": "Search all talks", value: query });
+  const dayRow = el("div", { class: tall ? "strip days" : "days", role: "group", "aria-label": "Day" });
+  const timeRow = el("div", { class: "strip times", role: "group", "aria-label": "Start time" });
+  const nav = el("div", { class: "nav" }, dayRow, timeRow);
+  const body = el("div", { class: "slot" });
+  const panel = el("section", { class: `face prog is-lcd${tall ? " is-tall" : ""}`, "aria-label": "Programme" },
+    el("div", { class: "prog-head" },
+      el("h1", { class: "brand" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })), el("small", { text: "Belgium 2026, 5–9 October" })),
+      search),
+    nav, body);
+
+  function draw() {
+    dayRow.textContent = ""; timeRow.textContent = ""; body.textContent = "";
+    const terms = query.split(/\s+/).filter(Boolean);
+    nav.hidden = terms.length > 0;
+    if (terms.length) {
+      const hits = talks.filter((t) => terms.every((w) => blob(t).includes(w))).sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+      put(body, el("div", { class: "slot-head" }, el("b", { text: String(hits.length) }),
+          el("span", { text: `${hits.length === 1 ? "talk matches" : "talks match"} “${query}”` })),
+        hits.length ? el("div", { class: "cards scroller", tabindex: "0", "aria-label": "Search results" }, hits.map((t) => card(t, { withWhen: true })))
+          : el("p", { class: "empty", text: "Nothing matches. Try a speaker's surname or a tool, like Kotlin or Quarkus." }));
+      if (face) for (const s of panel.querySelectorAll(".scroller")) watchScroll(s);
+      return;
+    }
+    for (const d of days) {
+      dayRow.append(el("button", { class: "pill", type: "button", text: fShort.format(new Date(startsOn(d)[0])), "aria-pressed": String(d === day),
+        onclick: () => { day = d; slot = startsOn(d)[0]; draw(); } }));
+    }
+    for (const s of startsOn(day)) {
+      timeRow.append(el("button", { class: "pill", type: "button", text: fTime.format(new Date(s)), "aria-pressed": String(s === slot),
+        onclick: () => { slot = s; draw(); } }));
+    }
+    const here = inSlot(slot);
+    const cards = el("div", { class: "cards scroller", tabindex: "-1" }, here.map((t) => card(t)));
+    // a short slot leaves room to show what's on next
+    const later = startsOn(day).filter((s) => s > slot);
+    if (!tall && here.length <= 4 && later.length) {
+      const nextSlot = later[0], nextTalks = inSlot(nextSlot).slice(0, 4);
+      put(cards, el("div", { class: "next-head" }, el("b", { text: `Next, ${fTime.format(new Date(nextSlot))}` }), el("span", { text: nextTalks.length < inSlot(nextSlot).length ? `${inSlot(nextSlot).length} sessions` : "" })),
+        nextTalks.map((t) => card(t, { next: true })));
+    }
+    put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
+        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}. Pick one and we'll walk you to your seat.` })),
+      cards);
+    requestAnimationFrame(() => { centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
   }
+  search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); draw(); });
+  draw();
+  return panel;
 }
 
-// a session without a rendered walk: its summary on the hall screen
-function showOnWall(t) {
-  const s = t.s || {};
-  slotsBox.textContent = "";
-  slotsBox.append(el("div", { class: "kx-detail" },
-    el("div", { class: "kx-meta", text: [t.type, t.start ? `${fDay.format(new Date(t.start))} ${fTime.format(new Date(t.start))}` : null, t.room].filter(Boolean).join(", ") }),
-    el("h2", { text: t.title }),
-    el("div", { class: "kx-who", text: t.speakers.map((sp) => sp.name).join(", ") }),
-    s.tldr ? el("p", { class: "kx-tldr", text: s.tldr }) : null,
-    s.keyPoints && s.keyPoints.length ? el("ul", { class: "kx-points" }, s.keyPoints.map((x) => el("li", { text: x }))) : null,
-    el("div", { class: "kx-actions" },
-      t.videoId ? el("a", { class: "kx-btn is-play", href: ytUrl(t), target: "_blank", rel: "noopener", text: "Watch on YouTube" }) : null,
-      el("button", { class: "kx-btn", type: "button", text: "Back to the programme", onclick: () => { history.replaceState(null, "", location.pathname); renderWall(); } })),
-    el("p", { class: "kx-note", text: roomNo(t) ? `The walk to Room ${roomNo(t)} isn't rendered yet.` : `${t.room || "This room"} is off the cinema floor, so there is no seat to walk you to.` })));
-  slotsBox.scrollTop = 0;
-}
-
-// ---------- the talk on the cinema screen ----------
-const pane = (t, tab) => {
-  const s = t.s || {};
-  if (tab === "points") return el("ul", {}, (s.keyPoints || []).map((p) => el("li", { text: p })));
-  if (tab === "monday") return el("ol", {}, (s.takeaways || []).map((p) => el("li", { text: p })));
-  if (tab === "chapters") return el("div", {}, (s.chapters || []).map((c) => chapter(t, c)));
-  return el("div", {}, (s.summary || t.abstract || []).map((p) => el("p", { style: "margin:0 0 18px", text: p })));
-};
+// ---------- the talk ----------
 const toSeconds = (at) => { const [m, sec] = String(at).split(":").map(Number); return (m || 0) * 60 + (sec || 0); };
-let playAt = null;
-function chapter(t, c) {
-  const kids = [el("time", { text: c.at }), el("span", { text: c.title })];
-  if (!t.videoId) return el("div", { class: "kx-chapter" }, ...kids);
-  if (!EMBED) return el("a", { class: "kx-chapter", href: ytUrl(t, toSeconds(c.at)), target: "_blank", rel: "noopener" }, ...kids);
-  return el("button", { class: "kx-chapter", type: "button", onclick: () => playAt && playAt(toSeconds(c.at)) }, ...kids);
-}
-function screenPanel(t, w, h) {
+function talkScreen(t, tall, onFloor) {
   const s = t.s || {};
-  const tabs = [["story", "The story"], ["points", "Key points"], ["monday", "Try this on Monday"], ["chapters", "Chapters"]]
-    .filter(([id]) => id === "story" || (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length) || (id === "chapters" && s.chapters && s.chapters.length));
-  const paneBox = el("div", { class: "kx-pane" });
-  const tabBox = el("div", { class: "kx-tabs", role: "group", "aria-label": "Talk details" });
-  const showTab = (id) => { paneBox.textContent = ""; paneBox.append(pane(t, id)); for (const b of tabBox.children) b.setAttribute("aria-pressed", String(b.dataset.tab === id)); };
-  for (const [id, label] of tabs) tabBox.append(el("button", { type: "button", "data-tab": id, text: label, onclick: () => showTab(id) }));
-  const left = el("div", { style: "min-width:0;display:flex;flex-direction:column" });
+  const tabs = [["short", "In short"], ["points", "Key points"], ["monday", "Try this on Monday"], ["chapters", "Chapters"], ["story", "Full summary"]]
+    .filter(([id]) => (id === "short" && tall && s.tldr) || (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
+      || (id === "chapters" && s.chapters && s.chapters.length && onFloor) || id === "story");
+  const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Talk details" });
+  const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Talk details" });
+  let playAt = null;
+  const chapter = (c) => {
+    const kids = [el("time", { text: c.at }), el("span", { text: c.title })];
+    if (!t.videoId) return el("div", { class: "chapter" }, ...kids);
+    if (!EMBED) return el("a", { class: "chapter", href: ytUrl(t, toSeconds(c.at)), target: "_blank", rel: "noopener" }, ...kids);
+    return el("button", { class: "chapter", type: "button", onclick: () => playAt(toSeconds(c.at)) }, ...kids);
+  };
+  const fill = (id) => {
+    pane.textContent = "";
+    if (id === "short") put(pane, el("p", { text: s.tldr }), s.watchIf ? el("p", { class: "note", text: `Worth it if ${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.` }) : null);
+    if (id === "points") put(pane, el("ul", {}, s.keyPoints.map((p) => el("li", { text: p }))));
+    if (id === "monday") put(pane, el("ol", {}, s.takeaways.map((p) => el("li", { text: p }))));
+    if (id === "chapters") put(pane, el("div", {}, s.chapters.map(chapter)));
+    if (id === "story") put(pane, (s.summary || t.abstract || []).map((p) => el("p", { text: p })));
+    pane.scrollTop = 0;
+    requestAnimationFrame(() => watchScroll(pane));
+    for (const b of tabRow.children) b.setAttribute("aria-pressed", String(b.dataset.tab === id));
+  };
+  for (const [id, label] of tabs) tabRow.append(el("button", { class: "pill", type: "button", "data-tab": id, text: label, onclick: () => fill(id) }));
+  const main = el("div", { class: "talk-main" });
+  const watch = () => t.videoId
+    ? (EMBED && onFloor ? el("button", { class: "btn is-main", type: "button", text: "Play the recording", onclick: () => playAt(0) })
+      : el("a", { class: "btn is-main", href: ytUrl(t), target: "_blank", rel: "noopener", text: "Watch on YouTube" }))
+    : null;
   const intro = () => {
-    left.textContent = "";
-    left.append(
-      el("div", { class: "kx-meta", text: [t.type, t.start ? `${fDay.format(new Date(t.start))} ${fTime.format(new Date(t.start))}` : null, t.room].filter(Boolean).join(", ") }),
-      el("h2", { text: t.title }),
-      el("div", { class: "kx-who", text: t.speakers.map((sp) => sp.company ? `${sp.name} (${sp.company})` : sp.name).join(", ") }),
-      s.tldr ? el("p", { class: "kx-tldr", text: s.tldr }) : null,
-      el("div", { class: "kx-actions" },
-        t.videoId ? (EMBED ? el("button", { class: "kx-btn is-play", type: "button", text: "Play the talk", onclick: () => playAt(0) })
-          : el("a", { class: "kx-btn is-play", href: ytUrl(t), target: "_blank", rel: "noopener", text: "Watch on YouTube" }))
-          : el("span", { class: "kx-note", text: "No recording on YouTube yet. This summary is from the abstract." }),
-        el("button", { class: "kx-btn", type: "button", text: "Back to the hall", onclick: () => goHall() })));
+    main.textContent = "";
+    put(main,
+      el("div", { class: "meta", text: [t.room, when(t), typeLabel(t)].filter(Boolean).join(", ") }),
+      !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? `${t.room} is a meeting room downstairs, so this one has no cinema seat.` : "This session has no cinema seat to walk you to." }) : null,
+      el("h2", { text: t.title, style: `--title:${titleSize(t.title, 46, 36)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
+      el("div", { class: "who-l", text: speakers(t, true) }),
+      !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
+      el("div", { class: "actions" }, watch(), el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() })),
+      !t.videoId ? el("p", { class: "note", style: "margin-top:10px", text: "No recording yet; the summary is from the abstract." }) : null);
   };
   playAt = (sec) => {
-    left.textContent = "";
-    left.append(el("div", { class: "kx-player" }, el("iframe", {
-      src: `https://www.youtube-nocookie.com/embed/${t.videoId}?autoplay=1&rel=0&start=${sec}`, title: t.title,
-      allow: "autoplay; encrypted-media; picture-in-picture; fullscreen", allowfullscreen: true })),
-    el("div", { class: "kx-actions" },
-      el("button", { class: "kx-btn", type: "button", text: "Stop and show the summary", onclick: intro }),
-      el("button", { class: "kx-btn", type: "button", text: "Back to the hall", onclick: () => goHall() })));
-    if (tabs.find(([id]) => id === "chapters")) showTab("chapters");
+    main.textContent = "";
+    put(main, el("div", { class: "meta", text: t.title }),
+      el("div", { class: "player" }, el("iframe", { src: `https://www.youtube-nocookie.com/embed/${t.videoId}?autoplay=1&rel=0&start=${sec}`, title: t.title,
+        allow: "autoplay; encrypted-media; picture-in-picture; fullscreen", allowfullscreen: true })),
+      el("div", { class: "actions" }, el("button", { class: "btn", type: "button", text: "Close the recording", onclick: intro }),
+        el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() })));
   };
   intro();
-  showTab(tabs.find(([id]) => id === "points") ? "points" : "story");
-  return el("div", { class: "kx-panel kx-screen" }, left, el("div", { class: "kx-side" }, tabBox, paneBox));
+  fill(tabs[0][0]);
+  return el("section", { class: `face talk ${onFloor ? "is-projected" : "is-lcd"}${tall ? " is-tall" : ""}`, "aria-label": t.title },
+    main, el("div", { class: "talk-side" }, tabRow, pane));
 }
 
 // ---------- moving between the hall and a seat ----------
-let room = null;   // the room we're sitting in, or null in the hall
+let room = null, current = null, busy = false;
 
-async function goHall() {
-  if (busy) return;
-  busy = true;
-  history.replaceState(null, "", location.pathname);
-  unpin();
-  if (room) {
-    await playClip(`walk-${room}-back`);
-    room = null;
-  }
-  await showStill("hall");
+async function toHall(withWalk) {
+  unmount();
+  if (withWalk && room) { say("Back to the hall"); await playClip(`walk-${room}-back`); }
+  room = null; current = null;
+  await showStill(shotKey("hall"));
   hideClip();
-  renderWall();
-  pin(wall, shots.hall.overlay.programme, 1600, wallHeight);
-  busy = false;
+  say("");
+  mount(programme(shape === "phone"), shotKey("hall"), "programme");
 }
+
+async function toSeat(t, withWalk) {
+  const n = roomNo(t);
+  unmount();
+  if (withWalk) { say(`Walking to Room ${n}`); await playClip(`walk-${n}`); }
+  await showStill(shotKey(`seat-${n}`));
+  hideClip();
+  say("");
+  room = n; current = t;
+  mount(talkScreen(t, shape === "phone", true), shotKey(`seat-${n}`), "screen");
+}
+
+async function toOffFloor(t) {   // no seat to walk to (BOFs downstairs): the summary stays on the hall screen
+  unmount();
+  await showStill(shotKey("hall"));
+  current = t; room = null;
+  mount(talkScreen(t, shape === "phone", false), shotKey("hall"), "programme");
+}
+
+const open = (t, withWalk) => (walkable.has(roomNo(t)) ? toSeat(t, withWalk) : toOffFloor(t));
+function rerender() { if (current) open(current, false); else toHall(false); }
 
 async function goTalk(t) {
   if (busy) return;
-  history.replaceState(null, "", `#talk-${t.id}`);
-  const n = roomNo(t);
-  if (!walkable.has(n)) { showOnWall(t); return; }
   busy = true;
-  unpin();
-  await playClip(`walk-${n}`);
-  await showStill(`seat-${n}`);
-  hideClip();
-  room = n;
-  const shot = shots[`seat-${n}`];
-  const [sw, sh] = shot.size.screen;                 // metres: the panel keeps the real screen's shape
-  const w = 2048, h = Math.round(w * sh / sw);
-  pin(screenPanel(t, w, h), shot.overlay.screen, w, h);
+  history.pushState({ talk: t.id }, "", `#talk-${t.id}`);
+  await open(t, true);
+  busy = false;
+}
+async function goHall() {
+  if (busy) return;
+  busy = true;
+  history.pushState({}, "", location.pathname);
+  await toHall(true);
   busy = false;
 }
 
+addEventListener("popstate", () => {
+  if (busy) return;
+  const m = /^#talk-(\d+)$/.exec(location.hash);
+  const t = m && talks.find((x) => x.id === Number(m[1]));
+  if (t) open(t, false); else toHall(false);
+});
+addEventListener("keydown", (e) => {
+  if (e.key === "Escape") { if (skipWalk) skipWalk(); else if (current) goHall(); }
+});
+
 // ---------- start ----------
-await showStill("hall");
-renderWall();
-pin(wall, shots.hall.overlay.programme, 1600, wallHeight);
-loading.classList.add("is-done");
 const deep = /^#talk-(\d+)$/.exec(location.hash);
-if (deep) { const t = talks.find((x) => x.id === Number(deep[1])); if (t) goTalk(t); }
-addEventListener("keydown", (e) => { if (e.key === "Escape" && room) goHall(); });
+const first = deep && talks.find((t) => t.id === Number(deep[1]));
+if (first) await open(first, false); else await toHall(false);
+loading.classList.add("is-done");
+// warm the cache for the walks, so the first click plays at once
+for (const n of walkable) { const l = document.createElement("link"); l.rel = "prefetch"; l.href = `media/walk-${n}.mp4`; document.head.append(l); }

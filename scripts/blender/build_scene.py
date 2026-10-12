@@ -45,6 +45,8 @@ ap.add_argument("--out")
 ap.add_argument("--samples", type=int, default=96)
 ap.add_argument("--preview", action="store_true", help="EEVEE, low resolution: fast look-dev")
 ap.add_argument("--lookdev", action="store_true", help="Cycles at half resolution: look-dev you can trust")
+ap.add_argument("--walk-samples", type=int, default=24, help="samples for walk frames (motion blur hides the rest)")
+ap.add_argument("--walk-engine", default="cycles", choices=["cycles", "eevee"])
 args = ap.parse_args(argv)
 ROOT = Path(args.root)
 venue = json.loads((ROOT / "site" / "kino" / "venue.json").read_text())["venue"]
@@ -358,7 +360,7 @@ M = {
     "posterA": emissive("posterA", 0x3a5cff, 3.0),
     "posterB": emissive("posterB", 0xff6a2a, 3.0),
     "posterC": emissive("posterC", 0xc9d6ff, 3.0),
-    "seat": material("seat", 0x222a42, 0.9, sheen=0.6, noise_bump=0.2),
+    "seat": material("seat", 0x27304d, 0.85, sheen=0.8, noise_bump=0.5, speckle=0.12),
     "seatFrame": material("seatFrame", 0x15161b, 0.5, 0.4),
     "steel": material("steel", 0xb8bcc4, 0.3, 0.9),
     "portal": material("portal", 0xc61d3b, 0.55, emission=0xc61d3b, strength=0.15),
@@ -376,8 +378,9 @@ M = {
     "led": emissive("led", 0x3f74ff, 12.0),
     "cove": emissive("cove", 0x8c9cff, 6.0),
     "panelLight": emissive("panelLight", 0xfff3e6, 8.0),       # the look of the panels; area lights below do the lighting      # about 4000 K, like the photos
-    "screen": emissive("screen", 0x2a3350, 4.0),       # the HTML is pinned over this in the browser
-    "programme": emissive("programme", 0x16224f, 4.0),  # the hall screen: the programme is pinned over it
+    # the HTML is pinned over these in the browser: they glow the panels' navy, so their light on the room matches
+    "screen": emissive("screen", 0x111a4a, 3.0),
+    "programme": emissive("programme", 0x15205a, 3.0),
     "schedule": emissive("schedule", 0x1c2a6b, 1.5),
     "scheduleCard": emissive("scheduleCard", 0xff7a1a, 2.5),
     "scheduleText": emissive("scheduleText", 0xf4f4f4, 2.0),
@@ -722,10 +725,12 @@ for r in auditoriums:
 # ---------------------------------------------------------------------------------- seats
 seat_me = bpy.data.meshes.new("seat-model")
 bm = bmesh.new()
-for (sx, sy, sz, x, y, z, rz) in ((0.46, 0.5, 0.09, 0, 0, -0.045, 0), (0.09, 0.5, 0.72, -0.25, 0, 0.3, 0.12)):
+# a cinema seat, as in the photos: deep cushion, tall padded back with a rounded top, an armrest on one side
+for (sx, sy, sz, x, y, z, rz) in ((0.5, 0.52, 0.13, 0.02, 0, -0.06, 0), (0.14, 0.54, 0.86, -0.25, 0, 0.36, 0.13),
+                                  (0.44, 0.07, 0.06, -0.02, 0.3, 0.17, 0)):
     m = Matrix.Translation((x, y, z)) @ Matrix.Rotation(-rz, 4, "Y") @ Matrix.Diagonal((sx, sy, sz, 1))
     bmesh.ops.create_cube(bm, size=1.0, matrix=m)
-bmesh.ops.bevel(bm, geom=list(bm.edges), offset=0.025, segments=2, affect="EDGES")
+bmesh.ops.bevel(bm, geom=list(bm.edges), offset=0.045, segments=3, affect="EDGES")
 bm.to_mesh(seat_me)
 bm.free()
 frame_me = bpy.data.meshes.new("seat-frame")
@@ -762,6 +767,7 @@ for name, bm_, mat in (("seats", seats_bm, M["seat"]), ("seat-frames", frames_bm
 WORD_FONT = bpy.data.fonts.load(str(ROOT / "scripts" / "blender" / "fonts" / "ArchivoBlack.ttf"))
 wordmark_blocks = [d for d in venue["decor"] if d.get("wordmark") == "devoxx" and d["floor"] == 1]
 truss_lamps, house_spots, word_lights = [], [], []
+word_top = {}                                   # room -> height of the top of its "#DEVOXX" (the talk panel starts above it)
 
 
 def aisle_y_for(n):
@@ -845,6 +851,7 @@ for n, door in doors.items():
             ob.rotation_euler = rot
             ob.location = (xw, start + along * off, floor_z)
         word_lights.append(((xw - toward * 0.0, (y0w + y1w) / 2, floor_z + 0.6), toward, n))
+        word_top[n] = floor_z + parts[0].dimensions.y * scale
 
 # corridor: backlit poster boxes on both walls, clear of the portals, the schedule screens and the stairwells
 door_ys = [(d["wall_x"], d["yc"]) for d in doors.values()]
@@ -1099,6 +1106,19 @@ screen_corners = [(SX - SCREEN["w"] / 2, sy_, SCREEN["z"] - SCREEN["h"] / 2), (S
 B.mesh("programme", screen_corners, [(0, 1, 2, 3)])
 
 
+# the phone's programme: a portrait schedule totem standing in front of the curtains, right of the big screen
+TOTEM = {"x": SX + 3.9, "y": NORTH - 2.6, "z": 1.42, "w": 0.70, "h": 1.24}
+tb = 0.035
+B.box("bezel", {"x": TOTEM["x"] - TOTEM["w"] / 2 - tb, "y": TOTEM["y"] - 0.03, "w": TOTEM["w"] + 2 * tb, "h": 0.07},
+      TOTEM["z"] - TOTEM["h"] / 2 - 0.09, TOTEM["z"] + TOTEM["h"] / 2 + tb)
+B.box("tableFrame", {"x": TOTEM["x"] - 0.06, "y": TOTEM["y"] + 0.04, "w": 0.12, "h": 0.06}, 0.04, TOTEM["z"] - TOTEM["h"] / 2)   # post
+B.box("tableFrame", {"x": TOTEM["x"] - 0.3, "y": TOTEM["y"] - 0.2, "w": 0.6, "h": 0.42}, 0.0, 0.04)                         # foot
+ty_ = TOTEM["y"] - 0.035
+totem_corners = [(TOTEM["x"] - TOTEM["w"] / 2, ty_, TOTEM["z"] - TOTEM["h"] / 2), (TOTEM["x"] + TOTEM["w"] / 2, ty_, TOTEM["z"] - TOTEM["h"] / 2),
+                 (TOTEM["x"] + TOTEM["w"] / 2, ty_, TOTEM["z"] + TOTEM["h"] / 2), (TOTEM["x"] - TOTEM["w"] / 2, ty_, TOTEM["z"] + TOTEM["h"] / 2)]
+B.mesh("programme", totem_corners, [(0, 1, 2, 3)])
+
+
 def schedule_board(face_x, face, yc, w=1.7, h=0.96, z0=1.35):
     """A wall screen with the next timeslot as orange cards, on the wall plane x = face_x facing +x (face=1) or -x."""
     def slab(key, y0, y1, za, zb, depth):
@@ -1279,9 +1299,10 @@ def set_cam(loc, target, fov):
 
 
 def hall_pose():
-    """Eye height, square on to the programme screen, the screen filling a bit under half the frame."""
-    d = fit_distance(SCREEN["w"] + 2 * BEZEL, SCREEN["h"] + BEZEL + CHIN, 50, 0.45)
-    return (SCREEN["x"], SCREEN["y"] - d, 1.7), (SCREEN["x"], SCREEN["y"], SCREEN["z"]), 50
+    """Square on to the programme screen, close enough that it fills most of a laptop's view (the frame is cropped
+    to the viewport, so the screen keeps a margin of curtain and ceiling round it at 16:10 as well as 16:9)."""
+    d = fit_distance(SCREEN["w"] + 2 * BEZEL, SCREEN["h"] + BEZEL + CHIN, 40, 0.8)
+    return (SCREEN["x"], SCREEN["y"] - d, SCREEN["z"]), (SCREEN["x"], SCREEN["y"], SCREEN["z"]), 40
 
 
 def seat_for(n, fov=52):
@@ -1289,8 +1310,9 @@ def seat_for(n, fov=52):
     b = door["room"]["bounds"]
     seats = [d for d in pans if d["floor"] == 1 and inside(b, d["bounds"]["x"], d["bounds"]["y"])]
     want = fit_distance(scr["w"], scr["h"], fov, 0.92)
+    # the right distance, near the middle, and eyes level with the screen's middle so the talk isn't keystoned
     best = min(seats, key=lambda s: abs(abs(s["bounds"]["x"] + s["bounds"]["w"] / 2 - scr["x"]) - want) +
-               abs(s["bounds"]["y"] + s["bounds"]["h"] / 2 - scr["y"]) * 0.6)
+               abs(s["bounds"]["y"] + s["bounds"]["h"] / 2 - scr["y"]) * 0.6 + abs(FH + s["height"] + 0.8 - scr["z"]) * 2.0)
     seat = (best["bounds"]["x"] + best["bounds"]["w"] / 2, best["bounds"]["y"] + best["bounds"]["h"] / 2, FH + best["height"] + 0.8)
     return seat, (scr["x"], seat[1], scr["z"]), fov, seats
 
@@ -1333,13 +1355,76 @@ def stair_rise(b, frac):
     return FH * frac + 0.18
 
 
-def walk(n):
-    """Keyframe the camera from the hall to its seat in room n, and swing that room's doors open."""
-    door, scr = doors[n], screens[n]
-    seat, look_end, fov_end, seats = seat_for(n)
-    west, face = door["west"], door["face"]
+def ease(x):
+    return 4 * x ** 3 if x < 0.5 else 1 - (-2 * x + 2) ** 3 / 2
+
+
+def smooth(e0, e1, x):
+    t = min(1.0, max(0.0, (x - e0) / (e1 - e0)))
+    return t * t * (3 - 2 * t)
+
+
+def keyframe_segment(pts, look0, look1, fov0, fov1, first, seconds, shift1=0.0):
+    """Keyframe cam along a Catmull-Rom path through pts, from rest to rest (eased), from frame `first`.
+    It looks at look0 at the start and look1 at the end, and ahead along the path in between. Returns the
+    number of frames after `first` (the segment spans first .. first + frames)."""
+    frames = int(seconds * FPS)
+    path, _ = catmull_rom(pts, frames * 6)
+    for f in range(frames + 1):
+        t = f / frames
+        u = ease(t)
+        idx = min(len(path) - 1, int(u * (len(path) - 1)))
+        pos = path[idx]
+        ahead = path[min(len(path) - 1, idx + len(path) // 7)].copy()
+        ahead.z = pos.z + (ahead.z - pos.z) * 0.25                      # keep the horizon level
+        target = Vector(look0).lerp(ahead, smooth(0.0, 0.35, t)).lerp(Vector(look1), smooth(0.62, 1.0, t))
+        cam.location = pos
+        cam.rotation_euler = aim(pos, target)
+        cam_data.angle_y = math.radians(fov0 + (fov1 - fov0) * u)
+        cam_data.shift_y = shift1 * smooth(0.55, 1.0, t)                 # the seat shot uses lens shift, not tilt
+        cam_data.keyframe_insert("shift_y", frame=first + f)
+        cam.keyframe_insert("location", frame=first + f)
+        cam.keyframe_insert("rotation_euler", frame=first + f)
+        cam_data.keyframe_insert("lens", frame=first + f)
+    return frames
+
+
+def landing(west):
+    """Where the two walk segments meet: at rest at the top of the side stair, looking down the corridor."""
     stair = next(l for l in venue["links"] if l["id"] == ("stair-west" if west else "stair-east"))["bounds"]
     sx = stair["x"] + stair["w"] / 2
+    pos = (sx, stair["y"] - 1.2, FH + 1.65)
+    return stair, sx, pos, (sx, stair["y"] - 12, FH + 1.6), 50
+
+
+WALK_ASPECT = 16 / 9
+
+
+def level_shift(loc, target, fov, aspect):
+    """Look level at target and shift the lens so target sits mid-frame: verticals stay vertical, so a screen
+    above eye height stays a rectangle instead of keystoning (as architectural photographers do)."""
+    dist = math.hypot(target[0] - loc[0], target[1] - loc[1])
+    frac = (target[2] - loc[2]) / dist / (2 * math.tan(math.radians(fov) / 2))   # of the frame height
+    return (target[0], target[1], loc[2]), frac * min(1.0, 1 / aspect) if aspect >= 1 else frac
+
+
+def walk_a(west, first=1):
+    """Segment A, shared by every room off that stair: from the hall shot to the top of the stair."""
+    stair, sx, jpos, jlook, jfov = landing(west)
+    lp, ll, hall_fov = hall_pose()
+    gap_y, in_x = stair["y"] + stair["h"] + 2.55, stair["x"] - 0.3 if sx > lp[0] else stair["x"] + stair["w"] + 0.3
+    pts = [lp, ((lp[0] + in_x) / 2, lp[1] - 1.2, 1.68), (in_x + (-1.6 if sx > lp[0] else 1.6), gap_y, 1.7), (sx, gap_y - 0.25, 1.7),
+           (sx, stair["y"] + stair["h"] - 0.4, 1.75), (sx, stair["y"] + stair["h"] / 2, stair_rise(stair, 0.5) + 1.65),
+           (sx, stair["y"] + 0.4, FH + 1.65), jpos]
+    return keyframe_segment(pts, ll, jlook, hall_fov, jfov, first, 3.4)
+
+
+def walk_b(n, first):
+    """Segment B for room n: from the top of the stair along the corridor, through the doors, up the aisle to the seat."""
+    door = doors[n]
+    seat, look_end, fov_end, seats = seat_for(n)
+    west, face = door["west"], door["face"]
+    stair, sx, jpos, jlook, jfov = landing(west)
     rake = next(l for l in venue["links"] if l["id"] == f"rake-{n}")
     steps = round(rake["rise"] / rake["riser"])
     going = rake["bounds"]["w"] / steps
@@ -1348,52 +1433,21 @@ def walk(n):
         i = min(steps - 1, max(0, int((x - rake["bounds"]["x"]) // going)))
         return FH + rake["base"] + ((i + 1) if rake["ascending"] else (steps - i)) * rake["riser"]
 
-    b = door["room"]["bounds"]
-    ys = [s["bounds"]["y"] for s in seats]
-    y0, y1 = min(ys), max(s["bounds"]["y"] + s["bounds"]["h"] for s in seats)
-    aisle_y = (b["y"] + y0) / 2 if door["room"].get("doorSide") == "low" else (y1 + b["y"] + b["h"]) / 2
+    aisle_y = aisle_y_for(n)
     high_x = rake["bounds"]["x"] + rake["bounds"]["w"] if west else rake["bounds"]["x"]
-    lp, _, hall_fov = hall_pose()
     wx, yc = door["wall_x"], door["yc"]
-    # into the stairwell through the side opening at its foot (between the wall end and the stub)
-    gap_y, in_x = stair["y"] + stair["h"] + 2.55, stair["x"] - 0.3 if sx > lp[0] else stair["x"] + stair["w"] + 0.3
-    pts = [lp, (in_x + (-1.6 if sx > lp[0] else 1.6), gap_y, 1.7), (sx, gap_y - 0.25, 1.7), (sx, stair["y"] + stair["h"] - 0.4, 1.75),
-           (sx, stair["y"] + stair["h"] / 2, stair_rise(stair, 0.5) + 1.65),
-           (sx, stair["y"] + 0.6, FH + 1.65), ((sx + cx) / 2, stair["y"] - 2.5, FH + 1.7),
-           (wx + face * 3.2, yc, FH + 1.7), (wx - face * 1.2, yc, FH + 1.65), ((high_x + wx) / 2, aisle_y, FH + 1.65),
-           ((high_x + seat[0]) / 2, aisle_y, tread((high_x + seat[0]) / 2) + 1.65), (seat[0], aisle_y, tread(seat[0]) + 1.6),
-           (seat[0], (aisle_y + seat[1]) / 2, seat[2] + 0.15), seat]
-    length_guess = sum((Vector(pts[i + 1]) - Vector(pts[i])).length for i in range(len(pts) - 1))
-    seconds = min(5.0, 2.8 + length_guess / 45)
-    frames = int(seconds * FPS)
-    path, length = catmull_rom(pts, frames * 4)
-
-    def ease(x):
-        return 4 * x ** 3 if x < 0.5 else 1 - (-2 * x + 2) ** 3 / 2
-
-    look = Vector(path[min(len(path) - 1, 40)])
-    for f in range(frames + 1):
-        t = f / frames
-        u = ease(t)
-        idx = min(len(path) - 1, int(u * (len(path) - 1)))
-        pos = path[idx]
-        ahead = path[min(len(path) - 1, idx + len(path) // 8)].copy()
-        ahead.z = pos.z + (ahead.z - pos.z) * 0.25                      # keep the horizon level
-        blend = 0 if t < 0.55 else (1 if t > 1 else (lambda s: s * s * (3 - 2 * s))((t - 0.55) / 0.45))
-        target = ahead.lerp(Vector(look_end), blend)
-        look = look.lerp(target, 1 - math.exp(-1 / FPS / 0.22)) if f < frames else target
-        cam.location = pos
-        cam.rotation_euler = aim(pos, look)
-        cam_data.angle_y = math.radians(hall_fov + (fov_end - hall_fov) * u)
-        cam.keyframe_insert("location", frame=f + 1)
-        cam.keyframe_insert("rotation_euler", frame=f + 1)
-        cam_data.keyframe_insert("lens", frame=f + 1)
-    # doors open as you reach them (around 55% of the walk) and stay open
+    pts = [jpos, ((jpos[0] + cx) / 2, jpos[1] - 2.0, FH + 1.68), (wx + face * 3.2, yc, FH + 1.7), (wx - face * 1.2, yc, FH + 1.65),
+           ((high_x + wx) / 2, aisle_y, FH + 1.65), ((high_x + seat[0]) / 2, aisle_y, tread((high_x + seat[0]) / 2) + 1.65),
+           (seat[0], aisle_y, tread(seat[0]) + 1.6), (seat[0], (aisle_y + seat[1]) / 2, seat[2] + 0.15), seat]
+    length = sum((Vector(pts[i + 1]) - Vector(pts[i])).length for i in range(len(pts) - 1))
+    level_look, shift = level_shift(seat, (look_end[0], look_end[1], look_end[2]), fov_end, WALK_ASPECT)
+    frames = keyframe_segment(pts, jlook, level_look, jfov, fov_end, first, min(4.2, 2.6 + length / 30), shift)
+    # the doors open as you reach them and stay open
     for hinge, side in door["leaves"]:
         hinge.rotation_euler = (0, 0, 0)
-        hinge.keyframe_insert("rotation_euler", frame=int(frames * 0.42))
+        hinge.keyframe_insert("rotation_euler", frame=first + int(frames * 0.22))
         hinge.rotation_euler = (0, 0, -side * face * 1.45)
-        hinge.keyframe_insert("rotation_euler", frame=int(frames * 0.56))
+        hinge.keyframe_insert("rotation_euler", frame=first + int(frames * 0.42))
     return frames
 
 
@@ -1409,22 +1463,72 @@ def screen_quad(corners, camera):
 OUT.mkdir(parents=True, exist_ok=True)
 shots = {}
 n = args.room
-# the hall gets its own camera, so rendering it never disturbs the walk's keyframes
-hall_data = bpy.data.cameras.new("cam-hall")
-hall_cam = bpy.data.objects.new("cam-hall", hall_data)
-scene.collection.objects.link(hall_cam)
+west = doors[n]["west"]
+side = "west" if west else "east"
+LAPTOP, PHONE, WALK_RES = (1920, 1080), (1080, 2340), (1280, 720)
+
+
+def set_res(wh):
+    scene.render.resolution_x, scene.render.resolution_y = (wh[0] // 2, wh[1] // 2) if (args.preview or args.lookdev) else wh
+
+
+def still_cam(name, loc, look, fov, sensor="VERTICAL", dof=None, level_for=None):
+    data = bpy.data.cameras.new(name)
+    ob = bpy.data.objects.new(name, data)
+    scene.collection.objects.link(ob)
+    if level_for:
+        look, data.shift_y = level_shift(loc, look, fov, level_for)
+    ob.location, ob.rotation_euler = loc, aim(loc, look)
+    data.sensor_fit, data.angle_y = sensor, math.radians(fov)
+    if dof:
+        data.dof.use_dof, data.dof.focus_distance, data.dof.aperture_fstop = True, dof[0], dof[1]
+    return ob
+
+
+# laptop: the hall screen; phone: the totem, the big screen soft behind it
 pos, look, fov = hall_pose()
-hall_cam.location, hall_cam.rotation_euler = pos, aim(pos, look)
-hall_data.sensor_fit, hall_data.angle_y = "VERTICAL", math.radians(fov)
+hall_cam = still_cam("cam-hall", pos, look, fov)
+tdist = 1.7                           # the totem fills 84% of a phone's width; the stand, floor and room show round it
+_hfov = 2 * math.atan(TOTEM["w"] / 2 / 0.84 / tdist)
+phone_hall_cam = still_cam("cam-hall-phone", (TOTEM["x"], TOTEM["y"] - tdist, TOTEM["z"] + 0.04), (TOTEM["x"], TOTEM["y"], TOTEM["z"] - 0.02),
+                           2 * math.degrees(math.atan(math.tan(_hfov / 2) * PHONE[1] / PHONE[0])), dof=(tdist, 1.8))
 bpy.context.view_layer.update()       # matrix_world is stale until the depsgraph runs
+set_res(LAPTOP)
 shots["hall"] = {"kind": "still", "overlay": {"programme": screen_quad(screen_corners, hall_cam)}, "size": {"programme": [SCREEN["w"], SCREEN["h"]]}}
-frames = walk(n)
-shots[f"walk-{n}"] = {"kind": "clip", "frames": frames, "fps": FPS}
+set_res(PHONE)
+shots["hall-phone"] = {"kind": "still", "overlay": {"programme": screen_quad(totem_corners, phone_hall_cam)}, "size": {"programme": [TOTEM["w"], TOTEM["h"]]}}
+
+# the walk: segment A (shared per stair) from frame 1, segment B (this room) right after it
+frames_a = walk_a(west, 1)
+first_b = frames_a + 2
+frames_b = walk_b(n, first_b)
+shots[f"walk-a-{side}"] = {"kind": "clip", "frames": frames_a + 1, "fps": FPS, "first": 1}
+shots[f"walk-b-{n}"] = {"kind": "clip", "frames": frames_b + 1, "fps": FPS, "first": first_b, "side": side}
+
+# the seat: laptop sees the whole screen; phone sees the middle of it, and the talk goes on what it sees
 seat, look_end, fov_end, _ = seat_for(n)
-scene.frame_set(frames + 1)
-shots[f"seat-{n}"] = {"kind": "still", "frame": frames + 1, "overlay": {"screen": screen_quad(screens[n]["corners"], cam)},
-                      "size": {"screen": [screens[n]["w"], screens[n]["h"]]}}
-(OUT / "shots.json").write_text(json.dumps(shots, indent=1))
+seat_cam = still_cam(f"cam-seat-{n}", seat, look_end, fov_end, level_for=WALK_ASPECT)
+scr = screens[n]
+dist = abs(scr["x"] - seat[0])
+pfov = 2 * math.degrees(math.atan(scr["h"] / 2 / 0.8 / dist))     # the screen fills 80% of a phone's height
+seat_phone_cam = still_cam(f"cam-seat-phone-{n}", seat, (scr["x"], seat[1], scr["z"]), pfov, level_for=PHONE[0] / PHONE[1])
+bpy.context.view_layer.update()
+set_res(LAPTOP)
+# the talk goes on the screen above the "#DEVOXX" standing in front of it
+# the talk fills the screen; the "#DEVOXX" and the seats in front of it come back on top as a cut-out layer
+zlow, zhigh = scr["z"] - scr["h"] / 2, scr["z"] + scr["h"] / 2
+full = [(scr["x"], scr["y"] - scr["w"] / 2, zlow), (scr["x"], scr["y"] + scr["w"] / 2, zlow),
+        (scr["x"], scr["y"] + scr["w"] / 2, zhigh), (scr["x"], scr["y"] - scr["w"] / 2, zhigh)]
+shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(full, seat_cam)}, "size": {"screen": [scr["w"], zhigh - zlow]},
+                      "front": f"seat-{n}-front", "clear_bottom": round((word_top.get(n, zlow) + 0.15 - zlow) / (zhigh - zlow), 4)}
+set_res(PHONE)
+half_w = dist * math.tan(math.radians(pfov) / 2) * PHONE[0] / PHONE[1] * 1.03   # edge to edge: the frame crops the screen
+y0, y1 = max(scr["y"] - scr["w"] / 2, seat[1] - half_w), min(scr["y"] + scr["w"] / 2, seat[1] + half_w)
+z0, z1 = zlow, zhigh
+sub = [(scr["x"], y0, z0), (scr["x"], y1, z0), (scr["x"], y1, z1), (scr["x"], y0, z1)]
+shots[f"seat-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(sub, seat_phone_cam)}, "size": {"screen": [y1 - y0, z1 - z0]},
+                            "front": f"seat-phone-{n}-front", "clear_bottom": round((word_top.get(n, z0) + 0.15 - z0) / (z1 - z0), 4)}
+(OUT / f"shots-{n}.json").write_text(json.dumps(shots, indent=1))
 
 # ---------------------------------------------------------------------------------- render settings
 if args.preview:
@@ -1520,25 +1624,68 @@ def render_reference(name):
     scene.camera = cam
 
 
+def still(camera, wh, name):
+    scene.camera = camera
+    set_res(wh)
+    scene.render.filepath = str(OUT / f"{name}.png")
+    bpy.ops.render.render(write_still=True)
+    scene.camera = cam
+
+
+def walk_settings():
+    """Walk frames: lower resolution and samples than the stills; motion blur hides the difference."""
+    set_res(WALK_RES)
+    if args.walk_engine == "eevee":
+        scene.render.engine = "BLENDER_EEVEE_NEXT" if "BLENDER_EEVEE_NEXT" in bpy.types.RenderSettings.bl_rna.properties["engine"].enum_items.keys() else "BLENDER_EEVEE"
+    else:
+        scene.cycles.samples = args.walk_samples
+    scene.camera = cam
+
+
+def front_layer(camera, wh, name):
+    """What stands in front of the cinema screen (this room's "#DEVOXX" and the seats) on a transparent background,
+    everything else held out, so the page can lay it over the HTML on the screen."""
+    keep = {o for o in scene.objects if o.name.startswith(f"word-{n}-") or o.name in ("seats", "seat-frames")}
+    held = [o for o in scene.objects if o.type in ("MESH", "CURVE", "FONT") and o not in keep and not o.is_holdout]
+    for o in held:
+        o.is_holdout = True
+    scene.render.film_transparent, use_comp = True, scene.render.use_compositing
+    scene.render.use_compositing = False
+    still(camera, wh, name)
+    for o in held:
+        o.is_holdout = False
+    scene.render.film_transparent, scene.render.use_compositing = False, use_comp
+
+
+def clip(first, frames, name):
+    walk_settings()
+    scene.frame_start, scene.frame_end = first, first + frames - 1
+    scene.render.filepath = str(OUT / name / "f_")
+    bpy.ops.render.render(animation=True)
+
+
 for what in [w for w in args.render.split(",") if w]:
     if what.startswith("ref:"):
+        set_res(LAPTOP)
         render_reference(what[4:])
     elif what == "hall":
-        scene.camera = hall_cam
-        scene.render.filepath = str(OUT / "hall.png")
-        bpy.ops.render.render(write_still=True)
-        scene.camera = cam
+        still(hall_cam, LAPTOP, "hall")
+    elif what == "hall-phone":
+        still(phone_hall_cam, PHONE, "hall-phone")
     elif what == "seat":
-        scene.frame_set(frames + 1)
-        scene.render.filepath = str(OUT / f"seat-{n}.png")
-        bpy.ops.render.render(write_still=True)
+        still(seat_cam, LAPTOP, f"seat-{n}")
+        front_layer(seat_cam, LAPTOP, f"seat-{n}-front")
+    elif what == "seat-phone":
+        still(seat_phone_cam, PHONE, f"seat-phone-{n}")
+        front_layer(seat_phone_cam, PHONE, f"seat-phone-{n}-front")
     elif what.startswith("walk@"):
+        walk_settings()
         for fr in what[5:].split("+"):
             scene.frame_set(int(fr))
             scene.render.filepath = str(OUT / f"walk-{n}-f{int(fr):03d}.png")
             bpy.ops.render.render(write_still=True)
-    elif what == "walk":
-        scene.frame_start, scene.frame_end = 1, frames + 1
-        scene.render.filepath = str(OUT / f"walk-{n}" / "f_")
-        bpy.ops.render.render(animation=True)
+    elif what == "walk-a":
+        clip(1, frames_a + 1, f"walk-a-{side}")
+    elif what == "walk-b":
+        clip(first_b, frames_b + 1, f"walk-b-{n}")
 print("done", json.dumps({k: v.get("frames") for k, v in shots.items()}))
