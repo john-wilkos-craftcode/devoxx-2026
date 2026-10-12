@@ -112,21 +112,44 @@
     el("span", {}, el("strong", { text: String(days.length) }), " days in ", el("strong", { text: String(rooms.size) }), " rooms"),
   );
 
-  // ---------- recap ----------
+  // ---------- recap: each trend leads with where speakers disagreed ----------
   if (DATA.recap && DATA.recap.trends && DATA.recap.trends.length) {
     $("#recap").hidden = false;
     $("#recap-intro").textContent = DATA.recap.intro || "";
     const box = $("#trends");
-    for (const tr of DATA.recap.trends) {
-      const linked = (tr.talkIds || []).map((id) => byId.get(id)).filter(Boolean);
-      box.append(el("article", { class: "trend" },
-        el("h3", { text: tr.title }),
-        tr.count ? el("p", { class: "trend-count", text: `${tr.count} talks touched on this` }) : null,
-        el("p", { text: tr.body }),
-        el("ul", { class: "trend-talks" }, linked.map((t) =>
-          el("li", {}, el("a", { href: `#talk-${t.id}`, text: `${t.title}, ${speakerNames(t)}` })))),
-      ));
+    const talkLink = (t) => el("a", { class: "side-talk", href: `#talk-${t.id}` }, el("span", { text: t.title }));
+    const debates = DATA.recap.trends.filter((tr) => tr.debate && tr.debate.sides && tr.debate.sides.length);
+    if (debates.length) {
+      box.append(el("nav", { class: "debate-index", "aria-label": "The debates" },
+        el("h3", { text: `${debates.length} things speakers disagreed on` }),
+        el("ul", {}, DATA.recap.trends.map((tr, i) => tr.debate
+          ? el("li", {}, el("a", { href: `#debate-${i + 1}`, text: tr.debate.question })) : null))));
     }
+    DATA.recap.trends.forEach((tr, i) => {
+      const linked = (tr.talkIds || []).map((id) => byId.get(id)).filter(Boolean);
+      const d = tr.debate;
+      const sides = d && d.sides ? d.sides : [];
+      box.append(el("article", { class: "trend", id: `debate-${i + 1}` },
+        el("header", { class: "trend-head" },
+          el("h3", { text: tr.title }),
+          tr.count ? el("span", { class: "trend-count", text: `${tr.count} talks` }) : null),
+        tr.consensus ? el("p", { class: "trend-consensus" }, el("strong", { text: "Most agreed: " }), tr.consensus) : null,
+        d ? el("div", { class: "debate" },
+          el("p", { class: "debate-q", text: d.question }),
+          el("div", { class: `debate-sides n${sides.length}` }, sides.flatMap((side, k) => [
+            k > 0 ? el("span", { class: "debate-or", "aria-hidden": "true", text: "or" }) : null,
+            el("div", { class: `side side-${k}` },
+              el("p", { class: "side-stance", text: side.stance }),
+              el("p", { class: "side-who", text: (side.who || []).join(", ") }),
+              el("div", { class: "side-talks" }, (side.talkIds || []).map((id) => byId.get(id)).filter(Boolean).map(talkLink))),
+          ]))) : null,
+        el("details", { class: "trend-more" },
+          el("summary", { text: "Read more" }),
+          el("p", { text: tr.body }),
+          linked.length ? el("ul", { class: "trend-talks" }, linked.map((t) =>
+            el("li", {}, el("a", { href: `#talk-${t.id}`, text: `${t.title}, ${speakerNames(t)}` })))) : null),
+      ));
+    });
   } else {
     document.querySelector('.topbar a[href="#recap"]').remove();
   }

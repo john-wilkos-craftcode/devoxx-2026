@@ -12,7 +12,36 @@
     25671,
     21690,
     23529
-   ]
+   ],
+   "consensus": "The harness around an agent shapes results more than the model does, and rules that matter belong in executable checks, not in CLAUDE.md prose.",
+   "debate": {
+    "question": "Should coding agents reach tools through MCP servers or plain CLIs?",
+    "sides": [
+     {
+      "stance": "CLIs and bash are lighter. Grall said agents increasingly prefer CLIs like gh over MCP servers; Charrière replaced a catalogue of tools with one bash tool, since every tool description eats a small model's context.",
+      "who": [
+       "Tugdual Grall",
+       "Philippe Charrière"
+      ],
+      "talkIds": [
+       23529,
+       22911
+      ]
+     },
+     {
+      "stance": "MCP pays off for current documentation. In Ward and Tzolov's eval the javadocs.dev MCP arm answered in about 19 seconds, while a shell agent grepping jars took 318. Petruzalek keeps MCP mainly for always-current docs.",
+      "who": [
+       "James Ward",
+       "Christian Tzolov",
+       "Daniela Petruzalek"
+      ],
+      "talkIds": [
+       21690,
+       25671
+      ]
+     }
+    ]
+   }
   },
   {
    "title": "Review is the new bottleneck",
@@ -25,7 +54,46 @@
     7008,
     16414,
     17782
-   ]
+   ],
+   "consensus": "Agents produce code faster than people can review it, so human attention has to move to smaller or higher-level units: specs, plans, phases or architecture views.",
+   "debate": {
+    "question": "How much human code review does agent-written code still need?",
+    "sides": [
+     {
+      "stance": "None as a separate step. Hoogendoorn's team at iBOOD dropped pull requests and code reviews; quality comes from pairing, trunk-based development and thousands of automated tests, at about 100 deploys a day.",
+      "who": [
+       "Sander Hoogendoorn"
+      ],
+      "talkIds": [
+       7008
+      ]
+     },
+     {
+      "stance": "Less over time, with AI reviewing first. Rentea wants a fresh-context adversarial AI before any human, then halving review after months of good PRs; Petruzalek's parallel review sub-agents replace much of her line-by-line review.",
+      "who": [
+       "Victor Rentea",
+       "Daniela Petruzalek"
+      ],
+      "talkIds": [
+       31452,
+       25671
+      ]
+     },
+     {
+      "stance": "A human must still own it. Cavalcanti saw a fresh-context Claude review invent a bug; Gavrilescu stopped reviewing and found 20 copies of one button; Schrijver: if you bring it to review, it's your code.",
+      "who": [
+       "Renato Guerra Cavalcanti",
+       "Alex Gavrilescu",
+       "Bert Jan Schrijver"
+      ],
+      "talkIds": [
+       25042,
+       25652,
+       19706
+      ]
+     }
+    ]
+   }
   },
   {
    "title": "Treat coding agents as untrusted code",
@@ -38,7 +106,35 @@
     25657,
     48301,
     5502
-   ]
+   ],
+   "consensus": "Prompt injection cannot be prevented reliably, so agents need deterministic limits outside the model: microVM sandboxes, host allowlists, server-scoped tools and credentials injected by a proxy.",
+   "debate": {
+    "question": "Are prompt-level defences against injection worth keeping at all?",
+    "sides": [
+     {
+      "stance": "No, they are only suggestions. Moraes showed \"treat as data\" wrappers beaten by forged closing tags, Gross said probabilistic security is no security, and Šelajev got a classifier to run a secret-stealing script.",
+      "who": [
+       "Elder Moraes",
+       "Richard Gross",
+       "Oleg Šelajev"
+      ],
+      "talkIds": [
+       21654,
+       7011,
+       25657
+      ]
+     },
+     {
+      "stance": "Yes, as one layer. Mehmandarov keeps tag sandwiching with closing-tag detection, canary tokens and a cheap intent-classifier model, then backs them with deterministic Bean Validation because all of it stays probabilistic.",
+      "who": [
+       "Rustam Mehmandarov"
+      ],
+      "talkIds": [
+       5502
+      ]
+     }
+    ]
+   }
   },
   {
    "title": "AI-found CVEs force faster patching",
@@ -51,7 +147,33 @@
     8194,
     4051,
     52102
-   ]
+   ],
+   "consensus": "AI-assisted research is finding vulnerabilities faster than before, so teams need automated upgrades and tests, and should rank CVEs by reachability and exposure rather than CVSS alone.",
+   "debate": {
+    "question": "Does the flood of AI-found vulnerabilities make software safer?",
+    "sides": [
+     {
+      "stance": "The findings are real and become fixes. Salm said frontier-model scanning found over 450 possible Spring vulnerabilities, leading to more than 200 fixes; Cvetkovic said Spring fixed more CVEs in months than in 13 years.",
+      "who": [
+       "Timo Salm",
+       "Neven Cvetkovic"
+      ],
+      "talkIds": [
+       50107,
+       50109
+      ]
+     },
+     {
+      "stance": "Volume is not security when human triage is the bottleneck. Semeteys credited Mozilla's 22 Claude-found Firefox bugs, but said duplicate and fabricated reports swamp security teams, and curl ended its bug bounty.",
+      "who": [
+       "Raphael Semeteys"
+      ],
+      "talkIds": [
+       11562
+      ]
+     }
+    ]
+   }
   },
   {
    "title": "The JVM gets leaner and faster",
@@ -64,7 +186,32 @@
     5510,
     9752,
     29351
-   ]
+   ],
+   "consensus": "Upgrading the JDK brings real memory and startup gains with little or no code change, from compact object headers to Leyden's AOT cache, each with some caveats.",
+   "debate": {
+    "question": "Will Valhalla value classes close Java's memory-layout gap?",
+    "sides": [
+     {
+      "stance": "Pressler called array memory layout Java's remaining structural handicap against low-level languages, and said Valhalla removes it by flattening values based on declared intent rather than manual layout control.",
+      "who": [
+       "Ron Pressler"
+      ],
+      "talkIds": [
+       49252
+      ]
+     },
+     {
+      "stance": "Paumard and Forax measured limits: streams and other generic code lose scalarization to erasure, heap flattening stops at about 64 bits, small flattened arrays were slower than pointers, and null-safety stays unsolved.",
+      "who": [
+       "José Paumard",
+       "Remi Forax"
+      ],
+      "talkIds": [
+       15354
+      ]
+     }
+    ]
+   }
   },
   {
    "title": "Java reaches native code and GPUs",
@@ -77,7 +224,36 @@
     19730,
     22947,
     22916
-   ]
+   ],
+   "consensus": "FFM, the Vector API and Project Babylon now let Java run numeric and AI workloads near native speed, without JNI or a Python runtime.",
+   "debate": {
+    "question": "Can pure Java kernels match native code for AI workloads?",
+    "sides": [
+     {
+      "stance": "Nearly everywhere. Peterssen said only matrix multiply needs native code, with attention at full speed on the Vector API; Fumero's Babylon-based HAT tile kernel ran in 78 µs against 77 µs for cuTile Python.",
+      "who": [
+       "Alfonso² Peterssen",
+       "Juan Fumero"
+      ],
+      "talkIds": [
+       14452,
+       21657
+      ]
+     },
+     {
+      "stance": "Native libraries still win the hottest paths. Przybyl saw the Vector API's gain halve against a tuned scalar loop, and Elasticsearch now calls a C++ kernel through FFM; jitLLM sends prefill matrix multiplies to cuBLAS.",
+      "who": [
+       "Piotr Przybyl",
+       "Michalis Papadimitriou",
+       "Orion Papadakis"
+      ],
+      "talkIds": [
+       17556,
+       19730
+      ]
+     }
+    ]
+   }
   },
   {
    "title": "Boundaries before services",
@@ -90,7 +266,32 @@
     17791,
     10034,
     16418
-   ]
+   ],
+   "consensus": "Good business boundaries matter more than service count, and consistency across boundaries needs explicit patterns: outbox or CDC, sagas with idempotent compensations, and reconciliation.",
+   "debate": {
+    "question": "Are hexagonal and clean-architecture layers worth their cost?",
+    "sides": [
+     {
+      "stance": "Only where change justifies them. Van de Ven said layers relocate dependencies rather than remove them, mappers cannot protect against dropped columns, and hexagonal adds distance that costs money when code rarely changes.",
+      "who": [
+       "Ties van de Ven"
+      ],
+      "talkIds": [
+       8186
+      ]
+     },
+     {
+      "stance": "Yes, especially with agents writing code. Vandeperre and van der Meer refactored a vibe-coded app into a framework-free domain with ports and adapters, separate build modules and ArchUnit tests, so drift fails the build.",
+      "who": [
+       "Maarten Vandeperre",
+       "Lutske van der Meer"
+      ],
+      "talkIds": [
+       5503
+      ]
+     }
+    ]
+   }
   },
   {
    "title": "From writing code to judging it",
@@ -103,7 +304,34 @@
     19706,
     21671,
     9023
-   ]
+   ],
+   "consensus": "Developer roles are shifting toward specifying, judging and owning results rather than disappearing, and accountability for agent output stays with people.",
+   "debate": {
+    "question": "Should developers keep hands-on skills like debugging?",
+    "sides": [
+     {
+      "stance": "Let them go. Rentea said Claude found 17 memory leaks and 10 bottlenecks in 30 minutes, called hand debugging and tuning \"unethical\" at work, and set a target of over 95% generated code.",
+      "who": [
+       "Victor Rentea"
+      ],
+      "talkIds": [
+       51951
+      ]
+     },
+     {
+      "stance": "Keep them on purpose. Cavalcanti cited Bainbridge: people who only monitor automation lose the skills for what cannot be automated, so he still writes API shapes himself; Clark and Rohrer called de-skilling the real risk.",
+      "who": [
+       "Renato Guerra Cavalcanti",
+       "Katie Clark",
+       "Simon Rohrer"
+      ],
+      "talkIds": [
+       25042,
+       8164
+      ]
+     }
+    ]
+   }
   }
  ]
 }
