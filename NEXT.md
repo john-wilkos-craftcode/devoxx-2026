@@ -8,6 +8,22 @@ Done:
   screen land per shot (`shots.json`). Cycles on the A1000: ~25 s per 1080p still, ~30 min per walk.
   Run from WSL against Windows Blender 5.2 (see the docstring); renders in C:\Users\wilkojo\kino-renders.
 
+How we get to photoreal (revised 12/10, after reading up on agent-driven Blender work):
+- Calibrate against the photos, not by eye from memory. Every area gets a reference camera placed
+  where a reference photo was taken (`data/references/cameras.json`, rendered with
+  `--render ref:<name>`), and `scripts/compare_render.py` puts render and photo side by side with
+  luminance and colour stats. Materials and light are tuned on that matched view, then carried over to
+  the real shots. One change at a time, at look-dev quality (960 px, 64 samples), then final quality.
+- A fresh reviewer agent (no stake in the build) critiques each render/photo pair and lists the
+  biggest realism gaps; fix those first.
+- Real CC0 PBR textures (ambientCG, Poly Haven; `scripts/fetch_textures.py`, gitignored) mapped in
+  world space, so the batched boxes need no UVs. Procedural detail on top where no texture fits (the
+  50 cm carpet tiles, the acoustic spray).
+- Physically based light: fixtures shaped like the real ones (hexagon LED panels, downlights, track
+  spots), colour temperature from the photos, haze only inside the auditoriums.
+- Small-scale realism: bevelled edges, plinths, speakers and signs on columns, curtain folds, glass.
+- Camera and post like a phone photo: real focal length, AgX, a little bloom and vignetting.
+
 Next:
 1. Art pass on the camera route so it matches the reference photos. These are now 2026 photos from
    the official Devoxx Flickr albums, listed with captions in `data/references/references.json`;
@@ -15,11 +31,16 @@ Next:
    CC BY-NC-ND) with one contact sheet per area. The old references were wrong: what we built as the
    ground-floor exhibition hall (sloped ceiling, screen between columns, funnel, red portals) is the
    upstairs foyer. Downstairs, where the booths are, is the **Hollywood room**:
-   - Hollywood room (start of the walk): first pass done (12/10). Raft ceiling with the blue-lit coffer
-     and ivy, black acoustic ceiling with ducts and track spots, white columns, mottled grey carpet,
-     beige curtains on the north wall, and the programme on a 16:10 laptop-shaped screen there
-     (overlay key `programme` in shots.json). Orange-card schedule screens on the stairwells' inner
-     walls, like the real ones. Still to do: soften the dark seam where the curtains meet the ceiling.
+   - Hollywood room (start of the walk): calibrated against `hollywood-empty.png` (ref camera
+     `hollywood`); per-band luminance within ~0.03 of the photo. White drop ceiling at 3 m with
+     hexagon LED panels (area light under each) and downlights (narrow spots: the pools on the carpet),
+     the blue-lit coffer at the entrance end, higher entrance ceiling with track spots and black panels.
+     Carpet: ambientCG Carpet016 fibre, 50 cm tiles laid quarter-turned with per-tile shade and sheen.
+     Curtains: pleated meshes with UVs and Poly Haven "terlenka". Frosted glass stairwells with alu
+     mullions, speakers and plinths on columns, extinguishers, exit signs, trusses, translucent ivy.
+     Floor-1 cinema walls and rakes stop above the drop ceiling over the room (Ghost Light stacks the
+     floors too close). Post: bloom, slight dispersion, vignette; AgX Medium High Contrast, -0.9 EV.
+     Still to do: the carpet's pebbly pattern is weaker than the photo's; fewer ivy clumps.
    - upstairs foyer: as before (sloped ceiling, LED lines, track spots, screen between dark columns,
      red side portals), but the tensile funnels are white fabric lit blue this year, not red
    - entrance: navy walls, blue "uitgang zaal 6/7" signs, glass front, white desks, stanchions

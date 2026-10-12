@@ -6,7 +6,8 @@ geometry; Blender adds real light: path tracing, soft shadows, bounce light, emi
 Run with Blender's Python (Windows Blender, driven from WSL):
   blender.exe -b --python scripts/blender/build_scene.py -- --root C:/path/to/repo --room 8 \
       --save C:/renders/kino.blend [--render hall,seat,walk] [--out C:/renders] [--samples 96] [--preview]
-  (--render walk@20+60 renders single frames of the walk, for look-dev)
+  (--render walk@20+60 renders single frames of the walk, ref:hollywood renders from the camera of a
+   reference photo in data/references/cameras.json, both for look-dev)
 
 Shots (per --room):
   hall      the Hollywood room (the exhibition floor downstairs), facing the screen on the curtained
@@ -43,6 +44,7 @@ ap.add_argument("--render", default="")
 ap.add_argument("--out")
 ap.add_argument("--samples", type=int, default=96)
 ap.add_argument("--preview", action="store_true", help="EEVEE, low resolution: fast look-dev")
+ap.add_argument("--lookdev", action="store_true", help="Cycles at half resolution: look-dev you can trust")
 args = ap.parse_args(argv)
 ROOT = Path(args.root)
 venue = json.loads((ROOT / "site" / "kino" / "venue.json").read_text())["venue"]
@@ -65,7 +67,7 @@ def srgb(h):
 MATS = {}
 
 
-def material(name, color, rough=0.85, metal=0.0, emission=None, strength=0.0, sheen=0.0, noise_bump=0.0, speckle=0.0):
+def material(name, color, rough=0.85, metal=0.0, emission=None, strength=0.0, sheen=0.0, noise_bump=0.0, speckle=0.0, bevel=0.0, grime=0.0):
     if name in MATS:
         return MATS[name]
     m = bpy.data.materials.new(name)
@@ -88,6 +90,23 @@ def material(name, color, rough=0.85, metal=0.0, emission=None, strength=0.0, sh
         bump.inputs["Strength"].default_value = noise_bump
         nt.links.new(tex.outputs["Fac"], bump.inputs["Height"])
         nt.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    if grime:
+        # dirt collects where surfaces meet (column foot, wall corners): darken by ambient occlusion
+        ao = nt.nodes.new("ShaderNodeAmbientOcclusion")
+        ao.inputs["Distance"].default_value = 0.35
+        ao.only_local = True
+        dark = nt.nodes.new("ShaderNodeMapRange")
+        dark.inputs["To Min"].default_value, dark.inputs["To Max"].default_value = 1 - grime, 1.0
+        nt.links.new(ao.outputs["AO"], dark.inputs["Value"])
+        _, a, b, out = mix_multiply(nt)
+        a.default_value = srgb(color)
+        nt.links.new(dark.outputs["Result"], b)
+        nt.links.new(out, bsdf.inputs["Base Color"])
+    if bevel:
+        # no razor edges: shade every box edge as rounded over a few millimetres
+        bev = nt.nodes.new("ShaderNodeBevel")
+        bev.inputs["Radius"].default_value = bevel
+        nt.links.new(bev.outputs["Normal"], bsdf.inputs["Normal"])
     if speckle:
         # mottled carpet: blotchy noise between a darker and a lighter shade of the base colour
         coord = nt.nodes.new("ShaderNodeTexCoord")
@@ -123,6 +142,152 @@ def emissive(name, color, strength):
     return m
 
 
+TEX = ROOT / "data" / "textures"
+
+
+def node(nt, kind, **inputs):
+    n = nt.nodes.new(kind)
+    for k, v in inputs.items():
+        n.inputs[k].default_value = v
+    return n
+
+
+def mix_multiply(nt):
+    """A colour Mix node set to multiply; returns (node, A, B, Result) sockets, found by type since the socket
+    order changes between Blender versions."""
+    mx = nt.nodes.new("ShaderNodeMix")
+    mx.data_type, mx.blend_type = "RGBA", "MULTIPLY"
+    mx.inputs["Factor"].default_value = 1.0
+    a, b = [i for i in mx.inputs if i.type == "RGBA"][:2]
+    out = next(o for o in mx.outputs if o.type == "RGBA")
+    return mx, a, b, out
+
+
+def textured(name, tex, scale, tint=None, rough=None, normal=1.0, sheen=0.0, tiles=None, uv=False):
+    """PBR material from a set fetched by scripts/fetch_textures.py, box-projected in object space (the batched
+    meshes have no UVs, and every object sits at the origin, so object space is world space in metres).
+    tint: replace the texture's colour with this one, keeping its light and dark detail.
+    tiles: carpet tiles of this size in metres, laid quarter-turned at random, each with its own mottling,
+    shade and sheen.
+    uv: map by the mesh's UVs (in metres) instead, for surfaces like curtains where box projection seams."""
+    d = TEX / tex
+    if not (d / "color.jpg").exists():
+        print(f"textures for {name} missing (run scripts/fetch_textures.py); using a flat colour")
+        return material(name, tint or 0x888888, rough or 0.9, sheen=sheen)
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    nt = m.node_tree
+    bsdf = nt.nodes["Principled BSDF"]
+    coord = nt.nodes.new("ShaderNodeTexCoord")
+    mapping = nt.nodes.new("ShaderNodeMapping")
+    mapping.inputs["Scale"].default_value = (1 / scale,) * 3
+    pos = coord.outputs["UV" if uv else "Object"]
+    if tiles:
+        # which tile, a random number per tile, and the position turned a quarter on half of the tiles
+        cell = node(nt, "ShaderNodeVectorMath")
+        cell.operation = "SCALE"
+        cell.inputs["Scale"].default_value = 1 / tiles
+        nt.links.new(coord.outputs["Object"], cell.inputs[0])
+        flo = nt.nodes.new("ShaderNodeVectorMath")
+        flo.operation = "FLOOR"
+        nt.links.new(cell.outputs["Vector"], flo.inputs[0])
+        rnd = nt.nodes.new("ShaderNodeTexWhiteNoise")
+        nt.links.new(flo.outputs["Vector"], rnd.inputs["Vector"])
+        sep, comb = nt.nodes.new("ShaderNodeSeparateXYZ"), nt.nodes.new("ShaderNodeCombineXYZ")
+        nt.links.new(coord.outputs["Object"], sep.inputs[0])
+        neg = node(nt, "ShaderNodeMath")
+        neg.operation = "MULTIPLY"
+        neg.inputs[1].default_value = -1.0
+        nt.links.new(sep.outputs["X"], neg.inputs[0])
+        nt.links.new(sep.outputs["Y"], comb.inputs["X"])
+        nt.links.new(neg.outputs["Value"], comb.inputs["Y"])
+        nt.links.new(sep.outputs["Z"], comb.inputs["Z"])
+        turn = node(nt, "ShaderNodeMath")
+        turn.operation = "GREATER_THAN"
+        turn.inputs[1].default_value = 0.5
+        nt.links.new(rnd.outputs["Value"], turn.inputs[0])
+        pick = nt.nodes.new("ShaderNodeMix")
+        pick.data_type = "VECTOR"
+        vin = [i for i in pick.inputs if i.type == "VECTOR"]
+        nt.links.new(turn.outputs["Value"], next(i for i in pick.inputs if i.type == "VALUE"))
+        nt.links.new(coord.outputs["Object"], vin[1])
+        nt.links.new(comb.outputs["Vector"], vin[2])
+        pos = next(o for o in pick.outputs if o.type == "VECTOR")
+    nt.links.new(pos, mapping.inputs["Vector"])
+
+    def image(file, color_space):
+        t = nt.nodes.new("ShaderNodeTexImage")
+        t.image = bpy.data.images.load(str(d / file), check_existing=True)
+        t.image.colorspace_settings.name = color_space
+        if not uv:
+            t.projection, t.projection_blend = "BOX", 0.25
+        nt.links.new(mapping.outputs["Vector"], t.inputs["Vector"])
+        return t
+    col = image("color.jpg", "sRGB")
+    color_out = col.outputs["Color"]
+    if tint is not None:
+        bw = nt.nodes.new("ShaderNodeRGBToBW")
+        nt.links.new(color_out, bw.inputs["Color"])
+        _, a, b, out = mix_multiply(nt)
+        a.default_value = tuple(c * 2 for c in srgb(tint)[:3]) + (1,)   # texture luminance ~0.5
+        nt.links.new(bw.outputs["Val"], b)
+        color_out = out
+    if tiles:
+        shift = nt.nodes.new("ShaderNodeVectorMath")                 # each tile samples the mottle elsewhere
+        shift.operation = "MULTIPLY_ADD"
+        shift.inputs[1].default_value = (37.0, 53.0, 0.0)
+        nt.links.new(rnd.outputs["Color"], shift.inputs[0])
+        nt.links.new(pos, shift.inputs[2])
+        mot = node(nt, "ShaderNodeTexNoise", Scale=11.0, Detail=8.0, Roughness=0.7)
+        nt.links.new(shift.outputs["Vector"], mot.inputs["Vector"])
+        f1 = node(nt, "ShaderNodeMath")
+        f1.operation = "MULTIPLY_ADD"
+        f1.inputs[1].default_value, f1.inputs[2].default_value = 2.6, -0.45
+        nt.links.new(mot.outputs["Fac"], f1.inputs[0])
+        f2 = node(nt, "ShaderNodeMath")
+        f2.operation = "MULTIPLY_ADD"
+        f2.inputs[1].default_value = 0.4
+        nt.links.new(rnd.outputs["Value"], f2.inputs[0])
+        nt.links.new(f1.outputs["Value"], f2.inputs[2])
+        # small dark specks, like the photos' carpet
+        speck = node(nt, "ShaderNodeTexNoise", Scale=38.0, Detail=3.0)
+        nt.links.new(shift.outputs["Vector"], speck.inputs["Vector"])
+        ramp = node(nt, "ShaderNodeMapRange")
+        ramp.inputs["From Min"].default_value, ramp.inputs["From Max"].default_value = 0.56, 0.66
+        ramp.inputs["To Min"].default_value, ramp.inputs["To Max"].default_value = 1.0, 0.55
+        nt.links.new(speck.outputs["Fac"], ramp.inputs["Value"])
+        f3 = node(nt, "ShaderNodeMath")
+        f3.operation = "MULTIPLY"
+        nt.links.new(f2.outputs["Value"], f3.inputs[0])
+        nt.links.new(ramp.outputs["Result"], f3.inputs[1])
+        _, a, b, out = mix_multiply(nt)
+        nt.links.new(color_out, a)
+        nt.links.new(f3.outputs["Value"], b)
+        color_out = out
+    nt.links.new(color_out, bsdf.inputs["Base Color"])
+    if rough is None and tiles:
+        sheen_shift = node(nt, "ShaderNodeMath")                     # tiles catch the light differently
+        sheen_shift.operation = "MULTIPLY_ADD"
+        sheen_shift.inputs[1].default_value, sheen_shift.inputs[2].default_value = 0.16, 0.86
+        nt.links.new(rnd.outputs["Value"], sheen_shift.inputs[0])
+        rmul = node(nt, "ShaderNodeMath")
+        rmul.operation = "MULTIPLY"
+        nt.links.new(image("rough.jpg", "Non-Color").outputs["Color"], rmul.inputs[0])
+        nt.links.new(sheen_shift.outputs["Value"], rmul.inputs[1])
+        nt.links.new(rmul.outputs["Value"], bsdf.inputs["Roughness"])
+    elif rough is None:
+        nt.links.new(image("rough.jpg", "Non-Color").outputs["Color"], bsdf.inputs["Roughness"])
+    else:
+        bsdf.inputs["Roughness"].default_value = rough
+    nm = node(nt, "ShaderNodeNormalMap", Strength=normal)
+    nt.links.new(image("normal.jpg", "Non-Color").outputs["Color"], nm.inputs["Color"])
+    nt.links.new(nm.outputs["Normal"], bsdf.inputs["Normal"])
+    if "Sheen Weight" in bsdf.inputs:
+        bsdf.inputs["Sheen Weight"].default_value = sheen
+    MATS[name] = m
+    return m
+
+
 # Kinepolis Antwerp, from the reference photos (data/references/): charcoal walls, navy carpet, pale
 # vaults, blue-grey seats, red portals, orange numeral panels, blue LED light. Downstairs, the Hollywood
 # room is the opposite: white columns and ceilings, grey carpet, beige curtains, black acoustic ceiling.
@@ -136,14 +301,21 @@ M = {
     "nosing": material("nosing", 0x5d6694, 0.8),
     "carpet": material("carpet", 0x161c2e, 1.0, noise_bump=0.3),
     "hallFloor": material("hallFloor", 0x2a2c33, 1.0, noise_bump=0.3),
-    "hollywoodFloor": material("hollywoodFloor", 0x7f7a74, 1.0, noise_bump=0.3, speckle=0.14),
-    "hallColumn": material("hallColumn", 0xecebe7, 0.75),
-    "hallWall": material("hallWall", 0xe4e2dd, 0.85),
-    "raft": material("raft", 0xf1f1ee, 0.9),
-    "acoustic": material("acoustic", 0x131418, 1.0, noise_bump=0.8),
-    "curtain": material("curtain", 0xb8ac9a, 0.95, sheen=0.5),
+    "hollywoodFloor": textured("hollywoodFloor", "carpet", 0.6, tint=0xa29b93, normal=1.0, tiles=0.5),
+    "hallColumn": material("hallColumn", 0xebeae6, 0.6, bevel=0.012, grime=0.3),
+    "hallWall": material("hallWall", 0xe4e2dd, 0.85, bevel=0.01, grime=0.25),
+    "raft": material("raft", 0xf1f1ee, 0.9, bevel=0.01),
+    "acoustic": material("acoustic", 0x10131c, 1.0, noise_bump=1.0),
+    "curtain": textured("curtain", "curtain", 1.4, tint=0x8f8574, normal=0.7, sheen=0.5, uv=True),
+    "frostedGlass": material("frostedGlass", 0xdfeee8, 0.2),
+    "plinth": material("plinth", 0x8d8d8a, 0.6, bevel=0.005),
+    "speaker": material("speaker", 0xe9e9e5, 0.45, bevel=0.01),
+    "hexFrame": material("hexFrame", 0xd2d5d8, 0.3, 0.8),         # brushed aluminium: panel rims, mullions
+    "extinguisher": material("extinguisher", 0xb3121a, 0.3),
+    "exitSign": emissive("exitSign", 0x18c060, 4.0),
+    "downlight": emissive("downlight", 0xfff1e0, 25.0),
     "bezel": material("bezel", 0x070708, 0.6),
-    "foliage": material("foliage", 0x2c4a1c, 0.6, sheen=0.3),
+    "foliage": material("foliage", 0x4a7a3a, 0.55, sheen=0.3),
     "tableFrame": material("tableFrame", 0x111114, 0.4, 0.6),
     "audFloor": material("audFloor", 0x111218, 1.0, noise_bump=0.2),
     "ceiling": material("ceiling", 0x121318, 1.0),
@@ -164,8 +336,8 @@ M = {
     "paving": material("paving", 0x2c2d31, 0.95),
     "funnel": material("funnel", 0xf3f4f8, 0.7),
     "led": emissive("led", 0x3f74ff, 12.0),
-    "cove": emissive("cove", 0x3d6bff, 60.0),
-    "panelLight": emissive("panelLight", 0xf2f5ff, 6.0),
+    "cove": emissive("cove", 0x3d6bff, 10.0),
+    "panelLight": emissive("panelLight", 0xfff3e6, 8.0),       # the look of the panels; area lights below do the lighting      # about 4000 K, like the photos
     "screen": emissive("screen", 0x2a3350, 4.0),       # the HTML is pinned over this in the browser
     "programme": emissive("programme", 0x16224f, 4.0),  # the hall screen: the programme is pinned over it
     "schedule": emissive("schedule", 0x1c2a6b, 1.5),
@@ -173,6 +345,17 @@ M = {
     "scheduleText": emissive("scheduleText", 0xf4f4f4, 2.0),
 }
 M["glazing"].node_tree.nodes["Principled BSDF"].inputs["Transmission Weight"].default_value = 0.9
+# leaves are thin: let a third of the light through, so backlit ivy glows like the real plants
+_fnt = M["foliage"].node_tree
+_tr = _fnt.nodes.new("ShaderNodeBsdfTranslucent")
+_tr.inputs["Color"].default_value = srgb(0x7fb04a)
+_mixs = _fnt.nodes.new("ShaderNodeMixShader")
+_mixs.inputs["Fac"].default_value = 0.3
+_fnt.links.new(_fnt.nodes["Principled BSDF"].outputs["BSDF"], _mixs.inputs[1])
+_fnt.links.new(_tr.outputs["BSDF"], _mixs.inputs[2])
+_fnt.links.new(_mixs.outputs["Shader"], _fnt.nodes["Material Output"].inputs["Surface"])
+M["frostedGlass"].node_tree.nodes["Principled BSDF"].inputs["Transmission Weight"].default_value = 1.0
+M["frostedGlass"].node_tree.nodes["Principled BSDF"].inputs["IOR"].default_value = 1.5
 
 
 # ---------------------------------------------------------------------------------- mesh building
@@ -234,6 +417,43 @@ def plate_under(p):
     return 0 if p.get("linkId") else ground_at(p["floor"], b["x"] + b["w"] / 2, b["y"] + b["h"] / 2)
 
 
+def subtract_rects(b, holes):
+    xs = sorted({b["x"], b["x"] + b["w"], *[v for h in holes for v in (h["x"], h["x"] + h["w"]) if b["x"] < v < b["x"] + b["w"]]})
+    ys = sorted({b["y"], b["y"] + b["h"], *[v for h in holes for v in (h["y"], h["y"] + h["h"]) if b["y"] < v < b["y"] + b["h"]]})
+    out = []
+    for j in range(len(ys) - 1):
+        for i in range(len(xs) - 1):
+            mx, my = (xs[i] + xs[i + 1]) / 2, (ys[j] + ys[j + 1]) / 2
+            if not any(h["x"] < mx < h["x"] + h["w"] and h["y"] < my < h["y"] + h["h"] for h in holes):
+                out.append({"x": xs[i], "y": ys[j], "w": xs[i + 1] - xs[i], "h": ys[j + 1] - ys[j]})
+    return out
+
+
+def intersect(a, b):
+    x0, y0 = max(a["x"], b["x"]), max(a["y"], b["y"])
+    x1, y1 = min(a["x"] + a["w"], b["x"] + b["w"]), min(a["y"] + a["h"], b["y"] + b["h"])
+    return {"x": x0, "y": y0, "w": x1 - x0, "h": y1 - y0} if x1 > x0 and y1 > y0 else None
+
+
+# The Hollywood room has a drop ceiling at HALL_CEIL. Ghost Light stacks the floors closer than the
+# real building, so cinema walls and seating from floor 1 would hang into the room: over the room's
+# footprint they stop at HALL_CLEAR, just above the drop ceiling.
+HALL_CEIL, HALL_CLEAR = 3.0, 3.3
+stair_links = [l for l in venue["links"] if l["id"] in ("stair-west", "stair-east")]
+stairwells = [{"x": l["bounds"]["x"] - 0.3, "y": l["bounds"]["y"], "w": l["bounds"]["w"] + 0.6, "h": 15.5} for l in stair_links]
+
+
+def box_clear_of_hall(key, b, bottom, top):
+    over = intersect(b, hall)
+    if not over or bottom >= HALL_CLEAR:
+        B.box(key, b, bottom, top)
+        return
+    for cell in subtract_rects(b, [over]):
+        B.box(key, cell, bottom, top)
+    B.box(key, over, max(bottom, HALL_CLEAR), top)
+
+
+hall_pad = {**hall, "x": hall["x"] - 0.5, "y": hall["y"] - 0.5, "w": hall["w"] + 1, "h": hall["h"] + 1}
 # walls and columns, full height; floor-0 walls stop under the floor-1 seating rakes
 for o in venue["obstacles"]:
     if o.get("hidden"):
@@ -247,15 +467,22 @@ for o in venue["obstacles"]:
     under = datum + plate_under(o)
     bottom = datum - RAKE_DEPTH if (tall and o["floor"] == 1) else under + o.get("base", 0)
     top = datum + CLEAR if tall else under + o["height"]
-    if o["floor"] == 0:
+    in_hall = o["floor"] == 0 and inside(hall_pad, b["x"] + b["w"] / 2, b["y"] + b["h"] / 2)
+    if o["floor"] == 0 and not in_hall:
         for a in auditoriums:
-            ab = a["bounds"]
-            if b["x"] < ab["x"] + ab["w"] and b["x"] + b["w"] > ab["x"] and b["y"] < ab["y"] + ab["h"] and b["y"] + b["h"] > ab["y"]:
+            if intersect(b, a["bounds"]):
                 top = min(top, FH - a.get("rake", 0) - 0.35)
     key = "column" if column else "wall" if tall else (o.get("material") if o.get("material") in M else "concrete")
-    if o["floor"] == 0 and tall and inside({**hall, "x": hall["x"] - 0.5, "y": hall["y"] - 0.5, "w": hall["w"] + 1, "h": hall["h"] + 1},
-                                           b["x"] + b["w"] / 2, b["y"] + b["h"] / 2):
-        key = "hallColumn" if column else "hallWall"      # the Hollywood room is white
+    if in_hall and tall:
+        if any(intersect(b, sw) for sw in stairwells):
+            # the stairwells are boxed in teal frosted glass up to the drop ceiling
+            B.box("frostedGlass", b, bottom, HALL_CEIL)
+            B.box("hallWall", b, HALL_CEIL, top)
+            continue
+        key, top = ("hallColumn" if column else "hallWall"), HALL_CEIL + 0.25     # white, up to the drop ceiling
+    if o["floor"] == 1 and tall:
+        box_clear_of_hall(key, b, bottom, top)
+        continue
     B.box(key, b, bottom, top)
 
 STAIRS = {"grand-stair", "stair-west", "stair-east", "hall-steps", "bof-1-steps", "bof-2-steps"}
@@ -286,24 +513,15 @@ for L in venue["links"]:
         top = datum + L["base"] + ((i + 1) if L["ascending"] else (n - i)) * L["riser"]
         sl = {"x": b["x"] + i * going, "y": b["y"], "w": going, "h": b["h"]} if along_x else \
              {"x": b["x"], "y": b["y"] + i * going, "w": b["w"], "h": going}
-        B.box("rake" if rake else "stair", sl, datum + L["base"] - 0.3, top)
+        if rake:
+            box_clear_of_hall("rake", sl, max(datum + L["base"] - 0.3, top - 0.6), top)
+        else:
+            B.box("stair", sl, datum + L["base"] - 0.3, top)
         if not rake:
             edge = 0 if L["ascending"] else going - 0.05
             st = {"x": sl["x"] + edge, "y": b["y"], "w": 0.05, "h": b["h"]} if along_x else \
                  {"x": b["x"], "y": sl["y"] + edge, "w": b["w"], "h": 0.05}
             B.box("nosing", st, top - 0.004, top + 0.006)
-
-
-def subtract_rects(b, holes):
-    xs = sorted({b["x"], b["x"] + b["w"], *[v for h in holes for v in (h["x"], h["x"] + h["w"]) if b["x"] < v < b["x"] + b["w"]]})
-    ys = sorted({b["y"], b["y"] + b["h"], *[v for h in holes for v in (h["y"], h["y"] + h["h"]) if b["y"] < v < b["y"] + b["h"]]})
-    out = []
-    for j in range(len(ys) - 1):
-        for i in range(len(xs) - 1):
-            mx, my = (xs[i] + xs[i + 1]) / 2, (ys[j] + ys[j + 1]) / 2
-            if not any(h["x"] < mx < h["x"] + h["w"] and h["y"] < my < h["y"] + h["h"] for h in holes):
-                out.append({"x": xs[i], "y": ys[j], "w": xs[i + 1] - xs[i], "h": ys[j + 1] - ys[j]})
-    return out
 
 
 FLOOR_KEY = {"corridor": "carpet", "foyer": "carpet", "landing": "carpet", "hall": "hollywoodFloor",
@@ -338,6 +556,12 @@ def cove(side, R=1.3, segs=16):
 
 cove(-1)
 cove(1)
+
+
+def cylinder(key, cx, cy, z0, z1, r, segs=16):
+    ring = [(cx + r * math.cos(2 * math.pi * k / segs), cy + r * math.sin(2 * math.pi * k / segs)) for k in range(segs)]
+    B.mesh(key, [(x, y, z) for z in (z0, z1) for x, y in ring],
+           [tuple(reversed(range(segs))), tuple(range(segs, 2 * segs)), *[(k, (k + 1) % segs, segs + (k + 1) % segs, segs + k) for k in range(segs)]])
 
 
 def lathe(key, profile, center, segs=48, phi0=0.0, phi=2 * math.pi, scale=(1, 1, 1)):
@@ -392,7 +616,7 @@ for r in auditoriums:
     for wb in ({"x": b["x"], "y": b["y"] - t / 2, "w": b["w"], "h": t}, {"x": b["x"], "y": b["y"] + b["h"] - t / 2, "w": b["w"], "h": t},
                {"x": far_x, "y": b["y"], "w": t, "h": b["h"]}, {"x": corr_x, "y": b["y"], "w": t, "h": yc - 1.15 - b["y"]},
                {"x": corr_x, "y": yc + 1.15, "w": t, "h": b["y"] + b["h"] - yc - 1.15}):
-        B.box("audWall", wb, lo, hi)
+        box_clear_of_hall("audWall", wb, lo, hi)
     B.box("audWall", {"x": corr_x, "y": yc - 1.15, "w": t, "h": 2.3}, FH + 2.7, hi)
     # portal frame (head + two jambs) standing proud of the wall
     px = wall_x + face * 0.16
@@ -483,73 +707,133 @@ for name, bm_, mat in (("seats", seats_bm, M["seat"]), ("seat-frames", frames_bm
     scene.collection.objects.link(ob)
 
 # ---------------------------------------------------------------------------------- the Hollywood room
-# The exhibition floor downstairs (data/references/, area "hollywood"). A white drop ceiling, the raft,
-# runs down the middle with a raised coffer lit blue from a hidden cove; around it the black acoustic
-# ceiling with ducts and track spots. White columns, grey carpet, beige curtains on the far (north)
+# The exhibition floor downstairs, after the photos in data/references/ (area "hollywood"). A white drop
+# ceiling at HALL_CEIL over the whole room with hexagonal LED panels and downlights; at the entrance end
+# a raised coffer lit blue from a hidden cove, and before it a higher ceiling with track spots and black
+# acoustic panels. White columns with speakers, mottled tile carpet, beige curtains on the far (north)
 # wall, and on that wall the programme on a 16:10 screen shaped like a laptop's.
 SX = 5.9                                        # on the axis between the column lines x = 2.3 and 8.78
 NORTH = hall["y"] + hall["h"] - 0.15            # inner face of the north wall
-RAFT_Z, COFFER_Z, BLACK_Z = 3.3, 3.85, 4.6
-stair_links = [l for l in venue["links"] if l["id"] in ("stair-west", "stair-east")]
-stairwells = [{"x": l["bounds"]["x"] - 0.3, "y": l["bounds"]["y"], "w": l["bounds"]["w"] + 0.6, "h": 15.5} for l in stair_links]
-raft = {"x": SX - 4.6, "y": hall["y"], "w": 9.2, "h": NORTH - hall["y"]}
-coffer = {"x": SX - 2.8, "y": hall["y"] + 6, "w": 5.6, "h": NORTH - 2.15 - hall["y"] - 6}
-COVE = 0.25                                      # width of the hidden ledge the LED strip sits on
-for cell in subtract_rects(raft, [coffer] + stairwells):
-    B.box("raft", cell, RAFT_Z, RAFT_Z + 0.25)
-outer = {"x": coffer["x"] - COVE, "y": coffer["y"] - COVE, "w": coffer["w"] + 2 * COVE, "h": coffer["h"] + 2 * COVE}
+NEAR_Z = 4.3                                     # ceiling over the entrance end
+entrance = {"x": hall["x"], "y": hall["y"], "w": hall["w"], "h": 11.0}
+coffer = {"x": SX - 4.6, "y": entrance["y"] + entrance["h"], "w": 9.2, "h": 11.0}
+inner = {"x": coffer["x"] + 0.7, "y": coffer["y"] + 0.7, "w": coffer["w"] - 1.4, "h": coffer["h"] - 1.4}
+STEP_Z, INNER_Z, COVE = HALL_CEIL + 0.25, HALL_CEIL + 0.6, 0.25
+for cell in subtract_rects(hall, [entrance, coffer] + stairwells):
+    B.box("raft", cell, HALL_CEIL, HALL_CEIL + 0.25)
+for cell in subtract_rects(coffer, [inner]):                      # the coffer's first step
+    B.box("raft", cell, STEP_Z, STEP_Z + 0.1)
+outer = {"x": inner["x"] - COVE, "y": inner["y"] - COVE, "w": inner["w"] + 2 * COVE, "h": inner["h"] + 2 * COVE}
 for wb in ({**outer, "h": 0.05}, {**outer, "y": outer["y"] + outer["h"] - 0.05, "h": 0.05},
            {**outer, "w": 0.05}, {**outer, "x": outer["x"] + outer["w"] - 0.05, "w": 0.05}):
-    B.box("raft", wb, RAFT_Z + 0.25, COFFER_Z)
-B.box("raft", outer, COFFER_Z, COFFER_Z + 0.05)
-for wb in ({"x": coffer["x"], "y": coffer["y"] - 0.17, "w": coffer["w"], "h": 0.04},
-           {"x": coffer["x"], "y": coffer["y"] + coffer["h"] + 0.13, "w": coffer["w"], "h": 0.04},
-           {"x": coffer["x"] - 0.17, "y": coffer["y"], "w": 0.04, "h": coffer["h"]},
-           {"x": coffer["x"] + coffer["w"] + 0.13, "y": coffer["y"], "w": 0.04, "h": coffer["h"]}):
-    B.box("cove", wb, RAFT_Z + 0.25, RAFT_Z + 0.27)
-for cell in subtract_rects(hall, stairwells):
-    B.box("acoustic", cell, BLACK_Z, BLACK_Z + 0.1)
-B.box("acoustic", {"x": hall["x"], "y": NORTH - 0.04, "w": hall["w"], "h": 0.04}, RAFT_Z, BLACK_Z)
-
-# recessed square panels: two rows in the coffer, one row each side of it, two above the screen
-panels = []
-y = coffer["y"] + 1.6
-while y < coffer["y"] + coffer["h"] - 0.5:
-    panels += [(SX - 1.5, y, COFFER_Z), (SX + 1.5, y, COFFER_Z), (raft["x"] + 0.8, y, RAFT_Z), (raft["x"] + raft["w"] - 0.8, y, RAFT_Z)]
-    y += 3.2
-panels += [(SX - 3.6, NORTH - 1.1, RAFT_Z), (SX + 3.6, NORTH - 1.1, RAFT_Z)]
-panels = [p for p in panels if not any(inside(sw, p[0], p[1]) for sw in stairwells)]
-for (px, py, pz) in panels:
-    B.box("panelLight", {"x": px - 0.3, "y": py - 0.3, "w": 0.6, "h": 0.6}, pz - 0.012, pz - 0.002)
-
-
-def tube(key, x, z, y0, y1, r, segs=16):
-    """A round duct along y."""
-    verts = [(x + r * math.cos(2 * math.pi * k / segs), yy, z + r * math.sin(2 * math.pi * k / segs)) for yy in (y0, y1) for k in range(segs)]
-    B.mesh(key, verts, [(k, (k + 1) % segs, segs + (k + 1) % segs, segs + k) for k in range(segs)])
-
-
-# the black ceiling either side of the raft: a duct and a line of track spots
+    B.box("raft", wb, STEP_Z + 0.1, INNER_Z)
+B.box("raft", outer, INNER_Z, INNER_Z + 0.05)
+for wb in ({"x": inner["x"], "y": inner["y"] - 0.17, "w": inner["w"], "h": 0.04},
+           {"x": inner["x"], "y": inner["y"] + inner["h"] + 0.13, "w": inner["w"], "h": 0.04},
+           {"x": inner["x"] - 0.17, "y": inner["y"], "w": 0.04, "h": inner["h"]},
+           {"x": inner["x"] + inner["w"] + 0.13, "y": inner["y"], "w": 0.04, "h": inner["h"]}):
+    B.box("cove", wb, STEP_Z + 0.1, STEP_Z + 0.12)
+# entrance end: higher ceiling, the bulkhead down to the drop ceiling, black acoustic panels at the sides
+B.box("raft", {k: entrance[k] for k in "xywh"}, NEAR_Z, NEAR_Z + 0.1)
+B.box("raft", {"x": hall["x"], "y": entrance["y"] + entrance["h"] - 0.05, "w": hall["w"], "h": 0.05}, HALL_CEIL + 0.25, NEAR_Z)
+for (x0, x1) in ((hall["x"], coffer["x"] - 0.6), (coffer["x"] + coffer["w"] + 0.6, hall["x"] + hall["w"])):
+    B.box("acoustic", {"x": x0, "y": entrance["y"], "w": x1 - x0, "h": entrance["h"] - 0.3}, NEAR_Z - 0.35, NEAR_Z)
 spots = []
-for side in (-1, 1):
-    edge = raft["x"] if side < 0 else raft["x"] + raft["w"]
-    tube("steel", edge + side * 1.9, BLACK_Z - 0.45, hall["y"] + 0.3, NORTH - 0.3, 0.28)
-    y = hall["y"] + 2
-    while y < NORTH - 1:
-        dx = edge + side * 0.8
-        if not any(inside(sw, dx, y) for sw in stairwells):
-            B.box("tableFrame", {"x": dx - 0.07, "y": y - 0.07, "w": 0.14, "h": 0.14}, BLACK_Z - 0.3, BLACK_Z)
-            spots.append((dx, y, BLACK_Z - 0.32))
-        y += 3.2
+for sy in (entrance["y"] + 2.5, entrance["y"] + 5.0):
+    for k in range(-3, 4):
+        sx = SX + k * 1.6
+        B.box("tableFrame", {"x": sx - 0.02, "y": sy - 0.5, "w": 0.04, "h": 1.0}, NEAR_Z - 0.04, NEAR_Z)   # track
+        cylinder("tableFrame", sx, sy, NEAR_Z - 0.32, NEAR_Z - 0.04, 0.055)
+        spots.append((sx, sy, NEAR_Z - 0.3))
 
-# trailing greenery hanging from the raft along both long edges of the coffer, and at its far corners
+
+def hex_panel(cx, cy, z, length=0.9, width=0.34, depth=0.05):
+    """A surface-mounted LED panel: an elongated hexagon in plan, white rim, glowing underside."""
+    half, cut = length / 2, width / 2
+    ring = [(-half, 0), (-half + cut, -cut), (half - cut, -cut), (half, 0), (half - cut, cut), (-half + cut, cut)]
+    top = [(cx + x, cy + y, z) for x, y in ring]
+    bot = [(cx + x, cy + y, z - depth) for x, y in ring]
+    B.mesh("hexFrame", top + bot, [tuple(range(6)), *[(i, (i + 1) % 6, 6 + (i + 1) % 6, 6 + i) for i in range(6)]])
+    glow = [(cx + x * 0.94, cy + y * 0.86, z - depth - 0.002) for x, y in ring]
+    B.mesh("panelLight", glow, [tuple(reversed(range(6)))])
+
+
+# hexagon panels on a grid between the columns, downlights between them
+lights, downlights = [], []
+for gx in [SX + 3.24 * k for k in range(-9, 8)]:
+    for gy in [NORTH - 2.2 - 3.2 * k for k in range(0, 16)]:
+        if not (hall["x"] + 1 < gx < hall["x"] + hall["w"] - 1 and gy > entrance["y"] + entrance["h"] + 0.5):
+            continue
+        if inside(coffer, gx, gy) or any(inside({**sw, "x": sw["x"] - 0.8, "w": sw["w"] + 1.6}, gx, gy) for sw in stairwells):
+            continue
+        hex_panel(gx, gy, HALL_CEIL)
+        lights.append((gx, gy, HALL_CEIL))
+        B.mesh("downlight", [(gx + 1.62 + 0.08 * math.cos(a), gy + 0.08 * math.sin(a), HALL_CEIL - 0.003)
+                             for a in [2 * math.pi * i / 12 for i in range(12)]], [tuple(reversed(range(12)))])
+        downlights.append((gx + 1.62, gy))
+for (gx, gy) in [(inner["x"] + 1.2 + 2.2 * i, inner["y"] + 1.5 + 2.5 * j) for i in range(3) for j in range(4)]:
+    hex_panel(gx, gy, INNER_Z)
+    lights.append((gx, gy, INNER_Z))
+
+# columns: a grey plinth, and a white speaker high up on the face towards the entrance
+for o in venue["obstacles"]:
+    b = o["bounds"]
+    if o["floor"] == 0 and o["height"] >= 3 and b["w"] < 1.2 and b["h"] < 1.2 and inside(hall, b["x"] + b["w"] / 2, b["y"] + b["h"] / 2):
+        B.box("plinth", {"x": b["x"] - 0.015, "y": b["y"] - 0.015, "w": b["w"] + 0.03, "h": b["h"] + 0.03}, 0, 0.1)
+        B.box("speaker", {"x": b["x"] + b["w"] / 2 - 0.13, "y": b["y"] - 0.2, "w": 0.26, "h": 0.2}, 2.42, 2.78)
+        B.box("tableFrame", {"x": b["x"] + b["w"] / 2 - 0.03, "y": b["y"] - 0.05, "w": 0.06, "h": 0.05}, 2.55, 2.65)
+
+# fire extinguishers on every third column, exit signs over the side walls, smoke detectors on the ceiling
+cols = [o["bounds"] for o in venue["obstacles"] if o["floor"] == 0 and o["height"] >= 3 and o["bounds"]["w"] < 1.2
+        and o["bounds"]["h"] < 1.2 and inside(hall, o["bounds"]["x"] + o["bounds"]["w"] / 2, o["bounds"]["y"] + o["bounds"]["h"] / 2)]
+for i, b in enumerate(cols):
+    if i % 3 == 1:
+        ex, ey = b["x"] + b["w"] + 0.1, b["y"] - 0.12
+        cylinder("extinguisher", ex, ey, 0.6, 1.08, 0.075)          # hung on a bracket, as in the photo
+        cylinder("tableFrame", ex, ey, 1.08, 1.15, 0.025)
+        B.box("tableFrame", {"x": ex - 0.04, "y": ey + 0.04, "w": 0.08, "h": 0.06}, 0.95, 1.15)
+for (sx_, sy_) in ((hall["x"] + 0.05, -10.0), (hall["x"] + 0.05, 8.0), (hall["x"] + hall["w"] - 0.2, -12.0)):
+    B.box("exitSign", {"x": sx_, "y": sy_ - 0.2, "w": 0.15, "h": 0.4}, HALL_CEIL - 0.42, HALL_CEIL - 0.2)
+for (gx, gy, _) in lights[::3]:
+    cylinder("speaker", gx + 0.9, gy + 1.1, HALL_CEIL - 0.04, HALL_CEIL, 0.06)
+
+# the stairwells' glass: white mullions every 1.25 m, and glass across the stair's high (south) end
+for l in stair_links:
+    b = l["bounds"]
+    B.box("frostedGlass", {"x": b["x"] - 0.3, "y": b["y"] - 0.3, "w": b["w"] + 0.6, "h": 0.3}, 0, HALL_CEIL)
+    for fx in (b["x"] - 0.33, b["x"] + b["w"] + 0.3):
+        y = b["y"] - 0.3
+        while y < b["y"] + 12.9:
+            B.box("hexFrame", {"x": fx, "y": y, "w": 0.03, "h": 0.05}, 0, HALL_CEIL)
+            y += 1.25
+        B.box("plinth", {"x": fx - 0.01, "y": b["y"] - 0.3, "w": 0.05, "h": 13.2}, 0, 0.12)
+    for fx in [b["x"] - 0.3 + 1.25 * k for k in range(4)]:
+        B.box("hexFrame", {"x": fx, "y": b["y"] - 0.33, "w": 0.05, "h": 0.03}, 0, HALL_CEIL)
+
+# trusses along the side walls, a box truss with its chords and a zigzag of diagonals
+for tx in (hall["x"] + 0.9, hall["x"] + hall["w"] - 0.9):
+    y0, y1, z = entrance["y"] + entrance["h"] + 1, NORTH - 2, HALL_CEIL - 0.45
+    for (dx, dz) in ((-0.15, 0), (0.15, 0), (-0.15, 0.3), (0.15, 0.3)):
+        B.box("steel", {"x": tx + dx - 0.02, "y": y0, "w": 0.04, "h": y1 - y0}, z + dz - 0.02, z + dz + 0.02)
+    y, k = y0, 0
+    while y < y1 - 0.4:
+        for dx in (-0.15, 0.15):
+            za, zb = (z, z + 0.3) if k % 2 == 0 else (z + 0.3, z)
+            B.mesh("steel", [(tx + dx - 0.012, y, za), (tx + dx + 0.012, y, za), (tx + dx + 0.012, y + 0.4, zb), (tx + dx - 0.012, y + 0.4, zb)], [(0, 1, 2, 3)])
+        y, k = y + 0.4, k + 1
+
+# trailing greenery: along the coffer, and clumps here and there on the ceiling (never over the screen)
 rng = random.Random(7)
-clumps = [(gx, y) for gx in (coffer["x"] - 0.12, coffer["x"] + coffer["w"] + 0.12)
-          for y in [coffer["y"] + 1.0 + 3.2 * k for k in range(int((coffer["h"] - 1.6) / 3.2) + 1)]]
-clumps += [(coffer["x"] + 0.5, coffer["y"] + coffer["h"] + 0.12), (coffer["x"] + coffer["w"] - 0.5, coffer["y"] + coffer["h"] + 0.12)]
+clumps = [(gx, y) for gx in (coffer["x"] - 0.12, coffer["x"] + coffer["w"] + 0.12) for y in (coffer["y"] + 1.5, coffer["y"] + 5.5, coffer["y"] + 9.5)]
+while len(clumps) < 22:
+    gx, gy = rng.uniform(hall["x"] + 3, hall["x"] + hall["w"] - 3), rng.uniform(entrance["y"] + 8, NORTH - 1.5)
+    if abs(gx - SX) < 3.5 and gy > NORTH - 7 or any(inside({**sw, "x": sw["x"] - 1, "w": sw["w"] + 2}, gx, gy) for sw in stairwells):
+        continue
+    if all(abs(gx - lx) > 0.9 or abs(gy - ly) > 0.6 for lx, ly, _ in lights):
+        clumps.append((gx, gy))
 for (gx, gy) in clumps:
     for _ in range(40):                                   # strands of ivy, leaves every few centimetres
-        x, y, z = gx + rng.uniform(-0.4, 0.4), gy + rng.uniform(-0.4, 0.4), RAFT_Z - 0.01
+        x, y, z = gx + rng.uniform(-0.4, 0.4), gy + rng.uniform(-0.4, 0.4), HALL_CEIL - 0.01
         for _ in range(int(rng.uniform(0.1, 0.8) ** 1.5 / 0.03) + 2):
             x, y, z = x + rng.uniform(-0.02, 0.02), y + rng.uniform(-0.02, 0.02), z - 0.03
             u = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-0.4, 0.4))).normalized()
@@ -557,24 +841,59 @@ for (gx, gy) in clumps:
             c, a_, b_ = Vector((x, y, z)), 0.055 * rng.uniform(0.7, 1.2), 0.035 * rng.uniform(0.7, 1.2)
             B.mesh("foliage", [c - u * a_, c - v * b_, c + u * a_, c + v * b_], [(0, 1, 2, 3)])
 
-# beige curtains along the north wall: a pleated sheet, smooth shaded
-xs = [hall["x"] + 0.2 + i * 0.05 for i in range(int((hall["w"] - 6.9) / 0.05))]
-cverts = [(x, NORTH - 0.09 + 0.05 * math.sin(2 * math.pi * x / 0.32), z) for x in xs for z in (0.02, RAFT_Z + 0.05)]
-cme = bpy.data.meshes.new("curtain")
-cme.from_pydata(cverts, [], [(2 * i, 2 * i + 2, 2 * i + 3, 2 * i + 1) for i in range(len(xs) - 1)])
-cme.shade_smooth()
-cob = bpy.data.objects.new("curtain", cme)
-cob.data.materials.append(M["curtain"])
-scene.collection.objects.link(cob)
+
+def curtain(name, x0, x1, y, z1, pleat=0.3, amp=0.09, face=-1):
+    """A pleated curtain along x at depth y, from just above the floor to z1: irregular folds (two frequencies plus
+    a per-fold depth), the hem breaking a little outward on the floor, UVs in metres for the fabric texture."""
+    rng_c = random.Random(name)
+    folds = [rng_c.uniform(0.6, 1.3) for _ in range(256)]
+    xs = [x0 + i * 0.025 for i in range(int((x1 - x0) / 0.025) + 1)]
+    zs = [0.0, 0.04, 0.12, 0.5, 1.2, 2.0, z1]
+    def depth(x, z):
+        k = (x - x0) / pleat
+        d = amp * math.sin(2 * math.pi * k) * folds[int(k) % 256] + 0.3 * amp * math.sin(2 * math.pi * k * 0.23 + 1.7)
+        return d * (1 + 0.5 * max(0.0, 0.12 - z) / 0.12) + (0.03 if z < 0.05 else 0.0)
+    verts, uvs = [], []
+    run, prev = 0.0, None
+    for x in xs:
+        p = (x, y + face * (amp * 1.6 + depth(x, 1.0)))
+        run += 0 if prev is None else math.dist(p, prev)
+        prev = p
+        for z in zs:
+            verts.append((x, y + face * (amp * 1.6 + depth(x, z)), z))
+            uvs.append((run, z))
+    n = len(zs)
+    faces = [(i * n + j, (i + 1) * n + j, (i + 1) * n + j + 1, i * n + j + 1) for i in range(len(xs) - 1) for j in range(n - 1)]
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts, [], faces)
+    uv = me.uv_layers.new(name="UVMap")
+    for poly in me.polygons:
+        for li in poly.loop_indices:
+            uv.data[li].uv = uvs[me.loops[li].vertex_index]
+    me.shade_smooth()
+    ob = bpy.data.objects.new(name, me)
+    ob.data.materials.append(M["curtain"])
+    scene.collection.objects.link(ob)
+
+
+curtain("curtain-north", hall["x"] + 0.2, hall["x"] + hall["w"] - 6.9, NORTH, HALL_CEIL + 0.05)
+# divider curtains drawn back against the columns away from the middle aisle
+for i, o in enumerate(venue["obstacles"]):
+    b = o["bounds"]
+    cxo, cyo = b["x"] + b["w"] / 2, b["y"] + b["h"] / 2
+    if o["floor"] == 0 and o["height"] >= 3 and b["w"] < 1.2 and b["h"] < 1.2 and inside(hall, cxo, cyo) and abs(cxo - SX) > 4:
+        side = 1 if cxo < SX else -1
+        x0 = b["x"] + b["w"] + 0.02 if side > 0 else b["x"] - 0.5
+        curtain(f"curtain-col-{i}", x0, x0 + 0.48, cyo, HALL_CEIL, pleat=0.12, amp=0.07)
 
 # the programme screen: 16:10 like a laptop panel, thin bezel with a deeper chin, in front of the curtains
-SCREEN = {"x": SX, "y": NORTH - 0.32, "z": 1.85, "w": 3.84, "h": 2.4}
+SCREEN = {"x": SX, "y": NORTH - 0.32, "z": 1.7, "w": 3.6, "h": 2.25}
 BEZEL, CHIN = 0.07, 0.18
 B.box("bezel", {"x": SX - SCREEN["w"] / 2 - BEZEL, "y": SCREEN["y"] - 0.05, "w": SCREEN["w"] + 2 * BEZEL, "h": 0.1},
       SCREEN["z"] - SCREEN["h"] / 2 - CHIN, SCREEN["z"] + SCREEN["h"] / 2 + BEZEL)
 sy_ = SCREEN["y"] - 0.055
 screen_corners = [(SX - SCREEN["w"] / 2, sy_, SCREEN["z"] - SCREEN["h"] / 2), (SX + SCREEN["w"] / 2, sy_, SCREEN["z"] - SCREEN["h"] / 2),
-                (SX + SCREEN["w"] / 2, sy_, SCREEN["z"] + SCREEN["h"] / 2), (SX - SCREEN["w"] / 2, sy_, SCREEN["z"] + SCREEN["h"] / 2)]
+                  (SX + SCREEN["w"] / 2, sy_, SCREEN["z"] + SCREEN["h"] / 2), (SX - SCREEN["w"] / 2, sy_, SCREEN["z"] + SCREEN["h"] / 2)]
 B.mesh("programme", screen_corners, [(0, 1, 2, 3)])
 
 
@@ -615,12 +934,23 @@ world = bpy.data.worlds.new("night")
 world.use_nodes = True
 world.node_tree.nodes["Background"].inputs["Color"].default_value = srgb(0x07060c)
 world.node_tree.nodes["Background"].inputs["Strength"].default_value = 1.0
-# a little haze in the air: spots and LEDs throw visible beams, as in the venue photos
-vol = world.node_tree.nodes.new("ShaderNodeVolumeScatter")
+scene.world = world
+# a little haze in the auditoriums only (the stage spots throw visible beams there, as in the photos);
+# the Hollywood room and the corridors are clear
+haze = bpy.data.materials.new("haze")
+haze.use_nodes = True
+hnt = haze.node_tree
+hnt.nodes.remove(hnt.nodes["Principled BSDF"])
+vol = hnt.nodes.new("ShaderNodeVolumeScatter")
 vol.inputs["Density"].default_value = 0.012
 vol.inputs["Anisotropy"].default_value = 0.55
-world.node_tree.links.new(vol.outputs["Volume"], world.node_tree.nodes["World Output"].inputs["Volume"])
-scene.world = world
+hnt.links.new(vol.outputs["Volume"], hnt.nodes["Material Output"].inputs["Volume"])
+hz = Batch()
+for r in auditoriums:
+    hz.box("haze", {k: r["bounds"][k] + d for k, d in (("x", 0.35), ("y", 0.2), ("w", -0.7), ("h", -0.4))},
+           FH - r.get("rake", 0) - 0.4, FH + CLEAR - 0.05)
+M["haze"] = haze
+hz.finish()
 
 
 def area(name, loc, size, power, color=(1, 1, 1), rot=(0, 0, 0)):
@@ -651,9 +981,18 @@ for sid in ("stair-west", "stair-east"):
     point(f"{sid}-foot", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] + 2.0, 3.0), 300, (0.85, 0.88, 1.0))
     point(f"{sid}-low", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] * 0.7, 2.6), 500, (0.8, 0.85, 1.0))
     point(f"{sid}-high", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] * 0.25, FH - 0.6), 500, (0.8, 0.85, 1.0))
-# the Hollywood room: an area light behind every ceiling panel, warm track spots in the black ceiling
-for (px, py, pz) in panels:
-    area(f"panel-{px:.1f}-{py:.1f}", (px, py, pz - 0.02), 0.6, 100, (0.97, 0.98, 1.0))
+# the Hollywood room: an area light under each hexagon panel, a narrow spot in each downlight (they throw the
+# pools of light on the carpet), warm track spots at the entrance end
+for (lx, ly, lz) in lights:
+    ob = area(f"panel-{lx:.1f}-{ly:.1f}", (lx, ly, lz - 0.06), 0.3, 55, (1.0, 0.94, 0.86))
+    ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", 0.8, 0.3
+for (lx, ly) in downlights:
+    spot = bpy.data.lights.new(f"down-{lx:.1f}-{ly:.1f}", "SPOT")
+    spot.energy, spot.spot_size, spot.spot_blend, spot.color = 45, math.radians(38), 0.35, (1.0, 0.9, 0.78)
+    spot.shadow_soft_size = 0.04
+    so = bpy.data.objects.new(spot.name, spot)
+    so.location = (lx, ly, HALL_CEIL - 0.01)
+    scene.collection.objects.link(so)
 for (tx, ty, tz) in spots:
     spot = bpy.data.lights.new(f"track-{tx:.1f}-{ty:.1f}", "SPOT")
     spot.energy, spot.spot_size, spot.spot_blend, spot.color = 350, math.radians(40), 0.5, (1.0, 0.92, 0.8)
@@ -674,7 +1013,7 @@ cam_data.sensor_fit = "VERTICAL"     # fov values below are vertical, as in the 
 cam = bpy.data.objects.new("cam", cam_data)
 scene.collection.objects.link(cam)
 scene.camera = cam
-scene.render.resolution_x, scene.render.resolution_y = (960, 540) if args.preview else (1920, 1080)
+scene.render.resolution_x, scene.render.resolution_y = (960, 540) if (args.preview or args.lookdev) else (1920, 1080)
 scene.render.fps = FPS
 ASPECT = 16 / 9
 
@@ -862,13 +1201,79 @@ else:
     scene.render.motion_blur_shutter = 0.4
 scene.view_settings.view_transform = "AgX" if "AgX" in [v.name for v in bpy.types.ColorManagedViewSettings.bl_rna.properties["view_transform"].enum_items] else "Filmic"
 scene.view_settings.look = "None"
+scene.view_settings.exposure = -0.9
+try:
+    scene.view_settings.look = "Medium High Contrast"
+except TypeError as e:
+    print("look:", e)
+
+
+def phone_post():
+    """Post like a phone photo: soft bloom around the lights, a hint of colour fringing towards the corners and
+    a little vignetting. No lens distortion, so the overlay corners in shots.json stay exact."""
+    ng = bpy.data.node_groups.new("post", "CompositorNodeTree")
+    ng.interface.new_socket("Image", in_out="OUTPUT", socket_type="NodeSocketColor")
+    rl, out = ng.nodes.new("CompositorNodeRLayers"), ng.nodes.new("NodeGroupOutput")
+    glare = ng.nodes.new("CompositorNodeGlare")
+    for k, v in (("Type", "Bloom"), ("Quality", "High"), ("Threshold", 1.2), ("Strength", 0.35), ("Size", 0.6)):
+        try:
+            glare.inputs[k].default_value = v
+        except (KeyError, TypeError, ValueError) as e:
+            print(f"post: glare {k}: {e}")
+    lens = ng.nodes.new("CompositorNodeLensdist")
+    lens.inputs["Distortion"].default_value, lens.inputs["Dispersion"].default_value = 0.0, 0.004
+    mask = ng.nodes.new("CompositorNodeEllipseMask")
+    mask.inputs["Size"].default_value = (1.15, 1.15)
+    blur = ng.nodes.new("CompositorNodeBlur")
+    blur.inputs["Size"].default_value = (250, 250)
+    vig = ng.nodes.new("ShaderNodeMix")
+    vig.data_type, vig.blend_type = "RGBA", "MULTIPLY"
+    vig.inputs["Factor"].default_value = 0.3
+    a, b = [i for i in vig.inputs if i.type == "RGBA"][:2]
+    links = ng.links
+    links.new(rl.outputs["Image"], glare.inputs["Image"])
+    links.new(glare.outputs["Image"], lens.inputs["Image"])
+    links.new(mask.outputs["Mask"], blur.inputs["Image"])
+    links.new(lens.outputs["Image"], a)
+    links.new(blur.outputs["Image"], b)
+    links.new(next(o for o in vig.outputs if o.type == "RGBA"), out.inputs["Image"])
+    scene.compositing_node_group = ng
+    scene.render.use_compositing = True
+
+
+if not args.preview:
+    phone_post()
 scene.render.image_settings.file_format = "PNG"
 
 if args.save:
     bpy.ops.wm.save_as_mainfile(filepath=args.save)
 
+REF_CAMS = json.loads((ROOT / "data" / "references" / "cameras.json").read_text())
+
+
+def render_reference(name):
+    """Render from a camera placed where a reference photo was taken, for side-by-side calibration."""
+    rc = REF_CAMS[name]
+    data = bpy.data.cameras.new(f"cam-ref-{name}")
+    ob = bpy.data.objects.new(f"cam-ref-{name}", data)
+    scene.collection.objects.link(ob)
+    ob.location, ob.rotation_euler = rc["loc"], aim(rc["loc"], rc["look"])
+    data.sensor_fit, data.angle_x = "HORIZONTAL", math.radians(rc["fov_h"])
+    hidden = [o for o in scene.objects if o.name in rc.get("hide", [])]
+    for o in hidden:
+        o.hide_render = True
+    scene.camera = ob
+    scene.render.filepath = str(OUT / f"ref-{name}.png")
+    bpy.ops.render.render(write_still=True)
+    for o in hidden:
+        o.hide_render = False
+    scene.camera = cam
+
+
 for what in [w for w in args.render.split(",") if w]:
-    if what == "hall":
+    if what.startswith("ref:"):
+        render_reference(what[4:])
+    elif what == "hall":
         scene.camera = hall_cam
         scene.render.filepath = str(OUT / "hall.png")
         bpy.ops.render.render(write_still=True)
