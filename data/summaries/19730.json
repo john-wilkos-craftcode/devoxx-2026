@@ -1,0 +1,44 @@
+{
+  "id": 19730,
+  "source": "transcript",
+  "tldr": "The TornadoVM team presents jitLLM, a pure-Java GPU inference engine that mixes TornadoVM-generated CUDA kernels with NVIDIA libraries inside CUDA graphs to reach 90%+ of llama.cpp decode throughput.",
+  "summary": [
+    "Michalis Papadimitriou and Orion Papadakis opened with a demo on an RTX 4090: a Java inference engine running Qwen3 4B in FP16 generated TornadoVM Java code for a Mandelbrot kernel, which a tool-calling harness compiled to CUDA and ran on the same GPU. The project, last year called GPULlama3.java, is now jitLLM. They claimed it reaches 90-97% of llama.cpp decode throughput and sometimes beats it on prefill, across models such as Gemma 4, GLM 4.7 and a 27B Qwen. A year ago they were 10-30x slower. They pitched it as the GPU option for local inference that stays in Java, alongside CPU-only projects like Llama3.java and JLama.",
+    "Papadimitriou summarised TornadoVM as a Java GPU programming framework for JDK 21 to 27, now on Maven and SDKMAN, with four programming levels: @Parallel loops, the low-level KernelContext API, a newer tile-based API, and library tasks that call NVIDIA libraries such as cuBLAS, cuDNN and cuFFT directly. Papadakis then walked through jitLLM's layers: a public API (load a GGUF, open a session, generate), an engine that queues and schedules requests for experimental continuous batching, a models layer for families, quantizations (FP32, Q8, Q4) and execution modes, abstract operation 'programs', a lowering step to TornadoVM task graphs, and a backend SPI choosing GPU or CPU. A paged KV cache shares blocks across sessions.",
+    "A live benchmark used a Java port of llama.cpp's own bench harness (4K-token prefill, 128-token decode, five repetitions) on Qwen3 0.6B: prefill was 1.2x llama.cpp, decode 93%. The gains come from mixing operators per layer. Model-specific steps like RMSNorm and RoPE use JIT-compiled TornadoVM kernels, compute-bound matrix multiplications in prefill go to cuBLAS, and the whole sequence is captured as a single CUDA graph to avoid per-kernel dispatch. Decode is memory-bound, so it stays fully JIT. Batch prefill gave 15x over token-by-token, and native libraries added more on top.",
+    "jitLLM plugs in three ways: its Java API directly, as a model provider for Quarkus LangChain4j, LangChain4j or Spring AI via application properties, or as an HTTP server with 'jitllm serve'. Demos ran the Quarkus LangChain4j weather sample (three tools: extract city, geocode, forecast) and a GitHub pull-request reviewer on a 27B Qwen model. The reviewer was pointed at a real jitLLM PR and at a draft PR porting Quarkus LangChain4j to Quarkus 4. The team plans to add the reviewer to its CI."
+  ],
+  "keyPoints": [
+    "jitLLM (formerly GPULlama3.java) is a Java LLM inference engine that compiles model layers to CUDA via TornadoVM at runtime.",
+    "On a Java port of llama.cpp's benchmark harness, they reported prefill at 1.2x llama.cpp and decode at 93% for Qwen3 0.6B, with decode above 90% on larger models.",
+    "TornadoVM library tasks call cuBLAS, cuDNN, cuFFT and CUTLASS from Java without JNI, and chain them with generated kernels in one task graph.",
+    "Each transformer layer becomes one CUDA graph mixing JIT kernels and cuBLAS calls, so it is dispatched once instead of per operation.",
+    "Prefill is compute-bound and benefits from vendor libraries; decode is memory-bound and runs best as fully JIT-compiled kernels.",
+    "The layered design (API, engine, models, programs, lowering, backend SPI) supports FP16, Q8 and Q4 quantization, a paged KV cache and experimental continuous batching.",
+    "Integration is via a Java API, a Quarkus LangChain4j / LangChain4j / Spring AI provider, or a local HTTP server started with jitllm serve."
+  ],
+  "takeaways": [
+    "Install TornadoVM through SDKMAN and run the jitLLM Quarkus demos on your own NVIDIA GPU.",
+    "If you run local models through llama.cpp or Ollama from Java, benchmark jitLLM as an in-JVM alternative for your models.",
+    "When optimising GPU pipelines, use vendor libraries for compute-bound steps and custom kernels for memory-bound or model-specific ones, and capture the sequence in a graph.",
+    "Open issues on the jitLLM project for models or LangChain4j features you need; the team asked for them."
+  ],
+  "quotes": [
+    {"text": "If you're having a project that runs on llama.cpp, you can swap it with jitLLM and you can get roughly 90% to 97% the same performance in throughput.", "at": "04:18"},
+    {"text": "Let's just use this NVIDIA library, they've been solving this problem for two decades now. We cannot do better.", "at": "32:41"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Self-generating GPU code demo"},
+    {"at": "05:42", "title": "Why LLM inference on the JVM"},
+    {"at": "08:34", "title": "TornadoVM programming models"},
+    {"at": "15:10", "title": "jitLLM architecture"},
+    {"at": "23:03", "title": "Live benchmark vs llama.cpp"},
+    {"at": "27:02", "title": "NVIDIA libraries and CUDA graphs"},
+    {"at": "33:53", "title": "Quarkus LangChain4j demos"},
+    {"at": "42:30", "title": "Wrap-up"}
+  ],
+  "tech": ["TornadoVM", "jitLLM", "CUDA", "CUDA graphs", "cuBLAS", "cuDNN", "cuFFT", "CUTLASS", "llama.cpp", "vLLM", "GGUF", "Qwen3", "Quarkus", "LangChain4j", "Spring AI", "SDKMAN", "JFR", "NVIDIA Nsight", "Llama3.java", "JLama"],
+  "watchIf": "You want to run local LLMs on NVIDIA GPUs from Java without JNI or a Python sidecar, or you are curious how inference engines squeeze performance out of a GPU.",
+  "themes": ["LLMs in Java apps", "JVM performance & runtime"],
+  "demo": true
+}

@@ -1,0 +1,85 @@
+{
+  "id": 5526,
+  "source": "transcript",
+  "tldr": "Semeteys wrote his techno-thriller like a software system, with lore-as-code Markdown, an AI writing harness, three LLM judges and a Pandoc build, then extended it into an alternate reality game.",
+  "summary": [
+    "Raphael Semeteys, an architect at Worldline who writes as Rafiki, finally finished a novel by applying a spec-driven agentic workflow to fiction: he is the 'showrunner', agents do the writing. Most of the months went into 'lore as code', Markdown files on characters (speech, clothing, conflicts, arcs), factions, technology and glossary, plus a harness holding the scenario and writing rules. Each chapter was drafted from the relevant lore files and refined until he approved it. Pandoc built PDF and EPUB. Three LLM judges reviewed the result: Gemini CLI for lore consistency, Codex/GPT for drama and pacing, Mistral for style. Getting noticed on Amazon was the step he had not planned for.",
+    "The same lore feeds other outputs. A QR code on page 175 ('scan if you are still human') opens an alternate reality game: a Dockerised TypeScript site set in 2036 with clearance levels unlocked by clues in the book. A graphic novel uses visual reference sheets for consistency. A newer fantasy project, published online chapter by chapter, uses Codex with two custom skills, one for image grounding and one for storytelling rules. A sped-up recording showed a chapter drafted, lore files updated to match, an illustration fixed, the site redeployed and everything committed."
+  ],
+  "keyPoints": [
+    "Keep the world in versioned Markdown (characters, factions, world, glossary) and inject only the files relevant to each chapter.",
+    "Separate the lore (the universe) from the harness (scenario, writing rules, steps); the scenario is one story within the lore.",
+    "Use several LLMs as judges with distinct roles: lore consistency (Gemini CLI), dramatic structure (Codex/GPT), style (Mistral).",
+    "Build the book like software: Pandoc from Markdown to PDF and EPUB, Kindle Previewer for checks, then publish and monitor.",
+    "Keep lore and output in sync: in his newer project, the agent updates character sheets when a chapter adds new lore, and images are generated from saved prompts for traceability."
+  ],
+  "takeaways": [
+    "Put the bulk of the effort into the context (lore or spec) before generating anything.",
+    "Give review agents separate, narrow roles instead of one generic 'review this' pass.",
+    "Ask the agent to write out its image or generation prompt first so every output can be traced and corrected."
+  ],
+  "quotes": [
+    {
+      "text": "AI is not replacing me here. I'm still the designer. I'm the architect.",
+      "at": "34:08"
+    },
+    {
+      "text": "What I design is both the lore but the loops.",
+      "at": "34:08"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "From game master to author"
+    },
+    {
+      "at": "05:53",
+      "title": "Lore as code and harness"
+    },
+    {
+      "at": "10:09",
+      "title": "Compile, LLM judges, publish"
+    },
+    {
+      "at": "15:02",
+      "title": "The visibility problem"
+    },
+    {
+      "at": "17:35",
+      "title": "Alternate reality game and comics"
+    },
+    {
+      "at": "23:00",
+      "title": "A new multimodal universe"
+    },
+    {
+      "at": "29:11",
+      "title": "Recorded chapter-writing demo"
+    },
+    {
+      "at": "32:49",
+      "title": "Lessons and Q&A"
+    }
+  ],
+  "tech": [
+    "Gemini CLI",
+    "Codex",
+    "Mistral",
+    "Pandoc",
+    "Markdown",
+    "EPUB",
+    "Kindle Previewer",
+    "Amazon Author Central",
+    "TypeScript",
+    "Docker",
+    "Agent skills",
+    "GitHub"
+  ],
+  "watchIf": "You use spec-driven agent workflows at work and want to see the same patterns (context files, harness, multi-model review, build pipeline) applied to a long creative project.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Hardware, robots & fun"
+  ],
+  "demo": false
+}

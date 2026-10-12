@@ -1,0 +1,76 @@
+{
+  "id": 17558,
+  "source": "transcript",
+  "tldr": "A slide-free demo tour of DuckDB, from the CLI and JDBC through querying CSV, Parquet, S3 and Postgres in one engine, to DuckLake and the upcoming Quack client-server protocol.",
+  "summary": [
+    "Oliver Geisser presented DuckDB as an open-source, in-process, column-oriented analytical database, fast at aggregations and weak at single-row transactions, and demoed everything live. After the CLI and its dot commands (.databases, .tables, .read), he embedded the engine via plain JDBC in a JBang script, noting DuckDB's own connection class for chunked columnar reads, and from Python. CSV import auto-detects delimiters and types, a 40-million-row Parquet file loaded into memory, and larger-than-memory data spills to disk. The dialect allows FROM 'file.parquet' with no SELECT *. The same file-system layer reads over HTTPS and S3, with credentials held in persistent secrets outside the code.",
+    "He attached DuckDB files, SQLite and a remote Postgres to one session so queries can join across them, which led to DuckLake: a standard-SQL catalog plus Parquet files on object storage. He built three lakes: all local, local catalog with S3, and Postgres catalog with S3, the last being a production setup. Multi-user access has needed Postgres because read-write DuckDB locks its file exclusively. With a DuckDB 2.0 alpha he started a server over the new Quack protocol and attached a second CLI with the new CONNECT command to query the S3-backed lake remotely. He said Quack ships at the end of the month."
+  ],
+  "keyPoints": [
+    "DuckDB runs in-process as a C++ library behind the CLI, JDBC and Python clients; the JDBC driver adds a chunk-based API for columnar results.",
+    "File formats (CSV, JSON, Excel, Parquet, SQLite) are read via extensions with type and delimiter auto-detection, locally, over HTTPS or from S3.",
+    "ATTACH lets one DuckDB session join data across DuckDB files, SQLite, Postgres and other databases, translating the dialect for the remote engine.",
+    "DuckLake keeps lake metadata in a plain SQL catalog (DuckDB or Postgres) and writes append-only Parquet files to local disk or S3.",
+    "The Quack protocol, shown in a DuckDB 2.0 alpha, turns DuckDB into a client-server database so several clients can share one read-write lake."
+  ],
+  "takeaways": [
+    "Try DuckDB without installing anything at shell.duckdb.org, which runs on WebAssembly.",
+    "Store cloud and database credentials as DuckDB persistent secrets instead of in scripts.",
+    "For a cheap lakehouse, evaluate DuckLake with a small Postgres catalog and Parquet on S3 before a managed cloud offering."
+  ],
+  "quotes": [],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "What DuckDB is"
+    },
+    {
+      "at": "01:34",
+      "title": "CLI basics"
+    },
+    {
+      "at": "04:08",
+      "title": "Embedding via JDBC and Python"
+    },
+    {
+      "at": "07:02",
+      "title": "Reading many file formats"
+    },
+    {
+      "at": "10:47",
+      "title": "Remote files and secrets"
+    },
+    {
+      "at": "12:12",
+      "title": "Attaching other databases"
+    },
+    {
+      "at": "16:06",
+      "title": "DuckLake"
+    },
+    {
+      "at": "20:53",
+      "title": "Quack client-server protocol"
+    }
+  ],
+  "tech": [
+    "DuckDB",
+    "DuckLake",
+    "Quack",
+    "JDBC",
+    "JBang",
+    "Python",
+    "Parquet",
+    "CSV",
+    "SQLite",
+    "PostgreSQL",
+    "AWS S3",
+    "WebAssembly"
+  ],
+  "watchIf": "You need to analyse files or join data from several databases without running a warehouse, or you are weighing a lightweight lakehouse.",
+  "themes": [
+    "Data & databases",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}

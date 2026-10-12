@@ -1,0 +1,125 @@
+{
+  "id": 7032,
+  "source": "transcript",
+  "tldr": "Vandeperre grows a coffee-shop app from one LLM call into a governed enterprise platform, demoing a model gateway, guardrails, sandboxes, supply chain, CDC, service mesh, rollouts and agent tracing.",
+  "summary": [
+    "Maarten Vandeperre (Red Hat) structured this three-hour deep dive around a coffee-shop analogy and the premise that 'calling an LLM' is not an AI architecture. He started with model access: hosted APIs, managed platforms like Amazon Bedrock, or your own serving stack with vLLM and llm-d. He argued open-weight models are now good enough for most narrow agentic tasks, and stressed that data residency is not sovereignty (the US CLOUD Act still applies to data stored in Europe). He also argued for controlling the model lifecycle so a validated model is not silently upgraded. A model-as-a-service gateway in front of all models gives routing, quotas and cost visibility.",
+    "A Quarkus LangChain4j demo with OpenWebUI compared four styles: a plain call, RAG over in-memory documents, tool calling with live stock data, and an MCP server. His advice: do not default to RAG or agents when a direct call with the document in context is cheaper. NeMo Guardrails, run as an OpenAI-compatible proxy, enforced prompt-injection checks, a 200-character input limit, PII masking, a coffee-only scope and a joke 'no cappuccino after lunch' rule written as a Colang flow plus a Python action. He described guardrails as a 'lasagna' of platform, application and model-level controls, and said a business rule like the cappuccino one belongs in application code.",
+    "For development, he showed OpenShift Dev Spaces (Eclipse Che) running a browser IDE in a Kubernetes pod with the Continue plugin, which calls a Qwen model through the gateway with a requested API key. He also pointed attendees to free OpenClaw sandboxes on developers.redhat.com and invited them to try breaking out. He covered a trusted software supply chain: signed commits, SBOMs, CVE thresholds that block the pipeline, curated base images such as UBI, and slim images without curl or vi. GitOps with Argo CD separates development from runtime, and Backstage software templates hide model and sizing choices behind simple options.",
+    "After the break he covered change data capture: Debezium reads the Postgres write-ahead log into Kafka and keeps a MongoDB copy in sync, ideally through an outbox table, which needs idempotent consumers. Istio, viewed in Kiali, enforced deny-by-default AuthorizationPolicies so the frontend could not reach the model router directly, plus mTLS and a 90/10 canary split. Argo Rollouts automated blue-green promotion with a PromQL analysis that fails on more than five HTTP 500s per minute. MLflow tracing showed every tool and model call behind an agentic mortgage app, which logs and metrics alone cannot do. Apache Camel routes let the platform team swap providers without code changes."
+  ],
+  "keyPoints": [
+    "Data residency is where data lives, sovereignty is who controls it; Vandeperre urged asking vendors to prove portability in RFPs, not just claim it.",
+    "Small open-weight models running locally on vLLM or Ollama cover most narrow agentic tasks; a model-as-a-service gateway adds routing, rate limits and per-team cost visibility.",
+    "Pick the cheapest architecture that works: direct call, then RAG, then tools/MCP, then agents. Validate MCP registries, since a malicious look-alike tool can be picked by the model.",
+    "NeMo Guardrails runs as an OpenAI-compatible proxy with Colang rules and Python actions; validate scope, input and output size, prompt injection and PII, on input and output.",
+    "Sandbox coding agents in Kubernetes pods (Dev Spaces / Eclipse Che) with network policies, no production secrets, and model access only via the gateway.",
+    "Supply chain: verify commit signatures, generate SBOMs, block on critical CVEs, pin versions, use curated base images, and plan for fast security-only releases.",
+    "Debezium CDC with an outbox table keeps vector stores and data lakes consistent with the source database, at the cost of eventual consistency and possible duplicate delivery.",
+    "Istio enforces that traffic goes through guardrail proxies, adds mTLS and request-level canaries and mirroring; Argo Rollouts automates promotion using Prometheus analysis templates."
+  ],
+  "takeaways": [
+    "Put one gateway in front of every model your organisation uses so you can route, rate-limit and attribute costs.",
+    "Try a direct LLM call with the document in context before building RAG or an agent.",
+    "Run guardrails as a proxy and use mesh policies to forbid any path to the model that bypasses it.",
+    "Give coding agents an isolated workspace with no production credentials and scoped service accounts, not admin access.",
+    "Add AI-level tracing (e.g. MLflow) next to logs and metrics so you can see which tools and models an agent called and how long each step took."
+  ],
+  "quotes": [
+    {
+      "text": "The first thing where you can burn your fingers is that you think that this architecture is doing AI. We call an LLM, so we're doing AI right.",
+      "at": "08:35"
+    },
+    {
+      "text": "The model itself cannot own the safety boundary. Make sure that you put the safety boundaries around it.",
+      "at": "42:12"
+    },
+    {
+      "text": "Your ability to deliver is becoming your ability to protect your organization as well.",
+      "at": "63:37"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Introduction and reality check"
+    },
+    {
+      "at": "09:36",
+      "title": "Model access and sovereignty"
+    },
+    {
+      "at": "19:22",
+      "title": "Direct calls, RAG, tools, MCP"
+    },
+    {
+      "at": "36:19",
+      "title": "Guardrails with NeMo"
+    },
+    {
+      "at": "51:50",
+      "title": "Sandboxed AI development"
+    },
+    {
+      "at": "60:05",
+      "title": "Trusted supply chain and GitOps"
+    },
+    {
+      "at": "67:44",
+      "title": "Platform engineering with Backstage"
+    },
+    {
+      "at": "84:02",
+      "title": "Change data capture with Debezium"
+    },
+    {
+      "at": "94:23",
+      "title": "Service mesh and Argo Rollouts"
+    },
+    {
+      "at": "115:23",
+      "title": "Agent ops and Camel abstraction"
+    }
+  ],
+  "tech": [
+    "Quarkus",
+    "LangChain4j",
+    "OpenWebUI",
+    "MCP",
+    "vLLM",
+    "llm-d",
+    "Ollama",
+    "OpenShift",
+    "OpenShift AI",
+    "NeMo Guardrails",
+    "TrustyAI",
+    "OpenShift Dev Spaces",
+    "Eclipse Che",
+    "Continue",
+    "OpenClaw",
+    "SonarQube",
+    "Red Hat UBI",
+    "Argo CD",
+    "Argo Rollouts",
+    "Backstage",
+    "Red Hat Developer Hub",
+    "Kafka",
+    "Debezium",
+    "PostgreSQL",
+    "MongoDB",
+    "Istio",
+    "Kiali",
+    "Prometheus",
+    "Loki",
+    "Grafana",
+    "MLflow",
+    "Apache Camel"
+  ],
+  "watchIf": "You are tasked with taking an AI proof of concept into an enterprise Kubernetes environment and want a tour of the platform pieces (gateway, guardrails, sandboxes, CDC, mesh, tracing) with working demos.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Cloud native & Kubernetes",
+    "Security & supply chain"
+  ],
+  "demo": true
+}
