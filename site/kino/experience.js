@@ -12,6 +12,8 @@ const dayKey = (iso) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).forma
 const roomNo = (t) => Number(String(t.room || "").replace(/\D/g, "")) || null;
 const EMBED = window.self === window.top;   // the claude.ai artifact sandbox can't embed YouTube
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Phones: a 16:9 wall would be ~200 px tall, so the panels become a sheet over the live venue.
+const SHEET = matchMedia("(max-width: 760px), (max-height: 520px)").matches;
 
 const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -91,6 +93,33 @@ const CSS = `
 .kx-skip[hidden] { display: none; }
 .kx-flat { position: fixed; z-index: 5; left: 18px; top: calc(14px + env(safe-area-inset-top, 0px)); color: #c9cdea; font: 15px/1 "Source Serif 4", Georgia, serif;
   background: rgba(14, 12, 28, .7); border: 1px solid #3A3060; border-radius: 999px; padding: 8px 14px; text-decoration: none; }
+.kx-sheet { position: fixed !important; left: 0; right: 0; bottom: 0; z-index: 4; width: auto !important; height: 64vh !important; max-height: 64vh;
+  border-radius: 18px 18px 0 0; padding: 18px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important; box-shadow: 0 -20px 60px rgba(0, 0, 0, .6) !important; }
+.kx-wall.kx-sheet { gap: 12px; }
+.kx-sheet h1 { font-size: 30px; }
+.kx-sheet .kx-wall-sub { font-size: 14px; }
+.kx-sheet .kx-days button, .kx-sheet .kx-search { font-size: 14px; padding: 6px 12px; }
+.kx-sheet .kx-search { width: 100%; margin-left: 0; }
+.kx-sheet .kx-slot { grid-template-columns: 54px 1fr; gap: 10px; padding: 10px 0; }
+.kx-sheet .kx-slot-time { font-size: 20px; }
+.kx-sheet .kx-slot-talks { grid-template-columns: 1fr; gap: 8px; }
+.kx-sheet .kx-talk { grid-template-columns: 38px 1fr; min-height: 0; padding: 8px 10px; gap: 10px; }
+.kx-sheet .kx-talk .kx-room { height: 38px; font-size: 22px; }
+.kx-sheet .kx-talk b { font-size: 17px; }
+.kx-sheet .kx-talk span { font-size: 13px; }
+.kx-screen.kx-sheet { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+.kx-sheet .kx-meta { font-size: 16px; }
+.kx-sheet h2 { font-size: 32px; margin-top: 8px; }
+.kx-sheet .kx-who { font-size: 15px; margin-top: 8px; }
+.kx-sheet .kx-tldr { font-size: 16px; border-left-width: 4px; padding-left: 12px; margin-top: 12px; }
+.kx-sheet .kx-actions { margin-top: 14px; gap: 8px; }
+.kx-panel.kx-sheet .kx-btn { font-size: 15px; padding: 8px 16px; }
+.kx-sheet .kx-tabs { flex-wrap: wrap; gap: 6px; }
+.kx-sheet .kx-tabs button { font-size: 14px; padding: 6px 12px; }
+.kx-sheet .kx-pane { font-size: 15px; overflow: visible; }
+.kx-sheet .kx-chapter { grid-template-columns: 56px 1fr; padding: 8px 0; }
+.kx-sheet .kx-chapter time { font-size: 17px; }
+.kx-sheet .kx-note { font-size: 14px; }
 .kx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 `;
 
@@ -109,17 +138,28 @@ export function startExperience(k) {
 
   const live = el("p", { class: "kx-sr", "aria-live": "polite" });
   const exitBtn = el("button", { class: "kx-exit", type: "button", text: "EXIT", title: "Back to the hall (Esc)", hidden: true, onclick: () => goLobby() });
-  const skipNote = el("p", { class: "kx-skip", text: "Click to skip", hidden: true });
+  const skipNote = el("p", { class: "kx-skip", text: SHEET ? "Tap to skip" : "Click to skip", hidden: true });
   const flatLink = el("a", { class: "kx-flat", href: "../", text: "Plain programme" });
   document.body.append(live, exitBtn, skipNote);
   if (EMBED) document.body.append(flatLink);
 
   // ---------- the programme wall: the big LED screen at the north end of the exhibition hall ----------
-  const WALL = { x: corridor.x + corridor.w / 2, y: 18.0, z: 3.15, w: 8, h: 4.5 };
+  // Centred between the hall's column lines at x 2.65 and 9.13, so the walk-up view has no column in it.
+  const WALL = { x: 5.9, y: 18.0, z: 3.15, w: 8, h: 4.5 };
   {
     const frame = new THREE.Mesh(new THREE.BoxGeometry(WALL.w + 0.3, WALL.h + 0.3, 0.2), k.mat(0x0b0c12, { roughness: 0.6 }));
     frame.position.copy(v3(WALL.x, WALL.y + 0.05, WALL.z));
-    const glow = new THREE.Mesh(new THREE.PlaneGeometry(WALL.w, WALL.h), new THREE.MeshBasicMaterial({ color: 0x0b1030 }));
+    // what the LED wall shows under the live HTML (and on phones, where the HTML is a sheet instead)
+    const ledTex = k.canvasTexture(1600, 900, (ctx, w, h) => {
+      ctx.fillStyle = "#05060c"; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "#EEEBF7"; ctx.font = '900 150px "Big Shoulders Display"';
+      ctx.fillText("Devoxx Belgium 2026", 90, 330);
+      ctx.fillStyle = "#FFC93C"; ctx.font = '800 90px "Big Shoulders Display"';
+      ctx.fillText("Now showing: every session", 90, 470);
+      ctx.fillStyle = "#9aa3c9"; ctx.font = '400 54px "Source Serif 4"';
+      ctx.fillText("Choose one and we'll take you to your seat.", 90, 590);
+    });
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(WALL.w, WALL.h), new THREE.MeshBasicMaterial({ map: ledTex, toneMapped: false, color: 0xcfcfcf }));
     glow.position.copy(v3(WALL.x, WALL.y - 0.06, WALL.z));
     scene.add(frame, glow);
     point(0x6a8cff, 140, 16, WALL.x, WALL.y - 4, WALL.z);
@@ -164,19 +204,27 @@ export function startExperience(k) {
     }
   }
   renderWall();
-  const wallObj = new CSS3DObject(wall);
-  wallObj.position.copy(v3(WALL.x, WALL.y - 0.08, WALL.z));
-  wallObj.scale.setScalar(WALL.w / 1600);
-  cssScene.add(wallObj);
+  if (SHEET) {
+    wall.classList.add("kx-sheet");
+    document.body.append(wall);
+  } else {
+    const wallObj = new CSS3DObject(wall);
+    wallObj.position.copy(v3(WALL.x, WALL.y - 0.08, WALL.z));
+    wallObj.scale.setScalar(WALL.w / 1600);
+    cssScene.add(wallObj);
+  }
 
   // ---------- camera poses ----------
   // fill: how much of the viewport the surface takes. Under 1 so the venue frames it.
+  // On phones only the band above the sheet shows the scene, so fit to that band's aspect.
+  const BAND = SHEET ? 0.36 : 1;   // fraction of the screen height the scene gets
   const fitDistance = (w, h, fov, fill = 0.92) => {
     const t = Math.tan(THREE.MathUtils.degToRad(fov) / 2);
-    return Math.max(h / 2 / t, w / 2 / (t * camera.aspect)) / fill;
+    return Math.max(h / 2 / (t * BAND), w / 2 / (t * camera.aspect)) / fill;
   };
   const LOBBY_FOV = 50, SEAT_FOV = 52;
   const lobbyPose = () => {
+    if (SHEET) { const d = fitDistance(WALL.w, WALL.h, 62, 0.9); return { pos: new THREE.Vector3(WALL.x, WALL.y - d, WALL.z), look: new THREE.Vector3(WALL.x, WALL.y, WALL.z), fov: 62 }; }
     const d = fitDistance(WALL.w, WALL.h, LOBBY_FOV, 0.8);
     return { pos: new THREE.Vector3(WALL.x, WALL.y - d, WALL.z), look: new THREE.Vector3(WALL.x, WALL.y, WALL.z), fov: LOBBY_FOV };
   };
@@ -231,7 +279,7 @@ export function startExperience(k) {
     return el("button", { class: "kx-chapter", type: "button", onclick: () => playAt && playAt(toSeconds(at)) }, ...kids);
   }
   function buildScreen(info, t) {
-    if (screenObj) { cssScene.remove(screenObj); screenObj.element.remove(); }
+    if (screenObj) { if (!screenObj.sheet) cssScene.remove(screenObj); screenObj.element.remove(); screenObj = null; }
     const { screen } = info;
     const pxW = 2048, pxH = Math.round(pxW * screen.h / screen.w);
     const s = t.s || {};
@@ -269,6 +317,12 @@ export function startExperience(k) {
     intro();
     showTab(tab);
     const panel = el("div", { class: "kx-panel kx-screen", style: `width:${pxW}px;height:${pxH}px` }, left, el("div", { class: "kx-side" }, tabBox, paneBox));
+    if (SHEET) {
+      panel.classList.add("kx-sheet");
+      document.body.append(panel);
+      screenObj = { element: panel, sheet: true };
+      return;
+    }
     screenObj = new CSS3DObject(panel);
     screenObj.position.copy(toThree(screen));
     screenObj.rotation.y = screen.west ? Math.PI / 2 : -Math.PI / 2;
@@ -330,10 +384,14 @@ export function startExperience(k) {
     }
     buildScreen(info, t);
     lightRoom(info.room);
-    for (const [n2, plane] of k.screenPlanes) plane.visible = n2 !== n;
+    for (const [n2, plane] of k.screenPlanes) plane.visible = SHEET || n2 !== n;
+    const plane = k.screenPlanes.get(n);   // the screen shows the talk you chose, not whatever was on at 14:00
+    if (plane) { plane.material.map.dispose(); plane.material.map = k.titleCard(t); plane.material.needsUpdate = true; }
+    if (SHEET) wall.hidden = true;
     const arrive = () => { state = "seated"; setPose(seatPose(info)); exitBtn.hidden = false; live.textContent = `Seated in Room ${n} for ${t.title}.`; };
     if (instant || reduceMotion) { arrive(); return; }
     state = "walking";
+    if (SHEET) wall.hidden = true;
     const curve = pathTo(info);
     const ms = Math.min(4300, 2300 + curve.getLength() * 22);
     animate(curve, toThree({ x: info.screen.x, y: info.seat.y, z: info.screen.z }), SEAT_FOV, ms, arrive);
@@ -341,13 +399,18 @@ export function startExperience(k) {
   function goLobby({ instant = false } = {}) {
     history.replaceState(null, "", location.pathname + location.search);
     exitBtn.hidden = true;
-    const back = () => { state = "lobby"; setPose(lobbyPose()); for (const l of roomLights) l.intensity = 0; live.textContent = "Back in the exhibition hall."; };
+    if (SHEET && screenObj) { screenObj.element.remove(); screenObj = null; }
+    const back = () => { state = "lobby"; if (SHEET) wall.hidden = false; setPose(lobbyPose()); for (const l of roomLights) l.intensity = 0; live.textContent = "Back in the exhibition hall."; };
     if (state !== "seated" || instant || reduceMotion || !current || !infoFor(roomNo(current))) { back(); return; }
     state = "walking";
     const pts = pathTo(infoFor(roomNo(current))).getPoints(60).reverse();
     animate(new THREE.CatmullRomCurve3(pts), toThree(lobbyPose().look), LOBBY_FOV, 2400, back);
   }
-  function refit() { if (state === "lobby") setPose(lobbyPose()); else if (state === "seated" && current) setPose(seatPose(infoFor(roomNo(current)))); }
+  // With a sheet over the bottom of the screen, shift the projection so the scene sits in the space above it.
+  const sheetOffset = () => { if (SHEET) camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * 0.3, innerWidth, innerHeight); };
+  sheetOffset();
+  function refit() {
+    sheetOffset(); if (state === "lobby") setPose(lobbyPose()); else if (state === "seated" && current) setPose(seatPose(infoFor(roomNo(current)))); }
   addEventListener("keydown", (e) => { if (e.key === "Escape" && state !== "lobby") goLobby(); });
 
   // ---------- start: a deep link seats you straight away; otherwise one dolly in towards the wall ----------
