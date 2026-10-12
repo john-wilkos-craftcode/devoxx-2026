@@ -229,6 +229,8 @@ for d in venue["decor"]:
     mat = d.get("material")
     if mat in ("floorBelow", "seat", "seatBack"):
         continue
+    if d.get("wordmark") and d["wordmark"] != "devoxx":
+        continue   # Ghost Light stores DEVOXX and JAVAPOLIS in the same spot; draw only DEVOXX
     under = d["floor"] * FH + plate_under(d)
     key = mat or ("stair" if d.get("linkId") in STAIRS else "rake" if d.get("linkId") else "concrete")
     if mat == "structure":

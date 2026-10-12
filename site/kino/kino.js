@@ -131,6 +131,9 @@ for (const d of venue.decor) {
   const top = under + d.height;
   let key = d.material || (d.linkId ? (STAIRS.has(d.linkId) ? "stair" : "rake") : "concrete");
   if (d.material === "floorBelow" || d.material === "seat" || d.material === "seatBack") continue;
+  // Ghost Light keeps both of the conference's names (DEVOXX and JAVAPOLIS) in the same place on
+  // the stages and draws one per chapter; drawing both overlays two words.
+  if (d.wordmark && d.wordmark !== "devoxx") continue;
   if (d.material === "structure") key = "rake";
   const m = M[key] || M.concrete;
   addBox(key, m, d.bounds, bottom, top);
