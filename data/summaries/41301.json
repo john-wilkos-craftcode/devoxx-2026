@@ -1,0 +1,101 @@
+{
+  "id": 41301,
+  "source": "transcript",
+  "tldr": "Using a coffee analogy and one Quarkus app wired to three backends, Vandeperre and Nigon compare hosted model APIs, self-hosted inference with vLLM and llm-d, and a governed model-as-a-service gateway.",
+  "summary": [
+    "Vandeperre and Nigon of Red Hat (this was a sponsored talk) frame the choice as getting coffee: buy it at Starbucks (hosted APIs such as OpenAI, Anthropic, Gemini), own a Jura machine (self-hosted inference on your own hardware), or use something in between (managed platforms like Amazon Bedrock or Azure Foundry). Their list of hosted-API risks: prices that can double overnight, one shared API key with no drill-down on the bill, latency you cannot control at peak, model upgrades that change behaviour, prompts leaving the organisation, a provider cutting off access, a limited menu, and cost that stays pure opex.",
+    "Their demo is a Quarkus and LangChain4j coffee-ordering app with a human-in-the-loop confirmation step, so an absurd total from a hallucinating small model can be rejected. Only the model configuration changes between backends. Vandeperre argues that data residency is not sovereignty, since jurisdiction still applies, and that open standards without open source still leave a kill switch. He illustrates the personal stakes with hypotheticals: medical summaries sold to insurers, or salary offers tuned to an applicant's debt.",
+    "Nigon covers what owning the stack costs: upfront GPU spend, GPUs idle overnight (fill them with fine-tuning or agentic batch jobs), peak concurrency, model upkeep, and above all unclear ownership between app, infra and security teams. Locally, Podman Desktop's AI Lab serves a 4B model behind an OpenAI-compatible /v1/chat/completions endpoint and generates Quarkus client snippets; a 9B download took down the hotel Wi-Fi the night before. For production she recommends vLLM over Ollama, which handles concurrent requests poorly, then llm-d for distributed inference with smart routing between vLLM pods, NVIDIA multi-instance GPU for sharing cards, and quantized models.",
+    "To stop 'shadow AI', with each developer running their own GPU and model, they put a model-as-a-service gateway in front: API keys tied to subscriptions, per-subscription token and request limits that return HTTP 429, and admin dashboards for time to first token, latency and token use per team. External models such as Claude can be registered behind it too, which they pitch as a first step even for teams staying on hosted APIs. The OpenShift AI demo deploys Qwen 0.6B on CPU and issues a key. Asked how to compare costs, they admitted they have no sizing guidance."
+  ],
+  "keyPoints": [
+    "Eight risks of hosted APIs: price increases, shared keys with no cost drill-down, uncontrolled peak latency, silent model upgrades, data leaving your boundary, provider cutoff, limited model menu, and pure opex.",
+    "Podman Desktop AI Lab serves Hugging Face models locally behind an OpenAI-compatible endpoint, so a LangChain4j app switches by changing the base URL (host.containers.internal inside a container).",
+    "Ollama is fine on a laptop but weak at concurrent requests; vLLM, with efficient KV-cache management, is the recommended production engine.",
+    "llm-d adds distributed inference on Kubernetes, routing requests to the vLLM replica with the most capacity.",
+    "Red Hat publishes validated, vLLM-optimised models on Hugging Face with benchmark data such as time to first token on given GPUs.",
+    "NVIDIA multi-instance GPU lets several models share one card; quantization shrinks models with little accuracy loss, which they compared to a 2.4 MB image versus a 73 KB JPEG.",
+    "A model-as-a-service gateway with subscriptions, token quotas and per-team observability addresses both shadow AI and the question of who is on call.",
+    "Swapping in a newer model with the same API shape still requires re-testing, because behaviour changes."
+  ],
+  "takeaways": [
+    "Put an AI gateway with per-team keys and token metrics in front of your model access now, even if it only proxies a hosted provider.",
+    "Keep the model endpoint configurable so the same app can target OpenAI, a local Podman model or an internal gateway.",
+    "Try small models like Qwen 0.6B or 4B-class models on CPU for summarisation tasks before buying GPUs.",
+    "Name an owner for the AI platform before self-hosting, covering serving, security and on-call.",
+    "Schedule fine-tuning or batch agentic jobs at night so self-hosted GPUs are not idle."
+  ],
+  "quotes": [
+    {
+      "text": "Data residency is not the same as sovereignty.",
+      "at": "15:38"
+    },
+    {
+      "text": "Production is not the playground.",
+      "at": "47:15"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Introduction and Red Hat"
+    },
+    {
+      "at": "04:53",
+      "title": "Three ways to get coffee"
+    },
+    {
+      "at": "07:22",
+      "title": "Risks of hosted APIs"
+    },
+    {
+      "at": "11:31",
+      "title": "Demo with OpenAI"
+    },
+    {
+      "at": "15:38",
+      "title": "Sovereignty and control"
+    },
+    {
+      "at": "19:01",
+      "title": "Challenges of self-hosting"
+    },
+    {
+      "at": "22:54",
+      "title": "Local models with Podman Desktop"
+    },
+    {
+      "at": "29:17",
+      "title": "Quantization, vLLM and llm-d"
+    },
+    {
+      "at": "34:20",
+      "title": "Model as a service gateway"
+    },
+    {
+      "at": "44:36",
+      "title": "Wrap-up and questions"
+    }
+  ],
+  "tech": [
+    "vLLM",
+    "llm-d",
+    "Quarkus",
+    "LangChain4j",
+    "Podman Desktop AI Lab",
+    "OpenShift AI",
+    "Ollama",
+    "NVIDIA MIG",
+    "Red Hat Connectivity Link",
+    "NeMo Guardrails",
+    "TrustyAI",
+    "Hugging Face",
+    "Qwen"
+  ],
+  "watchIf": "You call hosted LLM APIs today and need a beginner-level map of what self-hosting with vLLM, llm-d and a token-metering gateway would involve.",
+  "themes": [
+    "LLMs in Java apps",
+    "Cloud native & Kubernetes"
+  ],
+  "demo": true
+}

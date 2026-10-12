@@ -1,0 +1,77 @@
+{
+  "id": 50109,
+  "source": "transcript",
+  "tldr": "Cvetkovic argues AI-driven vulnerability discovery makes continuous patching mandatory for Spring apps, and demos Broadcom's commercial Spring Application Advisor upgrading Pet Clinic from Boot 2.7 to 3.5.",
+  "summary": [
+    "Cvetkovic, a Tanzu solution engineer at Broadcom, opens with the threat picture in this vendor lunch talk. Frontier models used by researchers, and by Broadcom through Anthropic's Project Glasswing, are finding flaws faster, and attackers can turn a published fix into an exploit within hours. He said the Spring team has fixed over 200 CVEs since April, against about 177 in the previous 13 to 14 years, and over 90 across the ecosystem since June. He cited a study in which only 17 of 100 AI-generated patches were clean, durable fixes. His remedy is continuous automated patching, filtering CVEs by actual exposure, and staying on upstream-maintained builds, which leads into the pitch for Spring Enterprise: a private repository with extended support for the last minor versions (Boot 2.7.35 against 2.7.18 in open source, 3.5 and Framework 6.2 beyond their open source end of life).",
+    "The demo runs Spring Application Advisor, a CLI built on OpenRewrite plus proprietary Broadcom recipes, on Spring Pet Clinic at Boot 2.7.3, where Trivy reported 135 CVEs, 18 critical. 'build-config get' maps the dependency tree, 'upgrade-plan get' lays out steps up to Boot 4.1 and Java 25, a patch apply to 2.7.35 cut it to 11 (3 critical, in Tomcat), and 'upgrade-plan apply' with squash jumped to 3.5 in about two minutes, optionally opening a PR. One medium Log4j CVE remained because its fix needs a minor bump. He also showed mapping files for in-house starters like a bank's shared Boot wrapper, and a not-yet-released option that attaches coding-agent skills to upgrade steps."
+  ],
+  "keyPoints": [
+    "According to Cvetkovic, the Spring team fixed more CVEs in a few months of 2026 than in the previous 13 to 14 years, driven by AI-assisted research.",
+    "Spring Enterprise extends patch support for the last minors before a major (Boot 2.7, 3.5, Framework 6.2) via a private Artifactory-style repository.",
+    "Application Advisor offers deterministic patch upgrades (with transitive pinning) and multi-step upgrade plans that can be squashed and submitted as pull requests.",
+    "On the demo app, patching alone took Trivy findings from 135 to 11; the remaining Log4j issue showed that some fixes need a minor version change and a judgement call on whether the library is actually used.",
+    "Mapping files define recipes per version step for internal libraries; agent skills per step were shown as unreleased work."
+  ],
+  "takeaways": [
+    "Run a scheduled pipeline that applies patch-level dependency updates several times a day, not just on a monthly cycle.",
+    "Scan your Spring apps with Trivy or a similar tool and prioritise CVEs by whether the vulnerable code is reachable.",
+    "Plan your move off Spring Boot 2.7 and 3.5 now, or budget for commercial extended support if you cannot.",
+    "Try the free Spring Academy App Advisor lab before evaluating the tool for your pipeline."
+  ],
+  "quotes": [
+    {
+      "text": "As soon as you publish things, bad actors can use this to produce exploits, faster than ever before.",
+      "at": "10:53"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "AI-accelerated vulnerabilities"
+    },
+    {
+      "at": "05:43",
+      "title": "Continuous patching and noise"
+    },
+    {
+      "at": "07:07",
+      "title": "The Spring CVE spike"
+    },
+    {
+      "at": "12:18",
+      "title": "Extended support releases"
+    },
+    {
+      "at": "17:37",
+      "title": "Spring Application Advisor"
+    },
+    {
+      "at": "20:27",
+      "title": "Upgrading Pet Clinic demo"
+    },
+    {
+      "at": "31:37",
+      "title": "Internal libraries and agent skills"
+    }
+  ],
+  "tech": [
+    "Spring Boot",
+    "Spring Framework",
+    "Spring Application Advisor",
+    "Tanzu Spring",
+    "OpenRewrite",
+    "Trivy",
+    "Log4j",
+    "Tomcat",
+    "Spring Academy",
+    "SLSA"
+  ],
+  "watchIf": "You maintain Spring Boot 2.7 or 3.x apps and want to see what Broadcom's commercial upgrade tooling and extended support actually do.",
+  "themes": [
+    "Security & supply chain",
+    "Spring & frameworks",
+    "Legacy modernization"
+  ],
+  "demo": true
+}

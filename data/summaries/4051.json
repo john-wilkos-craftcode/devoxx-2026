@@ -1,0 +1,107 @@
+{
+  "id": 4051,
+  "source": "transcript",
+  "tldr": "Schabetsberger explains what the EU Cyber Resilience Act requires of software makers, then compares free tools for SBOMs, vulnerability scanning and dependency updates, finding they disagree widely.",
+  "summary": [
+    "Schabetsberger, a freelance .NET and Angular engineer from Linz (and, by his own disclaimer, no lawyer), runs the talk around a running 'it depends' gag. The CRA has been in force since 10 December 2024 and applies fully from 11 December 2027. It covers any product with digital elements, including backends a product needs to work, with no size or revenue exemptions. Open source foundations have lighter 'steward' duties. Its rules: no shipping known vulnerabilities, free and signed security updates for the support period (at least five years by default), and informing customers. Most products need only a self-assessment for the CE mark; important and critical classes need standards, third-party assessment or certification.",
+    "Article 13's cybersecurity risk assessment drives the rest, since nearly every Annex I requirement applies 'on the basis of' it. He argues it is simply threat modelling done continuously and written down: Adam Shostack's four questions (what are we building, what can go wrong, what will we do about it, did we do a good job), STRIDE, which maps closely onto Annex I, and a whiteboard photo in the repo rather than an 80-page template. Since 11 September 2026, actively exploited vulnerabilities must be reported on ENISA's single reporting platform: an early warning within 24 hours, including weekends, a notification within 72 hours, and a final report later.",
+    "For SBOMs, he recommends CycloneDX or SPDX and tracking transitive and even dev dependencies. On an empty Angular app the tools disagreed: npm sbom and the CycloneDX npm CLI found 450 components (423 unique), the CycloneDX esbuild plugin only what was bundled, Syft only package.json plus stray GitHub Actions, Microsoft's SBOM tool 453, and GitHub's dependency graph 555 because it counts optional dependencies for every OS. The dependency graph also missed .NET transitive dependencies and central package management. Verify whatever your tool outputs.",
+    "For scanning he covers npm audit, dotnet list package --vulnerable, OWASP Dependency-Check, Trivy, Grype and OWASP Dependency-Track, which only accepts CycloneDX, so he wrote a converter for Yocto's SPDX output. Since maintainers owe you no backports, he argues for 'software gardening': Renovate or Dependabot with grouped updates, a cooldown of about 24 hours against compromised releases, and auto-merge for patches given good tests, plus OpenRewrite for migrations. He also inlines unmaintained libraries and uses distroless images or Docker Hardened Images."
+  ],
+  "keyPoints": [
+    "The CRA applies fully from 11 December 2027; vulnerability and incident reporting obligations started on 11 September 2026.",
+    "Reporting goes through ENISA's single reporting platform: early warning within 24 hours, full notification within 72 hours, final report within 14 days for exploited vulnerabilities or one month for severe incidents.",
+    "Security updates must be free and delivered securely for the support period, which defaults to at least five years.",
+    "About 90% of products need only self-assessment; important class I and II and critical products need harmonised standards, third-party assessment or EU certification (Annex III lists examples).",
+    "The required risk assessment can be a lightweight, continuously updated threat model using Shostack's four questions and STRIDE, with tools like OWASP Threat Dragon, Threagile or Microsoft Threat Modeling Tool.",
+    "SBOM tools gave 423 to 555 components for the same empty Angular app, depending on deduplication, tree shaking and optional OS-specific packages.",
+    "OWASP Dependency-Track accepts only CycloneDX, which can force a conversion step if your build, like Yocto, emits SPDX."
+  ],
+  "takeaways": [
+    "Hold a time-boxed threat-modelling session per release and commit the result to your repository as your CRA risk assessment.",
+    "Generate a CycloneDX or SPDX SBOM in CI and check its component count against your lock file.",
+    "Feed SBOMs into a scanner such as Dependency-Track or Trivy in a dedicated pipeline, not just build warnings.",
+    "Configure Renovate or Dependabot with grouped updates and a cooldown of at least 24 hours.",
+    "Set up an on-call path for 24-hour vulnerability early warnings and register on ENISA's platform."
+  ],
+  "quotes": [
+    {
+      "text": "What we already consider good practices today will simply be required by law tomorrow.",
+      "at": "06:14"
+    },
+    {
+      "text": "A picture of your whiteboard checked into your repository is infinitely better than the perfect threat model you never get around to make.",
+      "at": "16:59"
+    },
+    {
+      "text": "Whether your software should be secure must never be answered with: it depends.",
+      "at": "43:28"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Disclaimer and CRA basics"
+    },
+    {
+      "at": "03:29",
+      "title": "Who is affected"
+    },
+    {
+      "at": "06:14",
+      "title": "Core obligations and categories"
+    },
+    {
+      "at": "11:23",
+      "title": "Risk assessment as threat modelling"
+    },
+    {
+      "at": "16:59",
+      "title": "SBOMs and reporting deadlines"
+    },
+    {
+      "at": "21:06",
+      "title": "What counts as a dependency"
+    },
+    {
+      "at": "23:52",
+      "title": "Comparing SBOM tools"
+    },
+    {
+      "at": "31:32",
+      "title": "Vulnerability scanning tools"
+    },
+    {
+      "at": "35:38",
+      "title": "Automated dependency updates"
+    },
+    {
+      "at": "40:45",
+      "title": "Reducing dependencies and recap"
+    }
+  ],
+  "tech": [
+    "Cyber Resilience Act",
+    "CycloneDX",
+    "SPDX",
+    "Syft",
+    "Grype",
+    "Trivy",
+    "OWASP Dependency-Check",
+    "OWASP Dependency-Track",
+    "Microsoft SBOM Tool",
+    "GitHub dependency graph",
+    "Renovate",
+    "Dependabot",
+    "OpenRewrite",
+    "STRIDE",
+    "OWASP Threat Dragon",
+    "Docker Hardened Images",
+    "Yocto"
+  ],
+  "watchIf": "You ship software in the EU and need a practical engineering reading of the CRA plus an honest comparison of SBOM and scanning tools.",
+  "themes": [
+    "Security & supply chain"
+  ],
+  "demo": false
+}

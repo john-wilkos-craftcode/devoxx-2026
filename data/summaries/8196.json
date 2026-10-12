@@ -1,0 +1,80 @@
+{
+  "id": 8196,
+  "source": "transcript",
+  "tldr": "Rotsaert shows how ArchUnit turns architecture rules into JUnit tests and how the Taikai library on top of it provides ready-made, readable rules for Java and Spring projects.",
+  "summary": [
+    "Rotsaert starts from familiar drift in a layered Spring Boot app: a repository injected into a controller, a domain class depending on a service, cycles too long to spot in review, and a utils class half the code depends on. Code review fails on large, often AI-generated PRs, so he tests the architecture instead. ArchUnit expresses rules as JUnit tests (@AnalyzeClasses, @ArchTest) and has a pre-built layeredArchitecture() rule. But starting from a blank test is hard, the documentation is long, and the rules grow repetitive. Taikai sits on ArchUnit and offers a builder with predefined rules by category: Java, logging, test, and Spring controllers, services and repositories.",
+    "His demos ban Lombok imports, forbid methods that declare generic exceptions (with a documented exclusion for one Spring Security config class), and chain existing rules into a house convention for Spring configuration: config classes in a config package, immutable records with @ConfigurationProperties, and @ConfigurationPropertiesScan on the main class. Generated code is excluded, checkAll() reports every violation, and a company default config can be extended per project. When no Taikai rule exists, a plain ArchUnit rule plugs into the builder. His team had AI generate ArchUnit rules from their SonarQube instance through the SonarQube MCP server, so AI-written code fails the gate less often."
+  ],
+  "keyPoints": [
+    "ArchUnit rules run as JUnit tests on every build; use ImportOption to keep them from applying to test classes.",
+    "Taikai pulls in ArchUnit transitively and replaces class-level annotations with a builder (namespace, categories, build, check or checkAll).",
+    "Any Taikai rule can exclude specific classes or regex patterns, which documents deliberate exceptions in the test itself.",
+    "Generating ArchUnit rules from existing SonarQube rules with an AI model and the SonarQube MCP server reduced quality-gate failures on AI-generated code.",
+    "Adoption only happened once the Taikai test was added to the team's Maven archetype for new projects; Rotsaert judges the single-maintainer library acceptable because it is quick to release and easy to fork."
+  ],
+  "takeaways": [
+    "Copy the ready-made Taikai test (or the Spring Boot starter example) from its documentation into a project and run it.",
+    "Add rules one at a time when you see a recurring problem, and only enforce what matters, more strictly where AI writes the code.",
+    "Put architecture tests in your project archetype or template so new projects get them by default."
+  ],
+  "quotes": [
+    {
+      "text": "This is what I call configuration roulette. You search for all the annotations which contain the word configuration and then you add them.",
+      "at": "11:43"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "How architecture erodes"
+    },
+    {
+      "at": "03:53",
+      "title": "Testing with ArchUnit"
+    },
+    {
+      "at": "07:51",
+      "title": "Introducing Taikai"
+    },
+    {
+      "at": "08:53",
+      "title": "Banning unwanted dependencies"
+    },
+    {
+      "at": "10:15",
+      "title": "Spring configuration rules"
+    },
+    {
+      "at": "13:45",
+      "title": "Exclusions and full test"
+    },
+    {
+      "at": "17:47",
+      "title": "Lessons learned"
+    },
+    {
+      "at": "20:12",
+      "title": "Should you use Taikai"
+    }
+  ],
+  "tech": [
+    "ArchUnit",
+    "Taikai",
+    "JUnit 5",
+    "Spring Boot",
+    "Spring Security",
+    "Lombok",
+    "SonarQube",
+    "SonarQube MCP server",
+    "Maven archetypes",
+    "OpenAPI Generator",
+    "jOOQ"
+  ],
+  "watchIf": "Your architecture diagrams no longer match the code and you want a quick, low-effort way to enforce layering and conventions in CI.",
+  "themes": [
+    "Architecture & design",
+    "Testing & quality"
+  ],
+  "demo": true
+}

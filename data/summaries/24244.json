@@ -1,0 +1,94 @@
+{
+  "id": 24244,
+  "source": "transcript",
+  "tldr": "Boonen shows low-effort Maven and GitLab CI settings (parallel JUnit, quieter logs, no recompilation between jobs, workflow rules) that make builds faster and leaner, and measures them with Eco CI.",
+  "summary": [
+    "Boonen got into green software after his daughters asked what he was doing about the carbon burned in data centers at work. Of the three areas where software causes emissions (hardware production, energy used while building, hosting), he focuses on the build. On hardware he gives one tip: run pipelines on older, reused machines, either decommissioned in-house servers or the second-life servers a provider such as Hetzner offers. His Maven tips start with JUnit 5 parallel execution: five lines in junit-platform.properties cut a demo suite from just over six seconds to about three. Spring Boot integration tests with shared contexts may need annotations that keep them on one thread.",
+    "Next he cuts log noise. Simple-logger settings in .mvn/jvm.config add a timestamp, hide thread names and show only errors, which he says saves 10 to 20 seconds on large projects. The bigger waste is recompilation. Each CI job checks out the code again, so sources passed along as artifacts look newer than the compiled classes and Maven recompiles and retests everything. Setting lastModGranularityMs gives a grace period, which is safe because every job builds the same commit. He sets this in MAVEN_CLI_OPTS with skipped source and install plugins, quiet mode and --no-transfer-progress, plus -XX:TieredStopAtLevel=1 in MAVEN_OPTS.",
+    "His pipeline principles are to fail fast but report all test failures, and to do only the work needed. The GitLab demo compiles once, passes target/classes via artifacts and needs, runs unit and integration tests in parallel jobs, and merges the Surefire, Failsafe and JaCoCo outputs into one coverage job, with separate paths so one report does not overwrite another. Workflow rules skip pipelines for pushes to feature branches without a merge request, and job rules keep Sonar analysis and packaging off triggers where they add nothing. He measures with Eco CI, added through a hidden base job that reports per-job watt-hours, and suggests Kepler for self-hosted Kubernetes runners."
+  ],
+  "keyPoints": [
+    "Setting parallel execution to true and the mode to concurrent in junit-platform.properties halved a demo test suite (about 6 s to 3 s); shared Spring contexts may need to be kept on one thread.",
+    "Simple-logger properties in .mvn/jvm.config (timestamp on, thread name off, errors only) remove Maven info logs nobody reads in green pipelines.",
+    "Passing compiled classes between CI jobs does not help on its own: a fresh checkout makes sources newer than classes, so Maven recompiles and reruns tests unless lastModGranularityMs gives a grace period.",
+    "Pipeline-wide MAVEN_CLI_OPTS can skip the source and install plugins and add quiet mode and --no-transfer-progress; MAVEN_OPTS can stop tiered compilation at level 1 for short-lived builds.",
+    "In GitLab, artifacts plus needs share outputs between jobs, and workflow rules can skip pipelines on feature branches until a merge request exists.",
+    "Artifacts built on main for a commit can be fetched by commit ID through the GitLab API when a release tag on the same commit starts a new pipeline; on GitHub this takes API scripting with curl.",
+    "Eco CI estimates energy per job from inside the pipeline and can use Electricity Maps carbon intensity; Kepler measures node energy on Kubernetes runners you host yourself."
+  ],
+  "takeaways": [
+    "Add a junit-platform.properties with concurrent parallel execution and fix any tests that break.",
+    "Set lastModGranularityMs in your CI Maven options so later jobs reuse the compiled classes instead of recompiling.",
+    "Add GitLab workflow rules so pipelines run only for merge requests, the default branch and tags.",
+    "Extend your jobs from an Eco CI base job to get a per-job energy figure before and after each change."
+  ],
+  "quotes": [
+    {
+      "text": "Making your pipelines greener is not very difficult. Getting green results is.",
+      "at": "38:40"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why green pipelines"
+    },
+    {
+      "at": "04:45",
+      "title": "Where emissions come from"
+    },
+    {
+      "at": "07:16",
+      "title": "Parallel JUnit tests"
+    },
+    {
+      "at": "10:44",
+      "title": "Less Maven logging"
+    },
+    {
+      "at": "14:10",
+      "title": "Preventing recompilation"
+    },
+    {
+      "at": "18:18",
+      "title": "Pipeline design principles"
+    },
+    {
+      "at": "21:29",
+      "title": "GitLab artifacts and needs"
+    },
+    {
+      "at": "26:36",
+      "title": "Rules and workflows"
+    },
+    {
+      "at": "30:54",
+      "title": "Measuring carbon footprint"
+    },
+    {
+      "at": "38:40",
+      "title": "Conclusions"
+    }
+  ],
+  "tech": [
+    "Apache Maven",
+    "JUnit 5",
+    "GitLab CI",
+    "GitHub Actions",
+    "Spring Boot",
+    "Surefire",
+    "Failsafe",
+    "JaCoCo",
+    "SonarQube",
+    "Eco CI",
+    "Electricity Maps",
+    "Kepler",
+    "Kotlin"
+  ],
+  "watchIf": "You maintain Maven builds on GitLab or GitHub CI and want concrete settings that cut build time and energy without a rewrite.",
+  "themes": [
+    "Sustainability",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}

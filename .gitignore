@@ -6,3 +6,5 @@ data/raw/audio/
 data/raw/captions/
 data/raw/caption_batch.txt
 build/
+data/raw/video/
+data/raw/slides/

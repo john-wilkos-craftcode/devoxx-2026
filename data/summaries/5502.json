@@ -1,0 +1,100 @@
+{
+  "id": 5502,
+  "source": "transcript",
+  "tldr": "Mehmandarov builds a LangChain4j invoice-extraction pipeline layer by layer, adding guardrails, canary tokens, an intent classifier, deterministic validation, self-correction loops, multi-model voting and a mirror test.",
+  "summary": [
+    "Mehmandarov, a consultant at Miles in Oslo and a Java Champion, structures the talk as 'five stages of LLM grief' (honeymoon, attack, hallucination, bargaining, council) plus a bonus. The running example is a company feeding scanned invoice text to an LLM, getting JSON back and passing it to a payment system. The naive LangChain4j AI service works on day one, then pays a million dollars or an invoice dated 2050. Structured output only gives you 'a well-formatted lie': it shapes the response but validates nothing. The whole deck is Markdown in a GitHub repo, with each Java class linked to its code.",
+    "Against attacks such as white-on-white 'ignore all previous instructions' text in a PDF, he stacks defences: an input guardrail with a blocklist, length checks and PII rules; a canary token, a generated UUID the model is told never to reveal, checked by an output guardrail as a tripwire; an output format guardrail; sandwiching untrusted text between tags as data, not instructions (an OWASP-recommended technique, with detection of attempts to close the tag); and a 'bouncer', a cheap small model that classifies intent as data extraction, malicious or unknown before the expensive model sees anything. He also redacts PII on the way out, including from logs. He noted that recent small models already resist naive injections.",
+    "Since all of that is still probabilistic, the next layer is code: JSON schema checks, Jakarta Bean Validation for business rules such as invoice dates, and deterministic normalisation of dates, numbers and currencies. He compares function calling with code execution and lists MCP risks: injection through third-party servers, wrong tool selection, schema drift between client and server, and over-broad permissions. For 'bargaining' he loops extract, validate and re-prompt with the errors up to a retry limit. The 'council' votes across several models after normalising their outputs, and a stability analysis reruns with varied temperature and a fixed seed.",
+    "The pipeline ends in a verdict of accepted, needs review or rejected. He touches on goal-oriented agents in LangChain4j, where success criteria such as 'valid JSON that passes the validator' drive retries, and on observability for auditing. The final, most expensive check is the mirror test: have a model reconstruct the likely input from the extracted JSON and compare it with the original. The code runs with Maven and JUnit, locally against Ollama."
+  ],
+  "keyPoints": [
+    "Structured output into a Java object is not validation; it only makes a wrong answer well-formed.",
+    "Canary tokens: put a random UUID in the system prompt with instructions never to reveal it, and treat its appearance in output as proof of a successful injection.",
+    "Sandwiching wraps untrusted input in tags declared as data only; also detect inputs that try to close the tag, much like SQL injection.",
+    "A cheap 'bouncer' model classifying intent keeps attackers from ever reaching the expensive model.",
+    "Deterministic Bean Validation and normalisation of dates, amounts and currency codes catch the hallucinations guardrails miss, such as invoices from the future.",
+    "Self-correction loops feed validation errors back into the prompt with a hard retry cap; multi-model voting compares normalised outputs and lets the majority win.",
+    "MCP adds risks of its own: injection via third-party servers, wrong tool choice, client/server schema drift and excessive permissions, so least privilege still applies.",
+    "Mirror test: regenerate the plausible input from the output and compare it to the real input to detect manipulated extractions."
+  ],
+  "takeaways": [
+    "Add input and output guardrails to your LangChain4j AI services, including PII redaction on output and in logs.",
+    "Validate every LLM-produced object with Bean Validation business rules before it reaches a downstream system.",
+    "Return a three-way verdict (accept, needs review, reject) instead of failing with a stack trace.",
+    "Put a small, cheap intent-classification model in front of your main model for untrusted input.",
+    "Keep tool and MCP sets minimal, and only install MCP servers from publishers you trust."
+  ],
+  "quotes": [
+    {
+      "text": "It might as well be a well-formatted lie.",
+      "at": "07:53"
+    },
+    {
+      "text": "It's not taking down your system, it's taking down your credit card.",
+      "at": "20:58"
+    },
+    {
+      "text": "Trust your code, not the model.",
+      "at": "43:20"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "LLMs are probabilistic"
+    },
+    {
+      "at": "04:03",
+      "title": "The invoice pipeline"
+    },
+    {
+      "at": "07:53",
+      "title": "Input guardrails"
+    },
+    {
+      "at": "10:35",
+      "title": "Canary tokens and output guardrails"
+    },
+    {
+      "at": "14:26",
+      "title": "Sandwiching and the bouncer"
+    },
+    {
+      "at": "21:59",
+      "title": "Defence in depth and schemas"
+    },
+    {
+      "at": "24:28",
+      "title": "Deterministic validation"
+    },
+    {
+      "at": "26:43",
+      "title": "Tools, code execution and MCP"
+    },
+    {
+      "at": "32:36",
+      "title": "Self-correction and model voting"
+    },
+    {
+      "at": "40:40",
+      "title": "Mirror test and summary"
+    }
+  ],
+  "tech": [
+    "LangChain4j",
+    "Jakarta Bean Validation",
+    "OWASP Top 10 for LLM Applications",
+    "MCP",
+    "Ollama",
+    "JUnit",
+    "Maven",
+    "JSON Schema"
+  ],
+  "watchIf": "You are putting LLM output into a business process in Java and want a catalogue of layered guardrail and validation patterns with code you can copy.",
+  "themes": [
+    "Security & supply chain",
+    "LLMs in Java apps"
+  ],
+  "demo": false
+}

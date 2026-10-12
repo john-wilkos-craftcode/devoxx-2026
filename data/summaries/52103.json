@@ -1,0 +1,102 @@
+{
+  "id": 52103,
+  "source": "transcript",
+  "tldr": "Nine builders each get four minutes to demo browser games starring the Devoxx robots, built with AI assistants, and to say where the AI helped or failed.",
+  "summary": [
+    "Stephan Janssen, who started the contest after enjoying building a game himself, hands the stage to nine entrants. The first is a 3D puzzle game in which Voxy, Droid and Biggie combine abilities to open the venue. Its builder prototyped about 12 2D concepts first, then improved the graphics with a critic loop comparing screenshots against a commercial game. Heisenbug, built in 13 hours with Claude Code on plain Canvas JavaScript, has players read logs to find a bugged robot; the first version took one hour against the AI's one-day estimate. Devoxx Reboot uses Phaser 3, with AI-generated Tiled maps, sprite frames and a Web Audio chiptune sequencer.",
+    "Overclocked, plain JavaScript with no engine, uses flow fields for the crowd and tests written as user stories. The AI could not reproduce the venue from photos or plans, but could from room-by-room text descriptions. One entry is not a game: an Unreal Engine view of live Claude Code sessions, where hooks write a JSON file per sub-agent and a broker streams them to Unreal, so agents build booths and end in a graveyard showing their token use. Another is a text-mode BBS door game reached over a simulated dial-up line. A Copilot-built entry was reworked for mobile after the builder's daughters and strangers on a train tested it.",
+    "Please Do Not Throw Richie went from a 1,800-line ChatGPT brief to Codex for the hopping physics and Claude Code with Opus 5.5 when tokens ran low. It uses TypeScript, Vite, Rapier physics, Three.js and Sonic Pi music, runs as a PWA on GitHub Pages and hides a two-player fighting mini-game. Ghost Light, a 3D Three.js game set in 2126, lets players chat with recognisable Devoxx people. Its builder hit the same venue-layout problem and solved it zone by zone. They also noticed Claude Code had filled the rooms only with men and had to correct it."
+  ],
+  "keyPoints": [
+    "Several builders said the AI got the real venue layout wrong from photos, drone footage and official plans; describing it in words, one small zone at a time, worked better.",
+    "Zero-dependency plain JavaScript on Canvas was a common choice under time pressure; AI first versions arrived far faster than the AI's own estimates.",
+    "AI took over traditionally slow game-dev chores: Tiled-compatible tile maps, sprite frames, pathfinding and procedural chiptune music via the Web Audio API or Sonic Pi.",
+    "Builders mixed tools and switched when tokens ran out: ChatGPT for the brief, Codex for physics, Claude Code for content, Copilot in VS Code for mobile fixes.",
+    "Claude Code hooks can feed a live visualization: one entry streams sub-agent lifecycle and token counts into an Unreal Engine scene.",
+    "Human playtesting by family, colleagues and strangers caught problems the AI did not, such as a game that did not work on mobile."
+  ],
+  "takeaways": [
+    "Describe spatial layouts to a coding agent in text, zone by zone, rather than expecting it to read floor plans or photos.",
+    "Use Claude Code hooks writing JSON to build your own observability for sub-agent runs and token use.",
+    "Put real people in front of AI-generated software early; generated output still has to work for humans.",
+    "Check what AI-generated content assumes about people, such as who populates a scene, and correct it."
+  ],
+  "quotes": [
+    {
+      "text": "The human has to be in the loop because you can generate stuff. And it's still not interesting. So in the end, it still has to work for humans.",
+      "at": "27:50"
+    },
+    {
+      "text": "Then she figured out what works with me. Words, not pictures. Room by room, seat by seat.",
+      "at": "15:16"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why a robot games contest"
+    },
+    {
+      "at": "01:27",
+      "title": "3D robot puzzle game"
+    },
+    {
+      "at": "04:45",
+      "title": "Heisenbug"
+    },
+    {
+      "at": "07:41",
+      "title": "Devoxx Reboot in Phaser"
+    },
+    {
+      "at": "11:18",
+      "title": "Overclocked"
+    },
+    {
+      "at": "15:16",
+      "title": "Claude Code agents in Unreal"
+    },
+    {
+      "at": "19:14",
+      "title": "Text-mode BBS door game"
+    },
+    {
+      "at": "24:58",
+      "title": "Copilot-built mobile game"
+    },
+    {
+      "at": "29:36",
+      "title": "Please Do Not Throw Richie"
+    },
+    {
+      "at": "33:43",
+      "title": "Ghost Light"
+    }
+  ],
+  "tech": [
+    "Claude Code",
+    "Claude Code hooks",
+    "Codex",
+    "ChatGPT",
+    "GitHub Copilot",
+    "Gemini",
+    "Three.js",
+    "Phaser 3",
+    "Tiled",
+    "HTML Canvas",
+    "Web Audio API",
+    "Unreal Engine",
+    "TypeScript",
+    "Vite",
+    "Rapier",
+    "Sonic Pi",
+    "GitHub Pages",
+    "PWA"
+  ],
+  "watchIf": "You want a light lunch session showing how developers who are not game developers used coding agents to build working games, and where the AI fell short.",
+  "themes": [
+    "Hardware, robots & fun",
+    "AI agents & agentic coding"
+  ],
+  "demo": true
+}
