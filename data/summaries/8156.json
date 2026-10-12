@@ -1,0 +1,104 @@
+{
+  "id": 8156,
+  "source": "transcript",
+  "tldr": "Van Wassenhove gave a Reachy Mini robot an agent-built brain; six failures from running it at home show that specifying and verifying, not coding, are now the hard parts.",
+  "summary": [
+    "Van Wassenhove opens with his 13-year-old son, who ships apps \"at the speed of boredom\" without learning Java. To test what agentic AI looks like in practice, he gave a Reachy Mini, an open-source desktop robot with a Raspberry Pi in its head, a brain called Aura that runs on his laptop and was built almost entirely by agents he directs. His central claim: when making software gets cheap, the expensive parts are saying precisely what you want and judging whether what came back is any good. His workflow is a spec file, a failing test first, then one agent-built change per commit.",
+    "The first architecture was six Docker Compose services, which he collapsed into one brain on the laptop and one runtime on the robot, keeping module boundaries as packages. All keys, profiles and face prints live on the laptop, so stealing the robot gets you motors. He then walks through six failures, none caught by tests or alerts, all noticed by family. Face-print encryption silently fell back to plaintext when a release wiped the folder holding the passphrase, which sat in a plain settings file next to the encrypted records. It now lives in the OS keychain, with one key per person, so forgetting someone means destroying their key.",
+    "Memory mixed what people told it with what it inferred: it built a profile of his 11-year-old daughter (a songwriter currently in Scandinavia) from a metal playlist in the kitchen. Inferred memory now has its own label and is never sent to the model for minors. The robot answered a World Cup commentator on the TV, because the room closes the loop from speaker back to microphone. Being interrupted is now modelled as a state, not an error. For apps without APIs, the system prompt sets a ladder: API, CLI, files, app shortcuts, a real browser, and screen control only as a fenced last resort.",
+    "Self-improvement proposes skill rewrites that he approves. One tired late-night approval dropped the rule \"never say an app is unavailable unless you tried\", so code now restores protected rules word for word. Helper agents may read but not write, have few tries, and cannot spawn other agents. A fallback that echoed his input instead of answering ran unnoticed for days, so fallbacks must be loud. He closes with his bet: writing software is a commodity, but expertise, judgment and accountability are not."
+  ],
+  "keyPoints": [
+    "Six Docker Compose microservices were collapsed into two deployables (laptop brain, robot runtime); the separate containers implied an independence that did not exist.",
+    "Architecture is deciding trust boundaries: all secrets and face prints live on the laptop, and the robot never calls back.",
+    "\"It's encrypted\" means nothing: the agent-built store kept the passphrase in a plain file next to the data. Fixed with OS keychain storage and per-person keys, so deletion is key destruction.",
+    "Per turn, a layer builds a short paragraph of context for the recognised person instead of sending profiles; inferred memory is labelled separately and excluded for children.",
+    "The room is part of the system: TV audio fed back into the microphone triggered answers to nobody, and speech-to-text confidently mis-transcribed his East Flemish dialect, once as Vietnamese.",
+    "A six-step integration ladder for apps without APIs: API, CLI, files, app keyboard shortcuts, browser automation, then screenshot-and-mouse with explicit approval.",
+    "Rules must be checks in code: a late-night human approval let a skill rewrite drop a key rule; helpers are read-only and cannot hire sub-agents.",
+    "None of the six failures was caught by a test or alert; family members noticed every one."
+  ],
+  "takeaways": [
+    "Write security claims with an attacker in the sentence (\"someone who copies this folder gets nothing because the key is not in it\") and check them.",
+    "Keep facts users told the system separate from what an agent inferred, and label them differently in prompts.",
+    "Enforce agent limits as code checks, such as read-only helpers with no ability to spawn agents, rather than prompt instructions.",
+    "Make fallbacks loud: alert when a degraded mode is active instead of logging a warning nobody reads.",
+    "Review agent-built code for outcomes, especially security-sensitive paths, instead of trusting that it does what was asked."
+  ],
+  "quotes": [
+    {
+      "text": "If you cannot name your boundaries, you do not have an architecture. You just have a deployment.",
+      "at": "11:20"
+    },
+    {
+      "text": "Learning is not the same as knowing.",
+      "at": "25:35"
+    },
+    {
+      "text": "A silent fallback is a bug that keeps your service up but gives nothing of value to you.",
+      "at": "39:48"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "A son who ships apps"
+    },
+    {
+      "at": "04:06",
+      "title": "Reachy Mini and Aura"
+    },
+    {
+      "at": "08:14",
+      "title": "Spec, test, collapse services"
+    },
+    {
+      "at": "15:24",
+      "title": "Who is in the room"
+    },
+    {
+      "at": "22:31",
+      "title": "Learning is not knowing"
+    },
+    {
+      "at": "26:37",
+      "title": "The room talks back"
+    },
+    {
+      "at": "30:39",
+      "title": "Apps without APIs"
+    },
+    {
+      "at": "32:42",
+      "title": "Self-improvement and guardrails"
+    },
+    {
+      "at": "37:46",
+      "title": "Loud fallbacks"
+    },
+    {
+      "at": "40:50",
+      "title": "Expertise is the bet"
+    }
+  ],
+  "tech": [
+    "Reachy Mini",
+    "Raspberry Pi",
+    "Docker Compose",
+    "Speech-to-text",
+    "Face recognition",
+    "OS keychain",
+    "GitHub Copilot",
+    "Claude",
+    "ChatGPT",
+    "Spotify API",
+    "Local LLMs"
+  ],
+  "watchIf": "You build agentic systems and want concrete failure stories about trust boundaries, memory, guardrails and silent fallbacks, told through a home robot.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Architecture & design",
+    "Hardware, robots & fun"
+  ],
+  "demo": false
+}

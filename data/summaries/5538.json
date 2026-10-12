@@ -1,0 +1,14 @@
+{
+  "id": 5538,
+  "source": "abstract",
+  "tldr": "Daniel Raneland shares experience using the Strangler Fig pattern, with DDD and the Inverse Conway Manoeuvre, to modernise legacy systems instead of rewriting them.",
+  "summary": ["The session argues against the tempting full rewrite of a legacy system. Rewrites of complicated systems rarely succeed: they take long, the business cannot pause while they happen, and the second system effect tends to make the replacement over-engineered and bloated.", "Daniel Raneland instead describes his experience with the Strangler Fig pattern, where the original system is gradually replaced by breaking out or rewriting parts as separate systems. The talk also covers combining it with Domain Driven Design and using the resulting design for an Inverse Conway Manoeuvre, so that team structure works with Conway's law rather than against it."],
+  "keyPoints": ["Rewrites fail because of time, the need to keep delivering, and the second system effect.", "Strangler Fig replaces the legacy system piece by piece as separate systems.", "Domain Driven Design guides where to cut the system.", "Inverse Conway Manoeuvre aligns teams with the target design."],
+  "takeaways": ["Pick one bounded part of the legacy system to extract first instead of proposing a rewrite."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Strangler Fig pattern", "Domain Driven Design", "Conway's law"],
+  "watchIf": "You maintain a legacy system and are being pushed toward a big-bang rewrite.",
+  "themes": ["Legacy modernization", "Architecture & design"],
+  "demo": false
+}

@@ -1,0 +1,46 @@
+{
+  "id": 16426,
+  "source": "transcript",
+  "tldr": "Kozina puts a Spring for GraphQL facade in front of legacy REST and SOAP services and exposes curated GraphQL operations as MCP tools, adding Keycloak scopes and a three-tool dynamic mode for very large schemas.",
+  "summary": [
+    "Željko Kozina opens by saying teams run down their legacy systems even when those systems are stable and secure, and that the business now wants all of it exposed to AI. He doesn't want LLMs pointed directly at internal APIs, and he doesn't want another per-client BFF either. He proposes one GraphQL facade as the layer between MCP and the existing services. The demo goes through branches of Spring Petclinic. Adding the Spring for GraphQL starter and a few Java records gives a typed schema of queries and mutations (CQRS by design), browsable in GraphiQL. With it an LLM can fetch exactly the fields it needs.",
+    "A GraphQL operation already has what an MCP tool needs: a name, a description, a typed input and an output. So Kozina wrote a library that turns GraphQL operations into MCP tools and Spring in-process tools. Auto-generation is off by default. Generating all reads and writes gave 10 tools in MCP Inspector, but he recommends curated operation files reviewed in pull requests. In MCPJam he runs Qwen, Gemma and other local models side by side. Required fields block writes with missing data, though some models invent a value such as a pet's birth date. He automates these checks with promptfoo, verifying both the tool called and the answer, and runs read tests with writes disabled after an agent once updated three pets during a read test.",
+    "The SOAP part wraps an Antwerp city service listing off-leash dog areas as a new field on the GraphQL Owner type. In GraphQL that is safe because clients only pay for an expensive field when they ask for it. For security, Spring Security and Keycloak handle the MCP OAuth flow: every tool requires a baseline scope, and a GraphQL directive on mutations requires an extra write scope. A read-only user is refused when adding a pet.",
+    "Last, he plugs in many government open APIs, which grows the schema to almost 300 operations and 111,000 tokens. Instead of 274 tools he exposes three: embedding search over schema fields, type introspection, and an execute-GraphQL tool (optionally validate-only). It uses a GraphQL-specific embedding model on Ollama. Small local models struggle with the multi-step Eurostat questions, while Claude handles them well. His conclusion is to use curated operations by default and dynamic search as a \"captain's override\" for large APIs."
+  ],
+  "keyPoints": [
+    "Put a single GraphQL facade between MCP and legacy services rather than pointing LLMs at REST endpoints or building one BFF per client.",
+    "GraphQL operations map one-to-one to MCP tool definitions (name, description, typed input, output), so tools can be derived from the schema.",
+    "Auto-generating tools from every operation is off by default. Curated, reviewed operation files give more precise descriptions and predictable behaviour.",
+    "Test tools with MCP Inspector for spec conformance, MCPJam to compare several LLMs, and promptfoo to automate question suites that check both tool choice and answer.",
+    "Include questions that should not trigger any tool, and test reads with write tools disabled.",
+    "A legacy SOAP service (Antwerp off-leash dog zones) becomes an opt-in GraphQL field, so the expensive call only runs when asked for.",
+    "Auth: Spring Security plus Keycloak for MCP OAuth, a baseline scope for all tools and an extra scope on mutations declared through a GraphQL directive.",
+    "For a 111k-token schema (GitHub's public schema is about 300k, Netflix's about 4M), three tools (search, introspect, execute) replace hundreds, with accuracy depending heavily on schema quality and model."
+  ],
+  "takeaways": [
+    "Start by exposing a few hand-picked read-only operations as MCP tools and review tool definitions in pull requests like code.",
+    "Add a promptfoo (or similar) eval suite that checks the tool called and the answer across several models.",
+    "Require separate OAuth scopes for write tools so read-only agents cannot mutate data.",
+    "If you already have or are considering GraphQL, use it as the agent-facing contract over legacy REST and SOAP."
+  ],
+  "quotes": [
+    {"text": "Anything agentic is behaving like a JavaScript framework in my opinion. It's just too volatile, especially for enterprise.", "at": "11:19"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Legacy is not that bad"},
+    {"at": "03:08", "title": "From BFFs to GraphQL facade"},
+    {"at": "06:13", "title": "Adding GraphQL to Petclinic"},
+    {"at": "09:18", "title": "GraphQL operations as MCP tools"},
+    {"at": "16:24", "title": "Curated operations and testing"},
+    {"at": "21:33", "title": "Automated evals with promptfoo"},
+    {"at": "24:35", "title": "Wrapping a SOAP service"},
+    {"at": "28:39", "title": "Securing tools with Keycloak"},
+    {"at": "32:46", "title": "Large schemas, three tools"},
+    {"at": "42:06", "title": "Curated versus dynamic"}
+  ],
+  "tech": ["MCP", "Spring for GraphQL", "GraphQL", "Spring AI", "Spring Boot", "Spring Security", "Keycloak", "Spring Petclinic", "GraphiQL", "MCP Inspector", "MCPJam", "promptfoo", "Ollama", "SOAP", "WSDL"],
+  "watchIf": "You have to expose old REST or SOAP Java services to AI agents and want a concrete Spring-based pattern for curation, testing and auth instead of a greenfield demo.",
+  "themes": ["Legacy modernization", "AI agents & agentic coding", "Spring & frameworks"],
+  "demo": true
+}

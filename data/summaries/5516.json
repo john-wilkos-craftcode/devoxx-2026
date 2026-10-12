@@ -1,0 +1,24 @@
+{
+  "id": 5516,
+  "source": "abstract",
+  "tldr": "A lab on building Agent-to-Agent (A2A) protocol agents in Java with LangChain4j and the A2A Java SDK across Spring Boot and Quarkus, plus a Python agent and a router.",
+  "summary": [
+    "Participants build A2A-compliant agents, starting with the protocol's core: implementing an AgentCard for discovery and an AgentCardExecutor for message delivery. They then deploy the same capability contracts on Spring Boot, JA2A and Quarkus, and connect a Python agent built with the A2A Python SDK to show cross-language interaction.",
+    "The lab continues with a dynamic router agent that decomposes multi-turn tasks and dispatches them across the mesh, and finishes with Day-2 operations: distributed state management, load balancing for stateful LLM conversations and tracing with OpenTelemetry."
+  ],
+  "keyPoints": [
+    "A2A defines the wire format for interoperable multi-agent systems.",
+    "Agents expose an AgentCard and an AgentCardExecutor using the A2A Java SDK and LangChain4j.",
+    "The same agent contracts run on Spring Boot, JA2A and Quarkus and interoperate with a Python agent.",
+    "A router agent decomposes and delegates tasks; OpenTelemetry traces the interactions."
+  ],
+  "takeaways": [
+    "Expose one of your agents with an AgentCard so other frameworks can discover it."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["A2A protocol", "LangChain4j", "A2A Java SDK", "Quarkus", "Spring Boot", "Jakarta EE", "OpenTelemetry", "A2A Python SDK"],
+  "watchIf": "You want to build interoperable multi-agent systems in Java.",
+  "themes": ["AI agents & agentic coding", "LLMs in Java apps"],
+  "demo": false
+}

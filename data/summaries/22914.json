@@ -1,0 +1,14 @@
+{
+  "id": 22914,
+  "source": "abstract",
+  "tldr": "A 2-hour hands-on lab building an end-to-end ML pipeline in pure Java using JTaccuino notebooks, Hardwood, DFLib, DeepNetts and an early look at gog4j.",
+  "summary": ["Sven Reimers and Zoran Sevarac's lab challenges the idea that data science requires switching to Python. Participants build a complete predictive machine learning pipeline entirely on the JVM, working interactively in code.", "The stack includes JTaccuino for Jupyter-style notebooks, Hardwood as a zero-dependency Apache Parquet reader, DFLib for data frame cleaning and manipulation, and DeepNetts for building, training and evaluating neural networks on CPU or GPU. Attendees also get a first look at gog4j, an unreleased plotting API based on the grammar of graphics."],
+  "keyPoints": ["Complete ML pipeline built without leaving Java.", "JTaccuino provides notebook-style exploratory analysis.", "Hardwood reads Parquet; DFLib handles data frames.", "DeepNetts trains neural networks with CPU or GPU acceleration.", "gog4j is an unreleased grammar-of-graphics plotting API."],
+  "takeaways": ["Try DFLib and a Java notebook for your next data exploration task."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["JTaccuino", "Hardwood", "Apache Parquet", "DFLib", "DeepNetts", "gog4j", "Java"],
+  "watchIf": "You are a Java developer curious about data science and machine learning without switching to Python.",
+  "themes": ["Data & databases", "Java language & JDK"],
+  "demo": false
+}

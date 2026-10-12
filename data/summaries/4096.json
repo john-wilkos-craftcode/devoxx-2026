@@ -1,0 +1,23 @@
+{
+  "id": 4096,
+  "source": "abstract",
+  "tldr": "Shows how to use Apache Maven features to produce identical artifacts from identical inputs and how to diagnose sources of non-determinism with built-in verification.",
+  "summary": [
+    "Maarten Mulders starts from the pressure on delivery pipelines from auditors, regulators and governance teams, and the fact that many builds are not reproducible, which creates blind spots in compliance and traceability.",
+    "The session demonstrates how developers can use Maven features to reliably produce identical artifacts from identical inputs, diagnose where reproducibility breaks down, and use Maven's built-in verification tools to highlight sources of non-determinism."
+  ],
+  "keyPoints": [
+    "Non-reproducible builds weaken compliance and traceability.",
+    "Maven features can produce identical artifacts from identical inputs.",
+    "Built-in verification tools highlight sources of non-determinism."
+  ],
+  "takeaways": [
+    "Check whether two builds of your project produce identical artifacts and investigate any differences."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Apache Maven", "Reproducible builds"],
+  "watchIf": "You build with Maven and need reproducible, auditable artifacts.",
+  "themes": ["Security & supply chain", "Developer experience & tooling"],
+  "demo": false
+}

@@ -1,0 +1,26 @@
+{
+  "id": 8190,
+  "source": "abstract",
+  "tldr": "A workshop on AI-native Java development: using Skills, Agents, Commands, MCP servers and spec-driven tools across the SDLC, with Spring Boot, Quarkus and Micronaut examples.",
+  "summary": [
+    "The workshop sets out to explain step by step how tools such as Cursor, Claude Code, Codex and GitHub Copilot can be used across planning, design, implementation, validation and operations, organized around a Design / Build / Operate model. Participants work with Commands, reusable Skills, specialized Agents and MCP servers.",
+    "It also covers connecting issue-driven planning to OpenSpec/SpecKit, GitHub Issues and Azure DevOps work items, applying a Zero Trust mindset to agent skills and generated artifacts, and writing solid AGENTS.md files, Skills, Agents and Commands. Demos use Spring Boot, Quarkus and Micronaut."
+  ],
+  "keyPoints": [
+    "Commands automate repeatable actions across planning, implementation, validation and operations.",
+    "Skills are composed for analysis, design, implementation, operations and regulatory review.",
+    "Issue-driven planning is tied to OpenSpec/SpecKit, GitHub Issues and Azure DevOps.",
+    "A Zero Trust mindset is applied to agent skills, generated artifacts and automated workflows.",
+    "Guidance on writing AGENTS.md, Skills, Agents and Commands, plus extending agents with MCP servers."
+  ],
+  "takeaways": [
+    "Write or review an AGENTS.md for one of your Java projects.",
+    "Treat third-party agent skills and generated artifacts as untrusted input."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Claude Code", "Cursor", "Codex", "GitHub Copilot", "MCP", "OpenSpec", "SpecKit", "Spring Boot", "Quarkus", "Micronaut"],
+  "watchIf": "You want a practical, tool-by-tool introduction to agentic workflows for Java projects.",
+  "themes": ["AI agents & agentic coding", "Developer experience & tooling"],
+  "demo": false
+}

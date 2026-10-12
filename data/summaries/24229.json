@@ -1,0 +1,14 @@
+{
+  "id": 24229,
+  "source": "abstract",
+  "tldr": "A 3-hour lab building a multi-agent system with Java, Spring AI and MCP, including chat memory, RAG and production concerns like observability and security.",
+  "summary": ["Timo Salm and Sandra Ahlgrimm's lab frames agentic AI as the next shift after integrating non-deterministic LLM reasoning into software. Participants use Java, Spring AI and the Model Context Protocol to build autonomous systems, moving beyond basic prompting.", "The lab covers chat memory, RAG, tool integration and agentic patterns, and also addresses day-two production challenges: making agents observable, secure and reliable. By the end, attendees will have built a multi-agent system able to tackle complex, high-level tasks."],
+  "keyPoints": ["Built with Java, Spring AI and the Model Context Protocol.", "Covers chat memory, RAG, tool integration and agentic patterns.", "Addresses production concerns: observability, security and reliability.", "Outcome is a working multi-agent system."],
+  "takeaways": ["Add observability and security considerations to agent prototypes early, not after launch."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Java", "Spring AI", "MCP", "RAG"],
+  "watchIf": "You are a Spring developer who wants hands-on experience building agents beyond a simple chatbot.",
+  "themes": ["AI agents & agentic coding", "Spring & frameworks"],
+  "demo": false
+}

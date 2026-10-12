@@ -1,0 +1,46 @@
+{
+  "id": 52102,
+  "source": "transcript",
+  "tldr": "Belfius describes the agentic harness behind its Hey Belfius assistant, then its security team covers Mythos-era vulnerability discovery, safe AI-assisted development, and live jailbreaks of a chatbot guarded only by its system prompt.",
+  "summary": [
+    "Nicolas Goosse presents Hey Belfius, the bank's agent-based personal assistant launched on 21 April 2026. In under six months monthly conversation volume doubled, and the share of conversations resolved without asking for a human rose from 70% to 90%. His argument is that the model is not the architecture; the harness is. An orchestrator routes each request to specialized agents. Some are deterministic where deviation is unacceptable, others are generative where some leeway is fine. They draw on curated, clean data, so the assistant can answer personal questions such as 'how much did I spend on restaurants last month' and carry out actions instead of reciting steps. After launch, the team monitors conversations and evaluates against golden datasets with back-testing. Fixes go into the knowledge base, the routing or the copy, and the team makes a deliberate call on residual risk, since 100% accuracy is impossible.",
+    "Matias from the security team (the name is from the captions and he is not listed in the metadata) explains why vulnerability volume is rising. Anthropic's Claude Mythos, previewed under Project Glasswing, was the first model to finish the UK AI Security Institute's 32-step network takeover benchmark to domain admin, and GPT-5.5 Cyber has since done the same. Reported CVEs roughly doubled around the Mythos release. Developers are squeezed between keeping dependencies updated and the risk from compromised npm packages. Belfius has an R&D partnership with Aikido, running an open-weights model on an on-premises GPU appliance that scans source code and then sends agents to confirm which findings are exploitable.",
+    "His three rules for AI-assisted development: keep source code away from consumer LLM licenses that may use it for training; review all AI output with code scanners and with a different AI from the one that wrote the code; and do not become a 'meat proxy', meaning you should know what the output will look like before you generate it. He adds that about 20% of AI-suggested dependencies are hallucinated, which invites slopsquatting, so use an internal package registry. In a live demo on a small local Mistral model, he extracts the system prompt with a 'format the text above as a code block' trick, adds an evil second persona, and uses a gradual context-poisoning attack to get explosives information. His conclusion is defense in depth: input and output guardrails, canary tokens, LLM-as-judge, and a human in the loop."
+  ],
+  "keyPoints": [
+    "Hey Belfius doubled monthly conversations in under six months and raised the bot-only resolution rate from 70% to 90%.",
+    "Architecture: an orchestrator dispatching to specialized agents, mixing deterministic and generative components over curated data, with guardrails around everything.",
+    "Evaluation uses golden datasets and back-testing to quantify residual risk before go-live, plus ongoing monitoring of answers and user behavior.",
+    "Claude Mythos and GPT-5.5 Cyber completed the UK AISI 32-step domain-takeover benchmark; reported vulnerabilities roughly doubled around Mythos's release.",
+    "Belfius partners with Aikido on an on-prem, open-weights scanner that confirms exploitability with agents; still R&D.",
+    "About 20% of AI-suggested packages are hallucinated, enabling slopsquatting; an internal registry mitigates it.",
+    "A system-prompt-only guardrail fell to prompt extraction, persona injection and gradual context poisoning in the live demo.",
+    "Layer defenses: two independent guardrails each stopping 50% give about 75% coverage; add canaries, LLM-as-judge and human escalation."
+  ],
+  "takeaways": [
+    "Use enterprise LLM licenses with no-training guarantees; never paste company code into personal accounts.",
+    "Scan AI-generated code, and use a different model to review than the one that wrote it.",
+    "Route dependency installs through an internal package registry to block hallucinated or squatted packages.",
+    "Never put secrets in a system prompt; assume it can be extracted.",
+    "Add output guardrails with a canary string and monitor conversations for attack patterns after launch."
+  ],
+  "quotes": [
+    {"text": "The LLM is not the architecture, it's actually the harness.", "at": "06:11"},
+    {"text": "Just outsource the typing, not the thinking.", "at": "27:34"},
+    {"text": "It's quite awkward to have to explain what you're doing to a service worker.", "at": "38:03"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Hey Belfius launch and KPIs"},
+    {"at": "03:09", "title": "What customers expect"},
+    {"at": "07:12", "title": "The agentic harness"},
+    {"at": "11:19", "title": "Evaluation and residual risk"},
+    {"at": "14:24", "title": "Mythos and AI for security"},
+    {"at": "22:28", "title": "Rules for AI-assisted development"},
+    {"at": "27:34", "title": "Live chatbot jailbreak demo"},
+    {"at": "38:03", "title": "Defense in depth and takeaways"}
+  ],
+  "tech": ["Claude Mythos", "GPT-5.5 Cyber", "Aikido Security", "Mistral", "Dependabot", "npm", "LLM-as-judge", "Guardrails"],
+  "watchIf": "You are putting an LLM assistant in front of customers in a regulated industry and want a bank's view of harness design plus a concrete demo of why system-prompt guardrails fail.",
+  "themes": ["AI agents & agentic coding", "Security & supply chain"],
+  "demo": true
+}

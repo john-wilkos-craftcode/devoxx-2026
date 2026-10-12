@@ -1,0 +1,24 @@
+{
+  "id": 17763,
+  "source": "abstract",
+  "tldr": "A deep dive using multimodal and long-context LLM capabilities to build four solutions: video transcription with speakers, knowledge graphs from 1M tokens, image bank automation and object editing.",
+  "summary": [
+    "Laurent Picard's session architects four solutions step by step with multimodal and long-context models. The first transcribes videos and identifies speakers in a single prompt; the second extracts entities and relationships from massive inputs of 1M tokens with a single request to generate a knowledge graph.",
+    "The remaining two cover an image bank automation pipeline for consistent image generation that revives visual archives, and visual object detection and editing, identifying, restoring and transforming elements within images."
+  ],
+  "keyPoints": [
+    "Video transcription with speaker identification in a single prompt.",
+    "Knowledge graph generation from 1M-token inputs with one request.",
+    "Image bank pipeline for consistent image generation.",
+    "Object detection and editing within images."
+  ],
+  "takeaways": [
+    "Test whether a single long-context request can replace a multi-step extraction pipeline in your own project."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Multimodal LLMs", "Long-context LLMs", "Knowledge graphs"],
+  "watchIf": "You want to see what multimodal and long-context models can do beyond chat.",
+  "themes": ["LLMs in Java apps"],
+  "demo": false
+}

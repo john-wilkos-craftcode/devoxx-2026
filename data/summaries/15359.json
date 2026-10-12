@@ -1,0 +1,24 @@
+{
+  "id": 15359,
+  "source": "abstract",
+  "tldr": "Argues that seven Extreme Programming practices are tempting to skip with AI assistance, and that they matter more, not less, when AI amplifies both good and bad habits.",
+  "summary": [
+    "Nacho Cougil's session looks at seven XP practices, drawn from the family that includes TDD, refactoring, pair programming, simple design, collective code ownership, continuous integration and coding standards, that are at risk in an AI-assisted world. The risk is not that they are wrong, but that AI makes skipping them tempting.",
+    "The talk sets out to show what happens when teams skip them and why the practices become more critical. The central argument is that AI amplifies everything: a team without tests, shared standards or a feedback loop will build a mess faster, so AI acts as a stress test that XP practices pass."
+  ],
+  "keyPoints": [
+    "Seven XP practices are examined as being at risk when AI makes skipping them easy.",
+    "Candidate practices include TDD, refactoring, pair programming, simple design, collective ownership, CI and coding standards.",
+    "AI amplifies both good and bad habits.",
+    "Without tests, standards and feedback loops, AI speeds up building a mess."
+  ],
+  "takeaways": [
+    "Keep tests and refactoring in your workflow when using AI assistants rather than treating them as optional."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": [],
+  "watchIf": "Your team is adopting AI coding tools and you worry about engineering discipline slipping.",
+  "themes": ["Testing & quality", "AI agents & agentic coding"],
+  "demo": false
+}

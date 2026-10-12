@@ -1,0 +1,14 @@
+{
+  "id": 52105,
+  "source": "abstract",
+  "tldr": "Placeholder entry for the keynote overflow room; the listing contains no session content beyond the room name.",
+  "summary": ["This entry is the keynote overflow room, a 120-minute slot where the keynote was shown to attendees who could not fit in the main hall. The published abstract only repeats the name of the room, so there is no talk content to summarise."],
+  "keyPoints": ["Overflow room for the Devoxx Belgium 2026 keynote.", "No speakers, topics or agenda beyond the organiser listing.", "Content equals whatever the main keynote covered."],
+  "takeaways": ["Watch the main keynote recording instead of this entry for actual content."],
+  "quotes": [],
+  "chapters": [],
+  "tech": [],
+  "watchIf": "You want to know whether this entry has content of its own; it does not.",
+  "themes": ["Developer experience & tooling"],
+  "demo": false
+}

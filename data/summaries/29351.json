@@ -1,0 +1,48 @@
+{
+  "id": 29351,
+  "source": "transcript",
+  "tldr": "Bateman and Klang explain why fan-out code with executors is hard to get right and show how StructuredTaskScope handles cancellation, timeouts, joiners, exceptions and observability. It is proposed as final in JDK 28.",
+  "summary": [
+    "Alan Bateman starts with a plain example that fetches a customer from a database and an order from a web service, then combines them. Written sequentially it is easy to read and debug. Moved onto an ExecutorService with futures, it wastes time when something fails: it waits on a future whose sibling already failed, and close() waits for tasks whose results nobody needs. A thread dump also no longer shows how the tasks relate. Rewriting it with ExecutorCompletionService and shutdown() fixes the failure handling but makes the code worse, and observability is still missing.",
+    "Structured concurrency, an idea that goes back to Martin Sústrik's libdill and Nathaniel J. Smith's Python Trio, treats independent subtasks as one unit of work. StructuredTaskScope works inside try-with-resources: open, fork (one virtual thread per subtask by default), a single join, then close. Once close() returns, nothing is left running. If one subtask fails, its siblings are cancelled and join throws with the failure as the cause, and in nested scopes the cause chain shows the path through the task tree. Cancellation relies on thread interruption, so subtasks have to respond to interrupts or close() blocks.",
+    "Viktor Klang covers configuration and policy. Scope.open takes a configuration operator for a timeout (counted from open, ending at join, failing with a cancelled-by-timeout cause), a name and a thread factory. Joiners set the rules: awaitAllSuccessfulOrThrow is the default, allSuccessfulOrThrow returns the list of results, anySuccessfulOrThrow returns the first success, and allUntil takes a predicate, for example 'collect whatever finished in 500 ms'. His advice is to keep business logic out of custom joiners. Subtask exceptions arrive wrapped in an ExecutionException so the main thread's stack is preserved, and the joiner factories accept your own wrapper. Handle errors in the catch of the try-with-resources.",
+    "Bateman then shows that ScopedValue, final since JDK 25, binds context that subtasks inherit. The jcmd Thread.dump_to_file JSON format records the parent-child tree, which JFR and other tools build on. The API has been in preview for several releases and is now proposed to target JDK 28 as permanent. He calls it an on-ramp for independent tasks, not the definitive API. Next steps include exposing the internal lower-level primitives, which did not change across any prototype, and a structured FFM Arena that subtasks could share."
+  ],
+  "keyPoints": [
+    "Plain ExecutorService fan-out wastes time on failure: Future.get blocks on a sibling and ExecutorService.close() waits for tasks whose results are no longer needed.",
+    "StructuredTaskScope uses fork-many / join-once inside try-with-resources; after close() no subtask thread is still running.",
+    "A failing subtask cancels its siblings; nested scopes form a tree and the exception cause chain traces the failing path.",
+    "Cancellation is built on thread interruption; a subtask that ignores interrupts makes close() block, which makes the culprit easy to find.",
+    "Timeouts, names and thread factories are set at Scope.open via a configuration operator; the timeout spans open to join.",
+    "Built-in joiners: awaitAllSuccessfulOrThrow (default), allSuccessfulOrThrow, anySuccessfulOrThrow, and allUntil(predicate) for patterns like 'results within 500 ms'.",
+    "jcmd Thread.dump_to_file in JSON format preserves the task/subtask hierarchy; ScopedValue bindings are inherited by forked subtasks.",
+    "Structured concurrency is proposed to become permanent in JDK 28; a lower-level structured API and a structured FFM Arena are being explored."
+  ],
+  "takeaways": [
+    "Replace hand-rolled ExecutorService fan-out with StructuredTaskScope and virtual threads for independent I/O-bound calls.",
+    "Make sure your subtasks respond to interruption so cancellation and timeouts actually take effect.",
+    "Put error handling in a single catch on the try-with-resources rather than nesting try blocks inside the scope.",
+    "Use jcmd Thread.dump_to_file with JSON output when diagnosing hangs in concurrent code.",
+    "Try the JDK 28 API on a real service and send feedback to loom-dev while it can still change."
+  ],
+  "quotes": [
+    {"text": "There's 99 ways to try and fix this. Most of them have something wrong with them.", "at": "05:10"},
+    {"text": "How many here have ever had a scientifically chosen timeout number, or is it always like three or five seconds?", "at": "21:30"},
+    {"text": "We spent a lot of time forking in this talk, so it's now time to join and take some questions.", "at": "50:07"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Sequential versus executor code"},
+    {"at": "07:12", "title": "What structured concurrency means"},
+    {"at": "11:16", "title": "The StructuredTaskScope API"},
+    {"at": "18:26", "title": "Cancellation via interruption"},
+    {"at": "21:30", "title": "Configuration and timeouts"},
+    {"at": "25:37", "title": "Joiners"},
+    {"at": "31:44", "title": "Exception handling"},
+    {"at": "37:52", "title": "Scoped values and thread dumps"},
+    {"at": "44:00", "title": "Status and future work"}
+  ],
+  "tech": ["Structured concurrency", "StructuredTaskScope", "Virtual threads", "Project Loom", "ScopedValue", "ExecutorService", "jcmd", "JFR", "Foreign Function & Memory API", "JDK 28"],
+  "watchIf": "You write fan-out code with executors and futures and want the JDK team's own explanation of how to use StructuredTaskScope correctly before it becomes final.",
+  "themes": ["Java language & JDK", "JVM performance & runtime"],
+  "demo": false
+}

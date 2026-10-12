@@ -1,0 +1,14 @@
+{
+  "id": 50103,
+  "source": "abstract",
+  "tldr": "A lunch talk on training a Unitree G1 humanoid robot to walk and dance with reinforcement learning in NVIDIA Isaac Sim, ending with a live dance.",
+  "summary": ["The TNG speakers introduce reinforcement learning basics, policies and rewards, then move into simulation with NVIDIA Isaac Sim and the Unitree RL Lab. They run through shaping a walking policy before turning to dancing.", "For the dancing policy, the talk covers retargeting human motion from videos to the Unitree G1 robot and training an imitation policy. The session ends with the humanoid robot performing a dance."],
+  "keyPoints": ["Introduction to reinforcement learning: policies and rewards.", "Simulation with NVIDIA Isaac Sim and Unitree RL Lab.", "Shaping a walking policy first.", "Retargeting human video motion to the Unitree G1 for imitation learning.", "Closes with a live robot dance."],
+  "takeaways": ["Explore Isaac Sim and Unitree RL Lab to experiment with robot policies in simulation."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Reinforcement learning", "NVIDIA Isaac Sim", "Unitree RL Lab", "Unitree G1"],
+  "watchIf": "You want a light, visual introduction to reinforcement learning with a humanoid robot.",
+  "themes": ["Hardware, robots & fun"],
+  "demo": false
+}

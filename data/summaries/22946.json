@@ -1,0 +1,40 @@
+{
+  "id": 22946,
+  "source": "transcript",
+  "tldr": "Van der Meer uses Voyager's deep-space link to explain convolutional coding and Viterbi decoding, then shows the same algorithm in named-entity recognition and contrasts it with a TensorFlow denoising model.",
+  "summary": [
+    "Pieter van der Meer got interested after reading how Voyager 1 began sending gibberish when a memory chip failed. Engineers requested a memory dump, waited about two days for each round trip, and patched the Fortran/assembly code so it skipped the bad chip. NASA documents little about the fix, so the talk moves to what he did find in the archive of hand-typed memos and scanned folders: the telemetry encoding. He sets out the numbers. Voyager 1 is about 25 billion km away, transmits with roughly 23 W, receives at about −160 dBm against about −60 dBm for a good phone signal, and downlinks at 160 bit/s through 70 m Deep Space Network dishes in Madrid, Goldstone and Canberra, which uplink with around 100 kW.",
+    "The way to get data through that much noise is forward error correction. Peter Elias introduced convolutional codes in 1955, but they were impractical until Andrew Viterbi, later a co-founder of Qualcomm, published a decoding algorithm in 1967. Van der Meer animates a simplified encoder in which each input bit shifts through registers and produces two output bits. He then walks through Viterbi decoding on a trellis: compute the Hamming distance of each path, drop the unlikely ones, and keep the survivor with the lowest distance. In his demo, flipping up to two bits still recovers the original data, while three flips produce garbage.",
+    "To link this to current work, he points out that the same dynamic-programming search over hidden states drives classic NLP tasks such as named-entity recognition. A toy hidden Markov model with hand-set start and transition probabilities tags 'Alice works for Google in Paris'. In a second demo a TensorFlow model trained on noisy sine waves recovers a clean signal, which he admits is easy because the model was trained on exactly that noise. He also lists NASA AI work: predicting solar-flare interference, gravitational-wave detection, autonomous spacecraft and AI-designed antennas. In the Q&A he says the Voyager fix meant hand-editing jump addresses in the assembly so the code never touched the failed chip."
+  ],
+  "keyPoints": [
+    "Voyager 1 is about 25 billion km away; a command takes roughly a day each way, and its downlink runs at about 160 bit/s.",
+    "Received signal strength is around −160 dBm, versus about −60 dBm for a strong phone signal and −110 dBm for one bar.",
+    "Voyager uses convolutional coding (Elias, 1955): each input bit yields two output bits through shift registers and XOR logic.",
+    "Viterbi decoding picks the trellis path with the smallest Hamming distance; in the demo up to two flipped bits were corrected, three were not.",
+    "The same Viterbi search over hidden states underlies HMM-based named-entity recognition, shown with a toy person/location/organization tagger.",
+    "A TensorFlow model can denoise a signal it was trained for, but the speaker stressed this was a deliberately favorable setup."
+  ],
+  "takeaways": [
+    "Read up on Viterbi decoding if you work with sequence labelling; it is the same dynamic-programming idea behind HMM taggers.",
+    "Browse NASA's public Voyager archives and the live Deep Space Network dashboard for real engineering documents and link data.",
+    "Be wary of ML denoising demos trained on synthetic noise; real-world signals are much harder to clean up."
+  ],
+  "quotes": [
+    {"text": "If it's three, I'm screwed. I lost the data.", "at": "24:31"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Voyager's memory chip failure"},
+    {"at": "07:09", "title": "Voyager facts and hardware"},
+    {"at": "10:12", "title": "Deep Space Network and signal strength"},
+    {"at": "15:16", "title": "Convolutional encoding"},
+    {"at": "19:20", "title": "Viterbi decoding walkthrough"},
+    {"at": "25:35", "title": "Viterbi in named-entity recognition"},
+    {"at": "30:46", "title": "Machine learning signal decoding"},
+    {"at": "34:49", "title": "AI at NASA and phone reception"}
+  ],
+  "tech": ["Viterbi algorithm", "Convolutional codes", "Forward error correction", "Hidden Markov models", "Named-entity recognition", "TensorFlow", "NASA Deep Space Network", "Fortran"],
+  "watchIf": "You like space history and want an approachable, visual explanation of convolutional codes and Viterbi decoding. It covers fundamentals, not production techniques.",
+  "themes": ["Hardware, robots & fun"],
+  "demo": true
+}

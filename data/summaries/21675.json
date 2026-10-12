@@ -1,0 +1,14 @@
+{
+  "id": 21675,
+  "source": "abstract",
+  "tldr": "Matthias Bünger covers why Maven 4 took years, the challenges of changing Maven without breaking the ecosystem, and its new features and improvements.",
+  "summary": ["Maven 3 was released in 2010, and while it has had updates since, the Maven team concluded it could not evolve further without large changes that could break the ecosystem if done badly. After years of planning and coding, Maven 4 is close to release.", "Matthias Bünger sets out to explain the motivation and challenges behind Maven 4 development, and to present its new features and improvements."],
+  "keyPoints": ["Maven 3 dates from 2010, and further evolution needed big changes.", "Risk of breaking the wider ecosystem shaped the development.", "Talk covers motivation and challenges of the Maven 4 effort.", "Covers new features and improvements."],
+  "takeaways": ["Check your builds and plugins for Maven 4 compatibility before the release."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Maven 4", "Maven 3"],
+  "watchIf": "You maintain Maven builds and want to know what Maven 4 changes.",
+  "themes": ["Developer experience & tooling"],
+  "demo": false
+}

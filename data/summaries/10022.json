@@ -1,0 +1,14 @@
+{
+  "id": 10022,
+  "source": "abstract",
+  "tldr": "A 3-hour lab where participants add a feature to a Java/Angular app and control it with OpenFeature feature flags, including rollouts, A/B tests and observability.",
+  "summary": ["Alexandre Touret and Philippe Duval's lab starts from the idea that feature flagging decouples deployment from activation, so features can be switched on or off at runtime without redeploying. It positions OpenFeature, a CNCF project, as an open specification that works server- and client-side regardless of the backing store, as an alternative to proprietary or heavy tools.", "Participants add a new feature to an existing Java/Angular application and drive its activation through flags. Along the way the lab covers error handling, A/B testing, progressive rollouts, targeting and observability, with the aim of delivering faster and more safely."],
+  "keyPoints": ["Feature flags separate code deployment from feature activation.", "OpenFeature is a CNCF open specification for vendor-neutral flagging.", "Hands-on work on an existing Java/Angular application.", "Topics: error handling, A/B testing, progressive rollouts, targeting and observability."],
+  "takeaways": ["Try wrapping a risky feature behind an OpenFeature flag with a safe default value."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["OpenFeature", "Java", "Angular", "Feature flags", "CNCF"],
+  "watchIf": "You want safer releases and gradual rollouts without committing to a proprietary flagging vendor.",
+  "themes": ["Architecture & design", "Developer experience & tooling"],
+  "demo": false
+}

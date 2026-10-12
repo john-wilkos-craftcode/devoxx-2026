@@ -1,0 +1,25 @@
+{
+  "id": 17800,
+  "source": "abstract",
+  "tldr": "A beginner lab on building AI agents in Java with LangChain4j and CDI: AI services, memory, function calling, agent workflows and the Supervisor pattern.",
+  "summary": [
+    "Part 1 treats AI as a service: attendees inject LLM-backed services through CDI like any other bean, manage conversational memory with scopes such as @SessionScoped, and give agents tools through function calling.",
+    "Part 2 moves to agent architecture: designing declarative sequential and parallel workflows and the Supervisor pattern, where an AI plans and manages other agents. The lab also aims to give attendees a grasp of the MCP and A2A protocols and patterns for integrating agents into enterprise architectures."
+  ],
+  "keyPoints": [
+    "AI services are injected via CDI using LangChain4j.",
+    "Conversational memory is managed with scopes such as @SessionScoped.",
+    "Function calling gives agents tools.",
+    "Sequential and parallel workflows and the Supervisor pattern for agents.",
+    "Introduction to MCP and A2A protocols."
+  ],
+  "takeaways": [
+    "Expose one existing Java service as a tool an LLM agent can call."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["LangChain4j", "CDI", "MCP", "A2A", "Java"],
+  "watchIf": "You are a Java developer wanting a first hands-on path into building agents.",
+  "themes": ["AI agents & agentic coding", "LLMs in Java apps"],
+  "demo": false
+}

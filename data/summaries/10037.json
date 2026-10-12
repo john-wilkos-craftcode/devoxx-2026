@@ -1,0 +1,24 @@
+{
+  "id": 10037,
+  "source": "abstract",
+  "tldr": "An open Ask Us Anything BOF with Quarkus core team members and extension contributors on the ecosystem, community involvement and the team's agentic AI work.",
+  "summary": [
+    "Hosted by Dimitris Andreadis, the session brings together Quarkus core team members and extension contributors to discuss anything around the Quarkus ecosystem. The abstract cites 800+ extensions in the Quarkiverse, 1000+ contributors and the project's move to the Commonhaus Foundation.",
+    "Attendees are invited to bring questions and challenges, contribute ideas to shape the project's future, and hear about how to get involved, including the team's work on agentic AI."
+  ],
+  "keyPoints": [
+    "Open Q&A with Quarkus core team members and extension contributors.",
+    "Quarkus has 800+ extensions in the Quarkiverse and 1000+ contributors.",
+    "Quarkus is now part of the Commonhaus Foundation.",
+    "Discussion includes the team's agentic AI work."
+  ],
+  "takeaways": [
+    "Bring a concrete Quarkus question or feature idea to the team."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Quarkus", "Quarkiverse", "Commonhaus Foundation"],
+  "watchIf": "You use or contribute to Quarkus and want to talk directly with the team.",
+  "themes": ["Spring & frameworks", "Developer experience & tooling"],
+  "demo": false
+}

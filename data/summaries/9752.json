@@ -1,0 +1,48 @@
+{
+  "id": 9752,
+  "source": "transcript",
+  "tldr": "Van Dijk and Przybyl upgrade a Java 8-era image-search app with features up to Java 28 in IntelliJ IDEA, and argue that non-LTS upgrades pay for themselves in performance.",
+  "summary": [
+    "Marit van Dijk (JetBrains) and Piotr Przybyl (Elastic) open with a meme slideshow run from the IDE and a poll of Java versions. Neither employer can wait to upgrade: IntelliJ IDEA has to support new JDKs at release, and Elasticsearch had to replace the removed Security Manager. Compact source files and instance main methods with IO.println make Hello World shorter than in Python. The running demo is an image webshop. Twelve images are embedded with a Jina multimodal model into 768-dimension vectors in Elasticsearch, and the app combines text and kNN search with reciprocal rank fusion. It finds an \"Apple\" computer for \"computer\" and fruit for the Polish \"jabłko\".",
+    "Step by step the Java 8-style code changes. A DTO becomes a record. Imports collapse into `import module java.base`, with explicit imports needed where names clash, as with java.sql.Date. Scanner gives way to IO.readln. A parallel stream doing I/O, which slowed from 10 to 30 seconds once another parallel stream claimed the common pool, becomes Gatherers.mapConcurrent on virtual threads. They also show the built-in fold, scan, windowFixed and windowSliding gatherers. Debugging tips: non-suspending log points, the Java Stream Debugger's trace view, evaluate expression, and a debugger skill for agents in the next IntelliJ release.",
+    "Two CompletableFutures that had to cancel each other by hand become a StructuredTaskScope with fork and join. A thread dump shows the named scope and its virtual threads, and joiners and timeouts are configured through a lambda. Przybyl shows that cancellation still relies on interruption, so a CPU-bound task that ignores it breaks fast failure. Further stops: lazy constants (preview) replacing eager static fields like an ObjectMapper, Markdown Javadoc comments generated with JetBrains Air and Junie, and the lambda-configured builder in the newer Elasticsearch client.",
+    "The performance case for \"the gold dragons\" (management): with compact object headers, on by default in Java 27, 10 million tiny objects took about 114 MB instead of 190 MB. JetBrains Runtime 25 already enables them. The Vector API gave roughly 2x on some array operations and nothing on another, and Elasticsearch ships with it enabled on JDK 26. Java 28 previews include a simple JSON API and value classes, shown with LocalDate losing identity. Virtual thread pinning is caught with jdk.tracePinnedThreads in a Testcontainers and Toxiproxy test, then fixed by moving to Java 24. Scope values, flexible constructor bodies, record patterns, unnamed variables and primitive patterns (Polish pierogi plurals) follow. They close by arguing that an LTS you don't pay support for gets you nothing extra."
+  ],
+  "keyPoints": [
+    "Gatherers.mapConcurrent (Java 24) runs I/O-bound stream steps on a bounded number of virtual threads, avoiding the common-pool starvation that tripled a parallel stream's runtime in the demo.",
+    "StructuredTaskScope replaces hand-written mutual cancellation between CompletableFutures, which needs n(n-1) cancellations for n futures. Cancellation still relies on interruption, so blocking work must be interruptible.",
+    "Compact object headers, default in Java 27, cut a 10-million-tiny-object heap from about 190 MB to about 114 MB without code changes. JetBrains Runtime 25 already turns them on.",
+    "Virtual threads no longer pin inside synchronized blocks from Java 24. On Java 21, find pinning with -Djdk.tracePinnedThreads=full in an end-to-end test.",
+    "Scope values act as one-way, immutable, bounded-lifetime thread locals and can lower privileges for a nested call (their Log4Shell-inspired example).",
+    "The Vector API helps only some numeric operations (about 2x for two of three in their non-benchmark). Elasticsearch already uses it in production.",
+    "Upgrading is about idioms, not just version numbers. Newer libraries such as the Elasticsearch Java client remove a lot of boilerplate code.",
+    "Java 28 previews include value classes (no identity, possible flattening into arrays) and a minimal JSON API for small services."
+  ],
+  "takeaways": [
+    "Replace parallel streams that do I/O with Gatherers.mapConcurrent, and fan-out/fan-in CompletableFuture code with StructuredTaskScope.",
+    "If you are on Java 21 with virtual threads, run your integration tests with -Djdk.tracePinnedThreads=full, or move to Java 24+ to remove synchronized pinning.",
+    "Measure your service's memory with compact object headers enabled (-XX:+UseCompactObjectHeaders on 25, default on 27).",
+    "Use IntelliJ log points instead of System.out debugging, and the Stream Debugger to inspect pipelines.",
+    "Question an LTS-only policy if you aren't paying for JDK support. You still have to apply quarterly patch updates anyway."
+  ],
+  "quotes": [
+    {"text": "Why are you sticking to LTS if you're not actually paying for the support? Remember, four times zero is still zero.", "at": "175:03"},
+    {"text": "Upgrading is not only about bumping numbers in your pom.xml or Gradle file. It's also about changing how you think about stuff.", "at": "82:03"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Memes, polls and JEPs"},
+    {"at": "13:24", "title": "Compact sources and demo app"},
+    {"at": "29:42", "title": "Records and module imports"},
+    {"at": "38:53", "title": "Stream gatherers and debugging"},
+    {"at": "57:27", "title": "Structured concurrency"},
+    {"at": "73:55", "title": "Lazy constants and Markdown docs"},
+    {"at": "88:15", "title": "Compact headers and Vector API"},
+    {"at": "106:40", "title": "JSON API and value classes"},
+    {"at": "131:09", "title": "Virtual threads and scope values"},
+    {"at": "153:32", "title": "Constructors, patterns and LTS"}
+  ],
+  "tech": ["Java 25", "Java 27", "Java 28", "IntelliJ IDEA", "Stream Gatherers", "Structured Concurrency", "Scoped Values", "Virtual Threads", "Lazy constants", "Compact object headers", "Vector API", "Value classes", "Records", "Elasticsearch", "Kibana", "Jina embeddings", "Testcontainers", "Toxiproxy", "SDKMAN!", "JFR", "Junie"],
+  "watchIf": "You are on Java 8 to 21 and want an unhurried, demo-heavy tour of what newer Java (up to 28 previews) changes in real code, plus arguments to convince management to upgrade.",
+  "themes": ["Java language & JDK", "JVM performance & runtime", "Developer experience & tooling"],
+  "demo": true
+}

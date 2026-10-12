@@ -1,0 +1,14 @@
+{
+  "id": 23531,
+  "source": "abstract",
+  "tldr": "Ricky van Rijn describes a team-built AI orchestrator on Embabel Agent and how each step changed the team's way of working, from specs to sprints lasting days.",
+  "summary": ["MetaFactory built an orchestration tool to get an overview of active agents and their work. It reads agent, skill and spec files from default locations so it stays interchangeable with other tools, uses Embabel Agent as its base layer, and adds a visual dashboard showing which agent is active, what it is doing and the next task.", "The session sets out to explain how the orchestrator was built and what each technical step did to the team's way of working. Developers move toward reviewing and giving feedback to AI, business analysts write requirements as spec files that an AI agent reviews before assignment, and the product owner controls the queue, with sprints shortening from weeks to days."],
+  "keyPoints": ["Orchestrator uses Embabel Agent as its foundation.", "Reads agent, skill and spec files from default locations for tool interchangeability.", "Visual dashboard shows active agent, current work and next task.", "Roles shift: developers review, analysts write specs, product owners manage the queue."],
+  "takeaways": ["Store functional requirements as spec files that an agent can review before work is assigned."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Embabel Agent", "Agent skills", "Spec files"],
+  "watchIf": "You are working out how agentic tooling changes team roles and sprint planning.",
+  "themes": ["AI agents & agentic coding", "Teams, careers & leadership"],
+  "demo": false
+}

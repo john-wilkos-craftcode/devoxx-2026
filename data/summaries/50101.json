@@ -1,0 +1,23 @@
+{
+  "id": 50101,
+  "source": "abstract",
+  "tldr": "A screening of the official Java documentary, tracing 31 years of Java from Sun Microsystems through OpenJDK and the move from Java EE to Jakarta EE, told by those involved.",
+  "summary": [
+    "This is a documentary screening rather than a talk. It traces Java's history from its beginnings at Sun Microsystems through OpenJDK, the JVM ecosystem and the transition from Java EE to Jakarta EE, framing it as a community story of fighting for, rebuilding and opening up the platform.",
+    "It is told by people who shaped Java, including James Gosling, Joshua Bloch, James Duncan Davidson, Tim Lindholm, Kim Polese, Carla Schroer and Sharat Chander. Georges Saab of Oracle is listed as the speaker."
+  ],
+  "keyPoints": [
+    "Covers 31 years of Java, from Sun Microsystems to today.",
+    "Includes OpenJDK, the JVM ecosystem and the Java EE to Jakarta EE transition.",
+    "Features interviews with James Gosling, Joshua Bloch and other early contributors."
+  ],
+  "takeaways": [
+    "Watch it for context on how Java's community and governance came to be."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Java", "OpenJDK", "Jakarta EE", "JVM"],
+  "watchIf": "You are curious about the people and history behind Java.",
+  "themes": ["Java language & JDK"],
+  "demo": false
+}

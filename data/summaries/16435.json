@@ -1,0 +1,24 @@
+{
+  "id": 16435,
+  "source": "abstract",
+  "tldr": "An open BOF with the LangChain4j community on the project's current state, adoption stories, challenges and roadmap.",
+  "summary": [
+    "The session is an interactive discussion with members of the LangChain4j community, hosted by Dimitris Andreadis. LangChain4j debuted at Devoxx Belgium 2023 and has become a key framework for integrating LLMs into Java applications.",
+    "Participants discuss the project's current state, real-world adoption stories, ongoing challenges and roadmap developments, and are invited to ask questions, give feedback and exchange ideas, whether they use it in production or are just starting."
+  ],
+  "keyPoints": [
+    "Discussion of the current state and future direction of LangChain4j.",
+    "Real-world adoption stories and ongoing challenges.",
+    "Roadmap developments.",
+    "Open Q&A and feedback from users and contributors."
+  ],
+  "takeaways": [
+    "Bring feedback or feature requests for LangChain4j to the maintainers."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["LangChain4j"],
+  "watchIf": "You use or are considering LangChain4j and want to talk with its community.",
+  "themes": ["LLMs in Java apps", "AI agents & agentic coding"],
+  "demo": false
+}

@@ -1,0 +1,4 @@
+data/raw/transcripts/
+.venv/
+__pycache__/
+*.pyc

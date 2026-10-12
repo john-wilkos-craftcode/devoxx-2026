@@ -1,0 +1,94 @@
+{
+  "id": 7011,
+  "source": "transcript",
+  "tldr": "Prompt injection cannot be fully prevented, so Gross argues for treating coding agents as untrusted and running them in microVM sandboxes with network allowlists and externally injected credentials.",
+  "summary": [
+    "Gross starts from this year's agent-driven hacks, then explains the mechanics: the harness sends prompt, system prompt and a tool list (bash, skills, MCP tools) to the model and executes whatever tool calls come back, which is remote code execution by design. Entry points include poisoned training data, infected skills and MCP servers, harness exploits such as a GitHub Copilot auto-run link, and above all prompt injection. Injections hide in unrendered HTML, code comments, skills (Snyk found them in 36%), llms.txt, Unicode tag characters and remapped glyphs, and evade classifiers via Base64, DAN role-play, poems or a forged thinking trace. With no prepared statements for LLMs, probabilistic defences fail.",
+    "His answer is the lethal trifecta (private data, external actions, untrusted content: allow only two) plus a real box. Claude Code's built-in sandbox is not one, since Claude can rerun a command with it disabled. Containers fall to Docker-in-Docker, and on SandboxEscapeBench Claude Mythos Preview escaped every time. Agents escaped QEMU VMs but not Firecracker microVMs. A good sandbox is up to date, runs a hardened container in a microVM, allowlists folders and domains, injects credentials through a TLS-intercepting proxy, and monitors like a honeypot. He recommends the free Docker Sandboxes (sbx). Remaining leaks: allowed third-party hosts (SSRF), git hooks and rendered Markdown images."
+  ],
+  "keyPoints": [
+    "A coding agent is remote code execution by design: it runs whatever tool calls the model returns, in an unbounded loop.",
+    "Prompt injection can be hidden in Unicode tag characters, remapped font glyphs, HTML source tags, code comments and llms.txt; Snyk reported injections in 36% of skills scanned.",
+    "Claude Code's /sandbox lets the agent itself retry a failed command with the sandbox disabled; plain containers are easily escaped, especially with Docker-in-Docker.",
+    "MicroVMs (for example Firecracker) held where QEMU VMs did not; options include Docker Sandboxes, microsandbox and NVIDIA OpenShell, all pre-1.0.",
+    "Inject credentials from outside the sandbox (e.g. `sbx` secret commands for OpenAI auth) so a compromised agent cannot exfiltrate them; watch for leaks through git hooks, rendered images and allowed hosts."
+  ],
+  "takeaways": [
+    "Apply the lethal trifecta: never give one agent private data, external write or network access, and untrusted input all at once.",
+    "Run coding agents in a microVM-based sandbox such as Docker Sandboxes with folder and domain allowlists, not in the harness's built-in sandbox.",
+    "Keep API keys outside the sandbox and have a proxy inject them into outgoing requests.",
+    "Inspect .git/hooks after agent sessions, since git status does not show hook changes."
+  ],
+  "quotes": [
+    {
+      "text": "Security based on probability is no security at all.",
+      "at": "15:34"
+    },
+    {
+      "text": "The built-in Claude sandbox is not a sandbox.",
+      "at": "17:39"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Agents hacking companies"
+    },
+    {
+      "at": "02:04",
+      "title": "How coding agents work"
+    },
+    {
+      "at": "05:06",
+      "title": "Entry vectors and harness exploits"
+    },
+    {
+      "at": "09:14",
+      "title": "Prompt injection techniques"
+    },
+    {
+      "at": "15:34",
+      "title": "Why injection cannot be solved"
+    },
+    {
+      "at": "16:36",
+      "title": "Lethal trifecta and sandboxes"
+    },
+    {
+      "at": "22:42",
+      "title": "What makes a good sandbox"
+    },
+    {
+      "at": "25:46",
+      "title": "Docker Sandboxes setup"
+    },
+    {
+      "at": "28:50",
+      "title": "Remaining escape routes"
+    }
+  ],
+  "tech": [
+    "Claude Code",
+    "OpenAI Codex",
+    "GitHub Copilot",
+    "MCP",
+    "Agent skills",
+    "llms.txt",
+    "OWASP Top 10 for LLM Applications",
+    "SandboxEscapeBench",
+    "Docker",
+    "QEMU",
+    "Firecracker",
+    "Docker Sandboxes",
+    "microsandbox",
+    "NVIDIA OpenShell",
+    "Pi coding agent",
+    "Snyk"
+  ],
+  "watchIf": "You run coding agents on your laptop or in CI and want a quick map of the injection threats and a concrete sandboxing setup.",
+  "themes": [
+    "Security & supply chain",
+    "AI agents & agentic coding"
+  ],
+  "demo": false
+}

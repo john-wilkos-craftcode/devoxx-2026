@@ -1,0 +1,14 @@
+{
+  "id": 21694,
+  "source": "abstract",
+  "tldr": "David Simms explains what JEP 401 value objects are, what they do for the JVM, and the path from Valhalla toward healing the rift between objects and primitives.",
+  "summary": ["With JEP 401 value objects arriving in OpenJDK as a first preview, David Simms from the Java Platform Group sets out to explain what they are, why and how to use them, and what they do for the JVM and for your code. The change is a single keyword and does not require recompiling libraries.", "The talk includes project history, including peak Valhalla prototype performance and how dangerous edges were smoothed off, some JVM implementation details, and speculative future ideas. The message is that while List<int> is not here yet, JEP 401 is a path toward it, bringing safety and clarity benefits and some performance wins."],
+  "keyPoints": ["JEP 401 value objects arrive as a first preview, enabled by one keyword.", "Libraries do not need to be recompiled.", "Goal is to heal the rift between objects and primitives.", "Covers project history and JVM implementation details.", "List<int> is a longer-term goal."],
+  "takeaways": ["Try JEP 401 preview builds on small immutable types in your code."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Project Valhalla", "JEP 401", "OpenJDK", "JVM"],
+  "watchIf": "You want to understand Valhalla value objects from someone working on the JVM implementation.",
+  "themes": ["Java language & JDK", "JVM performance & runtime"],
+  "demo": false
+}

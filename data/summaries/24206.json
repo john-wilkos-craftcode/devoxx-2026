@@ -1,0 +1,14 @@
+{
+  "id": 24206,
+  "source": "abstract",
+  "tldr": "A community BOF with the GraalVM team on Crema, GraalPy, GraalWasm, framework integrations and the roadmap, with room for questions and feedback.",
+  "summary": ["Core members of the GraalVM team (Thomas Wuerthinger, Fabio Niephaus and Alina Yurenko) use this BOF to discuss where the project is heading. They plan to share updates on Crema, which brings dynamic class loading to Native Image and aims to combine the best of AOT and JIT compilation.", "The session also covers GraalOS, GraalPy, GraalWasm and other parts of the ecosystem, plus GraalVM-related updates in Micronaut, Quarkus and Spring. It closes with a look at the roadmap, and attendees are invited to bring questions, feedback and ideas."],
+  "keyPoints": ["Crema adds dynamic class loading to Native Image, mixing AOT and JIT strengths.", "Updates on GraalOS, GraalPy and GraalWasm.", "GraalVM-related news in Micronaut, Quarkus and Spring.", "Sneak peek at the project roadmap and open Q&A with the team."],
+  "takeaways": ["Bring your Native Image pain points and feedback to the team."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["GraalVM", "Native Image", "Crema", "GraalOS", "GraalPy", "GraalWasm", "Micronaut", "Quarkus", "Spring"],
+  "watchIf": "You use or evaluate GraalVM Native Image and want to influence or preview its direction.",
+  "themes": ["JVM performance & runtime", "Java language & JDK"],
+  "demo": false
+}

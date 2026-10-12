@@ -1,0 +1,24 @@
+{
+  "id": 15360,
+  "source": "abstract",
+  "tldr": "A hands-on lab on using JDK Flight Recorder to capture, analyze and extend application profiling data, including custom events and Prometheus integration.",
+  "summary": [
+    "Attendees work through capturing data about application behavior with JDK Flight Recorder (JFR), then managing and analyzing the resulting recordings. The lab, led by Ana-Maria Mihalceanu and José Paumard, also covers creating custom JFR events.",
+    "The session further looks at integrating JFR with Prometheus so that application and infrastructure behavior can be correlated, with the goal of better observability and the confidence to monitor, diagnose and tune Java applications."
+  ],
+  "keyPoints": [
+    "Capturing application data with JDK Flight Recorder.",
+    "Managing and analyzing JFR recordings.",
+    "Creating custom JFR events.",
+    "Integrating JFR with Prometheus to correlate application and infrastructure behavior."
+  ],
+  "takeaways": [
+    "Record a JFR session of one of your services and inspect it for hotspots."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["JDK Flight Recorder", "Prometheus", "Java"],
+  "watchIf": "You want hands-on practice using JFR to diagnose and tune Java applications.",
+  "themes": ["JVM performance & runtime"],
+  "demo": false
+}

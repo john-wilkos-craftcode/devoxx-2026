@@ -1,0 +1,24 @@
+{
+  "id": 20651,
+  "source": "abstract",
+  "tldr": "A beginner lab on TornadoVM covering simplified installation, new backends, profiling tools and running a local GPU-backed LLM in pure Java connected to DevoxxGenie.",
+  "summary": [
+    "The TornadoVM team walks attendees through what has changed in thirteen releases since their last Devoxx: SDKs on SDKMAN! and Maven Central, one SDK for JDK 21 to 27, a native layer rebuilt on the FFM API, Metal, CUDA and OpenCL backends, and the new CUDA Tile API. Short animations explain the programming model.",
+    "Participants then profile and debug with TornadoPulse, TornadoViz and the TornadoInsight IDE plugin, and run jitLLM (formerly GPULlama3.java) for LLM inference in pure Java, connecting it to DevoxxGenie in IntelliJ IDEA. Advanced demos on NVIDIA include cuBLAS in the same task graph as Java kernels and a glimpse of GPU-accelerated Apache Flink. No GPU programming experience is needed."
+  ],
+  "keyPoints": [
+    "TornadoVM SDKs are available through SDKMAN! and Maven Central and support JDK 21 to 27.",
+    "The native layer is rebuilt on Java's FFM API, with Metal, CUDA and OpenCL backends.",
+    "Tooling includes TornadoPulse, TornadoViz and the TornadoInsight IDE plugin.",
+    "jitLLM runs LLM inference in pure Java and plugs into DevoxxGenie as a local assistant."
+  ],
+  "takeaways": [
+    "Install the TornadoVM SDK via SDKMAN! and try a local GPU-backed LLM."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["TornadoVM", "jitLLM", "GPULlama3.java", "DevoxxGenie", "FFM API", "CUDA", "Metal", "OpenCL", "cuBLAS", "Apache Flink", "SDKMAN!"],
+  "watchIf": "You want to run LLMs or compute kernels on a GPU from Java without GPU programming experience.",
+  "themes": ["LLMs in Java apps", "JVM performance & runtime", "Hardware, robots & fun"],
+  "demo": false
+}

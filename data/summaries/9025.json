@@ -1,0 +1,24 @@
+{
+  "id": 9025,
+  "source": "abstract",
+  "tldr": "Cristian Schuszter of CERN shares how to move from individual contributor to technical leadership while staying hands-on and scaling impact through the team.",
+  "summary": [
+    "The talk addresses the transition after being promoted to lead a team or project: adapting ways of working, dropping old habits and worrying about having less impact because of less coding. Schuszter argues that leadership can amplify technical impact instead.",
+    "Drawing on their own path at CERN to a mix of Solution Architect, Tech Lead and Engineering Manager, the speaker shares best practices and adjustment techniques for the transition, and how to stay relevant without spending countless hours on coding."
+  ],
+  "keyPoints": [
+    "Being a great engineer does not automatically make you a great leader.",
+    "Leadership can amplify technical impact by scaling influence through the team.",
+    "The speaker combines Solution Architect, Tech Lead and Engineering Manager roles at CERN.",
+    "Techniques for staying technically relevant while coding less."
+  ],
+  "takeaways": [
+    "Identify which old habits to drop when you take on a lead role."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": [],
+  "watchIf": "You are a new or aspiring tech lead worried about losing technical impact.",
+  "themes": ["Teams, careers & leadership"],
+  "demo": false
+}

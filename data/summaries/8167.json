@@ -1,0 +1,24 @@
+{
+  "id": 8167,
+  "source": "abstract",
+  "tldr": "A BOF led by Trisha Gee asking where the value of open source lies in the age of AI, covering funding, commercial boundaries and community.",
+  "summary": [
+    "Trisha Gee brings together maintainers, contributors and enthusiasts to discuss whether AI, trained on open code and able to generate code on demand, makes open source libraries more or less valuable, and whether organizations can still earn money from training, consulting or support.",
+    "Questions for discussion include how an open source project supports itself financially, what belongs in the open offering versus a paid one, why we build open source in the first place, the pros and cons in an AI world, and how to build businesses around open source tools and use them to support businesses."
+  ],
+  "keyPoints": [
+    "Does AI change the value and business case of open source?",
+    "How projects fund themselves and split open from commercial features.",
+    "Whether the real value is the community, documentation and examples.",
+    "Pros and cons of open source tools in an AI world."
+  ],
+  "takeaways": [
+    "Clarify why your organization or project is open source before deciding what to charge for."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": [],
+  "watchIf": "You maintain or fund an open source project and wonder how AI changes its value.",
+  "themes": ["Teams, careers & leadership", "AI agents & agentic coding"],
+  "demo": false
+}

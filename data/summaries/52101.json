@@ -1,0 +1,25 @@
+{
+  "id": 52101,
+  "source": "abstract",
+  "tldr": "A tour of the major OpenJDK projects, from Valhalla, Leyden and Babylon to Panama, Amber, Loom and Detroit, and what each means for Java in the coming years.",
+  "summary": [
+    "Nicolai Parlog's closing session surveys where Java's big projects stand. Amber, Leyden, Panama and Loom have already improved the language, APIs and runtime, while Valhalla and Babylon are described as just getting started.",
+    "The talk looks at how Valhalla addresses the rift in Java's type system, Leyden startup and warmup time, Babylon reaching foreign programming models and hardware, Panama native interop, Amber language expressiveness, Loom structured concurrency and Detroit interop with Python and JavaScript. The goal is to show what to expect from Java in the next few years."
+  ],
+  "keyPoints": [
+    "Valhalla targets the split in Java's type system.",
+    "Leyden targets startup and warmup time.",
+    "Babylon extends Java to foreign programming models and hardware.",
+    "Panama improves interop with native code; Detroit with Python and JavaScript.",
+    "Amber and Loom continue to evolve the language and concurrency."
+  ],
+  "takeaways": [
+    "Follow the OpenJDK project pages to see which upcoming features affect your codebase."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Project Valhalla", "Project Leyden", "Project Babylon", "Project Panama", "Project Amber", "Project Loom", "Project Detroit"],
+  "watchIf": "You want a single overview of the Java roadmap across all current OpenJDK projects.",
+  "themes": ["Java language & JDK"],
+  "demo": false
+}

@@ -1,0 +1,14 @@
+{
+  "id": 21687,
+  "source": "abstract",
+  "tldr": "Ed Burns argues that Java's long-established, unglamorous strengths such as types, tests and static analysis are what keep AI coding agents honest, ending with an agent-safe checklist.",
+  "summary": ["Ed Burns of GitHub sets out to counter agent hype by focusing on what goes wrong: non-determinism, hallucinated APIs, token cost, unreviewable code and reviews that keep changing code until it breaks. The session argues that successful agentic development uses agent strengths (speed, breadth, tolerance for boilerplate) while backstopping their weaknesses.", "It presents ten reasons Java suits this: the type system, testing ecosystem, backwards compatibility culture, deep static analysis, build and dependency management, formatting enforcement, virtual threads and structured concurrency, the observability stack, JVM performance tuning and breadth of deployment options. For each, the talk names the agentic failure mode it addresses, and closes with a practical checklist for making a Java process agent-safe."],
+  "keyPoints": ["Agent weaknesses named: non-determinism, dependency sprawl, inconsistent error handling, hallucinated APIs, unmaintainable code.", "Ten Java strengths, from the type system to deployment options, each mapped to a failure mode.", "Static analysis, tests and formatting rules act as guardrails for generated code.", "Ends with a checklist for an agent-safe Java development process."],
+  "takeaways": ["Audit your build for type checks, tests, static analysis and formatting rules before letting agents commit code."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Java", "Virtual threads", "Structured concurrency", "Static analysis", "Observability"],
+  "watchIf": "You use coding agents on Java projects and want to know which existing practices make them safer.",
+  "themes": ["AI agents & agentic coding", "Testing & quality"],
+  "demo": false
+}

@@ -1,0 +1,14 @@
+{
+  "id": 10046,
+  "source": "abstract",
+  "tldr": "An open BOF discussion on whether and how to keep teaching kids to code and build robots now that AI generates code.",
+  "summary": ["This birds-of-a-feather session, hosted by Eddy Vos of Devoxx4Kids Netherlands, is an open discussion rather than a presentation. It starts from the observation that everyone talks about AI-assisted development and asks what that means for the next generation of developers.", "Organisers, mentors, teachers, parents and developers are invited to discuss whether children should still learn to code, which skills matter when AI writes the code, and how to make technology attractive and accessible to kids. The conversation also covers the future of Devoxx4Kids workshops, robotics and growing the next generation of makers."],
+  "keyPoints": ["Open discussion format with organisers, mentors, teachers, parents and developers.", "Questions raised: should kids still learn to code, and which skills matter when AI generates code.", "How to make technology attractive and accessible to children.", "Future of Devoxx4Kids, coding education and robotics."],
+  "takeaways": ["Bring your experience from teaching or mentoring kids and share what works."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Devoxx4Kids", "Robotics"],
+  "watchIf": "You teach, mentor or parent kids around technology and want to compare notes on coding education in the AI era.",
+  "themes": ["Teams, careers & leadership", "Hardware, robots & fun"],
+  "demo": false
+}

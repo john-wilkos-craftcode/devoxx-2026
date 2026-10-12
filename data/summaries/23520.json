@@ -1,0 +1,24 @@
+{
+  "id": 23520,
+  "source": "abstract",
+  "tldr": "A lab moving pose estimation from a Spring Boot/DJL backend into the browser with LiteRT.js and WebGPU, then comparing latency to decide when AI belongs on-device.",
+  "summary": [
+    "Attendees start with a Spring Boot and Kotlin service running pose estimation on the JVM with DJL and measure its round-trip latency. They then move the model into the browser using LiteRT.js and WebGPU, first on a static image and then on a live camera feed with a real-time skeleton overlay.",
+    "In the final part they race the browser against their own backend and produce a latency comparison that informs when AI belongs on-device, in the cloud, or nowhere. Two bonus labs (in-browser semantic search and a camera-driven self-filling form) and a decision framework are included; privacy and GDPR benefits of on-device inference are noted."
+  ],
+  "keyPoints": [
+    "Baseline: pose estimation on the JVM with Spring Boot, Kotlin and DJL.",
+    "Browser inference with LiteRT.js and WebGPU, including a live camera overlay.",
+    "Latency comparison between browser and backend.",
+    "Bonus labs: in-browser semantic search and a self-filling camera form."
+  ],
+  "takeaways": [
+    "Measure round-trip latency of an AI feature before deciding whether it needs a server."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["LiteRT.js", "WebGPU", "DJL", "Spring Boot", "Kotlin", "TypeScript"],
+  "watchIf": "You build web apps with AI features and want to run models client-side.",
+  "themes": ["Frontend & UI", "LLMs in Java apps"],
+  "demo": false
+}

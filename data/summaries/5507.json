@@ -1,0 +1,81 @@
+{
+  "id": 5507,
+  "source": "transcript",
+  "tldr": "Podlesniuk shows how INSHUR turns natural-language agent rules into executable ArchUnit, Error Prone and Checkstyle checks that coding agents hit during the build and fix themselves.",
+  "summary": [
+    "Podlesniuk, a tech lead at INSHUR, opens with three agent PRs for the same task under the same CLAUDE.md rules: two injected a Clock, one still called Instant.now(). His team now turns prose rules into checks that are executable, deterministic, fast, debuggable (failures name class, line and fix) and testable, using Checkstyle for source text, ArchUnit for compiled dependencies, and Error Prone for method bodies. In a demo service migrating from service classes to a mediator with handlers, ArchUnit rules such as \"no service packages\" and \"every @RestController injects a Mediator\" run as JUnit tests. An agent nudged toward the old style built a service, hit the failing test, and rewrote the feature correctly.",
+    "For drift already merged, an agent loops until ArchUnit exit criteria pass: no direct handler access in tests, no mocked repositories, @SpringBootTest on integration tests. A custom Claude Code command does architectural mutation testing, proposing plausible architectures that rename, reroute or invert dependencies; one survivor injected a repository into a controller. An Error Prone BugChecker suggests moving private handler methods that only read an aggregate root, and a Checkstyle rule forbids comments without a reason tag. New rules come from recurring PR review comments. Costs: over-strict rules, longer builds, more agent iterations and team adoption, so start with warnings or ArchUnit frozen rules."
+  ],
+  "keyPoints": [
+    "Natural-language rules in CLAUDE.md or AGENTS.md are not reliably followed; one of three agent runs ignored a word-for-word rule to inject Clock.",
+    "Deterministic checks should be executable, deterministic, fast, debuggable and testable; the failure message is the agent's context for fixing the violation.",
+    "Tool split: Checkstyle for source-level rules (naming, nesting, comments), ArchUnit for dependencies and layers, Error Prone BugCheckers for patterns inside method bodies.",
+    "Architectural mutation testing: an agent invents plausible architectures that violate a rule's intent (rename, reroute, invert); survivors reveal loopholes such as a repository injected into a controller.",
+    "Claude Code hooks block the agent from editing architecture test paths, and shared rules can be distributed across repositories as a versioned library."
+  ],
+  "takeaways": [
+    "Turn recurring PR review comments into ArchUnit or Checkstyle rules that fail the build with a specific reason and location.",
+    "Test each rule against small positive and negative example classes to prove it catches what it should.",
+    "Use architecture tests as exit criteria and let an agent loop to fix existing drift.",
+    "Protect rule files from agent edits with hooks, and roll out new rules as warnings or ArchUnit frozen rules before blocking."
+  ],
+  "quotes": [
+    {
+      "text": "The goal here is not to make everything deterministic but to make everything deterministic that we reliably can.",
+      "at": "19:29"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Agents ignore written rules"
+    },
+    {
+      "at": "01:04",
+      "title": "Properties of deterministic checks"
+    },
+    {
+      "at": "03:07",
+      "title": "Checkstyle, ArchUnit, Error Prone"
+    },
+    {
+      "at": "04:07",
+      "title": "ArchUnit rules live demo"
+    },
+    {
+      "at": "09:11",
+      "title": "Fixing existing drift"
+    },
+    {
+      "at": "11:15",
+      "title": "Architectural mutation testing"
+    },
+    {
+      "at": "14:20",
+      "title": "Error Prone and Checkstyle checks"
+    },
+    {
+      "at": "18:29",
+      "title": "Costs and Q&A"
+    }
+  ],
+  "tech": [
+    "ArchUnit",
+    "Error Prone",
+    "Checkstyle",
+    "JUnit",
+    "Spring Boot",
+    "Claude Code",
+    "Claude Code hooks",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "Mediator pattern"
+  ],
+  "watchIf": "Your team merges a lot of agent-written code and you want concrete ways to enforce architecture rules in the build instead of in prompts.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Architecture & design",
+    "Testing & quality"
+  ],
+  "demo": true
+}

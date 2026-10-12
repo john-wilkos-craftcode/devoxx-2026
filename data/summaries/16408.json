@@ -1,0 +1,14 @@
+{
+  "id": 16408,
+  "source": "abstract",
+  "tldr": "Martin Ladecky post-mortems a Commerzbank incident on an 11TB Oracle Exadata database that reached BaFin, and the write-side redesign and PostgreSQL migration that followed.",
+  "summary": ["The session reverse-engineers a critical failure at a major bank, where a system holding 11TB on Oracle Exadata, at around 10 billion records, saw indexing and read-side duplicate checks collapse and led to a formal report to BaFin. It walks through five milestones: application-layer first aid against cascading timeouts, a removed 10-day query window check that later triggered an 11TB full scan, the war-room decision to wait for Exadata Smart Flash Cache to warm up, and the move of deduplication from read side to a write-side integrity layer.", "It ends with the exit strategy: a zero-loss dual-write ingestion architecture to migrate the 10 billion records to Cloud PostgreSQL without CDC. Martin Ladecky aims to give a practical blueprint for the compliance-performance paradox and database cold starts."],
+  "keyPoints": ["At about 10 billion records, standard indexing and read-side duplicate checks collapsed.", "A query window check removed during refactoring years earlier led to an 11TB full scan.", "The team chose to wait for Exadata Smart Flash Cache to warm up.", "Deduplication moved from read side to a write-side integrity layer.", "Migration to Cloud PostgreSQL planned via dual-write without CDC."],
+  "takeaways": ["Review whether refactorings removed implicit query limits that protect large tables.", "Prefer write-side integrity checks over read-side deduplication at large scale."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Oracle Exadata", "Exadata Smart Flash Cache", "PostgreSQL", "Dual-write"],
+  "watchIf": "You run large relational databases and want a candid incident story and migration plan.",
+  "themes": ["Data & databases", "Architecture & design"],
+  "demo": false
+}

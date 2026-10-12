@@ -1,0 +1,48 @@
+{
+  "id": 14459,
+  "source": "transcript",
+  "tldr": "Garnier-Moiroux and Long live-code a Spring Security 7 app that moves from hashed passwords to one-time tokens, passkeys and MFA, then to OAuth2 SSO, a BFF gateway and a secured MCP server.",
+  "summary": [
+    "Daniel Garnier-Moiroux and Josh Long open with a Spring Boot web app backed by Postgres and a JdbcUserDetailsManager. Endpoints are secure by default. On passwords: SHA-256 is too fast to be safe, BCrypt (work factor 10, about 100 ms) is the default, and OWASP recommends Argon2, which also costs memory and needs Bouncy Castle or Password4j on the classpath. A DelegatingPasswordEncoder prefixes each hash with its algorithm, so stored hashes can be upgraded when a user logs in. Their main point is that the best way to handle passwords is to stop using them.",
+    "They explain the three authentication factors (knowledge, possession, inherence) and then add one-time-token login. Instead of a new filter chain they use a Customizer<HttpSecurity>, which keeps Spring Boot's defaults. A one-time token sent by email or SMS is still a kind of password and can be phished. Passkeys (WebAuthn, backed by the FIDO Alliance and every major OS and password manager) rely on a challenge signed with a private key on the device, and they are both safer and quicker to use. They then combine factors with Spring Security's MFA support. It can apply to the whole app or, through an authorization manager factory, only to specific paths such as an admin page that needs password, OTT and the ADMIN role.",
+    "Next they turn the app into an identity provider with Spring Authorization Server, which now ships inside Spring Security. They register a client and build an OAuth2 client app that logs in through OIDC. They also build a resource server that validates JWTs against the issuer's public keys. The client passes the access token along in steps: first as a manual bearer header, then through OAuth2ClientHttpRequestInterceptor on RestClient, and finally with declarative HTTP interface clients wired up by an HttpServiceGroupConfigurer bean.",
+    "For single-page apps they follow the backend-for-frontend pattern. A Spring Cloud Gateway functional router serves the static JavaScript (served with the JDK's jwebserver) and the API from one origin, uses a token relay filter on the API route, and the route order is set explicitly. This avoids CORS issues and keeps tokens off the browser. Garnier-Moiroux ends by exposing a Spring app's methods as MCP tools with Spring AI. He secures it with the spring-ai-community MCP server security module, and Claude Code goes through the OAuth flow in a browser before it books roller-skating classes as user Alice."
+  ],
+  "keyPoints": [
+    "Fast hashes like SHA-256 are a liability for passwords; use BCrypt or preferably Argon2 (CPU- and memory-hard), via DelegatingPasswordEncoder so hashes are upgraded on next login.",
+    "Use a Customizer<HttpSecurity> bean instead of a new SecurityFilterChain to add features without discarding Spring Boot's secure defaults.",
+    "One-time tokens remove your password store but are still phishable; passkeys (WebAuthn) are phishing-resistant and the biometric never leaves the device.",
+    "Spring Security MFA records completed factors as authorities; it can be enforced globally or per path, including requirements like 'password entered in the last 30 minutes'.",
+    "Spring Authorization Server is now part of Spring Security and can act as an OAuth2/OIDC identity provider alongside Keycloak, Okta or Entra ID.",
+    "Token propagation shrinks to a few lines with OAuth2ClientHttpRequestInterceptor or declarative HTTP interface clients plus an HttpServiceGroupConfigurer.",
+    "For SPAs, the recommended pattern is a backend-for-frontend: a gateway holds tokens and relays them, serving UI and API from the same origin.",
+    "MCP servers built with Spring AI can be protected with OAuth2, so agents like Claude Code act with the logged-in user's identity."
+  ],
+  "takeaways": [
+    "Migrate password storage to Argon2 behind a DelegatingPasswordEncoder and let hashes upgrade on login.",
+    "Add passkey (WebAuthn) registration to your Spring Security login as a first step away from passwords.",
+    "Require a second factor only on sensitive endpoints instead of app-wide, using the per-path MFA authorization manager.",
+    "Stop storing OAuth tokens in the browser; put a gateway in front of your SPA and use token relay.",
+    "If you expose MCP tools, put them behind OAuth2 rather than API keys."
+  ],
+  "quotes": [
+    {"text": "We've done the best job at doing the worst thing, which is we're using passwords as correctly as you can use passwords. But our message to you is: don't use passwords.", "at": "12:12"},
+    {"text": "This is the rare win where you get better security and better ergonomics for the users.", "at": "21:23"},
+    {"text": "You might lose your password. You probably won't lose your finger.", "at": "21:23"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Intro and app setup"},
+    {"at": "05:07", "title": "Users and password hashing"},
+    {"at": "13:12", "title": "One-time token login"},
+    {"at": "17:20", "title": "Passkeys with WebAuthn"},
+    {"at": "22:23", "title": "Multi-factor authentication"},
+    {"at": "27:29", "title": "Authorization server and OAuth client"},
+    {"at": "33:36", "title": "Resource server and token relay"},
+    {"at": "40:41", "title": "SPA via backend-for-frontend gateway"},
+    {"at": "45:50", "title": "Securing an MCP server"}
+  ],
+  "tech": ["Spring Security 7", "Spring Boot", "Spring Authorization Server", "OAuth 2", "OpenID Connect", "WebAuthn", "Passkeys", "Argon2", "BCrypt", "Spring Cloud Gateway", "RestClient", "HTTP interface clients", "Spring AI", "Model Context Protocol", "Claude Code", "PostgreSQL", "jwebserver"],
+  "watchIf": "You maintain Spring apps with username/password login and want to see, in working code, how passkeys, MFA, OAuth2 and BFF fit together in Spring Security 7.",
+  "themes": ["Security & supply chain", "Spring & frameworks"],
+  "demo": true
+}

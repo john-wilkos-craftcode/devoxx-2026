@@ -1,0 +1,2402 @@
+[
+ {
+  "id": "4ck-T2gaMQ4",
+  "title": "Teaching an Old Handle New Tricks: From Core Reflection to FFM  by Maurizio Cimadamore, Viktor Klang"
+ },
+ {
+  "id": "RlJaauOvcG0",
+  "title": "Devoxx Belgium : See You Next Year \ud83e\udd29"
+ },
+ {
+  "id": "-Aub1KMjMFM",
+  "title": "Devoxx the mini series: The Attendee"
+ },
+ {
+  "id": "zEUSFvDOiCo",
+  "title": "From vibe coding to harness engineering: modernizing a regulated environment with AI by Anyul Rivas"
+ },
+ {
+  "id": "fszyRIZXjQM",
+  "title": "Java on Kubernetes Without Container Images: The WebAssembly Way By Bruno Borges"
+ },
+ {
+  "id": "eSSPOCeoF0c",
+  "title": "How AI transforms engineering and inspiring young minds \u2013 Ayoub Hammou Ahabchane & Kamel Zaraoui"
+ },
+ {
+  "id": "LD2tKMpToYg",
+  "title": "Snake in 10 Lines: Learning More by Coding Less  by Guus de Wit"
+ },
+ {
+  "id": "JWFZY0aJTjg",
+  "title": "Project Detroit: From Foreign Libraries to Foreign Language Runtimes  by Maurizio Cimadamore"
+ },
+ {
+  "id": "c4F7Iy3XqaY",
+  "title": "Toxic Flows in MCP Servers and Skills: What Your Agent Blindly Trusts by Brian Vermeer"
+ },
+ {
+  "id": "E--oDq3X74E",
+  "title": "AI without spaghetti: Clean architecture in these of AI  by Maarten Vandeperre en Lutske van der Mee"
+ },
+ {
+  "id": "8NURE3I4AJQ",
+  "title": "High Performance Java Native AI with CUDA and the Vector API  by Zoran Sevarac"
+ },
+ {
+  "id": "0A2jqCqSIjg",
+  "title": "223 Pull Requests in 11 Days: The Recipe for Building Real Software with AI Agents  by Julien Dubois"
+ },
+ {
+  "id": "yhk1qvy6A_4",
+  "title": "Coder, Coach, Catalyst   using questions to make people grow  by Martin Mazur"
+ },
+ {
+  "id": "xEAYnXyt3L4",
+  "title": "Say Goodbye to LLM API keys with Workload Identity Federation  by Siarhei Biarozkin"
+ },
+ {
+  "id": "wxNQRGPnJ24",
+  "title": "The Rise of Agent Enablement: Coding Agents Don't Scale Themselves  Neither Do Your Teams  by Patric"
+ },
+ {
+  "id": "v86SfHA5ISw",
+  "title": "Taming Microservice Overload: Our Journey to Modular Monoliths  by Mario Klaver"
+ },
+ {
+  "id": "rNOzf12RORI",
+  "title": "The Yearly Java Performance Update for 2026 by Per Ake Minborg"
+ },
+ {
+  "id": "oey2TbFvfWE",
+  "title": "Agents Shouldn't Control Control Flow by Jeremy Adams"
+ },
+ {
+  "id": "nHRSwiFNQ9E",
+  "title": "State of Agentic Coding  by Daniela Petruzalek"
+ },
+ {
+  "id": "m9viRAIRAUQ",
+  "title": "The Hexagonal Hangover  by Ties van de Ven"
+ },
+ {
+  "id": "lsvVJaigNp8",
+  "title": "\"You May Now Optimize the Wedding\": Optimizing the Seating, Bachelor Party, and Honeymoon with Const"
+ },
+ {
+  "id": "kuUeHD_k5fs",
+  "title": "Java and the Next Generation of Programming Models  by Ana Maria Mihalceanu"
+ },
+ {
+  "id": "knE4uy7IYXY",
+  "title": "Making sense of vector databases  by Balkrishna Rawool"
+ },
+ {
+  "id": "jFxR6YYWdmI",
+  "title": "Is the IDE dead ?  by Martin Lippert"
+ },
+ {
+  "id": "ePBmAdRYl10",
+  "title": "When ORM Becomes OMG: Performance Pitfalls in JPA and Friends  by Jos Roseboom"
+ },
+ {
+  "id": "d1SJXp9QeWE",
+  "title": "Agents With Seatbelts: Practical Ways to Keep AI Code Gen Under Control  by Jonathan Vila Lo\u0301pez"
+ },
+ {
+  "id": "bqwtnKLU35E",
+  "title": "How to Architect Green Software by Ioannis Kolaxis"
+ },
+ {
+  "id": "am8adCMJQzk",
+  "title": "Dream Machines & Walled Gardens  by Anders Nora\u030as"
+ },
+ {
+  "id": "adFS-_sCTQ4",
+  "title": "SIMD for Java: how Elasticsearch already benefits from the Panama Vector API  by Piotr Przybyl"
+ },
+ {
+  "id": "Z64CjgCO5gk",
+  "title": "Software engineering in the age of AI agents: who\u2019s in control? by Bert Jan Schrijver"
+ },
+ {
+  "id": "S7x4DxwRnk4",
+  "title": "Quixotic: Pure Java Inference at Native Speed  by Alfonso\u00b2 Peterssen"
+ },
+ {
+  "id": "OCCOIgkCnjE",
+  "title": "Building, Shipping and Governing AI Agents on Kubernetes  by Tom O'Rourke, Ep Heijting"
+ },
+ {
+  "id": "NT0wyPM58G8",
+  "title": "The Devoxx Robot Games  by Stephan Janssen"
+ },
+ {
+  "id": "Mdu5_gndYn0",
+  "title": "Green Maven builds: sustainable CI in practice by Jan Boonen"
+ },
+ {
+  "id": "4hXQoN8co80",
+  "title": "Hey Belfius! Meet our new bank AI assistant\u2014and discover how we\u2019re building and securing AI across B"
+ },
+ {
+  "id": "0-1IGpVrFLQ",
+  "title": "Reflect, Transform, Accelerate: Bringing GPU Computing to Java By Juan Fumero"
+ },
+ {
+  "id": "-LMWT5OCneA",
+  "title": "Keeping Spring Applications Secure in the Age of AI  by Neven Cvetkovic"
+ },
+ {
+  "id": "VmPMUGImB-M",
+  "title": "Who to blame? The AI, The Programmer, or The Prompt?  by Makan Sepehrifar"
+ },
+ {
+  "id": "VaT7DgmVSms",
+  "title": "Engineering Lessons from Working on Software Older Than Me  by Guust Ysebie"
+ },
+ {
+  "id": "wzN6qq08w0U",
+  "title": "ADRs: The Why and How  by Venkat Subramaniam"
+ },
+ {
+  "id": "wbzpP0T9w6I",
+  "title": "Conquest, time travel and explosions using Git by Alexander Chatzizacharias"
+ },
+ {
+  "id": "rv2KpWgb0Mw",
+  "title": "Build a private cluster for the office by John Davies"
+ },
+ {
+  "id": "zo6L7bxn4OY",
+  "title": "Faster Development with Java, Python, and Micronaut  by Graeme Rocher, Thomas Wuerthinger"
+ },
+ {
+  "id": "wUyQmRriCng",
+  "title": "F*ck The System, and other bad ideas for the future by Jo Caudron"
+ },
+ {
+  "id": "wJ7R4qkVs8Y",
+  "title": "Underneath the Black Marker: AI Techniques for Detecting and Reversing Redactions  by David vonThene"
+ },
+ {
+  "id": "w2RTFWet_6c",
+  "title": "Choose your own adventure in agentic design patterns  by Guillaume Laforge"
+ },
+ {
+  "id": "vcL6eCAwLwY",
+  "title": "From a startup stack to 5 microseconds: inside a crypto trading engine  by Oleg Lobanov"
+ },
+ {
+  "id": "vNeyNkeU4ms",
+  "title": "Taming the Chaos: Security and Predictability in LLM Powered Applications  by Rustam Mehmandarov"
+ },
+ {
+  "id": "sWP9osLV45I",
+  "title": "Help! I hate my team mate! by Jessica Siewert"
+ },
+ {
+  "id": "hHu3rLsbYog",
+  "title": "Why Java Is Perfect for AI   Just Not the AI You\u2019re Thinking Of  by Trisha Gee, Andrey Santrosyan"
+ },
+ {
+  "id": "PGpKfdXZrpc",
+  "title": "Their API Went Down  So Why Is My App on Fire?  by Ines Panker"
+ },
+ {
+  "id": "qrtd6svRUnk",
+  "title": "Knocking on the Wrong Door: The Six Developers You\u2019ll Meet in Security  by Enrique Larios Vargas"
+ },
+ {
+  "id": "kaT6UpLrzhU",
+  "title": "AI in the Dark: Running LLMs in Air Gapped Production Environments by Mihaela Gheorghe Roman"
+ },
+ {
+  "id": "ewCPBgOrLAE",
+  "title": "Ask the Architects  by Gavin Bierman, Maurizio Cimadamore, Per Ake Minborg, Viktor Klang, Alan Batem"
+ },
+ {
+  "id": "eFSEg54mwVU",
+  "title": "Microservices Without the Distributed Mess  by Steven Hillaert"
+ },
+ {
+  "id": "W-OKVLMtPAw",
+  "title": "Bootiful Security  by Daniel Garnier Moiroux, Josh Long"
+ },
+ {
+  "id": "U7Z9fZn7rFg",
+  "title": "Choose your own adventure in agentic design patterns  by Guillaume Laforge"
+ },
+ {
+  "id": "SQUrHzMie3o",
+  "title": "Owning the Code You Didn't Type by Renato Guerra Cavalcanti"
+ },
+ {
+  "id": "QbA-rs7XLEk",
+  "title": "Owning the inference layer: When and how to run your own models  by Maarten Vandeperre, Camille Nigo"
+ },
+ {
+  "id": "LPhGSgO5eKE",
+  "title": "Production Ready Java Containers: Smaller, Faster, Smarter  by Albert Attard"
+ },
+ {
+  "id": "KwQ76IvU59M",
+  "title": "Introducing Agent Control Theory: The System Runs the Model  by Mark Pollack"
+ },
+ {
+  "id": "FvVe9J0Abjg",
+  "title": "Modernizing legacy code with AI: hands on examples & lessons learned  by Koen Vanderkimpen, Wim Lamb"
+ },
+ {
+  "id": "CuvV3Aud3Q0",
+  "title": "Decoding the Cosmos: Voyager's 1970s Algorithms Meet Today's Cutting Edge Tech  by Pieter van der Me"
+ },
+ {
+  "id": "AsVt_dzTmN4",
+  "title": "Kill All Mutants! Intro to Mutation Testing by Dave Aronson"
+ },
+ {
+  "id": "9ARcNYC-eVk",
+  "title": "\"You May Now Optimize the Wedding\": Optimizing the Seating, Bachelor Party, and Honeymoon with Const"
+ },
+ {
+  "id": "6mzvcPr30kg",
+  "title": "Hardwood: Building a Parquet Parser From Scratch With a Little Help From AI  by Gunnar Morling"
+ },
+ {
+  "id": "5y_82lCevHg",
+  "title": "Everyday JSON by Viktor Klang, Alan Bateman"
+ },
+ {
+  "id": "3bIiAoYtAPs",
+  "title": "Beyond the Pod: Architecting and Scaling AI Agents on Kubernetes  by Abdellfetah SGHIOUAR"
+ },
+ {
+  "id": "2Yh7LKt8YNw",
+  "title": "The Dark Secrets of Computer Science  by Fabien Marsaud"
+ },
+ {
+  "id": "lW1faHx-guk",
+  "title": "Devoxx: ThankYou"
+ },
+ {
+  "id": "FFRdupUFpL0",
+  "title": "Devoxx the mini series: Kinepolis in 2170"
+ },
+ {
+  "id": "9Uz6lyElOL0",
+  "title": "Devoxx the mini series: Inside the singularity"
+ },
+ {
+  "id": "CscMBNKvQA8",
+  "title": "Devoxx the mini series: The Rebellion"
+ },
+ {
+  "id": "ymLlOAB8h_c",
+  "title": "Wrap, Reshape, or Redesign: Retrofitting Your APIs for a World of Agents  by Horacio Gonzalez Zaal 1"
+ },
+ {
+  "id": "y4F1XBtQeDw",
+  "title": "Build the Builder: A Java Coding Agent in Your IDE with ACP  by Vadim Briliantov"
+ },
+ {
+  "id": "vAfQ4f8wIVI",
+  "title": "Agentic Engineering Reconversion  by Victor Rentea"
+ },
+ {
+  "id": "tle2mA7EwWU",
+  "title": "The Year of the Runtime  by Ron Pressler"
+ },
+ {
+  "id": "qFTuteOEtsE",
+  "title": "Half of a billion Idle GPUs: The Case for On Device AI  by Prince Canuma"
+ },
+ {
+  "id": "nhVRKv8VHKU",
+  "title": "Life in the Ivory Tower   Confessions of a Former Developer Who Turned Into an Architect by Robin cu"
+ },
+ {
+  "id": "mnoUXIT4nMY",
+  "title": "A Fleet of AI Agents, Each in Its Own Sandbox: Inside Docker's Agentic Platform  by Jean Laurent de"
+ },
+ {
+  "id": "gPtWq_LHL8o",
+  "title": "Let's dance! \u2013 Teaching your robot some moves with reinforcement learning  by Thomas Endres, Martin"
+ },
+ {
+  "id": "fShgG3jtkXQ",
+  "title": "MCP 2 0   Stateless, New Auth CIMD, and Exciting Extensions  by James Ward"
+ },
+ {
+  "id": "aup9tNzQu7c",
+  "title": "Welcome to Devoxx Belgium 2026 by Stephan Janssen"
+ },
+ {
+  "id": "aow56RgptLA",
+  "title": "Structured Concurrency Looms  by Alan Bateman, Viktor Klang"
+ },
+ {
+  "id": "ZDocIlx7Zvg",
+  "title": "From Brainless to Brilliant \u2014 Giving an Open Source Robot a Mind of Its Own  by Jan Van Wassenhove"
+ },
+ {
+  "id": "Tc2RFLa0ip8",
+  "title": "The pizza party of the future \ud83c\udf55 by Katie Clark and Simon Rohrer"
+ },
+ {
+  "id": "QvyIzP4-OvM",
+  "title": "AI Doesn\u2019t Click Buttons :APIs for the Agentic Age  by Kim Lauwers"
+ },
+ {
+  "id": "Pg5kS8l9CpI",
+  "title": "Engineering for the Long Haul: Operating Open Source at Scale  by Sven Sellen"
+ },
+ {
+  "id": "P14Fy05Gs38",
+  "title": "I Hired a Real Robot as My Junior Dev \u2014 and Now My Kids Don't Want to Learn Java Anymore  by Jan Van"
+ },
+ {
+  "id": "N3VyoNNLDqQ",
+  "title": "Safety, speed, and governance in the agentic era  by Oleg S\u030celajev"
+ },
+ {
+  "id": "Ij5RsREpjBg",
+  "title": "Fun with Flags: How OpenFeature Solves Your Feature Flag Headaches  by Simon Schrottner"
+ },
+ {
+  "id": "9MPYPejgTGo",
+  "title": "Emergent DevEx: The Good, the Bad, and the Legacy  by Makan Sepehrifar, Soroosh Khodami"
+ },
+ {
+  "id": "8nY-kqwoD_A",
+  "title": "G1, ZGC, Shenandoah,     with all these GCs in Java, which one do I choose?  by Antoine DESSAIGNE"
+ },
+ {
+  "id": "5W4o_aYOaIY",
+  "title": "java raspberry Pi and the art of by Matti Tahvonen"
+ },
+ {
+  "id": "1yndLHw9mbo",
+  "title": "Mission Possible: The 45 Minute Path to Bullet Proof Java Container Images  by Pasha Finkelshtein"
+ },
+ {
+  "id": "-2vEfnB2mRw",
+  "title": "From User Prompt to JPA Query: Comparing Tool Calling, Structured Output & Hybrid Approach  by Sebas"
+ },
+ {
+  "id": "yUMnuh5U5k4",
+  "title": "Post Quantum Today: How Your Passwords Will Be Safe in a Quantum Future  by Julian Burr"
+ },
+ {
+  "id": "6N6qFqn1_Uo",
+  "title": "Harness Engineering: Building the System Around Your AI Coding Agent   by JI Darwish"
+ },
+ {
+  "id": "nEW0kosJjc8",
+  "title": "A Year of Agentic AI Evolution: Lessons Learned Building Production grade Agentic Systems  by Mario"
+ },
+ {
+  "id": "yB6FIQPgsWE",
+  "title": "What rules the virtual? How our systems obey physical laws   by Marianne Hoornenborg"
+ },
+ {
+  "id": "A8TBUalnfdc",
+  "title": "Why Documentation Won\u2019t Write Itself\u2014and AI Won\u2019t Save You  by Christian Heitzmann"
+ },
+ {
+  "id": "4qeUklTLyTs",
+  "title": "Eval Driven Development: Why you need it to make your Agentic Application survive Production  by  Ur"
+ },
+ {
+  "id": "9vtYvAI2Dtk",
+  "title": "Deterministic by Design   Achieving Reproducible Builds with Maven  by Maarten Mulders"
+ },
+ {
+  "id": "QQcsZNf0eWs",
+  "title": "CRAcking Compliance   The EU Cyber Resilience Act  by Christian Schabetsberger"
+ },
+ {
+  "id": "HzbNrEDZkYU",
+  "title": "0 to 350 Engineers on Claude Code: What Could Go Wrong?  by Nicolas Martignole"
+ },
+ {
+  "id": "mOmuF5fDiUM",
+  "title": "Pragmatic multi cloud architecture: designing for resilience and portability beyond the hype   by Al"
+ },
+ {
+  "id": "1PtdpItmzTo",
+  "title": "Bootiful Spring Boot 4  by Josh Long"
+ },
+ {
+  "id": "_CtnBnmYQC0",
+  "title": "Integration patterns for distributed systems  by Dirk Fro\u0308hner, Sabarish Sekar"
+ },
+ {
+  "id": "DseVLPC4Qjs",
+  "title": "Run Frontier Open Models on consumer hardware  by Prince Canuma"
+ },
+ {
+  "id": "BLBwQpczk7M",
+  "title": "How to survive and thrive as a dev team in the exponential age of AI  Real world AI adoption, smarte"
+ },
+ {
+  "id": "q58Y2tyRdCE",
+  "title": "Building an Agent Ready Platform  by Timo Salm"
+ },
+ {
+  "id": "8JuQaWFKk4w",
+  "title": "Consistency Patterns in Event Driven Architecture  by Emanuel Trandafir"
+ },
+ {
+  "id": "vhDwy1eCXbs",
+  "title": "Big Runtimes Make Efficient Programs  by Ron Pressler"
+ },
+ {
+  "id": "vN9jWqSvJNE",
+  "title": "Surviving the \"AI Slopageddon\": How AI shakes the foundations of Open Source  by Raphael Semeteys"
+ },
+ {
+  "id": "2pSyF44THEc",
+  "title": "AI Made Building Cheap  Now Decisions Are the Bottleneck   by Dave Sammut, Joa\u0303o Rosa"
+ },
+ {
+  "id": "BOcNjR2lBus",
+  "title": "Architecture Observability and Guardrails  by Victor Rentea"
+ },
+ {
+  "id": "HO5CpETzywk",
+  "title": "Building LLM Inference Engines in Java with TornadoVM and the NVIDIA Ecosystem  by Thanos Stratikopo"
+ },
+ {
+  "id": "OLQ98Ko4p3Q",
+  "title": "GraalVM Next: Layers, Crema, and WebAssembly in Action  by Alina Yurenko"
+ },
+ {
+  "id": "Tfrt19d3TEA",
+  "title": "rm  rf self doubt: Debugging Impostor Syndrome for Developers  by Vincent Mayers"
+ },
+ {
+  "id": "ePQyy9sLmsY",
+  "title": "Beyond encryption at rest: computing on encrypted data  by Andrea Iacono"
+ },
+ {
+  "id": "yePre1hOvHE",
+  "title": "When benchmarks go bad   what we learned from measuring performance wrong  by Francesco Nigro, Holly"
+ },
+ {
+  "id": "a5cQAl0g2AM",
+  "title": "No Country For Old APIs  Wrapping legacy Java services as MCP tools without rewriting them   by Z\u030cel"
+ },
+ {
+  "id": "EJv0TMNSUjw",
+  "title": "Create your own AI Agents without code  by David Gageot"
+ },
+ {
+  "id": "i_VXe0mNicY",
+  "title": "A Deserter Returns: What the Java community helped me rediscover  by Thierry Chantier"
+ },
+ {
+  "id": "AxhLQZqZdIg",
+  "title": "Kubernetes for Developers  by Alain Regnier"
+ },
+ {
+  "id": "cbSl8UVdMVg",
+  "title": "Quarkus Meets Leyden at the JVM Performance Edge  by Georgios Andrianakis, Ana Maria Mihalceanu"
+ },
+ {
+  "id": "A_fp7RaG5UY",
+  "title": "AsyncAPI in action: OpenAPI for event driven applications  by Michel Schudel"
+ },
+ {
+  "id": "mebPFAKSpzw",
+  "title": "Exquisite Evals for Skills & MCPs  by Christian Tzolov, James Ward"
+ },
+ {
+  "id": "Upd5ZqUn1qY",
+  "title": "Write Java Code Like a Seasoned Hacker: 2026 Edition  by Soroosh Khodami"
+ },
+ {
+  "id": "NkstzPeo400",
+  "title": "BootUI, the missing developer console for Spring Boot and Quarkus  by Julien Dubois"
+ },
+ {
+  "id": "pgVJWp-SjxI",
+  "title": "Java Script No, Not That One: Modern Automation with Java  by Loi\u0308c Magnette"
+ },
+ {
+  "id": "y9JjxyKc6gU",
+  "title": "Do We Need a Build Language? Java Builds Java  by Rafael Winterhalter"
+ },
+ {
+  "id": "t9e9FtHB-48",
+  "title": "The Importance of HITL to Avoid Chaos and EU Regulations for AI  by Juan Antonio Bren\u0303a \ud83c\uddea\ud83c\uddf8\ud83c\uddea\ud83c\uddfa"
+ },
+ {
+  "id": "MmSvjJhZl3A",
+  "title": "Beyond assertEquals: Probabilistic Security and Bias Testing for Java LLM Applications  by Iryna Doh"
+ },
+ {
+  "id": "U9pOWsERF6o",
+  "title": "30 minutes to build your first Vidocq app, the 100% European Sovereign Java stack with zero external"
+ },
+ {
+  "id": "eyJ5LO-Kyuw",
+  "title": "\ud83e\uddf0 Dev Containers: the ultimate toolbox for developers?  by Ste\u0301phane Philippart"
+ },
+ {
+  "id": "Lf_m5dIjjqw",
+  "title": "The Magic of OpenTelemetry: Rewriting Your App in Production   by Bruce Bujon"
+ },
+ {
+  "id": "c45C2wNSZFc",
+  "title": "Solving Distributed Transactions with the Saga Pattern and Temporal  by Andrei Sulyz"
+ },
+ {
+  "id": "B5-4mDLrWjM",
+  "title": "From Laptop to Lakehouse: Analytical SQL with DuckDB  by Oliver Geisser"
+ },
+ {
+  "id": "C10mZ3pCnGo",
+  "title": "Responsibly Dimming the Lights in the Software Factory  by Victor Rentea"
+ },
+ {
+  "id": "6SPnBmQrYEk",
+  "title": "Tap into the NVIDIA Ecosystem from Java with TornadoVM's Hybrid API  by Thanos Stratikopoulos, Micha"
+ },
+ {
+  "id": "5AaJ3H9fG6M",
+  "title": "AI Security Deep Dive, Securing Agents and AI Applications  by  Brian Vermeer"
+ },
+ {
+  "id": "npSWywhFDHo",
+  "title": "Specialized AI Agents: from concept to production  by David Gageot"
+ },
+ {
+  "id": "zDqS1U5Gnk8",
+  "title": "Don\u2019t burn your fingers in the heat of the AI revolution  And get an OpenClaw   by Maarten Vandeperr"
+ },
+ {
+  "id": "5VjB4t8aFWE",
+  "title": "Beyond system out println: Applying a Debugging Mindset at Scale  by  Cees Bos"
+ },
+ {
+  "id": "QBQ11aL2aZc",
+  "title": "Learning modern Java the playful way  by Marit van Dijk, Piotr Przybyl"
+ },
+ {
+  "id": "Qdn-I3q50Ww",
+  "title": "Measuring the Unmeasurable: Evaluating Generative AI in Practice  by Erin Pacquetet"
+ },
+ {
+  "id": "496nv8jsWhQ",
+  "title": "From Developer to Story Builder: Engineering a Novel, an ARG, and a Transmedia World with AI  by Rap"
+ },
+ {
+  "id": "Ycdt7IT7Kdw",
+  "title": "Cheaper or Better? The Strategic Choice Behind AI Adoption  by Miriam Sasse"
+ },
+ {
+  "id": "SC5nO6iadsU",
+  "title": "Building AI Agents from First Principles  by Adib Saikali"
+ },
+ {
+  "id": "A7ZIf8LkSvE",
+  "title": "Loop Engineering, beyond prompt, context, and harness engineering  by  Guillaume Laforge, Wietse Ven"
+ },
+ {
+  "id": "vLDbzmiT7Xs",
+  "title": "Will Valhalla Fix Tony's Billion Dollar Mistake? by Jose\u0301 Paumard, Remi Forax"
+ },
+ {
+  "id": "sexe_tnhAOI",
+  "title": "Beyond Code: The Intent Driven IDE for the Agentic Age by Bruno Borges"
+ },
+ {
+  "id": "_VZg6dxlGaM",
+  "title": "Java, LEGO & AI: Teaching the Next Generation to Build, Not Just Prompt  by Eddy Vos"
+ },
+ {
+  "id": "IXcQYp51PLM",
+  "title": "From AI to Agent: A Field Guide to Agentic Patterns in LangChain4j  by  Loi\u0308c Magnette"
+ },
+ {
+  "id": "Q91obeWeWNQ",
+  "title": "Agent Loops, Decoded: Fundamentals to Agentic Patterns in Spring AI  by  Christian Tzolov"
+ },
+ {
+  "id": "d6D8nef-32c",
+  "title": "Prompt It Right: Spring Boot Testing in the AI Era by Philip Riecks"
+ },
+ {
+  "id": "pMv_39iSXVA",
+  "title": "From Autocomplete to Autopilot: How AI Is Changing the Developer Experience by Tugdual Grall"
+ },
+ {
+  "id": "wcghmWdu-HY",
+  "title": "Destructoring is the future of Javas Encapsulation  by  Richard Gross"
+ },
+ {
+  "id": "JzFelLDiVJQ",
+  "title": "Introduction to Spring AI by Timo Salm"
+ },
+ {
+  "id": "dq5rueVhiIM",
+  "title": "Can AI Build a Jakarta EE Runtime? The Vidocq Experiment by Antoine Sabot Durand, yann Blazart, Seba"
+ },
+ {
+  "id": "SgK0zMNayq0",
+  "title": "The Quarkus advantage: Turning build time metaprogramming into runtime performances by Mario Fusco,"
+ },
+ {
+  "id": "z8lal-Yt_04",
+  "title": "From Developer to Builder: A Spec Driven Development Deep Dive by Simon Martinelli"
+ },
+ {
+  "id": "GLJGhkxMdgU",
+  "title": "Secure Your Coding Agent Like It\u2019s Malware by Richard Gross"
+ },
+ {
+  "id": "zC2tbq7S5UE",
+  "title": "Modern Java in Practice   The Features That Matter by   Nicolai Parlog, Falk Sippach"
+ },
+ {
+  "id": "GGEmc6eR8c4",
+  "title": "Codepocalypse Now: LangChain4j vs JetBrains Koog  by Viktor Gamov, Baruch Sadogursky"
+ },
+ {
+  "id": "K3kD89Y1YCk",
+  "title": "Stopping AI Generated Architectural Drift: Deterministic Guardrails for Agentic Coding by Sasha Podl"
+ },
+ {
+  "id": "EnHPYkSAaCo",
+  "title": "Expanding Vector Search Beyond Similarity by Alina Yurenko"
+ },
+ {
+  "id": "YEy7AgRO7As",
+  "title": "The day we stopped publishing Kafka event from our API     by Virginie Zinck"
+ },
+ {
+  "id": "_dcauZC9ST8",
+  "title": "In the loop, not in the dark: staying in control in the era of dark software factories  by Alex Gavr"
+ },
+ {
+  "id": "j3aEB0i3Up8",
+  "title": "Your AI Agent Trusts Strangers  Let Me Show You   by  Elder Moraes"
+ },
+ {
+  "id": "rk22mStXsGU",
+  "title": "Teaching a New Dog Old Tricks: Give the Agent a Debugger  by  Anton Arhipov"
+ },
+ {
+  "id": "asAxisu6EQ0",
+  "title": "Testing Architecture Made Simple by Gunter Rotsaert"
+ },
+ {
+  "id": "dWF5HMkKiLg",
+  "title": "Building the Trusted Agent Ecosystem by Ivan Petrov, Patrick McGrath"
+ },
+ {
+  "id": "wWfj4AJahlQ",
+  "title": "One tool to rule them all: bash, a tiny LLM, and the birth of a coding agent  by  Philippe Charrie\u0300r"
+ },
+ {
+  "id": "GkcE1X1BJRI",
+  "title": "The games are in. It\u2019s your turn to play! \ud83c\udfae \ud83d\udd79\ufe0f"
+ },
+ {
+  "id": "nma5a_sbX5E",
+  "title": "Speaking next week at Devoxx Belgium?"
+ },
+ {
+  "id": "2D72Qlr1ATw",
+  "title": "Devoxx Belgium is Next Week!"
+ },
+ {
+  "id": "j9dhCtfjLVk",
+  "title": "Devoxx Belgium 2026 Tickets \u2013 2nd Batch available"
+ },
+ {
+  "id": "gc5fF6pGhDA",
+  "title": "Devoxx Belgium 2026 CFP is open! \u2764\ufe0f\u274c\ud83e\udd16"
+ },
+ {
+  "id": "V2tXNX9yyG8",
+  "title": "Devoxx 2008 RoxorLoops + Welcome by Stephan #BlastFromThePast"
+ },
+ {
+  "id": "iU0ytnOo6Qw",
+  "title": "[VDBUH2026] Brian Vermeer - Breaching LLM-Powered Apps: Overcoming Security and Privacy Challenges"
+ },
+ {
+  "id": "qSzhiRLFcwY",
+  "title": "[VDBUH2026] Andra Ghibutiu & Alex Proca - Opening thoughts"
+ },
+ {
+  "id": "qSJf8yKoFhY",
+  "title": "[VDBUH2026] Roberto Cortez - How difficult can it be to write efficient code?"
+ },
+ {
+  "id": "lW6VqE3HMvQ",
+  "title": "[VDBUH2026] Victor Botan - Scaling the Future: Lakehouse Architecture and OpenSource Collaboration"
+ },
+ {
+  "id": "jnPtYh-n0LM",
+  "title": "[VDBUH2026] Alexander Chatzizacharias: How to build your own fun and absurd pair programmer"
+ },
+ {
+  "id": "UIlFFBZKSaA",
+  "title": "[VDBUH2026] George Patra\u0219cu - Ports, Adapters, and Other Ways to Stop Breaking Your Business Logic"
+ },
+ {
+  "id": "Tl1uqW8RSAo",
+  "title": "[VDBUH2026] Andrei Mihai & Bianca Bulbuc - How Agentic AI Empowers Creative Thinking"
+ },
+ {
+  "id": "G58PbxBXC8c",
+  "title": "[VDBUH2026] Abdel Sghiouar - Optimizing LLM Inference for the Rest of Us"
+ },
+ {
+  "id": "8pDCcKqbwB4",
+  "title": "[VDBUH2026] Sander Hoogendoorn  - Keynote: Seven Habits of a (Mostly) Successful Team"
+ },
+ {
+  "id": "5hVlf9_G71Q",
+  "title": "[VDBUH2026] Victor Rentea - Kenote: AI Didn\u2019t Replace You. It Promoted You!"
+ },
+ {
+  "id": "47a1xmKmVCQ",
+  "title": "[VDBUH2026] Marit van Dijk & Piotr Przyby\u0142 - Learning modern Java the playful way"
+ },
+ {
+  "id": "QZrl5tghsTA",
+  "title": "[VDBUH2026] Julien Top\u00e7u - Hexagonal Architecture in Practice"
+ },
+ {
+  "id": "DAgVdXO4NFM",
+  "title": "[VDBUH2026] Magda Miu & Alin Miu - Engineering Leadership in the Age of AI"
+ },
+ {
+  "id": "0iNj3Z5KoEk",
+  "title": "[VDBUH2026] Lo\u00efc Magnette - Finding the Spark: A Career Reset Button"
+ },
+ {
+  "id": "-70FSX2dmsU",
+  "title": "[VDBUH2026] Ana-Maria Mih\u0103lceanu - Supercharge your JVM performance with Project Leyden"
+ },
+ {
+  "id": "KPaamLqH1hY",
+  "title": "Why smart developers write silly code by Ines Panker"
+ },
+ {
+  "id": "rDdM7b1DWB8",
+  "title": "The Art of Java Type Patterns by Simon\u00a0 Ritter"
+ },
+ {
+  "id": "pPfsS9_4QMU",
+  "title": "Training My Rival in Java: A Deep Q-Learning AI to Play Azul by Victor Uria Valle"
+ },
+ {
+  "id": "ucTOgQTk6wk",
+  "title": "Stop Using JSON Web Tokens (JWTs) for Authorization! by Sohan Maheshwar"
+ },
+ {
+  "id": "SOk5AzrSKBc",
+  "title": "Gearing up to Java 25: Key Language Features by Venkat Subramaniam"
+ },
+ {
+  "id": "KwxJEA_9ulI",
+  "title": "Supercharge Spring Boot Tests with Kotlin DSL Power by Urs Peter"
+ },
+ {
+  "id": "nJprIKMMXns",
+  "title": "Orchestrating payments for the millions by Faris Aziz"
+ },
+ {
+  "id": "p-znSwtxito",
+  "title": "Can GenAI predict code\u2019s energy use and why should we care? by Wilco Burggraaf"
+ },
+ {
+  "id": "R4piK1trAw8",
+  "title": "Testing Architecture Made Simple by Gunter Rotsaert"
+ },
+ {
+  "id": "GRXiK3-Uvu8",
+  "title": "Spring Boot in the Cloud: Advanced Optimization Deep Dive by Patrick Baumgartner"
+ },
+ {
+  "id": "3uDk7gOAVSM",
+  "title": "Testing Agents Before They Test You by Jettro Coenradie, Dani\u00ebl Spee"
+ },
+ {
+  "id": "q9rf6sIH6vQ",
+  "title": "Agentic Programming, this is how it's done by Jeroen Egelmeers"
+ },
+ {
+  "id": "CU_Jj38rm1k",
+  "title": "Level Up Your LangChain4j Apps for Production by Lize Raes"
+ },
+ {
+  "id": "gvRH64-L3BA",
+  "title": "5,5 prompt injection techniques in 15 minutes by Brian Vermeer"
+ },
+ {
+  "id": "dL9oX6UMlAc",
+  "title": "Emulating on the JVM by Remco Siemonsma"
+ },
+ {
+  "id": "sqsnwCk1yvM",
+  "title": "The developer's guide to making money in the open-source galaxy by Ronald Dehuysser"
+ },
+ {
+  "id": "Ru_Ay9C4weA",
+  "title": "How to survive and thrive as a dev (team) in the exponential age of AI by Sander Hoogendoorn"
+ },
+ {
+  "id": "u0eIRNaCZDQ",
+  "title": "Java 26 is boring, Which is why it is brilliant by Johannes Bechberger, Lutske de Leeuw"
+ },
+ {
+  "id": "YYzed0qH_ps",
+  "title": "Stop Patching, Start Shipping by Delicia De Jong"
+ },
+ {
+  "id": "xnmyVqb0os0",
+  "title": "How AI Is Rewriting the Practice of Open Source by Sri Rang"
+ },
+ {
+  "id": "S3BCWS41lmY",
+  "title": "How I built my own Intelligent Robot Arm from Scratch by Iulia Feroli"
+ },
+ {
+  "id": "3ZxBhnqLqik",
+  "title": "Intelligent Kotlin by Venkat\u00a0 Subramaniam, Josh Long, James Ward"
+ },
+ {
+  "id": "4ueNBW9Lp8Y",
+  "title": "Demystifying the Dreaded A/B Test by Chris DeMars"
+ },
+ {
+  "id": "9LrSZq5oueA",
+  "title": "Secure Java Applications against Quantum Threats by Ana-Maria Mihalceanu"
+ },
+ {
+  "id": "jD_MpL9xkSU",
+  "title": "pi and the Spec Paradox by Max Sumrall"
+ },
+ {
+  "id": "RDncdOFCCOM",
+  "title": "Generics - You Never Know What You're Gonna Get by Bram Janssens"
+ },
+ {
+  "id": "9q0cnzmpdsY",
+  "title": "Modernising the Energy Transition by Mark Dirksma, Marthijs Berfelo"
+ },
+ {
+  "id": "7BK-Zq5WP3o",
+  "title": "Tracing Java Performance Bottlenecks by Victor Rentea"
+ },
+ {
+  "id": "G2iBRl84ua4",
+  "title": "Hack Your Brain: Smarter Learning for Devs by Simone de Gijt"
+ },
+ {
+  "id": "nAAP0cuv5iM",
+  "title": "When Music and Software Come Together by Hanno Embregts"
+ },
+ {
+  "id": "JO_XX3YNNRA",
+  "title": "The record: migrate to immutability by Johan Hutting"
+ },
+ {
+  "id": "kDDKh4VI_Pg",
+  "title": "From Automation to Autonomy: The Next Evolution of Playwright Testing by Ashish Ghosh"
+ },
+ {
+  "id": "VAO6zwo0QsI",
+  "title": "How to Write Bad Java Code by Pratik Patel"
+ },
+ {
+  "id": "BMbAWG8zABI",
+  "title": "Welcome to Voxxed Days Amsterdam 2026 Day Two - Opening (room 2)"
+ },
+ {
+  "id": "Ap-NZ7OZ4YQ",
+  "title": "Burnout happens in teams that skip accessibility by Chris DeMars"
+ },
+ {
+  "id": "5hjt0NQ3WmQ",
+  "title": "Building my own (accurate!) Spotify Wrapped by Iulia Feroli"
+ },
+ {
+  "id": "yNM1mcefLUQ",
+  "title": "The three laws of Scalable Engineering by Jacopo Nardiello"
+ },
+ {
+  "id": "qyPbNHhS0Mk",
+  "title": "Welcome to Voxxed Days Amsterdam 2026 Day Two - Opening (room 1)"
+ },
+ {
+  "id": "fLK7-SUVVak",
+  "title": "Building AI Agents on the JVM by Anton Arhipov"
+ },
+ {
+  "id": "E3II7a4XloE",
+  "title": "Welcome to Voxxed Days Amsterdam 2026 - Opening (room 2)"
+ },
+ {
+  "id": "jHXEIPfp5Ig",
+  "title": "Taming Microservice Overload: Our Journey to Modular Monoliths by  Mario Klaver"
+ },
+ {
+  "id": "EPKTy6KcJUM",
+  "title": "Pipeline Patterns and Antipatterns - Things your Pipeline Should (Not) Do by  Daniele Raniz Raneland"
+ },
+ {
+  "id": "l3xcqAAtedE",
+  "title": "Stream tricks that you don't wanna miss ! by  Aicha Laafia"
+ },
+ {
+  "id": "RTQdC6IgBzc",
+  "title": "FrameworkDesktop and IncusOS, a perfect combination for running LLMs locally by  Peter Smink"
+ },
+ {
+  "id": "3UZy7LarDMc",
+  "title": "Moving towards the European Cloud by  Bouke\u00a0 Nijhuis"
+ },
+ {
+  "id": "okdgOPcFCqw",
+  "title": "Building AI Agents with Spring & MCP by James Ward, Josh Long"
+ },
+ {
+  "id": "YicnrjV2WME",
+  "title": "Coding Fast and Slow by Baruch\u00a0Sadogursky"
+ },
+ {
+  "id": "T5fyscsZ1Gc",
+  "title": "Un-observable AI is un-trustworthy AI\u00a0 by  Annie Freeman"
+ },
+ {
+  "id": "GAM6AHm4MZg",
+  "title": "Accessibility powered by AI by Ramona Domen"
+ },
+ {
+  "id": "_Hbn-WhMiHA",
+  "title": "RAG in the wild: real-world lessons from modernizing legacy systems by Susanne Pieterse"
+ },
+ {
+  "id": "JzP86TT8Rns",
+  "title": "Coupling, Cohesion and Change, The Blueprint of Modern Software Design by  Boyen van Gorp"
+ },
+ {
+  "id": "9judIPvzi_Q",
+  "title": "What Sorcery is This? How software uses Dark Patterns to manipulate users by Rachel Appel"
+ },
+ {
+  "id": "bgCl6ia7Q1s",
+  "title": "Early returns from outer space (in Kotlin) by Alejandro Serrano Mena"
+ },
+ {
+  "id": "_lTosGE5aIQ",
+  "title": "Ouvroir de Code Potentiel by Anders Nor\u00e5s"
+ },
+ {
+  "id": "W7SJQfwFRrY",
+  "title": "Write Java Code Like a Seasoned Hacker: 2026 Edition by  Soroosh Khodami"
+ },
+ {
+  "id": "07q8amh7i7w",
+  "title": "Engineering a Better Java Build Tool by Haoyi\u00a0 Li"
+ },
+ {
+  "id": "AU-IFWJe_mE",
+  "title": "Stop Guessing, Start Trusting: The Power of Contract Testing by Ashish Ghosh"
+ },
+ {
+  "id": "IrcJzRYbCV8",
+  "title": "GraalVM 25: What's New and What's Next by Alina Yurenko"
+ },
+ {
+  "id": "JXpcVf2ukEA",
+  "title": "Commit to Change: From Analyst to Java Developer by  Janne Ploeger"
+ },
+ {
+  "id": "AYIHS9ksBIY",
+  "title": "Securing the Software Supply Chain by Default by Marco van Veldhuizen"
+ },
+ {
+  "id": "NV5uUI2I_ow",
+  "title": "Six and a half ridiculous things to do with Quarkus by Holly Cummins"
+ },
+ {
+  "id": "9h0FEgNYyr8",
+  "title": "10 Things I Hate About Java by  Adele Carpenter"
+ },
+ {
+  "id": "MCv4CjfuuJg",
+  "title": "Are We Still Doing OOP? \ud83e\udd14 Let's Tackle Anemic Domain Models Together by  Michael Koers"
+ },
+ {
+  "id": "d-0nVPpU94c",
+  "title": "Dream Machines & Walled Gardens by Anders Nor\u00e5s"
+ },
+ {
+  "id": "8lswtL1wqxk",
+  "title": "How to trace a Java Memory Leak by Victor Rentea"
+ },
+ {
+  "id": "inQtpmi5WHk",
+  "title": "Zero-Toil AI Enablement: Bridging LLM Agents to Microservices with MCP-on-Envoy by  Jens Kat"
+ },
+ {
+  "id": "5C0NgH3Z_9Y",
+  "title": "Managing expectations with Autonomy Poker by Linda van der Pal"
+ },
+ {
+  "id": "djc0CnpkpSw",
+  "title": "The micro frontend game - a demo of cross-team scalability by  Martijn van Iersel"
+ },
+ {
+  "id": "OOLKTTT5B8s",
+  "title": "The Joy of Coding Competitions by  Bertjan Schrijver"
+ },
+ {
+  "id": "wogSpSI0mLQ",
+  "title": "Green Maven Builds: sustainable CI in practice by Jan Boonen"
+ },
+ {
+  "id": "4V9NOdVC_C0",
+  "title": "From Observability to Action: Elastic AI, Agent Builder, and Workflows by Evelien Schellekens"
+ },
+ {
+  "id": "ikyPZBlOamc",
+  "title": "Language Games by Eli Holderness"
+ },
+ {
+  "id": "SacYM4IGwUQ",
+  "title": "AI at Every Step: Why Are You Still Doing the Dev Cycle by Hand? by Dani\u00ebl Floor"
+ },
+ {
+  "id": "ra5ZQ67cfPM",
+  "title": "Tips and tricks to bring the fun and passion back in your team! by Paulien van Alst"
+ },
+ {
+  "id": "WVwEal1HKAw",
+  "title": "Building a legacy: The art of crafting maintainable systems by  Saman Nourkhalaj"
+ },
+ {
+  "id": "gjt0oyKxw7Q",
+  "title": "Solving grid congestion in 15 minutes by  Edo\u00a0 van Draanen"
+ },
+ {
+  "id": "1BMJ81jfeRI",
+  "title": "Make Cybersecurity Fun: Host Your Own Security-Themed Hackathon by Artem Makarov"
+ },
+ {
+  "id": "48Ht5lE1jno",
+  "title": "Integrating AI into Your Java Applications: Spring AI Deep Dive with RAG by Christian Tzolov"
+ },
+ {
+  "id": "VKajwv8wOTw",
+  "title": "Possessed by Packages: Is Your JavaScript Haunted? by Chris DeMars"
+ },
+ {
+  "id": "umTz4GYV8mc",
+  "title": "Avoiding pitfalls with Java streams, concurrency, HTTP requests and more by Jeroen Borgers"
+ },
+ {
+  "id": "bBOaqnDIRcA",
+  "title": "Java 25 in Production: Memory Dieting to Tame Latency and Garbage Collection by Manish Askani"
+ },
+ {
+  "id": "uvnxEZfSr1g",
+  "title": "Never Trust a Monkey! Can We Trust AI-Generated Code? by Baruch Sadogursky"
+ },
+ {
+  "id": "kNAmIwSnOm0",
+  "title": "From greenfield to minefield: How to avoid traps of creeping complexity by Adam Michalik"
+ },
+ {
+  "id": "L00fyYUWivI",
+  "title": "The invisible thread: Scaling under regulation and geopolitical risk by Daniele Tonella"
+ },
+ {
+  "id": "6jHZpbLH4WU",
+  "title": "Learning modern Java the playful way by Marit\u00a0van Dijk, Piotr\u00a0Przyby\u0142"
+ },
+ {
+  "id": "TfY0uXudi6Y",
+  "title": "Welcome to Voxxed Days Amsterdam 2026 - Opening (room 1)"
+ },
+ {
+  "id": "Cp-aFYHLiCw",
+  "title": "Database Connection Pool Sizing - Demystified! by Jasmin Fluri"
+ },
+ {
+  "id": "fwrcM5JMysk",
+  "title": "Team and Software: Making an Impact as an Architect by Eberhard Wolff"
+ },
+ {
+  "id": "MiaXVBnvIf0",
+  "title": "Hidden gems in Angular: hybrid rendering, new routing features, and beyond by Vojtech Ma\u0161ek"
+ },
+ {
+  "id": "usLv_vLcuws",
+  "title": "Model Context Protocol (MCP): The future of user interactions? by Jonas Bandi"
+ },
+ {
+  "id": "capTmZrKDmM",
+  "title": "JavaScript in 2026 by Christian Woerz"
+ },
+ {
+  "id": "taTRkX3mvhs",
+  "title": "Micro-Frontend & Me, a love story by Dan Neciu"
+ },
+ {
+  "id": "pHYmYpumxsM",
+  "title": "Ashes to Ashes, Specs to Specs: A Farewell to Old Testing Tools by Younes Jaaidi"
+ },
+ {
+  "id": "qj-u2KNeJ2s",
+  "title": "Did You Not Get the Memo? Signed, Atomic Design by Faris Aziz"
+ },
+ {
+  "id": "wkXpsCjO0Ps",
+  "title": "Develop your own Browser extension by \u0141ukasz Nowak"
+ },
+ {
+  "id": "7mNqcHqB-YU",
+  "title": "The Ultimate Guide to Browser-Based AI: Privacy-First, Offline-Ready and Future-Proof by M. Salnikov"
+ },
+ {
+  "id": "ozpzPpZd_d8",
+  "title": "Getting more out of Maven by Marit van Dijk and Andres Almiray"
+ },
+ {
+  "id": "WvQ8FouKTZI",
+  "title": "Profiling Without Pain: Always-On Performance for the JVM by Scott Gerring"
+ },
+ {
+  "id": "6Md_6KX0kOk",
+  "title": "AI without spaghetti: Clean architecture in the age of AI by Lutske de Leeuw and Maarten Vandeperre"
+ },
+ {
+  "id": "LJ_GRwPj11E",
+  "title": "The Hidden Security Hazards in Your Java Stack by Brian Vermeer"
+ },
+ {
+  "id": "rV7MIxFKSDI",
+  "title": "Are We Ready For The Next Cyber Security Crisis Like Log4Shell? by Soroosh Khodami"
+ },
+ {
+  "id": "u5eAaJuZa3o",
+  "title": "Break the silo: How we built a decentralized control plane for service orchestration by E. Taborelli"
+ },
+ {
+  "id": "GPG4bMUapZc",
+  "title": "Who to blame? The AI, The Programmer, or The Prompt? by Makan Sepehrifar"
+ },
+ {
+  "id": "SbgE1UM25zg",
+  "title": "Don\u2019t Panic! A Guide to Keeping the Human Edge in a Universe of Instant Output by Janina Sutter"
+ },
+ {
+  "id": "V1xvxi7kMGs",
+  "title": "Debugging Your Health: Fitness for Desk Warriors by Radek Kargul"
+ },
+ {
+  "id": "KDHFBVaVkLU",
+  "title": "Coding a Multi-Agent Game Master with Spring AI by Alessandra Pasini and Arnaud Jean"
+ },
+ {
+  "id": "4kAe03wGy2w",
+  "title": "Social Engineering: Hacking Humans by Pawel Sucho\u0142biak"
+ },
+ {
+  "id": "DXEsG3Vo6F4",
+  "title": "Running Your Coding Agent Locally: Lessons from a Real-World Experiment by S. Maestri and A. Soldano"
+ },
+ {
+  "id": "1i_f8h4WzdA",
+  "title": "Finding the Spark: A Career Reset Button by Lo\u00efc Magnette"
+ },
+ {
+  "id": "7Yc-0sIfjmY",
+  "title": "Data Integrity 2.0. The biggest advancement in data quality in 30 years! by Connor McDonald"
+ },
+ {
+  "id": "7OjePJ1NVpA",
+  "title": "Secure By Design: Architecting cloud and AI workloads from the perspective of infosec by N. Godec"
+ },
+ {
+  "id": "4BOdAMHdpsI",
+  "title": "Agentic AI Patterns by Kevin Dubois and Mario Fusco"
+ },
+ {
+  "id": "LTpAAz715GE",
+  "title": "Create Intelligent MCP based applications with Quarkus by Dimitris Andreadis"
+ },
+ {
+  "id": "jygFpQ9hao4",
+  "title": "From Shadows to Spotlight - How Swiss Post Performs Reliable ML Deployment by Giovanni Degiorgi"
+ },
+ {
+  "id": "XP33pQCa7JA",
+  "title": "Welcome to Voxxed Days Zurich 2026 by Federico Yankelevich and Patrick Baumgartner"
+ },
+ {
+  "id": "59EVOp8r0aw",
+  "title": "The Promise of Trustworthy AI by C\u00e9sar Soto Valero"
+ },
+ {
+  "id": "kmT3AGVg15w",
+  "title": "A Deep Dive Into Advanced TypeScript - A Live Coding Expedition by Christian W\u00f6rz"
+ },
+ {
+  "id": "coeonD6Xwxg",
+  "title": "Keeping data private in real-time pipelines by Olena Kutsenko"
+ },
+ {
+  "id": "XUoHu70GVoQ",
+  "title": "Help! My manager is asking me for KPIs ! by Geoffrey Graveaud"
+ },
+ {
+  "id": "ISTK2wrwN0w",
+  "title": "Compilers, User Interfaces & the Rest of Us by Matheus Albuquerque"
+ },
+ {
+  "id": "AdSMwTHgYBQ",
+  "title": "High-Speed Crypto Trading: JVM Techniques Behind Bitvavo\u2019s \u00b5s Revolution - Oleg Lobanov, Marcos Maia"
+ },
+ {
+  "id": "1Fet0IyyJrY",
+  "title": "Behind the hype: managing billion-scale embeddings in Elasticsearch and OpenSearch by Pietro Mele"
+ },
+ {
+  "id": "Q7K2MoVeUX8",
+  "title": "A Beginner\u2019s Guide to Semantic Search by Pietro Mele"
+ },
+ {
+  "id": "NE_VbdKKZCg",
+  "title": "When ORM Becomes OMG: Performance Pitfalls in JPA and Friends by Jos Roseboom"
+ },
+ {
+  "id": "oRVtTEbtt_Y",
+  "title": "TornadoVM: Supercharge your Java with GPU acceleration - Christos Kotselidis, Mary Xekalaki"
+ },
+ {
+  "id": "zzyYPuMaMGc",
+  "title": "The Room of Requirements for Developers: Scaling AI Magic with Internal Portals - Maarten Vandeperre"
+ },
+ {
+  "id": "UqaSWiE076w",
+  "title": "Supercharge your JVM performance with Project Leyden and Spring Boot by  Moritz Halbritter"
+ },
+ {
+  "id": "66t87eHEzYI",
+  "title": "Training My Rival in Java: A Deep Q-Learning AI to Play Azul by Victor Uria Valle"
+ },
+ {
+  "id": "eWb7SO2hZ4g",
+  "title": "The developer's guide to making money in the open source galaxy by Ronald Dehuysser"
+ },
+ {
+  "id": "p4PERb4Ux40",
+  "title": "TDD makes you a better everyday developer by Jesse Kershaw"
+ },
+ {
+  "id": "50TyQFJUlbo",
+  "title": "Spring Boot Observability in Practice: Actuator, Micrometer & OpenTelemetry by Patrick Baumgartner"
+ },
+ {
+  "id": "qbMT5TbWcHs",
+  "title": "Streams \u2013 Below the Surface by Cay Horstmann and Maurice Naftalin"
+ },
+ {
+  "id": "4CvRr-o2gEM",
+  "title": "Rethinking Full Stack Application Development with Kiro by Alessandra Pasini & Romain Jourdan"
+ },
+ {
+  "id": "CYxwXobrL28",
+  "title": "RamaLama: Making working with AI Models Boring by Cedric Clyburn"
+ },
+ {
+  "id": "P3CxlzQPqcs",
+  "title": "Plan for Unplanned Work: Game Days with Chaos Engineering by Daniel Afonso"
+ },
+ {
+  "id": "2uSSBXYFItM",
+  "title": "Optimizing Resource Usage in Kubernetes by Carlos Sanchez"
+ },
+ {
+  "id": "zfKqikfVSqA",
+  "title": "One AI Chat to Rule Them All: Connecting Enterprise Tools with MCP by Karthik Sayapparaju"
+ },
+ {
+  "id": "XICH90Xa4HM",
+  "title": "MCP at the LHC: Coordinating the World\u2019s Largest Machine by Georg \u0160umailov"
+ },
+ {
+  "id": "pkSZHPG61S4",
+  "title": "Be more productive with IntelliJ IDEA - Marit van Dijk"
+ },
+ {
+  "id": "wBTIusHmlA0",
+  "title": "LLMs can't optimize schedules, but AI can! by Tom Cools"
+ },
+ {
+  "id": "DSxMPEUDd48",
+  "title": "The Past, Present and Future of Programming Languages by Kevlin Henney - Voxxed Days CERN '26"
+ },
+ {
+  "id": "zLAOqBiGKWQ",
+  "title": "JSol'Ex: solar image processing in Java by C\u00e9dric Champeau"
+ },
+ {
+  "id": "oOeTJr-W7Xs",
+  "title": "How we rebuild a legacy monolithic platform at CERN and still sleep at night by Dmitry Kekelidze"
+ },
+ {
+  "id": "cCwISrQSgFY",
+  "title": "Are We Ready For The Next Cyber Security Crisis Like Log4Shell? - Soroosh Khodami"
+ },
+ {
+  "id": "z0NnBVMqo64",
+  "title": "Are We Ready For The Next Cyber Security Crisis Like Log4Shell? by Soroosh Khodami"
+ },
+ {
+  "id": "w_2dz6BRIM0",
+  "title": "Welcome by Federico Yankelevich and Tiziano Leidi"
+ },
+ {
+  "id": "tzmEudUS9Os",
+  "title": "May the Control Plane be with you: Kamaji and the rise of Kubernetes at scale by Dario Tranchitella"
+ },
+ {
+  "id": "sYSyvuopq5A",
+  "title": "Visualizing robot minds, and other fun stuff by Alessandro Giusti"
+ },
+ {
+  "id": "qykfkpLNMb8",
+  "title": "The Past, Present and Future of Programming Languages by Kevlin Henney"
+ },
+ {
+  "id": "mbY696LZhc8",
+  "title": "Type Clash: When Structural and Nominal Systems Collide by Matteo Orlandi and Luca Caputo"
+ },
+ {
+  "id": "lw8CtPn6cLQ",
+  "title": "Sharing is caring! Building trust in a system through transparency: lessons from Swiss Post E-Voting"
+ },
+ {
+  "id": "hrBsQSG5Eos",
+  "title": "Bug fixed, now what? by Konstantinos Kitsios"
+ },
+ {
+  "id": "hAdOywL5aN0",
+  "title": "Rethinking Full Stack Application Development with Kiro by Alessandra Pasini and Romain Jourdan"
+ },
+ {
+  "id": "gfBTuL7xkp8",
+  "title": "Tracing Java's Hidden Performance Traps by Victor Rentea"
+ },
+ {
+  "id": "cTJorhnxrFI",
+  "title": "Spec-Driven Development with AI Agents From High-Level Requirements to Working SW by Anton Arhipov"
+ },
+ {
+  "id": "WpAoFHyVY_I",
+  "title": "The developer's guide to making money in the open-source galaxy by Ronald Dehuysser"
+ },
+ {
+  "id": "lnSn2rxSlKo",
+  "title": "Get The Most Out of Virtual Threads in Java 25: A Deep Dive  by Christian W\u00f6rz"
+ },
+ {
+  "id": "c8l5Lai1454",
+  "title": "Backlog.md: The simplest project management tool for the AI Era by Alex Gavrilescu"
+ },
+ {
+  "id": "YaJ4MpaRqGU",
+  "title": "Securing RAG Pipelines with Fine Grained Authorization by Sohan Maheshwar"
+ },
+ {
+  "id": "WS_EhytQZe8",
+  "title": "(Panel) Building Secure Software: Practical Strategies for Developers"
+ },
+ {
+  "id": "W5L4sb4ROYU",
+  "title": "(Panel) Spec-Driven Development in the Age of Agents"
+ },
+ {
+  "id": "V_Jg0mc9C04",
+  "title": "Agentic AI Patterns by Kevin Dubois"
+ },
+ {
+  "id": "U6QLMCQKGtU",
+  "title": "Why Hexagonal and Onion Architecture Are Answers to The Wrong Question by Oliver Drotbohm"
+ },
+ {
+  "id": "SJM81afqSgY",
+  "title": "From Shadows to Spotlight - How Swiss Post Performs Reliable ML Deployment by Giovanni Degiorgi"
+ },
+ {
+  "id": "S3v4YrYBcr0",
+  "title": "Technical Enshittification: Why Everything in IT is Horrible Right Now and How to Fix It by Baruch S"
+ },
+ {
+  "id": "Oy005l5vHtE",
+  "title": "Reactive \u2764\ufe0f Loom: A Forbidden Love Story by Francesco Nigro"
+ },
+ {
+  "id": "MHzYG9dhpiA",
+  "title": "Behavioral Software Engineering by Mario Fusco"
+ },
+ {
+  "id": "JOaGTXFyTHI",
+  "title": "Friendly Borders: Graph algorithms reveal Eurovision voting patterns by Domagoj Mari\u0107"
+ },
+ {
+  "id": "U-JoPkJJYso",
+  "title": "Distributed Systems - What Can Go Wrong and How to Get It Right by Florian Mair"
+ },
+ {
+  "id": "KJGuaDJ1Mts",
+  "title": "Learning modern Java the playful way by Marit van Dijk and Piotr Przyby\u0142"
+ },
+ {
+  "id": "Cp7K6b7Derc",
+  "title": "Defense against the dark arts of AI: The playbook for a sovereign model-as-a-service platform"
+ },
+ {
+  "id": "Bfj3K3ELU64",
+  "title": "Teaching Exotic Programming Languages to Large Language Models by Alessandro Giagnorio"
+ },
+ {
+  "id": "A4XD3PQycR8",
+  "title": "Why Bad Code Quality Is Not (Only) Your Fault by Annelore Egger"
+ },
+ {
+  "id": "7Ez5YtLevO8",
+  "title": "Why Security Matters: The Risks of Agentic AI and How to Mitigate Them by Christoph B\u00fchler"
+ },
+ {
+  "id": "6HR6HzFzVoM",
+  "title": "The Future of Angular: Faster, Lighter, Stronger by Lo\u00efc Magnette"
+ },
+ {
+  "id": "4n73p8qm17Q",
+  "title": "Driving Smarter Mobility: From OpenStreetMap to Real-Time Traffic Simulation with SUMO & Godot"
+ },
+ {
+  "id": "44E9lC0TTH4",
+  "title": "Catching the 137-Killer: A Java Memory Forensics Investigation by Martijn Dashorst"
+ },
+ {
+  "id": "2peFTUktkuY",
+  "title": "Write Once, Accelerate Everywhere: GPU-Ready Java with TornadoVM by Thanos Stratikopoulos"
+ },
+ {
+  "id": "1UrXz6LWtl4",
+  "title": "Training My Rival in Java: A Deep Q-Learning AI to Play Azul by Victor Uria Valle"
+ },
+ {
+  "id": "136SC6nKJqc",
+  "title": "Break the silo: How we built a decentralized control plane for service orchestration by E. Taborelli"
+ },
+ {
+  "id": "yvP9h-LugH8",
+  "title": "Back to Basics: Crafting Quality Software in the Age of Complexity by Scott Gerring"
+ },
+ {
+  "id": "vuNTPe-Upak",
+  "title": "Devoxx Belgium Organiser, Speakers & Visitors interviews"
+ },
+ {
+  "id": "Tnkkb8vGCvc",
+  "title": "Sustainable Engineering"
+ },
+ {
+  "id": "zcZhxdzp3yM",
+  "title": "How Microsoft Fabric Empowers Developers with Unified Data, DevOps, and AI by Josh Ndemenge"
+ },
+ {
+  "id": "uk-2RRzJzxU",
+  "title": "Data Mesh: The Speedrun by Nick Bozovits"
+ },
+ {
+  "id": "zSVYNwkzhyQ",
+  "title": "Executable Agreements: Code, Collaborate, and Deploy with Confidence by Dr. Dimitris Dranidis"
+ },
+ {
+  "id": "z3i8zgZmql8",
+  "title": "Disney Driven Development - Keynote by Melinda Seckington"
+ },
+ {
+  "id": "xpfxU-bFEaY",
+  "title": "Magenta Eagle: How We\u2019re Re-engineering Software Delivery with AI-Driven Development by K. Galanis"
+ },
+ {
+  "id": "tWMZWTulDrM",
+  "title": "Machine Learning In Observability Systems: From Insights To Action by Panos Tsilopoulos"
+ },
+ {
+  "id": "qgU6GhmnRHE",
+  "title": "Black Friday Brilliance: Managing a Billion Transactions with Tech, Tactics, and Teamwork -J.Coleman"
+ },
+ {
+  "id": "jdf80v9vKmc",
+  "title": "Evolutionary Architecture: How do you build systems that can evolve? by Nikhil Barthwal"
+ },
+ {
+  "id": "qdgUfW5B97E",
+  "title": "How We Turned AI Hype into Real Value by Dimitra Gkoutziouli"
+ },
+ {
+  "id": "nvJDF7DNoSs",
+  "title": "Microservice Matchmaking: Pact Testing Between Spring Boot and gRPC by Stelios Gkiokas"
+ },
+ {
+  "id": "n9IcRKkCltc",
+  "title": "The Future of Angular: Faster, Lighter, Stronger by Loic Magnette"
+ },
+ {
+  "id": "mX_YLwf5g3o",
+  "title": "The Java Cloud-Native Stack for Microservices and Serverless Architecture - by Markus Kett"
+ },
+ {
+  "id": "jQ6sKH9biXg",
+  "title": "How to design your messages: Patterns and tradeoffs in Event Driven Architectures Workshop"
+ },
+ {
+  "id": "ire9Fc8D5jQ",
+  "title": "The Hidden Art of Thread-Safe Programming: Exploring java.util.concurrent by Dr. Heinz Kabutz"
+ },
+ {
+  "id": "hFWwZvFIMWs",
+  "title": "Architecting for Sustainability: A Software Architects Guide to Green Software Keynote by Eoin Woods"
+ },
+ {
+  "id": "ckahekUE8F8",
+  "title": "Unlocking Reactive State Super Powers with NgRx Signal Store by by Dimitris Kiriakakis"
+ },
+ {
+  "id": "c7LpamFLGRo",
+  "title": "The Day the EU Broke My Build: NIS2 for Developers by Antonis Gkogkotsis"
+ },
+ {
+  "id": "ZEl5n1-98qw",
+  "title": "From Cold Starts to Escape Velocity: Three Practical Ways to Accelerate Java Services by C. Edelveis"
+ },
+ {
+  "id": "Z2l5V2Mvlx4",
+  "title": "Patterns & Practices for building Multi-Agent Systems by Nikhil Barthwal"
+ },
+ {
+  "id": "VcHMn1r9kLE",
+  "title": "Eternal Sunshine of the Spotless Macro by Andrea Mocci"
+ },
+ {
+  "id": "UEawJWWl6kI",
+  "title": "The Future of Utility-First CSS: What Tailwind v4 Signals for Web Development by Devlin Duldulao"
+ },
+ {
+  "id": "U-ZvfbGdzmQ",
+  "title": "Impact Over Output: Our Shift from Project Delivery to Product Thinking by Eva Lampri"
+ },
+ {
+  "id": "QEzAlHaoZV0",
+  "title": "The Remix Evolution: How React Router v7 Enables Fast and Resilient Apps by Aurora Scharff"
+ },
+ {
+  "id": "O7GLFp6aIpQ",
+  "title": "To RAG or not to RAG by Piotr Przyby\u0142"
+ },
+ {
+  "id": "NmOAUrlJawI",
+  "title": "From Prompt to PR: Vibe Coding Meets AI Code Review by Triantafyllos Tsirellis"
+ },
+ {
+  "id": "MPOE8beKF-U",
+  "title": "MCP for Java developers by Sandra Ahlgrimm"
+ },
+ {
+  "id": "MAzeWP5g8Pc",
+  "title": "Tracing event-based systems with OpenTelemetry by Harry Kimpel"
+ },
+ {
+  "id": "EXDzEI6uQ0E",
+  "title": "Improving Spring Boot test efficiency by Sergei Chernov"
+ },
+ {
+  "id": "LZWWjmbst-M",
+  "title": "Are We Ready For The Next Cyber Security Crisis Like Log4Shell? by Soroosh Khodami"
+ },
+ {
+  "id": "IHe8ex_--EE",
+  "title": "Inside karoot: the tech that moves people by Symeon Foskolos"
+ },
+ {
+  "id": "Ew6WT8UkVDE",
+  "title": "Luckily, You Don\u2019t Have to Rewrite Everything in Rust by Vitaly Bragilevsky"
+ },
+ {
+  "id": "DLXh9eOcj_4",
+  "title": "Do Legacy Systems dream of Modernization? by Katerina Andreadou"
+ },
+ {
+  "id": "BnEXF9qsimA",
+  "title": "Streaming financial market data through WebSockets by Athanasios Irodotou"
+ },
+ {
+  "id": "Bg-bckegBu0",
+  "title": "AI Security Simplified: Turning Complexity into Cohesion by Christos Koukoumialos"
+ },
+ {
+  "id": "8g-lQURqjvM",
+  "title": "AI Agents for increased productivity and efficiency by Konstantinos Bloutsos"
+ },
+ {
+  "id": "53kOvf08hV4",
+  "title": "Learning modern Java the playful way by Marit Van Dijk and Piotr Przyby\u0142"
+ },
+ {
+  "id": "4bVyuUJpMsc",
+  "title": "From Tower of Babel to Babel Fish: Evolving Kafka Architecture With Schema Registry by Viktor Gamov"
+ },
+ {
+  "id": "i8NdLtGK4wk",
+  "title": "Work-Life Balance, Surviving a Company Merge"
+ },
+ {
+  "id": "OrhGyTGJgOg",
+  "title": "Java on Mobile - JavaFX"
+ },
+ {
+  "id": "1J_djKerA38",
+  "title": "Project Leyden, Babylon, Panama - TornadoVM"
+ },
+ {
+  "id": "7ugIy024e1Y",
+  "title": "Inspiring the Next Generations"
+ },
+ {
+  "id": "_3F-0W2tgfo",
+  "title": "Maven 4, AI Impact and Calculations , Graph Databases"
+ },
+ {
+  "id": "sfelnVlUplg",
+  "title": "AI Tools for Developers"
+ },
+ {
+  "id": "zVEcqrHQXwI",
+  "title": "Quarkus Unleashed by Roberto Cortez"
+ },
+ {
+  "id": "tH8aqbHWgIM",
+  "title": "The Future of Refactoring: Test Driven Navigation By Alex Bunardzic"
+ },
+ {
+  "id": "r9cfeOEgHrM",
+  "title": "Architecture as Code: Quantifying Architectural Trade offs  by  Neal Ford"
+ },
+ {
+  "id": "nPoC6m3axeU",
+  "title": "Not just code  Abusing Claude Code to do just about anything but coding By Barry van Someren"
+ },
+ {
+  "id": "n34UjuPKIYI",
+  "title": "How browsers REALLY load Web pages by Robin Marx"
+ },
+ {
+  "id": "jvRSSsP26Z8",
+  "title": "Level Up Your LangChain4j Apps for Production by Lize Raes"
+ },
+ {
+  "id": "iO79VR0zAhQ",
+  "title": "Virtual Threads, Structured Concurrency and Scoped Values: Putting it all together  by  Balkrishna R"
+ },
+ {
+  "id": "VKcRNtj0tzc",
+  "title": "Live Coding The Hive: building a microservices ready modular monolith  by Thomas PIERRAIN, Julien To"
+ },
+ {
+  "id": "J754RsoUd00",
+  "title": "Finally, final means final   A deep dive into field immutability in Java by Per Minborg"
+ },
+ {
+  "id": "4NQCjSsd-Mg",
+  "title": "Spring Boot: Chapter 4  by Brian Clozel, Stephane Nicoll"
+ },
+ {
+  "id": "-iKd__Lzt7w",
+  "title": "Your Code Base as a Crime Scene by Scott Sosna"
+ },
+ {
+  "id": "md2JFgegN7U",
+  "title": "Robotics and GraalVM native libraries by Florian Enner"
+ },
+ {
+  "id": "HeQErLzvnhc",
+  "title": "Local Development in the AI Era by Roberto Carratala\u0301, Kevin Dubois"
+ },
+ {
+  "id": "Aa2Zn8WFJrI",
+  "title": "Behavioral Software Engineering by Mario Fusco"
+ },
+ {
+  "id": "70AuY_mShrI",
+  "title": "From the comfort of AWS to the unknown of GCP and Back?! by Natalie Godec, Endy Kasanardjo"
+ },
+ {
+  "id": "30qKZVdamUg",
+  "title": "Opening keynote Devoxx Belgium 2025 with Arthur Janssen"
+ },
+ {
+  "id": "sCkJURhQZUM",
+  "title": "Accelerating Maven Builds: From Snail's Pace \ud83d\udc0c to Rocket Speed \ud83d\ude80 by Maarten Mulders"
+ },
+ {
+  "id": "hVd8iUnLp8A",
+  "title": "Unleashing Vector Search with Spring AI, LangChain4J, Hibernate Vector, and the Oracle Database 23ai"
+ },
+ {
+  "id": "YlMinrvdkT4",
+  "title": "Bootiful GraalVM by Thomas Wuerthinger, Josh Long"
+ },
+ {
+  "id": "LSoDQU_9MMA",
+  "title": "Backlog.md : Reaching 95% Task success rate with AI Agents  by  Alex Gavrilescu"
+ },
+ {
+  "id": "Jo5mOBRr2b4",
+  "title": "A Developer's Search for Meaning: Thriving as AI Transforms Our World  by  Elma Westergren, Markus W"
+ },
+ {
+  "id": "CjPPJFcUCl8",
+  "title": "Java for AI by Paul Sandoz"
+ },
+ {
+  "id": "uefc2t9AmQI",
+  "title": "GraalVM meets WebAssembly by Fabio Niephaus"
+ },
+ {
+  "id": "q0_KPLHOnCg",
+  "title": "It only starts with a container by Patrik Dudits\u030c"
+ },
+ {
+  "id": "kjyXQdrgAi0",
+  "title": "Augmented Development, the successes, surprises and pitfalls  by  Andy Bailey"
+ },
+ {
+  "id": "h16ngaxx0zo",
+  "title": "Supercharge your JVM performance with Project Leyden and Spring Boot by Moritz Halbritter, Ana Maria"
+ },
+ {
+  "id": "gzKdHe_ywW8",
+  "title": "The New AI Native Dev Coding Workflow by Patrick Debois"
+ },
+ {
+  "id": "fJwKvE2AxIo",
+  "title": "ONNX Based Generative AI LLMs in Java with Project Babylon  by  Adam Sotona"
+ },
+ {
+  "id": "cFAD9TEzB8w",
+  "title": "The Awareness Layer by Robert  Ranson"
+ },
+ {
+  "id": "bDpsuMKfC60",
+  "title": "Enable Digital sovereignty by tech stack liquidity by Merlin Bo\u0308gershausen"
+ },
+ {
+  "id": "X9baI7RBhqk",
+  "title": "Agentic AI Patterns by Kevin Dubois, Mario Fusco"
+ },
+ {
+  "id": "TqeSofn5_HA",
+  "title": "When auto scaling isn't fast enough: Handling high volume live event traffic by Ivan Schwarz"
+ },
+ {
+  "id": "VDzEhTB23zE",
+  "title": "The Diabolical Developer: Rise of the Rogue Agents by Martijn Verburg"
+ },
+ {
+  "id": "PJOthBhLbao",
+  "title": "Unifying AI integration with Model Context Protocol by  Christian Tzolov, Dariusz Je\u0328drzejczyk"
+ },
+ {
+  "id": "O6G6ufT03fk",
+  "title": "Securing MCP Servers by Daniel Garnier Moiroux"
+ },
+ {
+  "id": "N-Mm9XQM_t0",
+  "title": "Pattern Matching, Under the Microscope by Angelos Bimpoudis"
+ },
+ {
+  "id": "L6V6aQixOZU",
+  "title": "Discover the Agent Development Kit for Java for building AI agents  by  Guillaume Laforge"
+ },
+ {
+  "id": "KXwPJvdWFJQ",
+  "title": "Coding, Rewritten: What 10.000+ AI-Generated Code Completions Taught Me About the Future of Software"
+ },
+ {
+  "id": "JeWMFlUzp94",
+  "title": "Ask the architects by Per Minborg, Stuart Marks, Angelos Bimpoudis, Paul Sandoz, Viktor Klang"
+ },
+ {
+  "id": "IYkm5sUie3s",
+  "title": "The Bold, the Broken, and the Burned: Hard won lessons in the 6 years of developing Quarkus by Guill"
+ },
+ {
+  "id": "HmneQx1maCI",
+  "title": "Building AI agents with Structured Outputs, Function Calling, and MCP by Julien Dubois"
+ },
+ {
+  "id": "H82o1OcrZGg",
+  "title": "MCP in Action: Connecting AI to Enterprise Systems by Zineb BENDHIBA"
+ },
+ {
+  "id": "Fsf-ModpE20",
+  "title": "What Can You Do with an Apache Kafka \"Queue?\" by Sandon Jacobs"
+ },
+ {
+  "id": "EgKsRsx1-HM",
+  "title": "Beyond local tools: Deep dive into MCP by James Ward, Maximilian Schellhorn"
+ },
+ {
+  "id": "AEuOdJu9K9A",
+  "title": "Passkeys, one time tokens: passwordless Spring Security  by  Daniel Garnier Moiroux"
+ },
+ {
+  "id": "2QkhBvgqR8c",
+  "title": "There may not be intelligent life in our Universe after all  by Robert Pabst"
+ },
+ {
+  "id": "1SdrnPtzBh4",
+  "title": "Code Review Remarks: Lessons Learned by Blagoj Jovanov"
+ },
+ {
+  "id": "05x0_1y9l_8",
+  "title": "How package encapsulation with Spring Modulith simplified our code by Jos Roseboom"
+ },
+ {
+  "id": "-V251N-pYYI",
+  "title": "Delay the AI Overlords: How OAuth and OpenFGA Can Keep Your AI Agents from Going Rogue  by  Deepu Sa"
+ },
+ {
+  "id": "-S1n8VVfao8",
+  "title": "It\u2019s Fine Actually: Doing Better in Legacy Java by Pasha Finkelshteyn, Baruch Sadogursky"
+ },
+ {
+  "id": "4uHmNzANdUw",
+  "title": "Crypto Agility   Prepare for the unexpected! by Kristof Verslype"
+ },
+ {
+  "id": "ylkzIScNSpA",
+  "title": "Legal JVM dopes for your apps by Dmitry Chuyko"
+ },
+ {
+  "id": "w-TXBwukxqY",
+  "title": "Why I Am Not Afraid AI Will Take My Job by Maarten Mulders"
+ },
+ {
+  "id": "tEHzFedonNc",
+  "title": "Spec Driven Development Why your prompt chaos won\u2019t scale  by  Simon Maple"
+ },
+ {
+  "id": "s9d6JPjegRU",
+  "title": "Six and a half ridiculous things to do with Quarkus by Holly Cummins"
+ },
+ {
+  "id": "rcrA4SOdhzA",
+  "title": "Structured Concurrency in Action by Nicolai Parlog"
+ },
+ {
+  "id": "qonlBhm9iFY",
+  "title": "The Best of Java Shorts Show: 100 Snippets in 50 Minutes by Adam Bien"
+ },
+ {
+  "id": "osnfw4yaDe4",
+  "title": "Hacking your parenting by Patricia Lenten"
+ },
+ {
+  "id": "mSO6x2QdBI8",
+  "title": "Application Architecture for Real World Continuous Delivery  by  Christopher Batey"
+ },
+ {
+  "id": "guF2NvgJIN8",
+  "title": "Serialization 2.0: A Marshalling Update! by Viktor Klang"
+ },
+ {
+  "id": "eWxOisRMcII",
+  "title": "TDD & DDD From the Ground Up Live Coding by Chris Simon"
+ },
+ {
+  "id": "_zO7YtLmNuA",
+  "title": "Things You Thought You Didn\u2019t Need To Care About That Have a Big Impact On Your Job  by  Holly Cummi"
+ },
+ {
+  "id": "eIVEqy7Zp6A",
+  "title": "What comes after Git? by Christian Schabetsberger"
+ },
+ {
+  "id": "dVy-lengAhY",
+  "title": "Is AIOps the Future of IT Operations? Real Use Cases from the Trenches by Danilo Banjac, Iveri Prang"
+ },
+ {
+  "id": "d3ObY-aLEm0",
+  "title": "Generative AI: tech du jour or the next big thing? by Massimo Re Ferre'"
+ },
+ {
+  "id": "co3acmgP2Ng",
+  "title": "Domain centric? Why Hexagonal, Onion and Clean architecture are answers to the wrong question by Oli"
+ },
+ {
+  "id": "_Y-srK-Ad4c",
+  "title": "Gen AI Grows Up: Enterprise JVM Agents With Embabel  by  Rod Johnson"
+ },
+ {
+  "id": "_B9f6cmhak0",
+  "title": "What\u2019s new in Spring Modulith? by Oliver Drotbohm"
+ },
+ {
+  "id": "ZO-619lqjK0",
+  "title": "Outcoded by Our Kids: It Took Us 20 Years, They Used 20 Prompts!  by  Jan Van Wassenhove, Bart Wulle"
+ },
+ {
+  "id": "U7BoaihbbZU",
+  "title": "Rise of the Agents: You, AI, and the Future of Society by Martijn Verburg"
+ },
+ {
+  "id": "SfK1THAFnIk",
+  "title": "Panel Discussion: LangChain4j Turns Two   What We\u2019ve Learned and What\u2019s Next by Dimitris Andreadis,"
+ },
+ {
+  "id": "0B5kYjVQ-I4",
+  "title": "The LLM Smo\u0308rga\u030asbord  by John Davies"
+ },
+ {
+  "id": "PO6wOtzUb3w",
+  "title": "GPULlama3 java: Beyond CPU Inference with Modern Java by Michalis Papadimitriou"
+ },
+ {
+  "id": "MQanscTqZ24",
+  "title": "Garbage Collection in Java: Choosing the Correct Collector by Stefan Johansson"
+ },
+ {
+  "id": "DUFrGRbiRmU",
+  "title": "Brokk: an AI Native Code Platform for Java, in Java by Jonathan Ellis"
+ },
+ {
+  "id": "ABjIUw7ojiU",
+  "title": "Self Healing Rollouts: Automating Production Fixes with Agentic AI & Argo Rollouts  by  Carlos Sanch"
+ },
+ {
+  "id": "7nosZt4JjMg",
+  "title": "Breaking Down AI Silos: Building Interoperable Multi Agent Systems with Google's A2A Protocol and Ja"
+ },
+ {
+  "id": "72e_0WxaQl0",
+  "title": "Understanding Prompt Injection   Techniques, Challenges, and Advanced Escalation by Brian Vermeer"
+ },
+ {
+  "id": "5DKwBUwbsUc",
+  "title": "Java as an AI development Platform by Zoran Sevarac"
+ },
+ {
+  "id": "2BcWWWkb8ac",
+  "title": "The Wait is Over: Foreign Function & Memory FFM API brings modern Java to the Raspberry Pi  by  Fran"
+ },
+ {
+  "id": "1aW7bHCZvLw",
+  "title": "AI Agents and BPM: How to Instruct and Integrate AI Components into Complex Insurance Processes by N"
+ },
+ {
+  "id": "lba2uEaRLcs",
+  "title": "Opening Keynote: Vibe Coding by Stephan Janssen"
+ },
+ {
+  "id": "zxqrentybmA",
+  "title": "Vaadin: Modern Web UIs in Pure Java\u2014A Live Coding Tour   by  Sebastian Kuehnau"
+ },
+ {
+  "id": "wY2JEeRZSI8",
+  "title": "Unveiling the simple math that powers AI by Marianne Hoornenborg"
+ },
+ {
+  "id": "pYuzgGzslHY",
+  "title": "Code, burnout and depression: an engineering perspective of mental health in IT by Manuel Bernhardt"
+ },
+ {
+  "id": "VOPK9RHWqRk",
+  "title": "Weather the Storm: How Value Classes Will Enhance Java Performance  by  Remi Forax, Cle\u0301ment de Tast"
+ },
+ {
+  "id": "kRgGrrlXShg",
+  "title": "A Decade of DevOps at ING : The Roaring Shift from Agile Roots to Scalable Platform Engineering by I"
+ },
+ {
+  "id": "iP1qqq5Uoag",
+  "title": "Tornado Cash, the World's Biggest Cyber Crimes and Modern Privacy by James Birnie"
+ },
+ {
+  "id": "h2XtwJOcdT8",
+  "title": "Raising Young Coders by Cassandra Chin"
+ },
+ {
+  "id": "f_5b_qanhzg",
+  "title": "AI Powered Form Wizards: Chat, Click, Done by Loi\u0308c Magnette"
+ },
+ {
+  "id": "dbx1_P7W1DM",
+  "title": "Why You Should Build Agents on the JVM by Rod Johnson"
+ },
+ {
+  "id": "YoaG2gr9aAU",
+  "title": "Pull, Push, and Merge: Lessons from a Journey of Growth Through Acquisitions by April Schuppel Zaal"
+ },
+ {
+  "id": "XJMrMxlt-BQ",
+  "title": "Fixing time zones for fun   twenty programming puzzles to master internationalization   by  Martijn"
+ },
+ {
+  "id": "TQWWkaSEmVo",
+  "title": "The Imperfect Architect by Robin Custers"
+ },
+ {
+  "id": "Ro-zZPkizas",
+  "title": "The Ultimate Showdown of Database Migration Tools by  Pasha Finkelshteyn & Mikhail Polivakha"
+ },
+ {
+  "id": "IwAsq3EfaC0",
+  "title": "Testing Challenges in the Age of AI by Konstantin Pavlov"
+ },
+ {
+  "id": "HiiTsNziamg",
+  "title": "Agent Orchestration with LangChain4J by Lize Raes"
+ },
+ {
+  "id": "EJ9q8hQXV8I",
+  "title": "Java 25 - \u201cThe Next LTS Release\u201d by Georges Saab, Nicolai Parlog"
+ },
+ {
+  "id": "DSRQ-90eDBw",
+  "title": "Creating effective and objective architectural decision records ADRs by Piet van Dongen"
+ },
+ {
+  "id": "5Y370b8iTq0",
+  "title": "You Don\u2019t Need a PhD to Try Quantum Computing by Matteo Di Pirro"
+ },
+ {
+  "id": "0z3i-_fKsVc",
+  "title": "Java and AI by Paul Sandoz"
+ },
+ {
+  "id": "PrIh_9HomfI",
+  "title": "Akka: an enterprise runtime for resilient agentic AI by Renato Guerra Cavalcanti"
+ },
+ {
+  "id": "DfeCGn0cqyM",
+  "title": "Wat? That\u2019s possible in Java? by Michael Vitz"
+ },
+ {
+  "id": "D-MyhXkBx70",
+  "title": "Thirty years of Java development: keeping it all together  by  Cristian Schuszter"
+ },
+ {
+  "id": "2l1GBp80CbY",
+  "title": "Fault tolerant AI Agents on the JVM with Koog framework by Vadim Briliantov"
+ },
+ {
+  "id": "yitHp0k2CI0",
+  "title": "Shifting the trajectory: Undoing the damage of working in front of a computer screen by Georgios Dia"
+ },
+ {
+  "id": "uoV7d2Af2tM",
+  "title": "Making significant Software Architecture decisions by Bert Jan Schrijver"
+ },
+ {
+  "id": "u5XAjauwPEI",
+  "title": "Docker Compose your Dev Toolkit for AI and Cloud workflows by Guillaume Lours"
+ },
+ {
+  "id": "sQ3xn3F6Q5c",
+  "title": "Java Performance Update 2025: From JDK 21 to JDK 25  by Per Minborg"
+ },
+ {
+  "id": "qjTxFjW0_n8",
+  "title": "Braving the Change: Recalibrating to new realities by Tom Cools"
+ },
+ {
+  "id": "k7NrmGmNnig",
+  "title": "Agentic GraphRAG: AI\u2019s Logical Edge by Stephen Chin"
+ },
+ {
+  "id": "emJ5Fyboy-4",
+  "title": "Cryptography in a post quantum world: why our encryption now has a use by date, and what we need to"
+ },
+ {
+  "id": "dQIpU-X4QvU",
+  "title": "Yes, We Put AI Agents for Healthcare in Production  No, Don't Try This at Home  by  Marie Alice Blet"
+ },
+ {
+  "id": "cOp5rklR3jI",
+  "title": "What's new in the Gemini universe? by Guillaume Vernade"
+ },
+ {
+  "id": "NLBXwosKU6U",
+  "title": "Build your own keyboard from A to Zerty by Bruce Bujon"
+ },
+ {
+  "id": "b2EnKGFSGc8",
+  "title": "From Sticky Notes to Strategic Boundaries: Real World EventStorming at the Port of Rotterdam  by  Ma"
+ },
+ {
+  "id": "WkEbrin6jkk",
+  "title": "Writing GPU Ready AI Models in Pure Java with Babylon  by Lize Raes, Ana Maria Mihalceanu"
+ },
+ {
+  "id": "TZl1gYomyH0",
+  "title": "The Psychology of Code  by Victor Rentea"
+ },
+ {
+  "id": "Sw3PlFXfWj4",
+  "title": "Bootiful Spring AI by Mark Pollack, Christian Tzolov, Josh Long, James Ward"
+ },
+ {
+  "id": "KwXMAtldEz0",
+  "title": "Bootiful Spring Boot by Josh Long"
+ },
+ {
+  "id": "JD159YnGoPw",
+  "title": "How to build your own fun and absurd pair programmer by Alexander Chatzizacharias"
+ },
+ {
+  "id": "F8p4PPx5nSo",
+  "title": "AI Agents, the New Frontier for LLMs  by Guillaume Laforge"
+ },
+ {
+  "id": "EDNmUpE32aM",
+  "title": "From Vulnerability to Victory: Mastering the CVE Lifecycle for Java Developers  by Anthony Dahanne"
+ },
+ {
+  "id": "DaYNwrvJGmk",
+  "title": "Platform Engineering 101: Building Internal Developer Platforms by Maarten Vandeperre"
+ },
+ {
+  "id": "Bgsln75ogMU",
+  "title": "From OpenAI to Opensource AI: Navigating Between Commercial Ownership and Collaborative Openness by"
+ },
+ {
+  "id": "AQqZUzeTFOc",
+  "title": "Vibe coding your way into a security nightmare by Arjen Wiersma"
+ },
+ {
+  "id": "991TTtoPm54",
+  "title": "30 Years of Java   How Did We Get Here? by Simon Ritter"
+ },
+ {
+  "id": "7ZmPgQ21pnY",
+  "title": "How we scaled Continuous Delivery across 1000s of Developers and 100s of applications by Christopher"
+ },
+ {
+  "id": "4sjJmKXLnuY",
+  "title": "The New Java Best Practices by  Stephen Colebourne"
+ },
+ {
+  "id": "2h3NWZdhuYw",
+  "title": "Scaling AI Adoption: From 30 Engineers to Tech Wide Transformation   Lessons from Doctolib's Journey"
+ },
+ {
+  "id": "1pCfP2XAgNg",
+  "title": "Understanding Kubernetes in a visual way by Aure\u0301lie Vache"
+ },
+ {
+  "id": "1K1EElv6QNc",
+  "title": "The Road Not Taken: A Developer's Guide to Life Beyond Spring Boot by Frederik Pietzko"
+ },
+ {
+  "id": "0SnuppAHOlQ",
+  "title": "Top 10 Event Driven Architecture Pitfalls by Victor Rentea"
+ },
+ {
+  "id": "0OtngsVzOno",
+  "title": "A Long Spring: 19 Years of Living with Your Past Mistakes by Arjen Poutsma"
+ },
+ {
+  "id": "mtWHfYTLeKE",
+  "title": "From AI Infused to Agentic: Building an Enterprise Agentic Framework  by Mario Fusco, Clement Escoff"
+ },
+ {
+  "id": "zjlMw_hy0mg",
+  "title": "Think with your hands: introduction to Lego Serious Play  by Annabelle Buffart"
+ },
+ {
+  "id": "qn3BluLhYd8",
+  "title": "The Yoga of Image Generation with Stable Diffusion & ComfyUI by Raphae\u0308l Semeteys"
+ },
+ {
+  "id": "n30uo20p6YI",
+  "title": "Hands on refactoring session with the CodeLaser MCP server by Piet van Remortel, Bart Naudts"
+ },
+ {
+  "id": "k3o1nSh3g2Q",
+  "title": "Tactical Domain Driven Design with Java and Spring by Oliver Drotbohm"
+ },
+ {
+  "id": "fDPJtzuWLFg",
+  "title": "Your Survival Guide to AI in Software Development by Rafik FERROUKH"
+ },
+ {
+  "id": "cbs4BQ0BwmA",
+  "title": "Spring Boot in the Cloud: Advanced Optimization Deep Dive by Patrick Baumgartner"
+ },
+ {
+  "id": "aemFEi5N8Ho",
+  "title": "What the Duck?\ud83e\udd86 The Hidden Crisis in Tech by Aicha Laafia"
+ },
+ {
+  "id": "ZWec2QyAl_k",
+  "title": "Be more productive with IntelliJ IDEA  by Marit van Dijk"
+ },
+ {
+  "id": "Z15X-0eSo50",
+  "title": "Joda Beans, POJO code generation and beyond by Stephen Colebourne"
+ },
+ {
+  "id": "Yq8yvWnZB7Q",
+  "title": "I Lost Weight on Kubernetes with **SlimFaas** by Guillaume CHERVET"
+ },
+ {
+  "id": "UJPWIz8eobc",
+  "title": "101 Cursor AI, Learning to use for Java Enterprise projects by Juan Antonio Bren\u0303a Moral"
+ },
+ {
+  "id": "T0JbiPZZKCY",
+  "title": "MCP in the Wild: Real Time Agentic Systems with Live AB Testing  by  Arun Gupta"
+ },
+ {
+  "id": "SrFXsjeGc6Q",
+  "title": "From LLM orchestration to autonomous agents: Agentic AI patterns with LangChain4j by Clement Escoffi"
+ },
+ {
+  "id": "SCV2AKUZS9A",
+  "title": "Your offspring is our Future, so let us help you! by Eddy Vos, Daniel De Luc"
+ },
+ {
+  "id": "RX9zwgHuNmA",
+  "title": "Paketo Buildpacks: the best way to build Java container images? by Anthony Dahanne"
+ },
+ {
+  "id": "QWDV6r0F6fs",
+  "title": "Coding challenge: AI test vs PI test by Frederieke Scheper, Laurens van der Kooi"
+ },
+ {
+  "id": "Ne9CGoHwACY",
+  "title": "Build an MCP Server with Java by Sergio  del Amo Caballero"
+ },
+ {
+  "id": "LGlyLmxjutI",
+  "title": "Authorization in Spring Security: permissions, roles and beyond by Daniel Garnier Moiroux"
+ },
+ {
+  "id": "Kv61d6A8xm8",
+  "title": "Going serverless with Quarkus, GraalVM native images and AWS Lambda by  Bert Jan Schrijver"
+ },
+ {
+  "id": "DiZs--ODXVM",
+  "title": "On standards and AI agents: a walkthrough of MCP, A2A, ADK and more by Emmanuel Bernard, Guillaume L"
+ },
+ {
+  "id": "DagPSLimU04",
+  "title": "The Invisible Monster: The Carbon Footprint of AI by Olivier Bierlaire"
+ },
+ {
+  "id": "BOpzs5AGU50",
+  "title": "A2A in 30 Minutes: Building Interoperable AI Agents by Loi\u0308c Magnette"
+ },
+ {
+  "id": "962JVfxyuTk",
+  "title": "Loom in JDK 25: Virtual Threads, Structured Concurrency, and Scoped Values  by  Remi Forax, Jose\u0301 Pa"
+ },
+ {
+  "id": "7oEICZ3fp3I",
+  "title": "Amazon Q Developer: Your AI Pair Programmer for Java Modernization and Development by Pal Magnus Sla"
+ },
+ {
+  "id": "2jLC3RbOh6s",
+  "title": "Integrating OpenAPI Generator into CERN React Apps: Pitfalls and Best Practices from the Frontlines"
+ },
+ {
+  "id": "1J6mbMReOnI",
+  "title": "Deep Dive: GraalVM in Practice by Alina Yurenko"
+ },
+ {
+  "id": "-OSYyY17VzE",
+  "title": "The power of Cursor rules in Java Enterprise development by Juan Antonio Bren\u0303a Moral"
+ },
+ {
+  "id": "-0vkHxlGlOU",
+  "title": "Java Memory Leaks by Victor Rentea"
+ },
+ {
+  "id": "z4zAKNLmrIw",
+  "title": "Spec Driven Development with Kiro: Vibe Coding with Guardrails  by  Kevin Azijn, Adriaan de Jonge"
+ },
+ {
+  "id": "wL5f2Gw08Y0",
+  "title": "Wirespec   API design, actually spec first, in your ecosystem  By  Jerre van Veluw"
+ },
+ {
+  "id": "usTiNoSNdlw",
+  "title": "Picocli: put some Java in your terminal \ud83d\udcbb! by Ste\u0301phane Philippart"
+ },
+ {
+  "id": "sw-G9F4RJV4",
+  "title": "Securing Your CICD Pipelines: Best Practices and Strategies  By  Adrien Pessu"
+ },
+ {
+  "id": "qgGIIpsF050",
+  "title": "Extending Functional Pipeline with Gatherers by Venkat Subramaniam"
+ },
+ {
+  "id": "nzDpu4qh0jA",
+  "title": "Bootiful Spring Boot: the Deep Dive by Josh Long"
+ },
+ {
+  "id": "na7yitK39kY",
+  "title": "Stop Scheduling Like It\u2019s 1999 \u2013 Green Software Needs Better Timing  by  Ted Vinke"
+ },
+ {
+  "id": "lCprbhmX4II",
+  "title": "Java 21 to 25   Better Language, Better APIs, Better Runtime by Nicolai Parlog"
+ },
+ {
+  "id": "khRkbvTuPX4",
+  "title": "30 minutes to understand MCP Model Context Protocol  by S e\u0301bastien Blanc"
+ },
+ {
+  "id": "jBQ0WdiNbdA",
+  "title": "Gemini CLI in Action by Wietse Venema"
+ },
+ {
+  "id": "dwcNiEEuV_Y",
+  "title": "Why Haven\u2019t They Fixed This? by Maurice  Naftalin, Stuart Marks"
+ },
+ {
+  "id": "cvEd8PHXY3U",
+  "title": "Practical API Testing with OpenAPI and Citrus Framework  by  Timon Borter"
+ },
+ {
+  "id": "ZcpD1M0Wa8Q",
+  "title": "Large Scale Distributed LLM Inference with LLM D and Kubernetes by Abdel Sghiouar"
+ },
+ {
+  "id": "WNQ5ylMs4Ok",
+  "title": "TornadoVM Deep Dive: Empowering Java Developers with GPU Acceleration  by  Thanos Stratikopoulos, Ch"
+ },
+ {
+  "id": "V_73mdDxplQ",
+  "title": "RoboCoders: Judgment Day \u2013 AI IDEs Face Off By Viktor Gamov, Baruch Sadogursky"
+ }
+]

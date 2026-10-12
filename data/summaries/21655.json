@@ -1,0 +1,24 @@
+{
+  "id": 21655,
+  "source": "abstract",
+  "tldr": "Gavin Bierman presents the next wave of Project Amber pattern-matching experiments, including user-defined deconstruction, nested constant patterns, primitive conversions and reconstruction of records.",
+  "summary": [
+    "The talk starts from Amber's existing features, which together enable data oriented programming built on compositional pattern matching. It then explores where the project goes next, presenting experimental designs and the language design challenges they raise.",
+    "Directions under development include user-defined deconstruction for ordinary interfaces and classes, nested constant patterns, an exhaustive pattern-matching statement, safer primitive value conversions within pattern matching, and a compact notation for deconstructing and constructing record instances, called reconstruction."
+  ],
+  "keyPoints": [
+    "Pattern matching is the core of Amber's data oriented programming style.",
+    "User-defined deconstruction would extend patterns to ordinary classes and interfaces.",
+    "Other experiments: nested constant patterns, an exhaustive matching statement and safer primitive conversions.",
+    "Reconstruction is a compact notation for deconstructing and constructing records."
+  ],
+  "takeaways": [
+    "Follow the Amber design discussions to see how upcoming pattern features could simplify your data-handling code."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Project Amber", "Pattern matching", "Records", "Java"],
+  "watchIf": "You track Java language evolution and want to hear it from a member of the language team.",
+  "themes": ["Java language & JDK"],
+  "demo": false
+}

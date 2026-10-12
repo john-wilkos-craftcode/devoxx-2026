@@ -1,0 +1,77 @@
+{
+  "id": 7012,
+  "source": "transcript",
+  "tldr": "Gross explains how serialization and deep reflection break encapsulation, and how Project Amber's planned deconstruction patterns would give Java safe serialization, pattern matching for classes and withers.",
+  "summary": [
+    "Gross opens with an Adult class whose constructor rejects anyone under 18, yet after deserialization through JDK serialization, or Jackson with a no-arg constructor, it reports age 17. Built-in serialization sets private fields directly, and Jackson and Hibernate use deep reflection (setAccessible(true) on private final fields). With perhaps a third or more of Java vulnerabilities involving serialization, the JDK is moving to integrity by default: deprecating serialization, restricting deep reflection unless the application opts in, and JEP \"Prepare to Make Final Mean Final\". Records already go through their canonical constructor, but classes remain necessary when internal state differs from the API, like his timestamp that accepts a string but stores a long.",
+    "The missing concept, he argues, is a first-class deconstructor: the inverse of a constructor that says how to take an object apart. Using strawman syntax still under discussion in Project Amber, he shows what it would enable: two annotations that any serialization format (Jackson, Hibernate) could use, versioning, pattern matching on ordinary classes (no public JDK class is a record today), matching on factory methods like Optional.of(Ball.of(RED)), and class withers based on a declared canonical constructor, with record withers for free. In Q&A he compares this with Lombok's withers, notes that C# record withers clone objects without rerunning constructor checks, and explains why he writes builders by hand."
+  ],
+  "keyPoints": [
+    "Both JDK serialization and Jackson-style deep reflection skip constructors, so constructor invariants cannot be trusted after deserialization.",
+    "The JDK is moving to integrity by default: restricting deep reflection unless the application opts in, and the JEP \"Prepare to Make Final Mean Final\".",
+    "Records are serialized through their canonical constructor and reject setAccessible on final fields, but classes remain necessary when stored state differs from the constructor API.",
+    "A deconstruction pattern as a first-class language feature would enable format-agnostic serialization, pattern matching on classes and factories, and withers that run through the constructor.",
+    "Jackson can avoid a default constructor today with the parameter-names module and the -parameters compiler flag, as long as field, constructor parameter and getter names match."
+  ],
+  "takeaways": [
+    "Do not assume constructor validation holds for objects created by Jackson, Hibernate or Java serialization; validate after deserialization or use records.",
+    "Prefer records for data carriers so serialization goes through the canonical constructor.",
+    "Check whether your frameworks rely on deep reflection on final fields, since upcoming JDK releases will restrict it by default."
+  ],
+  "quotes": [
+    {
+      "text": "Reflection is not the problem, deep reflection is.",
+      "at": "07:11"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Can we trust deserialized objects"
+    },
+    {
+      "at": "04:07",
+      "title": "Encapsulation and deep reflection"
+    },
+    {
+      "at": "07:11",
+      "title": "Integrity by default"
+    },
+    {
+      "at": "10:14",
+      "title": "Records and their limits"
+    },
+    {
+      "at": "14:18",
+      "title": "Deconstruction as a concept"
+    },
+    {
+      "at": "16:21",
+      "title": "Serialization, patterns and withers"
+    },
+    {
+      "at": "25:35",
+      "title": "Q&A: Lombok, Jackson, builders"
+    }
+  ],
+  "tech": [
+    "Java serialization",
+    "Reflection API",
+    "Project Amber",
+    "Records",
+    "Pattern matching",
+    "Withers",
+    "Jackson",
+    "Hibernate",
+    "Lombok",
+    "Kotlin",
+    "C#",
+    "JEP 500"
+  ],
+  "watchIf": "You want to understand why deserialized Java objects can violate their own invariants and what Project Amber's deconstruction work is likely to bring.",
+  "themes": [
+    "Java language & JDK",
+    "Security & supply chain"
+  ],
+  "demo": false
+}

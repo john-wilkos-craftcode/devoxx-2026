@@ -1,0 +1,14 @@
+{
+  "id": 10023,
+  "source": "abstract",
+  "tldr": "Julien Topçu and Josian Chevalier argue that technical debt is the visible part of deeper accidental design debt, and show how to detect and act on it.",
+  "summary": ["The session starts from the frustration that technical debt keeps piling up even when teams apply refactoring, KISS and YAGNI. It asks whether those practices sometimes make things worse, and suggests technical debt is only the visible part of accidental design debt, which can lead to spaghetti software and microservices that are really a distributed monolith.", "Julien Topçu and Josian Chevalier set out to explore how design debt works and how it affects architecture, processes, organisation and the business. Through concrete examples they show how to detect it, assess how deep it goes, and act before it becomes entrenched."],
+  "keyPoints": ["Technical debt may be a symptom of deeper design debt.", "Following KISS, YAGNI and refactoring does not prevent design debt.", "Design debt can produce distributed monoliths disguised as microservices.", "Impacts reach architecture, processes, organisation and business."],
+  "takeaways": ["Check whether your microservices can be deployed and changed independently, or form a distributed monolith."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Microservices"],
+  "watchIf": "Your codebase keeps accumulating debt despite refactoring and you suspect a design-level cause.",
+  "themes": ["Architecture & design"],
+  "demo": false
+}

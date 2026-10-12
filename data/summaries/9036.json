@@ -1,0 +1,14 @@
+{
+  "id": 9036,
+  "source": "abstract",
+  "tldr": "A retrospective on converting 1970s analogue HO model trains to digital control over Bluetooth using Seeed Studio boards and TinyGo, with successes and mistakes.",
+  "summary": ["Florian Forestier and Justine Bachelard describe taking old HO gauge model trains, which run on simple 12V DC track power, out of the attic and converting them to digital. Using Seeed Studio hardware, Bluetooth and TinyGo, they built a working railway network where speed, direction and lights of each train can be managed individually.", "The talk is a retrospective on the hardware and software architecture of this embedded project, including what worked and what went wrong during design. Everything is open source, so attendees are invited to use, fork and extend it."],
+  "keyPoints": ["Analogue 12V DC trains converted to individually controlled digital ones.", "Stack: Seeed Studio boards, Bluetooth and TinyGo.", "Control covers speed, direction and lights per train.", "Retrospective on hardware and software architecture, including mistakes.", "Project is open source."],
+  "takeaways": ["Look at TinyGo if you want to try embedded projects in Go."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["TinyGo", "Seeed Studio", "Bluetooth", "Embedded systems"],
+  "watchIf": "You enjoy hardware tinkering and want a story of embedded Go on microcontrollers.",
+  "themes": ["Hardware, robots & fun"],
+  "demo": false
+}

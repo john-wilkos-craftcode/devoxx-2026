@@ -1,0 +1,14 @@
+{
+  "id": 7036,
+  "source": "abstract",
+  "tldr": "A 2-hour lab building a production-oriented agentic application with LangChain4j and Quarkus, covering MCP, A2A, skills, guardrails, resilience and testing.",
+  "summary": ["Mario Fusco, Georgios Andrianakis and Kevin Dubois lead a lab on building agentic systems that are reliable, observable, secure and testable, not just demos. Participants build an application with LangChain4j and its Quarkus extension, connecting remote tools and agents via MCP and A2A.", "The lab also covers encapsulating business capabilities as reusable skills, enforcing governance with guardrails, and resilience through fault tolerance, retries and persistence for long-running workflows. Testing is covered too: validating agent behaviour, mocking tools and models, and automating tests. It is the last part of a three-section workshop, and attendees can work through the earlier parts at their own pace."],
+  "keyPoints": ["Uses LangChain4j and the Quarkus extension.", "Interoperability via MCP and A2A.", "Skills and guardrails for reuse and governance.", "Fault tolerance, retries and persistence for long-running workflows.", "Testing with mocked tools and models."],
+  "takeaways": ["Add automated tests with mocked models and tools to any agent prototype."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["LangChain4j", "Quarkus", "MCP", "A2A", "Guardrails"],
+  "watchIf": "You want to move a Java agent prototype toward production with proper testing and resilience.",
+  "themes": ["AI agents & agentic coding", "LLMs in Java apps"],
+  "demo": false
+}

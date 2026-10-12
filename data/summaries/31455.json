@@ -1,0 +1,38 @@
+{
+  "id": 31455,
+  "source": "transcript",
+  "tldr": "Canuma argues that the billion-plus Apple Silicon devices already in use can run most AI workloads locally, and shows the MLX-VLM/MLX-Audio engine and Nativ app built to do that.",
+  "summary": [
+    "Prince Canuma grew up in Mozambique, where devices and later GPUs were scarce, and set out to make AI that runs locally. He calls Apple's installed base the largest distributed compute fleet in the world: half a billion AI-capable devices in 2023, more than a billion today. They have unified memory shared by CPU and GPU and a Neural Engine, yet sit mostly idle. Neywa Labs' stack is the MLX-VLM and MLX-Audio engines, which run open models on Mac, iPhone, iPad and Vision Pro and now cover any-to-any modalities. On top sits Nativ, a native macOS app that connects to coding tools like Codex and OpenCode and supports extensions defined in a single JSON file. The MLX ecosystem grew from about 100 to 5,000 models.",
+    "Canuma compares local and cloud: shared memory and memory bandwidth limit local inference, while cloud capacity costs money for every token, and multimodal and agentic workloads make tokens much more expensive. He says intelligence per watt has risen to the point where 70-90% of the queries people send to the cloud could run on the device, up from 23% three years ago. He was first to implement Google's TurboQuant locally, which he says speeds up decoding without losing accuracy and allows contexts of up to a million tokens on a Mac Studio (LongBench v2 runs on an M3 Ultra). Speculative decoding and MTP give 2-3x more. He lists four reasons to go local (privacy, latency, cost, sovereignty) and notes that 40,000 Nativ downloads cost his company nothing to serve. Demos: a Reachy Mini robot with real-time on-device voice cloning and a local model generating 3D scenes in Nativ."
+  ],
+  "keyPoints": [
+    "MLX-VLM grew from vision-language models into a multimodal engine, and the MLX ecosystem went from about 100 to 5,000 models that run on Apple devices.",
+    "Canuma estimates that 70-90% of typical cloud queries can now run on the device, against 23% three years ago, because open models trail closed ones by only 3-6 months.",
+    "TurboQuant KV-cache quantisation on MLX speeds up decoding and allows contexts up to 1M tokens on a Mac Studio without losing accuracy, according to the speaker's LongBench v2 runs.",
+    "He says a current Mac Studio can serve around 100 concurrent streams, enough for parallel agents or a whole household.",
+    "His four arguments for local inference are privacy, latency, cost and sovereignty. The last is about not depending on a hosted model that can be withdrawn or blocked."
+  ],
+  "takeaways": [
+    "Try running your agent or coding workflow against a local open model on Apple Silicon before paying for extra cloud usage.",
+    "Send only long-running or truly frontier tasks to the cloud and keep sensitive documents on the device.",
+    "Look at MLX-VLM and MLX-Audio if you need multimodal inference on Mac or iOS."
+  ],
+  "quotes": [
+    {"text": "There's zero cost associated with us supplying Nativ as an application, as a developer tool for the world.", "at": "16:19"},
+    {"text": "Inference is moving where the data lives.", "at": "18:23"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "From Mozambique to local AI"},
+    {"at": "02:03", "title": "Apple Silicon as compute fleet"},
+    {"at": "03:04", "title": "MLX-VLM, MLX-Audio and Nativ"},
+    {"at": "07:10", "title": "Local versus cloud trade-offs"},
+    {"at": "10:13", "title": "Intelligence per watt and TurboQuant"},
+    {"at": "13:16", "title": "Privacy, latency, cost, sovereignty"},
+    {"at": "17:22", "title": "Reachy Mini and Nativ demos"}
+  ],
+  "tech": ["MLX", "MLX-VLM", "MLX-Audio", "Nativ", "Apple Silicon", "TurboQuant", "Speculative decoding", "Reachy Mini", "Hugging Face", "LongBench v2"],
+  "watchIf": "You are deciding whether an AI feature should run on users' Macs and iPhones or in the cloud and want a short argument for local inference with numbers.",
+  "themes": ["Developer experience & tooling", "Hardware, robots & fun"],
+  "demo": false
+}

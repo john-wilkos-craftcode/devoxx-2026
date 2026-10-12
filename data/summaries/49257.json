@@ -1,0 +1,14 @@
+{
+  "id": 49257,
+  "source": "abstract",
+  "tldr": "Rod Johnson presents Embabel, a JVM agent framework on Spring AI that uses a deterministic GOAP planner instead of an LLM to choose the next action.",
+  "summary": ["Rod Johnson introduces Embabel, a JVM-native agent framework built on Spring AI and Spring Boot. It takes the opposite approach to frameworks that ask a language model to decide what to do next, which can leave non-reproducible traces that are hard to explain.", "Its core is Goal-Oriented Action Planning (GOAP), borrowed from game AI: developers declare goals and annotate actions with @Action and @AchievesGoal, and a deterministic non-LLM planner chains them by pre- and post-conditions. The plan is inspectable before it runs and explainable afterwards. The listing notes that full session details were still pending."],
+  "keyPoints": ["Embabel is built on Spring AI and Spring Boot.", "Planning uses GOAP, a deterministic algorithm rather than an LLM.", "Actions are annotated with @Action and @AchievesGoal.", "Plans can be inspected before execution and explained after."],
+  "takeaways": ["Consider deterministic planning where you need reproducible, explainable agent behaviour."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Embabel", "Spring AI", "Spring Boot", "GOAP"],
+  "watchIf": "You build agents on the JVM and need reproducible, explainable behaviour.",
+  "themes": ["AI agents & agentic coding", "Spring & frameworks"],
+  "demo": false
+}

@@ -1,0 +1,106 @@
+{
+  "id": 24228,
+  "source": "transcript",
+  "tldr": "Tahvonen shows how a Java web developer can build real Raspberry Pi projects, from a BBQ smoker controller to a jetty camera, entirely in Java, and shares a starter project.",
+  "summary": [
+    "Tahvonen, a Java web developer with about 20 years of experience and one year of Raspberry Pi tinkering, started after promising Frank Delporte to update an old Vaadin demo. Home Assistant, written in Python, sat unused in a closet because he could not extend it. Instead he built his own systems: a jetty Raspberry Pi 5 that makes sunset time-lapses and tracks water level for fishing in the Turku archipelago, a start gate for orienteering races with up to 2,000 runners, a temperature monitor for his hunting club's meat cooler using Ruuvi Bluetooth sensors, and his main project, a battery-backed BBQ smoker controller.",
+    "The smoker reads MEATER and cheaper Bluetooth probes plus a thermocouple in the firebox, and runs a P controller that adjusts airflow. A solenoid valve let too little air through, so he hooked a micro servo to the butterfly valve of an old chainsaw carburettor. The fan uses software PWM over a 10-second cycle. The UI is a Vaadin progressive web app he controls from his iPhone. He prefers Quarkus over Spring Boot on these devices because it starts more than twice as fast.",
+    "His lessons: use a microcontroller rather than a JVM for a single wireless sensor; Pi4J is a low-level GPIO/I2C API, so use the Pi4J drivers (for example for the BME280) where they exist, and wrap C drivers with the FFM API otherwise. He vibe-coded a Java camera driver on top of libcamera. Skip breadboards for real builds and use WAGO lever connectors and soldering. Develop and test on the laptop with hardware simulated through CDI-injected alternative implementations.",
+    "The demo showed his starter repository: a Quarkus app with simulated-hardware mode, climate and actuator views, a system monitor that checks enabled interfaces, and tools for GPIO, an I2C bus scanner, PWM (moving a servo live) and Bluetooth scanning. A deploy script explodes the fat JAR, rsyncs only changed files, tunes JVM options for the Pi, and installs the app as a systemd service. For remote access he uses a single Cloudflare Tunnel on the Pi 5 for all home services, which provides the HTTPS needed for web push notifications, and recommends passkeys over passwords. He closed by advising people to set limits on how much time the hobby takes."
+  ],
+  "keyPoints": [
+    "A Raspberry Pi Zero 2 (512 MB) works but crashed from heat when encoding time-lapse video; buy cases with active cooling, and buy spare Pis because they sell out.",
+    "Quarkus artifacts start more than twice as fast as Spring Boot ones on small Pis, which is why he prefers Quarkus there.",
+    "Pi4J is a low-level GPIO API; prefer the higher-level Pi4J drivers, contribute new ones, or use Java's FFM API to wrap existing C drivers.",
+    "Hardware simulation through CDI: inject a simulated implementation of the same interface for local development, with no simulation code in the device build.",
+    "His deploy script explodes the artifact, rsyncs only changed files, sets Pi-specific JVM options and user groups (e.g. Bluetooth), and runs the app as a systemd service.",
+    "Web push notifications in a PWA require HTTPS; one Cloudflare Tunnel on a single Pi can expose several services on the home network.",
+    "For authentication he recommends passkeys (the starter has a branch for it) over shared passwords, username/password or depending on an external OpenID Connect provider."
+  ],
+  "takeaways": [
+    "Pick a real problem from your own life and build it in Java instead of working through breadboard tutorials.",
+    "Develop on your laptop with simulated hardware behind an interface, and automate rsync-based deploys to the Pi.",
+    "Use a cheap microcontroller for a lone wireless sensor and keep the Pi as the central Java server.",
+    "Expose home services through a tunnel such as Cloudflare Tunnel to get HTTPS, and protect them with passkeys."
+  ],
+  "quotes": [
+    {
+      "text": "If you are not building anything industrial, it doesn't need to be bulletproof.",
+      "at": "15:24"
+    },
+    {
+      "text": "Skip the tutorials. You are all adults here. You are all smart engineers and you all have agents to help you these days. So build something real.",
+      "at": "22:34"
+    },
+    {
+      "text": "Set some limits, go fishing, enjoy your family, eat the barbecue.",
+      "at": "42:59"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Getting started with Pis"
+    },
+    {
+      "at": "04:09",
+      "title": "Jetty camera and water level"
+    },
+    {
+      "at": "07:16",
+      "title": "Orienteering gate and meat cooler"
+    },
+    {
+      "at": "10:21",
+      "title": "The BBQ smoker controller"
+    },
+    {
+      "at": "18:28",
+      "title": "Sensors, Pi4J and drivers"
+    },
+    {
+      "at": "22:34",
+      "title": "Wiring and development lessons"
+    },
+    {
+      "at": "27:45",
+      "title": "Starter project demo"
+    },
+    {
+      "at": "35:53",
+      "title": "HTTPS, tunnels and passkeys"
+    },
+    {
+      "at": "41:58",
+      "title": "Wrap-up"
+    }
+  ],
+  "tech": [
+    "Raspberry Pi 5",
+    "Raspberry Pi Zero 2",
+    "Pi4J",
+    "Quarkus",
+    "Spring Boot",
+    "Vaadin",
+    "Progressive web apps",
+    "Web Push",
+    "CDI",
+    "FFM API",
+    "libcamera",
+    "BME280",
+    "Bluetooth LE",
+    "Ruuvi",
+    "MEATER",
+    "rsync",
+    "systemd",
+    "Cloudflare Tunnel",
+    "ngrok",
+    "Passkeys"
+  ],
+  "watchIf": "You are a Java developer who wants to try Raspberry Pi projects without switching to Python, and want a practical setup for development, deployment and remote access.",
+  "themes": [
+    "Hardware, robots & fun",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}

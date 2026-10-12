@@ -1,0 +1,24 @@
+{
+  "id": 13753,
+  "source": "abstract",
+  "tldr": "An informal BOF where the Belgian Java User Group (BeJUG) introduces itself and invites attendees to share ideas on events and ways to get involved.",
+  "summary": [
+    "Frank Delporte and Tom Cools host an open session with no slides and no strict agenda. They describe what BeJUG is about, how it connects Java enthusiasts across Belgium, and the events it organizes, from meetups to hands-on sessions.",
+    "Attendees are invited to ask questions, share what they would like from their local user group, and learn how to get involved as an attendee, speaker or contributor, as well as to network."
+  ],
+  "keyPoints": [
+    "Introduction to BeJUG and how it connects Java developers in Belgium.",
+    "Overview of event types, from meetups to hands-on sessions.",
+    "Ways to participate as attendee, speaker or contributor.",
+    "Open discussion on what attendees want from the group."
+  ],
+  "takeaways": [
+    "Join BeJUG and consider proposing a meetup talk."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": [],
+  "watchIf": "You are a Java developer in Belgium who wants to meet the community.",
+  "themes": ["Teams, careers & leadership"],
+  "demo": false
+}

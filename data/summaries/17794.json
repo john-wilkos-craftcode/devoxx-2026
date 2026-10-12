@@ -1,0 +1,14 @@
+{
+  "id": 17794,
+  "source": "abstract",
+  "tldr": "Clément de Tastes and Remi Forax explain JEP 401 value classes and their stack and heap optimisations through a black hole ray-tracing simulation, plus a look at null-restricted types.",
+  "summary": ["The session covers what value classes are, how the Java spec was reinterpreted to allow classes without identity, how they interact with existing code, and which optimisations they enable on the stack and the heap. The abstract says Java 28 will introduce them as a preview feature through JEP 401.", "To make it concrete, the speakers use a black hole simulation and rendering, which involves huge numbers of vectors, rays, coordinates and intermediate values along thousands of light-ray trajectories. They finish with the experimental ! syntax for null-restricted types, its optimisation potential and the limits of the current design."],
+  "keyPoints": ["Value classes give up identity in exchange for better performance (JEP 401).", "Covers how the spec was reinterpreted and how value classes interact with existing code.", "Stack and heap optimisations are illustrated by a black hole ray simulation.", "Previews the experimental ! syntax for null-restricted types and its limitations."],
+  "takeaways": ["Identify allocation-heavy small immutable types in your code that could become value classes."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Project Valhalla", "JEP 401", "Value classes", "Null-restricted types"],
+  "watchIf": "You care about JVM performance and want a concrete Valhalla example beyond slides.",
+  "themes": ["Java language & JDK", "JVM performance & runtime"],
+  "demo": false
+}

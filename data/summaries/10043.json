@@ -1,0 +1,14 @@
+{
+  "id": 10043,
+  "source": "abstract",
+  "tldr": "An interactive BOF where attendees analyse short, tricky Java snippets together and predict what they print, to test assumptions about the language.",
+  "summary": ["Clément de Tastes leads an interactive session built around short Java snippets whose output is easy to get wrong. The group analyses each one together, relying on the subtleties and pitfalls that catch even experienced developers.", "The stated goal is to learn, revisit core concepts, challenge assumptions and better understand how the Java language really behaves. This is the hard edition, aimed at an advanced audience."],
+  "keyPoints": ["Series of short Java snippets analysed collaboratively.", "Focus on subtleties and pitfalls of the language.", "Participants predict output before discussing the actual behaviour.", "Advanced level."],
+  "takeaways": ["Re-read the language spec on the rules you only think you know."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Java"],
+  "watchIf": "You enjoy Java puzzlers and want to test how well you know the language.",
+  "themes": ["Java language & JDK"],
+  "demo": false
+}

@@ -1,0 +1,48 @@
+{
+  "id": 17759,
+  "source": "transcript",
+  "tldr": "Regnier covers what developers need to know about Kubernetes without becoming DevOps: Flox and kind locally, image builds without Docker, resources, graceful shutdown, probes, kubectl debug, security and OpenTelemetry.",
+  "summary": [
+    "Alain Regnier (SCIAM, Google Developer Expert, Kubestronaut) argues that Docker Compose is no longer the best local setup when production runs on Kubernetes. He walks through recorded terminal sessions. Flox, which is built on Nix, gives each project a declarative, shareable environment pinning tools such as kubectl, Helm and kind, so they exist only inside 'flox activate'. kind then runs local clusters with one or three nodes from a YAML config, with cloud-provider-kind adding ingress and Gateway support. For images he recommends trusted base images, a non-root user, small or distroless images and multi-stage builds, or skipping Docker with Kaniko (now maintained by Chainguard), Jib or Buildpacks.",
+    "On resources: always set requests, because pods without them are the first to be evicted, but keep requests modest since they reserve capacity. Pod-level requests and limits now let containers share a budget. In-place pod resize, stable in Kubernetes 1.35, changes limits without a restart and pairs well with the Vertical Pod Autoscaler, though a JVM fixes its max heap at startup. For graceful shutdown he lists every reason a pod gets stopped. The pod leaves the Service endpoints, a preStop hook runs (he recommends a 10-second sleep), SIGTERM reaches PID 1, and SIGKILL follows after terminationGracePeriodSeconds (30 s by default). Use exec-form CMD/ENTRYPOINT so your process is PID 1. Exceeding the memory limit means an OOM kill from the kernel with no warning.",
+    "For probes, startup, readiness and liveness should be separate endpoints. They should not log, should not hit the database on every call, and need generous timeouts on loaded Java apps; misconfigured probes are a common cause of random restarts in his audits. Image volumes mount an OCI image read-only, which he demonstrates by updating a Hugo blog's content image without copying files. A kubectl debug demo finds a bug in a shell-less Python pod: with --target the ephemeral container shares the process namespace, and /proc/1/root shows the app listening on 8080, not 80. Ephemeral containers stay until the pod restarts. He also covers node debugging and mirrord for attaching a local IDE process to a live cluster.",
+    "The security section covers SBOMs generated with bom and scanned with Trivy to catch new CVEs, and RuntimeClass with gVisor or Kata Containers for sandboxing untrusted code such as AI agents. It also covers CEL-based ValidatingAdmissionPolicy, demonstrated on GKE by rejecting a one-replica deployment, and securityContext settings: runAsNonRoot, dropped capabilities and a read-only root filesystem. He closes with OpenTelemetry: start with the auto-instrumentation Java agent, move to manual SDK spans when the agent's overhead grows, and rely on trace-to-log correlation across microservices."
+  ],
+  "keyPoints": [
+    "Flox (built on Nix) gives per-project, declarative, shareable toolchains; kind simulates multi-node clusters locally, with cloud-provider-kind for ingress and Gateway.",
+    "Images can be built without Docker using Kaniko (now maintained by Chainguard), Jib for Maven/Gradle, or Buildpacks.",
+    "Pods without resource requests are first to be evicted; pod-level resources and in-place pod resize (stable in 1.35) reduce restarts.",
+    "Graceful shutdown sequence: removal from Service endpoints, preStop hook (sleep about 10 s), SIGTERM to PID 1, SIGKILL after terminationGracePeriodSeconds (default 30 s).",
+    "Use exec-form CMD/ENTRYPOINT so the app is PID 1; memory-limit OOM kills come from the kernel with no SIGTERM.",
+    "Keep liveness and readiness probes distinct, log-free and cheap; tight timeouts on loaded Java apps cause random restarts.",
+    "kubectl debug --target attaches an ephemeral container sharing the process namespace; /proc/1/root exposes the target's filesystem even in distroless images.",
+    "Use CEL ValidatingAdmissionPolicy for rules like minimum replicas, no Docker Hub images or no :latest tags, and RuntimeClass with gVisor or Kata for untrusted workloads."
+  ],
+  "takeaways": [
+    "Add a preStop sleep and handle SIGTERM in your service, and check that your process runs as PID 1.",
+    "Split liveness and readiness endpoints and remove database calls and logging from them.",
+    "Try Flox plus kind instead of Docker Compose for a local environment closer to production.",
+    "Generate an SBOM at build time and rescan it with Trivy regularly.",
+    "Start with the OpenTelemetry Java agent, then replace it with targeted manual spans if overhead becomes a problem."
+  ],
+  "quotes": [
+    {"text": "Pods without request are first candidate for termination even if they are healthy.", "at": "10:15"},
+    {"text": "If you exceed your limit you're going to be shot, but you're going to be shot by the kernel, not by the kubelet. So there is no warning whatsoever.", "at": "16:26"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Intro and agenda"},
+    {"at": "03:08", "title": "Local dev with Flox and kind"},
+    {"at": "08:13", "title": "Building container images"},
+    {"at": "09:14", "title": "Requests, limits and resize"},
+    {"at": "12:18", "title": "Graceful shutdown"},
+    {"at": "18:29", "title": "Probes and image volumes"},
+    {"at": "24:38", "title": "kubectl debug and mirrord"},
+    {"at": "33:50", "title": "SBOM, RuntimeClass and CEL"},
+    {"at": "41:01", "title": "Security context"},
+    {"at": "42:02", "title": "OpenTelemetry for developers"}
+  ],
+  "tech": ["Kubernetes", "kind", "Flox", "Nix", "Kaniko", "Jib", "Buildpacks", "kubectl debug", "mirrord", "bom", "Trivy", "gVisor", "Kata Containers", "CEL", "ValidatingAdmissionPolicy", "OpenTelemetry", "Spring Boot Actuator", "Quarkus", "GKE", "Hugo"],
+  "watchIf": "You deploy apps to Kubernetes but leave the YAML to the platform team, and you want a checklist of the settings that actually affect your app's reliability and security.",
+  "themes": ["Cloud native & Kubernetes", "Developer experience & tooling"],
+  "demo": false
+}

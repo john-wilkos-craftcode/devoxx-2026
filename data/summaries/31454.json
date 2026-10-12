@@ -1,0 +1,43 @@
+{
+  "id": 31454,
+  "source": "transcript",
+  "tldr": "Canuma explains the accuracy/latency/memory trade-offs of local inference on Apple Silicon and spends most of the hour demoing Nativ, his app built on MLX-VLM, running coding agents and voice on a laptop.",
+  "summary": [
+    "Prince Canuma says running a model on a Mac is easy but running it fast is not, and that inference infrastructure is one of the few things he could not vibe code: a month of trying cost him $500 to $1,000 in extra usage. Local inference trades accuracy, latency and memory against each other. Quantisation and speculative decoding (a small draft model checked by the big one, up to about 3x) move those dials. A careless quantisation can hide accuracy problems that only show up in long contexts. Apple's unified memory, shared by CPU and GPU since the M1, means one optimisation carries across Mac, iPhone and iPad. But the model competes for that memory with the OS, Chrome and the IDE, and decode speed is bounded by memory bandwidth divided by model size.",
+    "The MLX-VLM engine, now any-to-any multimodal and with a Swift SDK announced, adds continuous batching with a scheduler that decides admission and prefill and throttles requests before the machine starts swapping. It also has TurboQuant KV-cache compression for contexts up to a million tokens, plus speculative decoding. Most of the session is a live demo of Nativ, the macOS app on top: a roughly 19 GB Cohere coding model answering at about 90 tokens per second with Wi-Fi off, system-wide voice dictation (600,000 words in a few weeks), scheduled tasks, plugging into harnesses such as Pi and Codex CLI, and generating a chat web app. Some installs failed on conference Wi-Fi.",
+    "He also shows RepoMeter, a tool he built locally after agent-written PRs pushed the engine's tests to 86,000 lines. He cut them to 22,000 lines and from 106 test files to 16 with the same coverage. His list of server habits to unlearn: don't maximise batch size, optimise for concurrency across modalities, tune per chip generation (M1 to M5) rather than per rack, and check output against the PyTorch/Transformers reference on long prompts, not just short ones. In Q&A he says the engine stays open source, CUDA works but is not the focus, an M1 with 32-64 GB is fine, and reasoning budgets help against the \"doom loops\" small models fall into."
+  ],
+  "keyPoints": [
+    "Decode is memory-bound: estimate tokens per second from memory bandwidth and quantised model size before buying hardware.",
+    "On-device inference shares RAM with the OS and apps, so the scheduler has to throttle admissions to avoid swap, unlike a server that owns 100% of memory.",
+    "Continuous batching lets one Mac Studio serve many users or parallel sub-agents across voice, text and image models.",
+    "Validate quantised and ported models against the reference implementation on long prompts. Numerical errors accumulate with context length.",
+    "Prompt caching to disk makes reloading a large prompt 8-100x faster, depending on model and workload.",
+    "Nativ runs local models behind coding harnesses (Pi, Codex CLI), adds voice dictation and meeting transcription, and is extended through JSON-defined extensions. It cost nothing to serve its first 40,000 downloads.",
+    "Setting a reasoning budget or turning reasoning off (for example on Qwen 27B) reduces doom loops in small local models."
+  ],
+  "takeaways": [
+    "Before buying a Mac for local models, divide its memory bandwidth by the model size to estimate decode speed.",
+    "Test any quantised model on long-context prompts against the full-precision reference, not just on short benchmarks.",
+    "Try a local coding model behind your existing agent harness for routine tasks and keep cloud models for the hard cases.",
+    "Cap reasoning tokens on local reasoning models that loop."
+  ],
+  "quotes": [
+    {"text": "Running models on the Mac is easy, but really getting them to run efficiently fast is actually quite hard. And this is one of the very few things that you cannot vibe code.", "at": "00:03"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why inference needs expertise"},
+    {"at": "02:03", "title": "Accuracy, latency, memory"},
+    {"at": "04:08", "title": "Unified memory and bandwidth"},
+    {"at": "06:12", "title": "Continuous batching on device"},
+    {"at": "08:16", "title": "MLX-VLM engine"},
+    {"at": "12:21", "title": "Nativ demo"},
+    {"at": "23:38", "title": "Projects and RepoMeter"},
+    {"at": "34:49", "title": "Server habits to unlearn"},
+    {"at": "38:55", "title": "Q&A"}
+  ],
+  "tech": ["MLX", "MLX-VLM", "MLX-Audio", "Nativ", "Apple Silicon", "TurboQuant", "Speculative decoding", "Continuous batching", "KV cache", "Qwen", "Pi", "Codex CLI", "Hugging Face", "EmbeddingGemma", "Liquid AI LFM", "CUDA"],
+  "watchIf": "You want to run open models on a Mac for coding or voice work and want a practical tour of an MLX-based stack. Don't expect benchmark-heavy engine internals: the talk is mostly a product demo.",
+  "themes": ["Developer experience & tooling", "AI agents & agentic coding"],
+  "demo": true
+}

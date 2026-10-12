@@ -1,0 +1,24 @@
+{
+  "id": 22920,
+  "source": "abstract",
+  "tldr": "A lab building a virtual-thread web application with structured concurrency and scoped values, then comparing the result to a reactive approach.",
+  "summary": [
+    "Participants write a virtual-thread-based web application that uses structured concurrency to parallelize requests and implements different strategies to process them. They work with StructuredTaskScope and the Joiner implementations the API provides, and write their own.",
+    "The lab also covers using Scoped Values (final in JDK 25) to pass sensitive information between modules without method parameters, and organizes the application with Data Oriented Programming. Structured Concurrency is still a preview feature in JDK 26 and 27. The lab ends by comparing the Loom approach with a classical reactive one."
+  ],
+  "keyPoints": [
+    "Virtual threads (JDK 21) make blocking almost free, enabling thread-per-request style at scale.",
+    "Structured Concurrency uses StructuredTaskScope and Joiner implementations, including custom ones.",
+    "Scoped Values replace ThreadLocal for passing data between modules.",
+    "Data Oriented Programming is used to structure the app."
+  ],
+  "takeaways": [
+    "Try replacing a ThreadLocal in your code with a ScopedValue."
+  ],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Virtual threads", "Structured Concurrency", "Scoped Values", "Project Loom", "JDK 25", "JDK 26"],
+  "watchIf": "You want hands-on experience with the Loom APIs as an alternative to reactive programming.",
+  "themes": ["Java language & JDK", "JVM performance & runtime"],
+  "demo": false
+}

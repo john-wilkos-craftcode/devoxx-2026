@@ -1,0 +1,14 @@
+{
+  "id": 4079,
+  "source": "abstract",
+  "tldr": "A 3-hour beginner lab where participants add generative AI to Java applications with LangChain4j and Quarkus, covering prompts, RAG, MCP tools and agents.",
+  "summary": ["In this hands-on lab, Stéphane Philippart and Matthieu Vincent show that integrating AI into an application does not require a new language or stack. Participants stay in Java and work with popular frameworks including LangChain4j and Quarkus.", "The lab walks through the main aspects of building generative AI applications: customising prompts, enriching models with your own data through RAG, calling local or remote tools via MCP, and creating agents. Attendees only need a laptop and a browser, since a fully configured development environment is provided through EasyLab."],
+  "keyPoints": ["Integrate AI models into Java applications without leaving the Java ecosystem.", "Frameworks used include LangChain4j and Quarkus.", "Topics: prompt customisation, RAG, tool calling through MCP, and agents.", "Environment is provided through EasyLab; only a laptop and browser are needed."],
+  "takeaways": ["Start with LangChain4j in an existing Java project before considering a new stack."],
+  "quotes": [],
+  "chapters": [],
+  "tech": ["Java", "LangChain4j", "Quarkus", "RAG", "MCP", "EasyLab"],
+  "watchIf": "You are a Java developer new to generative AI and want a guided, practical first integration.",
+  "themes": ["LLMs in Java apps", "AI agents & agentic coding"],
+  "demo": false
+}
