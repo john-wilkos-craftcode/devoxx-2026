@@ -1,0 +1,314 @@
+{
+ "source": "Official Devoxx Belgium 2026 photos, Flickr account bejug (https://www.flickr.com/photos/bejug/albums). Licence CC BY-NC-ND 4.0: used only as modelling reference, not redistributed; the images are gitignored and fetched by scripts/fetch_references.py.",
+ "areas": {
+  "hollywood": "Hollywood room: the exhibition floor downstairs, where the booths are. The walk starts here.",
+  "foyer": "Upstairs foyer: the long hall with the sloped ceiling, the screen between the columns and the tensile funnels.",
+  "entrance": "Entrance and registration, with the stair up.",
+  "auditorium": "Auditorium (Room 8, the keynote room): black room, blue-grey seats, #DEVOXX letters on the stage floor."
+ },
+ "local": [
+  {
+   "area": "hollywood",
+   "file": "hollywood-empty.png",
+   "caption": "The Hollywood room empty, booths removed (supplied by John, 12/10). Central raised coffer, white square columns, recessed lights, black acoustic panels at the top corners, beige curtains, glass partitions, grey carpet."
+  }
+ ],
+ "photos": [
+  {
+   "area": "hollywood",
+   "id": "55574943113",
+   "taken": "2026-10-06 14:04:18",
+   "page": "https://www.flickr.com/photos/bejug/55574943113/",
+   "image": "https://live.staticflickr.com/65535/55574943113_f9d4a769ec_k.jpg",
+   "caption": "From the entrance end: raised central ceiling coffer with a blue LED cove and hanging greenery; black acoustic ceiling with track spots around it; grid of white square columns; grey carpet; booths along both sides."
+  },
+  {
+   "area": "hollywood",
+   "id": "55575254550",
+   "taken": "2026-10-06 14:05:09",
+   "page": "https://www.flickr.com/photos/bejug/55575254550/",
+   "image": "https://live.staticflickr.com/65535/55575254550_47040d1e9e_k.jpg",
+   "caption": "Same view a minute later; coffer edge, columns and side booths."
+  },
+  {
+   "area": "hollywood",
+   "id": "55578503859",
+   "taken": "2026-10-07 13:58:09",
+   "page": "https://www.flickr.com/photos/bejug/55578503859/",
+   "image": "https://live.staticflickr.com/65535/55578503859_d0699d51e1_k.jpg",
+   "caption": "Same axis from further back: the coffer's full length, black ceiling with track spots at the front."
+  },
+  {
+   "area": "hollywood",
+   "id": "55572333671",
+   "taken": "2026-10-05 10:14:16",
+   "page": "https://www.flickr.com/photos/bejug/55572333671/",
+   "image": "https://live.staticflickr.com/65535/55572333671_ffddcd6c7a_k.jpg",
+   "caption": "Monday 10:14, wide: coffer with greenery, recessed square ceiling lights, columns receding."
+  },
+  {
+   "area": "hollywood",
+   "id": "55572333651",
+   "taken": "2026-10-05 10:14:19",
+   "page": "https://www.flickr.com/photos/bejug/55572333651/",
+   "image": "https://live.staticflickr.com/65535/55572333651_4faa5eef89_k.jpg",
+   "caption": "Same, slightly to the left: columns, ceiling lights, the far wall."
+  },
+  {
+   "area": "hollywood",
+   "id": "55574944283",
+   "taken": "2026-10-06 09:30:15",
+   "page": "https://www.flickr.com/photos/bejug/55574944283/",
+   "image": "https://live.staticflickr.com/65535/55574944283_b352e188a6_k.jpg",
+   "caption": "Carpet texture up close; low white ceiling panels with greenery and recessed lights."
+  },
+  {
+   "area": "hollywood",
+   "id": "55578506469",
+   "taken": "2026-10-07 19:49:02",
+   "page": "https://www.flickr.com/photos/bejug/55578506469/",
+   "image": "https://live.staticflickr.com/65535/55578506469_97cbc73df8_k.jpg",
+   "caption": "Evening crowd: beige floor-length curtains between the columns."
+  },
+  {
+   "area": "hollywood",
+   "id": "55578335881",
+   "taken": "2026-10-07 19:49:35",
+   "page": "https://www.flickr.com/photos/bejug/55578335881/",
+   "image": "https://live.staticflickr.com/65535/55578335881_86e6f17296_k.jpg",
+   "caption": "Side aisle: white columns, curtains, grey carpet."
+  },
+  {
+   "area": "hollywood",
+   "id": "55578506419",
+   "taken": "2026-10-07 19:49:39",
+   "page": "https://www.flickr.com/photos/bejug/55578506419/",
+   "image": "https://live.staticflickr.com/65535/55578506419_09c6f9711a_k.jpg",
+   "caption": "Side aisle: exposed ducts and pipes in the black ceiling, white columns, wall plants."
+  },
+  {
+   "area": "hollywood",
+   "id": "55580927705",
+   "taken": "2026-10-08 15:51:14",
+   "page": "https://www.flickr.com/photos/bejug/55580927705/",
+   "image": "https://live.staticflickr.com/65535/55580927705_86e3a9331c_k.jpg",
+   "caption": "Truss along the side, top of a white column, black ceiling."
+  },
+  {
+   "area": "hollywood",
+   "id": "55580632058",
+   "taken": "2026-10-08 15:54:38",
+   "page": "https://www.flickr.com/photos/bejug/55580632058/",
+   "image": "https://live.staticflickr.com/65535/55580632058_a0b064928b_k.jpg",
+   "caption": "Side wall: truss, beige curtains, grey ceiling, white columns."
+  },
+  {
+   "area": "hollywood",
+   "id": "55580926250",
+   "taken": "2026-10-08 15:55:24",
+   "page": "https://www.flickr.com/photos/bejug/55580926250/",
+   "image": "https://live.staticflickr.com/65535/55580926250_d2ac8e0d7c_k.jpg",
+   "caption": "Glass doors with blue frames, curtains, steel bin, grey carpet."
+  },
+  {
+   "area": "foyer",
+   "id": "55572354836",
+   "taken": "2026-10-05 08:53:38",
+   "page": "https://www.flickr.com/photos/bejug/55572354836/",
+   "image": "https://live.staticflickr.com/65535/55572354836_adbe2508fb_k.jpg",
+   "caption": "Monday 08:53, empty: sloped white ceiling planes with blue LED lines and track spots, screen between dark square columns, blue-lit glass at the end, red side portals, rows of stacked chairs. (This is what the old references showed. It is upstairs, not the Hollywood room.)"
+  },
+  {
+   "area": "foyer",
+   "id": "55572463658",
+   "taken": "2026-10-05 08:53:58",
+   "page": "https://www.flickr.com/photos/bejug/55572463658/",
+   "image": "https://live.staticflickr.com/65535/55572463658_b4cc60efe0_k.jpg",
+   "caption": "Same, landscape."
+  },
+  {
+   "area": "foyer",
+   "id": "55572516319",
+   "taken": "2026-10-05 08:53:03",
+   "page": "https://www.flickr.com/photos/bejug/55572516319/",
+   "image": "https://live.staticflickr.com/65535/55572516319_8eab890ee9_k.jpg",
+   "caption": "Screen between the columns up close, blue tensile funnel under it."
+  },
+  {
+   "area": "foyer",
+   "id": "55580632338",
+   "taken": "2026-10-08 14:38:49",
+   "page": "https://www.flickr.com/photos/bejug/55580632338/",
+   "image": "https://live.staticflickr.com/65535/55580632338_bbcb2764c2_k.jpg",
+   "caption": "Thursday afternoon, crowded: same axis, schedule screens on the left."
+  },
+  {
+   "area": "foyer",
+   "id": "55579485987",
+   "taken": "2026-10-08 14:39:18",
+   "page": "https://www.flickr.com/photos/bejug/55579485987/",
+   "image": "https://live.staticflickr.com/65535/55579485987_6918e34217_k.jpg",
+   "caption": "Same axis, motion blur; LED lines along both ceiling edges."
+  },
+  {
+   "area": "foyer",
+   "id": "55580514911",
+   "taken": "2026-10-08 17:49:10",
+   "page": "https://www.flickr.com/photos/bejug/55580514911/",
+   "image": "https://live.staticflickr.com/65535/55580514911_4eaa072635_k.jpg",
+   "caption": "Tensile funnels: white fabric lit blue (not red this year), dark columns, black ceiling."
+  },
+  {
+   "area": "foyer",
+   "id": "55580631743",
+   "taken": "2026-10-08 17:49:11",
+   "page": "https://www.flickr.com/photos/bejug/55580631743/",
+   "image": "https://live.staticflickr.com/65535/55580631743_cca14ae6b5_k.jpg",
+   "caption": "Same funnels, closer."
+  },
+  {
+   "area": "entrance",
+   "id": "55579486072",
+   "taken": "2026-10-08 10:02:24",
+   "page": "https://www.flickr.com/photos/bejug/55579486072/",
+   "image": "https://live.staticflickr.com/65535/55579486072_699bb6b85a_k.jpg",
+   "caption": "Registration: round pendant light, glass front, white desks, stanchions."
+  },
+  {
+   "area": "entrance",
+   "id": "55579486057",
+   "taken": "2026-10-08 10:02:28",
+   "page": "https://www.flickr.com/photos/bejug/55579486057/",
+   "image": "https://live.staticflickr.com/65535/55579486057_79a8ac275a_k.jpg",
+   "caption": "Same, other angle."
+  },
+  {
+   "area": "entrance",
+   "id": "55572442848",
+   "taken": "2026-10-05 10:03:04",
+   "page": "https://www.flickr.com/photos/bejug/55572442848/",
+   "image": "https://live.staticflickr.com/65535/55572442848_898dea25ac_k.jpg",
+   "caption": "Monday 10:03: concrete ceiling washed blue, registration desks."
+  },
+  {
+   "area": "entrance",
+   "id": "55577308497",
+   "taken": "2026-10-07 09:47:10",
+   "page": "https://www.flickr.com/photos/bejug/55577308497/",
+   "image": "https://live.staticflickr.com/65535/55577308497_7ad4a679b0_k.jpg",
+   "caption": "Glass front, navy walls, blue 'uitgang zaal 6/7' sign, stanchions."
+  },
+  {
+   "area": "entrance",
+   "id": "55578506174",
+   "taken": "2026-10-07 10:06:19",
+   "page": "https://www.flickr.com/photos/bejug/55578506174/",
+   "image": "https://live.staticflickr.com/65535/55578506174_af0b11385f_k.jpg",
+   "caption": "Same sign, closer."
+  },
+  {
+   "area": "entrance",
+   "id": "55574843786",
+   "taken": "2026-10-06 14:55:12",
+   "page": "https://www.flickr.com/photos/bejug/55574843786/",
+   "image": "https://live.staticflickr.com/65535/55574843786_e4a2a9f5d9_k.jpg",
+   "caption": "Stair: steel rail, white treads, tall window (black and white)."
+  },
+  {
+   "area": "auditorium",
+   "id": "55573804052",
+   "taken": "2026-10-06 09:17:49",
+   "page": "https://www.flickr.com/photos/bejug/55573804052/",
+   "image": "https://live.staticflickr.com/65535/55573804052_9856c7489c_k.jpg",
+   "caption": "Empty, from the stage: seats rising, truss light towers either side, star-field ceiling spots."
+  },
+  {
+   "area": "auditorium",
+   "id": "55575256380",
+   "taken": "2026-10-06 09:18:06",
+   "page": "https://www.flickr.com/photos/bejug/55575256380/",
+   "image": "https://live.staticflickr.com/65535/55575256380_9805f5c238_k.jpg",
+   "caption": "Same, black and white, wider: the rake and the front rows."
+  },
+  {
+   "area": "auditorium",
+   "id": "55573803662",
+   "taken": "2026-10-06 09:19:09",
+   "page": "https://www.flickr.com/photos/bejug/55573803662/",
+   "image": "https://live.staticflickr.com/65535/55573803662_f6ec2a68ab_k.jpg",
+   "caption": "#DEVOXX letters on the stage floor, empty seats behind."
+  },
+  {
+   "area": "auditorium",
+   "id": "55574944928",
+   "taken": "2026-10-06 09:19:24",
+   "page": "https://www.flickr.com/photos/bejug/55574944928/",
+   "image": "https://live.staticflickr.com/65535/55574944928_c44f3c20db_k.jpg",
+   "caption": "Orange and white X letters, patterned stage carpet, seats and aisle stairs."
+  },
+  {
+   "area": "auditorium",
+   "id": "55574999819",
+   "taken": "2026-10-06 09:15:01",
+   "page": "https://www.flickr.com/photos/bejug/55574999819/",
+   "image": "https://live.staticflickr.com/65535/55574999819_49becf5304_k.jpg",
+   "caption": "Empty, from mid-room: screen with the programme, #DEVOXX letters, blue-grey seats."
+  },
+  {
+   "area": "auditorium",
+   "id": "55573804447",
+   "taken": "2026-10-06 09:15:30",
+   "page": "https://www.flickr.com/photos/bejug/55573804447/",
+   "image": "https://live.staticflickr.com/65535/55573804447_0d84c410f8_k.jpg",
+   "caption": "Same, screen showing the talk grid."
+  },
+  {
+   "area": "auditorium",
+   "id": "55573804082",
+   "taken": "2026-10-06 09:15:48",
+   "page": "https://www.flickr.com/photos/bejug/55573804082/",
+   "image": "https://live.staticflickr.com/65535/55573804082_f5dd513791_k.jpg",
+   "caption": "Side aisle, black and white: seat ends, numbered rows, truss tower."
+  },
+  {
+   "area": "auditorium",
+   "id": "55578334081",
+   "taken": "2026-10-07 10:43:47",
+   "page": "https://www.flickr.com/photos/bejug/55578334081/",
+   "image": "https://live.staticflickr.com/65535/55578334081_6236b09e5f_k.jpg",
+   "caption": "From the top of the centre aisle during a keynote: steps with red LED edge lights, screen, truss towers."
+  },
+  {
+   "area": "auditorium",
+   "id": "55578445433",
+   "taken": "2026-10-07 10:42:52",
+   "page": "https://www.flickr.com/photos/bejug/55578445433/",
+   "image": "https://live.staticflickr.com/65535/55578445433_5be063091a_k.jpg",
+   "caption": "Same, from the side."
+  },
+  {
+   "area": "auditorium",
+   "id": "55578334066",
+   "taken": "2026-10-07 10:44:44",
+   "page": "https://www.flickr.com/photos/bejug/55578334066/",
+   "image": "https://live.staticflickr.com/65535/55578334066_05dddadeb4_k.jpg",
+   "caption": "Side aisle with stair lights, full room."
+  },
+  {
+   "area": "auditorium",
+   "id": "55580515101",
+   "taken": "2026-10-08 19:58:09",
+   "page": "https://www.flickr.com/photos/bejug/55580515101/",
+   "image": "https://live.staticflickr.com/65535/55580515101_10cbaedca7_k.jpg",
+   "caption": "Stage floor and ceiling spots."
+  },
+  {
+   "area": "auditorium",
+   "id": "55578446843",
+   "taken": "2026-10-07 10:17:02",
+   "page": "https://www.flickr.com/photos/bejug/55578446843/",
+   "image": "https://live.staticflickr.com/65535/55578446843_e69bd70707_k.jpg",
+   "caption": "Full room from the stage."
+  }
+ ]
+}

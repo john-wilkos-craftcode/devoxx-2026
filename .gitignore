@@ -8,3 +8,4 @@ data/raw/caption_batch.txt
 build/
 data/raw/video/
 data/raw/slides/
+data/references/img/
