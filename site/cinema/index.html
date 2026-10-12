@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Devoxx Cinema 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cinema.css">
+</head>
+<body>
+<div class="stage" id="stage">
+  <img class="plate" id="plate" alt="">
+  <video class="plate" id="clip" muted playsinline preload="auto" hidden></video>
+  <div class="overlay" id="overlay"></div>
+</div>
+<a class="flat" href="../">Flat programme</a>
+<div class="loading" id="loading">Lights down…</div>
+<script src="../data.js"></script>
+<script type="module" src="cinema.js"></script>
+</body>
+</html>

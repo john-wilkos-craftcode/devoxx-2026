@@ -64,8 +64,17 @@ Next:
    Fixed on the way: a Ghost Light collider was built as a 6 m wall across the foot of each side
    stair, so the walk went through it (the WebGL version has the same bug).
    Look-dev: `--render walk@40+46` renders single frames of the walk.
-2. Render the Room 8 walk + seat still, build a test page: <video> transitions, stills, and the HTML
-   programme/talk pinned onto the screens with a CSS perspective transform from shots.json.
+2. Room 8 walk and the test page (12/10, in progress):
+   - corridor and auditorium dressed after the 2026 photos (sloped white ceiling planes with blue LED
+     lines and track spots, navy walls, poster boxes; star-field ceiling, truss light towers, red aisle
+     LEDs, "#DEVOXX" in Archivo Black with an orange X)
+   - `site/cinema/`: the stills and walk clips with the programme and the talk as HTML pinned onto the
+     screens by a CSS matrix3d from `shots.json` (which now also carries each screen's size in metres).
+     Rooms without a rendered walk open their summary on the hall screen. Phones get the panels as a
+     sheet, like the WebGL version.
+   - `scripts/blender/publish_renders.py <render dir>` turns a render folder into `site/cinema/media/`
+     (JPEG stills, walk clip forward and reversed, merged shots.json).
+   - Final walk: 1080p at 64 samples, about a minute per frame on the A1000.
 3. Then all 14 rooms (~7 h of GPU, overnight), and retire the WebGL version.
 4. Done: the "What we heard this week" recap (`data/recap.json`) is live.
 5. Later: slide-by-slide navigation (`scripts/detect_slides.py` works; prefers H.264).

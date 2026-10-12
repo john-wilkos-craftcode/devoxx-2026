@@ -1,0 +1,114 @@
+/* The rendered cinema (Blender stills and walk clips) with the programme and the talk as real HTML pinned onto
+   the screens. The .kx-* panel styles are copied from ../kino/experience.js, which this page will replace. */
+:root { --night: #0B0A14; --text: #EEEBF7; --bulb: #FFC93C; color-scheme: dark; }
+html, body { margin: 0; height: 100%; background: #000; color: var(--text); overflow: hidden; }
+.stage { position: fixed; inset: 0; overflow: hidden; }
+.plate { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.plate[hidden] { display: none; }
+.overlay { position: absolute; inset: 0; pointer-events: none; }
+.pinned { position: absolute; left: 0; top: 0; transform-origin: 0 0; transition: opacity .35s ease; }
+.pinned.is-hidden { opacity: 0; pointer-events: none !important; }
+.flat { position: fixed; z-index: 5; left: 18px; top: calc(14px + env(safe-area-inset-top, 0px)); color: #c9cdea; font: 15px/1 "Source Serif 4", Georgia, serif;
+  background: rgba(14, 12, 28, .7); border: 1px solid #3A3060; border-radius: 999px; padding: 8px 14px; text-decoration: none; }
+.loading { position: fixed; inset: 0; display: grid; place-items: center; background: #000; font: 800 28px/1 "Big Shoulders Display", sans-serif; letter-spacing: .04em; transition: opacity .5s; }
+.loading.is-done { opacity: 0; pointer-events: none; }
+.kx-wall { box-shadow: none; }   /* sized by cinema.js to the hall screen's 16:10 */
+@media (prefers-reduced-motion: reduce) { .pinned { transition: none; } }
+
+.kx-panel { pointer-events: auto; box-sizing: border-box; color: #EEEBF7; font-family: "Source Serif 4", Georgia, serif; -webkit-font-smoothing: antialiased; }
+.kx-panel *, .kx-panel *::before, .kx-panel *::after { box-sizing: border-box; }
+.kx-panel button, .kx-panel a { font: inherit; color: inherit; }
+.kx-panel :focus-visible { outline: 6px solid #FFC93C; outline-offset: 4px; }
+
+.kx-wall { width: 1600px; height: 900px; background: #05060c; padding: 44px 56px; display: grid; grid-template-rows: auto auto 1fr; gap: 22px;
+  box-shadow: 0 0 0 14px #0b0c12, 0 0 120px 30px rgba(70, 110, 255, .25); }
+.kx-wall-head { display: flex; align-items: baseline; gap: 28px; flex-wrap: wrap; }
+.kx-wall h1 { margin: 0; font: 900 76px/0.9 "Big Shoulders Display", sans-serif; letter-spacing: .01em; }
+.kx-wall-sub { color: #9aa3c9; font-size: 26px; }
+.kx-days { display: flex; gap: 10px; flex-wrap: wrap; }
+.kx-days button, .kx-search { background: #10132a; border: 2px solid #252b55; border-radius: 999px; padding: 10px 24px; font-size: 26px; cursor: pointer; color: #c9cdea; }
+.kx-days button[aria-pressed="true"] { background: #FFC93C; color: #17122B; border-color: #FFC93C; font-weight: 600; }
+.kx-search { cursor: text; width: 420px; margin-left: auto; color: #EEEBF7; }
+.kx-search::placeholder { color: #6f77a3; }
+.kx-slots { overflow-y: auto; padding-right: 14px; scrollbar-color: #2b3266 transparent; }
+.kx-slot { display: grid; grid-template-columns: 120px 1fr; gap: 18px; padding: 16px 0; border-top: 2px solid #171b38; }
+.kx-slot-time { font: 800 40px/1 "Big Shoulders Display", sans-serif; color: #FFC93C; padding-top: 6px; }
+.kx-slot-talks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kx-talk { display: grid; grid-template-columns: 64px 1fr; gap: 14px; text-align: left; background: #0d1024; border: 2px solid #1b2047; border-radius: 12px;
+  padding: 12px 14px; cursor: pointer; min-height: 112px; }
+.kx-talk:hover { border-color: #FFC93C; background: #141936; }
+.kx-talk .kx-room { display: grid; place-items: center; background: #f0641e; color: #fff; font: 900 40px/1 "Big Shoulders Display", sans-serif; border-radius: 6px; height: 64px; margin: 0; }
+.kx-talk .kx-room.is-bof { background: #2f3f86; font-size: 22px; }
+.kx-talk b { display: block; font: 800 27px/1.08 "Big Shoulders Display", sans-serif; letter-spacing: .01em; }
+.kx-talk span { display: block; color: #9aa3c9; font-size: 19px; margin-top: 6px; }
+.kx-empty { color: #9aa3c9; font-size: 30px; padding: 40px 0; }
+
+.kx-screen { background: #05050a; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 56px; padding: 56px 72px; }
+.kx-meta { color: #FFC93C; font: 800 34px/1 "Big Shoulders Display", sans-serif; letter-spacing: .02em; }
+.kx-screen h2 { margin: 18px 0 0; font: 900 84px/0.95 "Big Shoulders Display", sans-serif; text-wrap: balance; }
+.kx-who { color: #c9c3e6; font-size: 30px; margin-top: 18px; }
+.kx-tldr { font-size: 34px; line-height: 1.38; margin-top: 26px; border-left: 8px solid #FFC93C; padding-left: 26px; max-width: 30em; }
+.kx-actions { display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap; }
+.kx-panel .kx-btn { border: 2px solid #3a3f70; background: transparent; border-radius: 999px; padding: 12px 28px; font-size: 28px; cursor: pointer; text-decoration: none; }
+.kx-panel .kx-btn:hover { border-color: #FFC93C; }
+.kx-panel .kx-btn.is-play { background: #FFC93C; color: #17122B; border-color: #FFC93C; font-weight: 600; }
+.kx-side { display: grid; grid-template-rows: auto 1fr; gap: 18px; min-height: 0; }
+.kx-tabs { display: flex; gap: 10px; }
+.kx-tabs button { background: #10132a; border: 2px solid #252b55; border-radius: 999px; padding: 8px 22px; font-size: 26px; cursor: pointer; color: #c9cdea; }
+.kx-tabs button[aria-pressed="true"] { background: #EEEBF7; color: #17122B; border-color: #EEEBF7; }
+.kx-pane { overflow-y: auto; padding-right: 12px; font-size: 28px; line-height: 1.42; scrollbar-color: #2b3266 transparent; }
+.kx-pane ul, .kx-pane ol { margin: 0; padding-left: 1.1em; display: grid; gap: 14px; }
+.kx-pane li::marker { color: #FFC93C; }
+.kx-chapter { display: grid; grid-template-columns: 110px 1fr; gap: 12px; width: 100%; text-align: left; background: none; border: 0; border-top: 2px solid #171b38; padding: 12px 0; cursor: pointer; text-decoration: none; }
+.kx-chapter time { color: #FFC93C; font: 800 32px/1.1 "Big Shoulders Display", sans-serif; }
+.kx-chapter:hover span { text-decoration: underline; text-decoration-color: #FFC93C; }
+.kx-player { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 10px; overflow: hidden; }
+.kx-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.kx-note { color: #9aa3c9; font-size: 24px; margin-top: 14px; }
+
+.kx-hud { position: fixed; z-index: 5; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; pointer-events: auto;
+  display: flex; gap: 8px; font: 15px/1 "Source Serif 4", Georgia, serif; }
+.kx-hud button, .kx-hud a { background: rgba(14, 12, 28, .78); color: #EEEBF7; border: 1px solid #3A3060; border-radius: 999px; padding: 8px 16px; cursor: pointer; text-decoration: none; }
+.kx-exit { position: fixed; z-index: 5; right: 18px; top: calc(16px + env(safe-area-inset-top, 0px)); pointer-events: auto; cursor: pointer;
+  background: #0a8a3a; color: #fff; border: 0; border-radius: 4px; padding: 7px 14px 6px; font: 800 18px/1 "Big Shoulders Display", sans-serif; letter-spacing: .12em;
+  box-shadow: 0 0 22px rgba(20, 220, 100, .45); }
+.kx-exit[hidden] { display: none; }
+.kx-skip { position: fixed; z-index: 5; left: 50%; top: calc(16px + env(safe-area-inset-top, 0px)); translate: -50% 0; color: #c9cdea; font: 15px/1 "Source Serif 4", Georgia, serif; pointer-events: none; opacity: .8; }
+.kx-skip[hidden] { display: none; }
+.kx-flat { position: fixed; z-index: 5; left: 18px; top: calc(14px + env(safe-area-inset-top, 0px)); color: #c9cdea; font: 15px/1 "Source Serif 4", Georgia, serif;
+  background: rgba(14, 12, 28, .7); border: 1px solid #3A3060; border-radius: 999px; padding: 8px 14px; text-decoration: none; }
+.kx-sheet { position: fixed !important; left: 0; right: 0; bottom: 0; z-index: 4; width: auto !important; height: 64vh !important; max-height: 64vh;
+  border-radius: 18px 18px 0 0; padding: 18px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important; box-shadow: 0 -20px 60px rgba(0, 0, 0, .6) !important; }
+.kx-wall.kx-sheet { gap: 12px; }
+.kx-sheet h1 { font-size: 30px; }
+.kx-sheet .kx-wall-sub { font-size: 14px; }
+.kx-sheet .kx-days button, .kx-sheet .kx-search { font-size: 14px; padding: 6px 12px; }
+.kx-sheet .kx-search { width: 100%; margin-left: 0; }
+.kx-sheet .kx-slot { grid-template-columns: 54px 1fr; gap: 10px; padding: 10px 0; }
+.kx-sheet .kx-slot-time { font-size: 20px; }
+.kx-sheet .kx-slot-talks { grid-template-columns: 1fr; gap: 8px; }
+.kx-sheet .kx-talk { grid-template-columns: 38px 1fr; min-height: 0; padding: 8px 10px; gap: 10px; }
+.kx-sheet .kx-talk .kx-room { height: 38px; font-size: 22px; }
+.kx-sheet .kx-talk b { font-size: 17px; }
+.kx-sheet .kx-talk span { font-size: 13px; }
+.kx-screen.kx-sheet { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+.kx-sheet .kx-meta { font-size: 16px; }
+.kx-sheet h2 { font-size: 32px; margin-top: 8px; }
+.kx-sheet .kx-who { font-size: 15px; margin-top: 8px; }
+.kx-sheet .kx-tldr { font-size: 16px; border-left-width: 4px; padding-left: 12px; margin-top: 12px; }
+.kx-sheet .kx-actions { margin-top: 14px; gap: 8px; }
+.kx-panel.kx-sheet .kx-btn { font-size: 15px; padding: 8px 16px; }
+.kx-sheet .kx-tabs { flex-wrap: wrap; gap: 6px; }
+.kx-sheet .kx-tabs button { font-size: 14px; padding: 6px 12px; }
+.kx-sheet .kx-pane { font-size: 15px; overflow: visible; }
+.kx-sheet .kx-chapter { grid-template-columns: 56px 1fr; padding: 8px 0; }
+.kx-sheet .kx-chapter time { font-size: 17px; }
+.kx-sheet .kx-note { font-size: 14px; }
+.kx-detail h2 { margin: 12px 0 0; font: 900 64px/0.95 "Big Shoulders Display", sans-serif; }
+.kx-detail .kx-who { font-size: 26px; margin-top: 12px; color: #c9c3e6; }
+.kx-detail .kx-tldr { font-size: 28px; margin-top: 18px; }
+.kx-points { font-size: 24px; line-height: 1.4; display: grid; gap: 10px; margin: 18px 0 0; padding-left: 1.1em; max-width: 52em; }
+.kx-points li::marker { color: #FFC93C; }
+.kx-sheet .kx-detail h2 { font-size: 28px; }
+.kx-sheet .kx-points, .kx-sheet .kx-detail .kx-tldr { font-size: 15px; }
+.kx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

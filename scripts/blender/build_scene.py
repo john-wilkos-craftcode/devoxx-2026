@@ -1417,12 +1417,13 @@ pos, look, fov = hall_pose()
 hall_cam.location, hall_cam.rotation_euler = pos, aim(pos, look)
 hall_data.sensor_fit, hall_data.angle_y = "VERTICAL", math.radians(fov)
 bpy.context.view_layer.update()       # matrix_world is stale until the depsgraph runs
-shots["hall"] = {"kind": "still", "overlay": {"programme": screen_quad(screen_corners, hall_cam)}}
+shots["hall"] = {"kind": "still", "overlay": {"programme": screen_quad(screen_corners, hall_cam)}, "size": {"programme": [SCREEN["w"], SCREEN["h"]]}}
 frames = walk(n)
 shots[f"walk-{n}"] = {"kind": "clip", "frames": frames, "fps": FPS}
 seat, look_end, fov_end, _ = seat_for(n)
 scene.frame_set(frames + 1)
-shots[f"seat-{n}"] = {"kind": "still", "frame": frames + 1, "overlay": {"screen": screen_quad(screens[n]["corners"], cam)}}
+shots[f"seat-{n}"] = {"kind": "still", "frame": frames + 1, "overlay": {"screen": screen_quad(screens[n]["corners"], cam)},
+                      "size": {"screen": [screens[n]["w"], screens[n]["h"]]}}
 (OUT / "shots.json").write_text(json.dumps(shots, indent=1))
 
 # ---------------------------------------------------------------------------------- render settings
