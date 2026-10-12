@@ -1,0 +1,101 @@
+{
+  "id": 50105,
+  "source": "transcript",
+  "tldr": "O'Rourke walks a GitHub pull-request agent from scaffold to production on Solo.io's open source stack, using agentgateway, kagent and agentregistry to cut tool-call overhead and lock the agent down.",
+  "summary": [
+    "O'Rourke, EMEA field CTO at Solo.io, frames agent risk as security (over-scoped credentials and network reachability), cost (agents looping) and safety. He referred to a recent incident in which a swarm of OpenAI agents reached a JFrog instance they were never meant to see. His example is a simple agent that sorts 24 open pull requests by merge readiness. Against GitHub's MCP server, which he said exposes 95 tools (32 of which can change the repository) and costs 31,000 tokens before any work starts, the agent needed 25 loops, 136,000 tokens and 56 seconds; he estimates $4,000 to $5,000 a month for a team running it.",
+    "agentgateway, a Rust proxy that also serves as the Istio ambient waypoint, combines an LLM gateway, an MCP and A2A gateway, and an inference gateway. Progressive disclosure exposes only tool names and descriptions behind two meta-tools, list and invoke, which he says shrinks the context by about 80%. Code mode goes further: the gateway writes TypeScript that runs in a sandbox and chains the calls, so the live demo dropped from 25 loops and roughly 60 to 75 seconds to two loops and about 20 seconds through one CRD change. vLLM Semantic Router then classifies prompts from Claude Desktop, sending generic questions to frontier models and proprietary code or GDPR-sensitive data to open-weight or EU-hosted models.",
+    "For shipping, arctl from agentregistry scaffolds an agent for a chosen framework (ADK, CrewAI, LangGraph) and language (Python, Java, Go) with a Dockerfile and approved MCP servers. kagent runs it as a pod through BYO or declarative Agent CRDs. Each agent gets a SPIFFE identity backed by mTLS in ztunnel, so policy can block connections at L4 or allow only specific HTTP verbs at L7. In the demo, the agent was restricted to the GitHub list and pull-request-read tools, and requests to JFrog were limited to GET, returning a 403 otherwise. OpenTelemetry traces stored in ClickHouse record every hop, including on whose behalf an agent acted.",
+    "Credentials stay at the gateway: elicitation stores a narrowly scoped GitHub token instead of a shared PAT, and a built-in STS performs RFC 8693 token exchange for MCP servers that use their own identity providers. To address idle agent pods, which he puts at about 80% of their lifetime and $7,000 to $8,000 a month for 36 agents, Solo.io and Google have started Agent Substrate, which rehydrates agents from storage into a small gVisor-sandboxed worker pool, with Firecracker microVMs supported. A fleet manager discovers Claude Code, Codex and Cursor on enrolled laptops and routes them through the gateway. The talk ended with a declarative 'excuse bot' agent built in the kagent UI, its MCP calls visible in the traces."
+  ],
+  "keyPoints": [
+    "GitHub's MCP server exposes 95 tools and costs about 31,000 tokens before any reasoning; a naive PR-triage agent took 25 loops, 136,000 tokens and 56 seconds.",
+    "Progressive disclosure behind list and invoke meta-tools cuts MCP context by about 80%, and gateway-side code mode reduced the same task to two loops in about 20 seconds.",
+    "vLLM Semantic Router in agentgateway routes prompts by content, sending proprietary code or GDPR-relevant data to open-weight or EU-hosted models.",
+    "kagent runs agents as Kubernetes pods from BYO or declarative CRDs, and arctl scaffolds projects for ADK, CrewAI or LangGraph in Python, Java or Go.",
+    "Each agent gets a SPIFFE identity with mTLS in ztunnel, enabling deny-by-default egress at L4 and per-verb rules at L7, such as GET-only access to JFrog.",
+    "Elicitation keeps scoped tokens on the gateway, and a built-in STS does RFC 8693 token exchange so corporate identities work with MCP servers using other identity providers.",
+    "Agent Substrate, a Solo.io and Google project, replaces one mostly idle pod per agent with a small gVisor-sandboxed worker pool that rehydrates agents on demand."
+  ],
+  "takeaways": [
+    "Count the tools and tokens your MCP servers expose before the agent does any work, and filter them down to what each agent actually needs.",
+    "Try progressive disclosure or code mode for MCP so multi-step tool chains run outside the model's context window.",
+    "Give every agent its own workload identity and make egress deny-by-default, opening only the hosts and HTTP verbs it needs.",
+    "Keep credentials at a gateway with token exchange instead of handing personal access tokens to agents.",
+    "Trace every LLM, MCP and A2A hop with OpenTelemetry so you can answer who did what, when and on whose behalf."
+  ],
+  "quotes": [
+    {
+      "text": "Every agent has a SPIFFE identity, so it's got its own unique identity that can then have policy assigned to it.",
+      "at": "28:21"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "How agents go wrong"
+    },
+    {
+      "at": "04:40",
+      "title": "A naive pull-request agent"
+    },
+    {
+      "at": "08:16",
+      "title": "Introducing agentgateway"
+    },
+    {
+      "at": "13:31",
+      "title": "Progressive disclosure and code mode"
+    },
+    {
+      "at": "17:40",
+      "title": "Semantic routing demo"
+    },
+    {
+      "at": "20:26",
+      "title": "Running agents with kagent"
+    },
+    {
+      "at": "27:02",
+      "title": "Observability and agent identity"
+    },
+    {
+      "at": "32:09",
+      "title": "Elicitation and token exchange"
+    },
+    {
+      "at": "36:21",
+      "title": "Agent Substrate and sandboxing"
+    },
+    {
+      "at": "44:10",
+      "title": "Managing developer desktops"
+    }
+  ],
+  "tech": [
+    "kagent",
+    "agentgateway",
+    "agentregistry",
+    "Kubernetes",
+    "Istio ambient",
+    "MCP",
+    "A2A",
+    "vLLM Semantic Router",
+    "SPIFFE",
+    "OpenTelemetry",
+    "ClickHouse",
+    "gVisor",
+    "Firecracker",
+    "Google ADK",
+    "CrewAI",
+    "LangGraph",
+    "RFC 8693"
+  ],
+  "watchIf": "You run or plan to run AI agents on Kubernetes and want concrete patterns for cutting MCP token costs and enforcing identity, egress and credential controls at the platform layer.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Cloud native & Kubernetes",
+    "Security & supply chain"
+  ],
+  "demo": true
+}

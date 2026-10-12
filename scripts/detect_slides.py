@@ -2,7 +2,7 @@
 
 Devoxx recordings put the speaker camera on one side and the slides (or the presenter's screen)
 on the other, between a logo bar on top and a sponsor bar below. Per talk:
-  1. download a 480p video-only stream with yt-dlp (see yt.py) into data/raw/video/ (gitignored),
+  1. download a 480p video-only H.264 stream (AV1 decodes far too slowly) into data/raw/video/,
   2. pick the slide side: the one whose outer strip has more fine detail (text) than the camera's,
   3. run ffmpeg scene detection on that crop and keep changes at least MIN_GAP seconds apart,
   4. save a small thumbnail per slide in data/raw/slides/<id>/ (gitignored: frame grabs of the
@@ -98,7 +98,7 @@ def main():
         path = next(iter(VIDEO.glob(f"{t['videoId']}.*")), None)
         if not path:
             try:
-                yt.run(["-f", "bv*[height<=480][ext=mp4]/bv*[height<=480]", "-o", str(VIDEO / "%(id)s.%(ext)s"),
+                yt.run(["-f", "bv*[height<=480][vcodec^=avc1]/bv*[height<=480][ext=mp4]/bv*[height<=480]", "-o", str(VIDEO / "%(id)s.%(ext)s"),
                         f"https://www.youtube.com/watch?v={t['videoId']}"])
             except yt.Blocked as e:
                 sys.exit(f"{tid}: YouTube is rate limiting ({e}); stopping")

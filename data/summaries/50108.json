@@ -1,0 +1,81 @@
+{
+  "id": 50108,
+  "source": "transcript",
+  "tldr": "Salm walks through Spring AI's core building blocks (ChatModel and ChatClient, structured output, the Advisor API, RAG, @Tool and MCP) as the harness that compensates for what LLMs cannot do alone.",
+  "summary": [
+    "Salm, a solution architect at Broadcom, frames Spring AI as a harness around the model: LLMs predict tokens without verifying facts, are stateless, only know their public training data and cannot act. The usual remedies (memory, RAG, tool calling) raise new problems in turn: token cost, context limits, an attack surface when the model decides which tool to call, and the need for governance and observability. Spring AI builds on Spring Boot auto-configuration, so switching provider (OpenAI, Azure OpenAI, Anthropic, Ollama) is mostly a dependency and configuration change; Spring AI 2.0 requires Spring Boot 4. Using a recipe-finder sample, he shows the low-level ChatModel and ImageModel APIs with PromptTemplate, then the fluent ChatClient built from an auto-configured ChatClient.Builder with a default system prompt, and .entity() for structured output, which works natively or by adding a JSON schema to the prompt.",
+    "The Advisor API, which works like REST client interceptors and supports both blocking and streaming calls, is the basis of the advanced features. Advisors run as an ordered chain, so a logging advisor should sit after RAG to see the full prompt. For RAG he shows indexing with document readers, splitters and VectorStore.add, then retrieval with QuestionAnswerAdvisor using a SearchRequest with topK and a similarity threshold, plus a more modular RAG implementation. Recursive advisors copy the chain to run sub-loops such as LLM-based evaluation or structured-output validation with retry. Tools are plain methods annotated with @Tool and @ToolParam and passed via .tools(). MCP clients only need a server URL in configuration; servers use the MCP server starter and @McpTool. Observability through OpenTelemetry and testing with LLM evaluators were mentioned only briefly; a free Spring Academy course covers the rest."
+  ],
+  "keyPoints": [
+    "Spring AI 2.0 requires Spring Boot 4; provider switching is done through starters and configuration, not code changes.",
+    "ChatClient (fluent, built from an injected ChatClient.Builder) is the main API; .entity(Recipe.class) returns structured output, falling back to schema instructions in the prompt when the provider has no native support.",
+    "Advisors are an ordered interceptor chain around model calls; RAG, memory, validation and logging are all implemented as advisors.",
+    "QuestionAnswerAdvisor gives basic RAG with a configurable topK and similarity threshold; recursive advisors enable evaluation and retry loops.",
+    "@Tool and @ToolParam expose Java methods to the model; @McpTool exposes them to other agents over MCP."
+  ],
+  "takeaways": [
+    "Learn ChatClient and the Advisor API first; most other Spring AI features are built on them.",
+    "Use .entity() structured output to slot LLM calls into ordinary typed Java workflows.",
+    "Place logging advisors after RAG and other context-adding advisors so you see the prompt that actually reaches the model.",
+    "Keep the tool set small and run agents in restricted environments, since the model decides which tools to call."
+  ],
+  "quotes": [],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why models need a harness"
+    },
+    {
+      "at": "08:58",
+      "title": "Setup and ChatModel"
+    },
+    {
+      "at": "15:31",
+      "title": "ChatClient and structured output"
+    },
+    {
+      "at": "20:10",
+      "title": "Retrieval-augmented generation"
+    },
+    {
+      "at": "24:13",
+      "title": "The Advisor API"
+    },
+    {
+      "at": "30:46",
+      "title": "Recursive advisors"
+    },
+    {
+      "at": "32:08",
+      "title": "Tool calling"
+    },
+    {
+      "at": "36:15",
+      "title": "Model Context Protocol"
+    },
+    {
+      "at": "40:19",
+      "title": "Observability, testing, resources"
+    }
+  ],
+  "tech": [
+    "Spring AI",
+    "Spring Boot 4",
+    "OpenAI",
+    "Azure OpenAI",
+    "Anthropic",
+    "Ollama",
+    "RAG",
+    "Vector stores",
+    "Model Context Protocol (MCP)",
+    "MCP Java SDK",
+    "OpenTelemetry",
+    "Spring Academy"
+  ],
+  "watchIf": "You are a Spring developer who has not used Spring AI yet and want a compact tour of its core APIs before building RAG or agentic features.",
+  "themes": [
+    "LLMs in Java apps",
+    "Spring & frameworks"
+  ],
+  "demo": false
+}

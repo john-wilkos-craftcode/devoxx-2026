@@ -1,0 +1,85 @@
+{
+  "id": 41302,
+  "source": "transcript",
+  "tldr": "De Smet and Cools use a wedding's seating plan, honeymoon itinerary and bachelor-party pub crawl to show why planning problems defeat brute force and how Timefold Solver models them in Java.",
+  "summary": [
+    "Cools' sister-in-law is marrying on his birthday, Halloween, and his future brother-in-law's vibe-coded planning app did not work, so the two Timefold speakers rebuilt it with a Claude-generated front end, a REST layer and Timefold Solver on Quarkus. They start with requirements for the seating plan, collected partly from the audience: family sides together, fixed seats for the couple, food preferences, distance to the toilet or dance floor, accessible seats, keeping political extremes apart, and pairs to seat together or apart. Brute force breaks down fast: on a MacBook Pro, 10 guests took 27 seconds, 12 an hour, 16 about five years, and 20 an estimated 580,000 years.",
+    "Instead of vibe-coding an algorithm you would then have to maintain, they argue for a solver library, the way you use Spring or Quarkus instead of writing a web server. Guest is annotated @PlanningEntity and its seat field @PlanningVariable; solver.solve() returns the best plan found so far and keeps improving it. Constraints are written in Java with a filter and penalize, for example penalizing guests who need an accessible seat but did not get one. Because the filter runs hundreds of thousands of times, it must not call a database. The audience voted on hard versus soft for each rule; food preference split the room. Seat conflicts must be stated explicitly, and pairing becomes four constraints: required, prohibited, preferred and unpreferred. Switching the political constraint from penalize to reward, with Quarkus live reload, produced a plan that quietly mixes the extremes.",
+    "The honeymoon, a road trip south of Naples, uses @PlanningListVariable for an itinerary of polymorphic hotel and activity visits, with unassigned values allowed because there are more activities than days, plus opening hours and travel time. The bachelor party became timefold.beer, a public app that plans five rounds at Brussels' Beer Central within a budget and preferences, with presets for variety, calories and cost, and re-plans when a beer runs out. They close by mentioning Timefold's ready-made APIs such as Field Service Routing and a webinar on connecting deterministic solvers to agents."
+  ],
+  "keyPoints": [
+    "Brute-forcing seat assignments grows factorially: 20 guests have about 2.4 quintillion orderings, an estimated 580,000 years of compute on a MacBook Pro.",
+    "Timefold Solver models a problem with @PlanningEntity and @PlanningVariable annotations, similar to JPA, plus constraints written in Java with filter and penalize.",
+    "Constraint code runs hundreds of thousands of times per solve, so it must stay cheap: no database calls in a filter.",
+    "Physical reality, such as no two guests in one seat, must be stated as a hard constraint; whether rules like food preference are hard or soft depends on the use case.",
+    "@PlanningListVariable with unassigned values allowed handles ordered itineraries where not every candidate activity fits.",
+    "The solver keeps a best-so-far solution, reports which constraints are broken, and can re-plan when input changes, such as a beer running out."
+  ],
+  "takeaways": [
+    "Do not brute-force or vibe-code a custom search algorithm for scheduling or assignment problems; use a solver such as Timefold Solver.",
+    "List your constraints with stakeholders before writing code, and decide explicitly which are hard and which are soft.",
+    "Keep constraint functions free of I/O and expensive calls.",
+    "Use score analysis to explain to users why a plan broke a given rule."
+  ],
+  "quotes": [
+    {
+      "text": "If you don't tell TimeFold or these sort of algorithms what's not allowed, it will do it.",
+      "at": "18:21"
+    },
+    {
+      "text": "You wouldn't vibe code a web server like that. So why would you try to vibe code an algorithm like this?",
+      "at": "14:14"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "A stolen birthday"
+    },
+    {
+      "at": "05:57",
+      "title": "Seating plan requirements"
+    },
+    {
+      "at": "11:28",
+      "title": "Why brute force fails"
+    },
+    {
+      "at": "14:14",
+      "title": "Modelling with Timefold Solver"
+    },
+    {
+      "at": "18:21",
+      "title": "Hard and soft constraints"
+    },
+    {
+      "at": "22:30",
+      "title": "Solving and sabotaging seating"
+    },
+    {
+      "at": "25:07",
+      "title": "Honeymoon itinerary"
+    },
+    {
+      "at": "30:02",
+      "title": "Bachelor party pub crawl"
+    },
+    {
+      "at": "33:46",
+      "title": "Other use cases"
+    }
+  ],
+  "tech": [
+    "Timefold Solver",
+    "Quarkus",
+    "Spring Boot",
+    "Constraint Streams",
+    "Claude Code"
+  ],
+  "watchIf": "You have a scheduling, routing or assignment problem and want a light-hearted introduction to modelling it with constraints in Java.",
+  "themes": [
+    "Architecture & design",
+    "Hardware, robots & fun"
+  ],
+  "demo": true
+}

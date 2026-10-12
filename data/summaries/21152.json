@@ -1,0 +1,83 @@
+{
+  "id": 21152,
+  "source": "transcript",
+  "tldr": "Bos uses three real production incidents (a saturated load balancer, a slow ingress, a JMS server freezing on LDAP timeouts) to show how curiosity, data and proved hypotheses find bugs nobody owns.",
+  "summary": [
+    "Bos, an observability engineer at OpenValue and Grafana Champion, tells three incident stories. On a Dutch government open-data maps platform (GeoServer, GeoWebCache on NFS, Apache, vendor-run load balancers across data centres) the only metric was a five-minute CPU and memory average. He added Jolokia for JMX over HTTP and Telegraf feeding InfluxDB and Grafana. During a multi-day outage this showed Tomcat stuck at its 200-thread limit and Apache at 256 workers. Telegraf ICMP pings revealed latency and packet loss only through the load balancer, which the vendor eventually replaced. That also fixed other teams' 'random' failures. Custom file I/O metrics added to GeoWebCache then pinned the remaining slowness on NFS. On Kubernetes, gaps in distributed traces across many services turned out to be an overloaded ingress, and twice an egress was behind a war-room incident.",
+    "The third story was an outage across many services that all used JMS. Bos took a gigabyte of logs from the LDAP authentication server, loaded them into Grafana Loki and showed query times rising during each incident. When the team blamed noisy neighbours, a colleague answered 'assume it's you, prove it's not you'. Decompiling the JMS server showed how it used its LDAP connection. A lab test combining a connect-per-message producer with long-lived connections reproduced the bug: one failed authentication froze every connection, and the vendor shipped several hotfixes. His method: know the surrounding environment and how it works under the hood, keep asking questions, raise detailed tickets with other teams, form hypotheses and prove them, draw component diagrams and incident timelines, share the analysis on a page, and fill observability gaps with OpenTelemetry. An AI agent needs the same data."
+  ],
+  "keyPoints": [
+    "Simple Telegraf ICMP checks against the load balancer and individual services isolated a faulty load balancer behind months of 'random' failing requests.",
+    "Hidden platform components such as Kubernetes ingress and egress often explain trace gaps and outbound connection failures; involve the platform team.",
+    "Parsing a gigabyte of LDAP logs in Grafana Loki turned an argument about cause and effect into a visible correlation.",
+    "A lab reproduction combining two client patterns, which each worked alone, exposed a vendor JMS bug in which one failed authentication froze all connections.",
+    "Treat explanations like noisy neighbours as hypotheses to disprove with data, not as conclusions."
+  ],
+  "takeaways": [
+    "Map every component a request touches, including load balancers, ingress, egress and auth servers, and learn how they behave under the hood.",
+    "When you suspect another team's component, file a ticket with your observations and data instead of letting the issue go.",
+    "Build an incident timeline and share the analysis on a page others can add to.",
+    "Instrument your services with OpenTelemetry metrics, logs and traces before the next outage."
+  ],
+  "quotes": [
+    {
+      "text": "Assume it's you. Prove it's not you.",
+      "at": "22:06"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "From IE6 to production debugging"
+    },
+    {
+      "at": "02:58",
+      "title": "Open data maps platform"
+    },
+    {
+      "at": "08:10",
+      "title": "Pinging the load balancer"
+    },
+    {
+      "at": "12:02",
+      "title": "NFS and the first lessons"
+    },
+    {
+      "at": "13:03",
+      "title": "Gaps in Kubernetes traces"
+    },
+    {
+      "at": "18:10",
+      "title": "JMS and the authentication server"
+    },
+    {
+      "at": "25:10",
+      "title": "Reproducing the vendor bug"
+    },
+    {
+      "at": "30:31",
+      "title": "Assembling the puzzle"
+    }
+  ],
+  "tech": [
+    "OpenTelemetry",
+    "Grafana",
+    "Grafana Loki",
+    "Jolokia",
+    "Telegraf",
+    "InfluxDB",
+    "Tomcat",
+    "Apache HTTP Server",
+    "GeoServer",
+    "GeoWebCache",
+    "Kubernetes",
+    "JMS",
+    "LDAP"
+  ],
+  "watchIf": "You get pulled into incidents spanning many services and teams and want a practical method for finding root causes that sit in someone else's component.",
+  "themes": [
+    "Developer experience & tooling",
+    "Cloud native & Kubernetes"
+  ],
+  "demo": false
+}

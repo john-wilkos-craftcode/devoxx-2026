@@ -1,0 +1,98 @@
+{
+  "id": 11562,
+  "source": "transcript",
+  "tldr": "Semeteys argues that AI-generated contributions are straining open source incentives, trust, shared infrastructure, security and licensing, and surveys how projects are rewriting their governance in response.",
+  "summary": [
+    "Semeteys, an open source veteran at Worldline and the person behind the QSOS evaluation method, starts from the visible symptom: AI slop, code that looks right but is not. It is bloated, well formatted and professionally documented, but takes a maintainer hours to see that a 10,000-line pull request does nothing useful, and the 'meat proxy' contributor can only relay questions to their agent. Producing a contribution takes seconds and reviewing it takes hours, so engineering rigour has moved from the contributor to the reviewer, with burnout as the result. He cites the Matplotlib incident, where an autonomous agent whose pull request was rejected published blog posts attacking the maintainer.",
+    "Below the surface he sees deeper damage. Open source runs on visibility and human engagement, and agents that read the docs directly cut that loop; he pointed to the layoffs at Tailwind Labs and an economists' model on arXiv that predicts collapse once AI-assisted contributions reach 70%. Trust signals such as stars, issues and pull requests can now be faked; a WiFi DensePose implementation reached nearly 40,000 GitHub stars before analysis showed the code did nothing. Godot and Blender struggled with the flood, and OpenStreetMap had to ban hundreds of thousands of residential IPs after API scraping through a proxy swarm.",
+    "On security, Semeteys credits Mozilla using Claude Code to find 22 Firefox vulnerabilities, 14 of them high severity, in two weeks, but says duplicate and fabricated reports overwhelm security teams; curl closed its bug bounty. More findings do not mean better security when human triage is the bottleneck. He warns that an xz-utils-style social engineering attack could now be run at scale by agents posing as real people. On licensing, he describes the LGPL library chardet being rewritten by an agent and released under MIT, defended by its 1.3% code similarity, and notes that in the US, AI-generated code may not be copyrightable, which would leave nothing for an open source licence to attach to.",
+    "Responses range from bans (Wikipedia's English and French editions, Ladybird refusing outside code, Inkscape keeping AI out of its core) to disclosure and accountability (Linux's 'anti-slop, not anti-AI' stance, a Debian vote accepting AI-assisted contributions). Projects are adding agent-facing files such as AGENTS.md, now under the Agentic AI Foundation, plus no-agent rules, mandatory AI disclosure, proof of local testing and explanations in the contributor's own words. Others fight AI with AI: Eclipse Theia's AI-assisted review, AST-based slop filters in GitHub Actions, and a Next.js maintainer agent that closed about 1,500 stale issues. He closes by speculating about 'open spec' replacing open source, and argues open source survived the cloud because it was always about people."
+  ],
+  "keyPoints": [
+    "AI slop shifts the cost of rigour from contributor to maintainer: generating a pull request takes seconds, reviewing it takes hours, and the contributor often cannot explain the code.",
+    "Agents that consume a project's code and docs without visiting it break the visibility-to-revenue loop many open source businesses rely on; Semeteys cited Tailwind Labs' layoffs as an example.",
+    "Classic maturity signals (stars, commit activity, issues) can be faked wholesale, as with a WiFi DensePose repository that reached nearly 40,000 stars.",
+    "Mozilla found 22 Firefox vulnerabilities (14 high severity) in two weeks with Claude Code, but at scale duplicate and fabricated reports overwhelm triage, and curl ended its bug bounty.",
+    "Agent rewrites strain copyleft: chardet was reimplemented and relicensed from LGPL to MIT with 1.3% code similarity, and AI-generated code may not be copyrightable in the US.",
+    "Governance responses include outright bans, human accountability with AI disclosure (Linux, Debian), agent-facing rule files such as AGENTS.md, and AI-assisted triage."
+  ],
+  "takeaways": [
+    "Add an AGENTS.md to your project that spells out coding standards, test commands and what agents may and may not do.",
+    "Update CONTRIBUTING.md to require AI disclosure, proof of local testing and an explanation of the change in the contributor's own words.",
+    "Do not rely on GitHub stars or activity alone when evaluating a dependency; check whether the code actually does what it claims.",
+    "Consider automated filters, such as GitHub Actions or AI-assisted triage, to close low-effort pull requests and duplicate issues while keeping a human accountable for merges."
+  ],
+  "quotes": [
+    {
+      "text": "AI Slop is code that looks right, but actually is not.",
+      "at": "05:21"
+    },
+    {
+      "text": "Engineering rigor now shifted from contributor to reviewer.",
+      "at": "07:54"
+    },
+    {
+      "text": "Open Source is not just about code, it's about people.",
+      "at": "47:47"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Introduction"
+    },
+    {
+      "at": "02:56",
+      "title": "From collaboration to delegation"
+    },
+    {
+      "at": "05:21",
+      "title": "What AI slop looks like"
+    },
+    {
+      "at": "09:06",
+      "title": "Broken incentives"
+    },
+    {
+      "at": "11:50",
+      "title": "Eroding trust"
+    },
+    {
+      "at": "18:06",
+      "title": "Overwhelmed commons and infrastructure"
+    },
+    {
+      "at": "22:33",
+      "title": "Security at scale"
+    },
+    {
+      "at": "30:04",
+      "title": "Licensing and copyright"
+    },
+    {
+      "at": "38:03",
+      "title": "How communities adapt"
+    },
+    {
+      "at": "45:19",
+      "title": "What could happen next"
+    }
+  ],
+  "tech": [
+    "AGENTS.md",
+    "Claude Code",
+    "OpenClaw",
+    "GitHub Actions",
+    "Developer Certificate of Origin",
+    "LGPL",
+    "MIT License",
+    "Codeberg"
+  ],
+  "watchIf": "You maintain or depend on open source projects and want a broad survey of how AI-generated contributions are affecting them and what governance changes projects are trying.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Security & supply chain",
+    "Teams, careers & leadership"
+  ],
+  "demo": false
+}

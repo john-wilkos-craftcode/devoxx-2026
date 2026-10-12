@@ -1,0 +1,93 @@
+{
+  "id": 21657,
+  "source": "transcript",
+  "tldr": "Fumero shows how HAT, built on Project Babylon's code reflection, JIT-compiles plain Java into CUDA and OpenCL kernels, and how its thread, tensor and tile APIs approach cuBLAS-level matrix multiply.",
+  "summary": [
+    "Fumero, of Oracle's Java Platform Group, opens with a demo: Llama inference written entirely in Java on HAT (Heterogeneous Accelerator Toolkit), with the whole transformer (matmul, flash attention, RMSNorm) offloaded to the GPU. It runs at about 140 tokens/s on an Apple M4 via OpenCL, against about 14 tokens/s for an unoptimised parallel Java CPU version, and about 160 tokens/s on a GeForce RTX 5060, launching some 84,000 kernels for one prompt. He contrasts two ways to reach GPUs from Java: calling native libraries through Panama FFM (fastest, but vendor-locked) and JIT-compiling Java code at runtime, which HAT does. He judges every model on three axes: performance, portability (functional and performance) and productivity.",
+    "Code reflection sits between javac's verbose AST and lossy bytecode: annotating a method with @Reflect makes javac keep a code model that can be analysed and transformed, for example by fusing a multiply and an add into an FMA. HAT turns such models into CUDA or OpenCL C, and also has a Java backend for debugging. Its SIMT thread API looks like CUDA or OpenCL. A kernel uses gix/giy/giz thread indices with a bounds guard, a compute method dispatches kernels over an NDRange, and an Accelerator created from a MethodHandles lookup runs it. Kernel code is a restricted subset of Java, with no reflection or inheritance.",
+    "On an RTX 5060 matrix multiply, measured with Nsight Compute, multithreaded CPU Java takes about 300 ms. A naive HAT kernel takes about 1,900 µs and a hand-tuned one with shared memory and register tiling about 295 µs, against 203 µs for cuBLAS in FP32. That tuned kernel is about 100 lines nobody should have to write. A tensor API (tile shape, accumulator, load, multiply-accumulate, store) maps to NVIDIA WMMA and falls back to private arrays and loop tiling on OpenCL 1.2, giving about 8x on the Mac and 274 µs on NVIDIA. A tile API modelled on NVIDIA's new cuTile reached 78 µs against 77 µs for cuTile in Python, but fell behind above 2K matrices. Nsight Compute pointed to shared-memory bank conflicts, and adding swizzling nearly closed the gap.",
+    "His conclusion is that narrowing the domain (tiles cannot express every GPU program) is what lets all three axes improve together. Next steps are formal SIMT and tile specifications that vendors can implement, better execution in plain Java for IDE debugging, and more use cases. Asked about large multi-kernel programs, he said he vibe-coded the Llama port with an AI assistant. The first version ran at 0.6 tokens/s, and reaching the final speed took his own guidance on kernel fusion and avoiding data movement."
+  ],
+  "keyPoints": [
+    "HAT's Llama inference in pure Java: about 140 tokens/s on an Apple M4 GPU (OpenCL) and about 160 tokens/s on an RTX 5060, versus about 14 tokens/s on CPU.",
+    "Code reflection (@Reflect) preserves structure, types and names that bytecode loses, which makes code transformation simpler than the bytecode-based approach of TornadoVM, Aparapi or Sumatra.",
+    "HAT has three programming models: SIMT threads (CUDA/OpenCL style), tensors (WMMA-style tile multiply-accumulate) and tiles (modelled on NVIDIA cuTile).",
+    "Matrix multiply on an RTX 5060: CPU Java about 300 ms, naive HAT about 1,900 µs, tuned SIMT about 295 µs, tensor API 274 µs, tile API 78 µs versus cuTile Python 77 µs; cuBLAS FP32 about 203 µs.",
+    "Tensor code stays portable: on OpenCL 1.2 without tensor instructions, HAT expands it to private arrays and loop tiling, still about 8x faster than the naive version on a Mac.",
+    "Nsight Compute exposed shared-memory bank conflicts in the tile kernel; adding swizzling of the thread indices closed most of the gap to cuTile.",
+    "Kernel code is restricted Java (no reflection, no inheritance); the compute layer is less restricted and the host application is unrestricted."
+  ],
+  "takeaways": [
+    "If you need GPU speed now and accept vendor lock-in, call native libraries such as cuBLAS through the FFM API.",
+    "Follow Project Babylon and HAT if you want portable GPU kernels in Java, and use the Java backend to debug kernels in an IDE.",
+    "Profile CUDA kernels with Nsight Compute, and when memory throughput is high check its memory section for shared-memory bank conflicts.",
+    "Judge any GPU programming model on performance, portability and productivity together, not just raw speed."
+  ],
+  "quotes": [
+    {
+      "text": "If you beat cuBLAS, well done.",
+      "at": "29:04"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Llama inference demo"
+    },
+    {
+      "at": "07:21",
+      "title": "Paths from Java to GPUs"
+    },
+    {
+      "at": "11:47",
+      "title": "Performance, portability, productivity"
+    },
+    {
+      "at": "17:26",
+      "title": "Code reflection basics"
+    },
+    {
+      "at": "20:55",
+      "title": "HAT stack and thread API"
+    },
+    {
+      "at": "29:04",
+      "title": "Matrix multiply performance"
+    },
+    {
+      "at": "33:30",
+      "title": "Tensor API"
+    },
+    {
+      "at": "39:12",
+      "title": "Tile API and swizzling"
+    },
+    {
+      "at": "46:25",
+      "title": "Next steps and Q&A"
+    }
+  ],
+  "tech": [
+    "Project Babylon",
+    "Code reflection",
+    "HAT (Heterogeneous Accelerator Toolkit)",
+    "CUDA",
+    "OpenCL",
+    "Panama FFM API",
+    "cuBLAS",
+    "NVIDIA cuTile",
+    "NVIDIA Nsight Compute",
+    "Tensor cores / WMMA",
+    "Triton",
+    "TornadoVM",
+    "Aparapi",
+    "Llama"
+  ],
+  "watchIf": "You want to see how close plain Java can now get to native GPU performance, and the abstractions Project Babylon proposes for getting there.",
+  "themes": [
+    "Java language & JDK",
+    "JVM performance & runtime",
+    "LLMs in Java apps"
+  ],
+  "demo": false
+}

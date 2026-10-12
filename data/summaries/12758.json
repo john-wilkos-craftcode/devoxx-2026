@@ -1,0 +1,84 @@
+{
+  "id": 12758,
+  "source": "transcript",
+  "tldr": "Larios Vargas argues that security programmes fail because they prescribe training for every problem, and presents a COM-B-based diagnosis with six developer behaviour patterns to match interventions to the actual barrier.",
+  "summary": [
+    "Larios Vargas, co-lead of the OWASP Security Culture Project, uses a hallway of doors as his metaphor. Leadership holds keys (mandatory training, policies, tools, checklists), but each door is a different barrier to behaviour change. The typical result: 100% training completion, good quiz scores, a green compliance dashboard, and the same pen-test findings six months later. When security fails, organisations add more training, tools and controls, then ask 'why don't developers care?'. He calls that the wrong question: knowing is not doing, and training only opens the door when the blocker really is knowledge, not time, tools, autonomy or trust.",
+    "To diagnose, he borrows the COM-B model from behavioural science: Capability (can I do it?), Opportunity (can I do it here?) and Motivation (will I do it, especially under pressure?). Developers first assess themselves, then discuss the results in a psychologically safe team conversation to find the patterns that dominate the team. He stresses that a pattern describes a current state rather than a personality trait, and must never be used for labelling, hiring, performance reviews or discipline; the self-assessment is therefore anonymous, and team leads see only the predominant patterns.",
+    "The six patterns each need a different door. Skeptics ('nobody has ever attacked us') lack motivation and need evidence such as what late fixes cost, not fear. Enthusiasts have capability and motivation but no supporting environment; give them time, recognition, a champion role and early tool access. Compliant developers stop at the checklist and need the purpose behind it. Unaware developers need foundations, ideally paired with an enthusiast. Resistant developers are often skilled; treat their objections as feedback and let them co-design controls. Embedded developers should be made role models rather than taken for granted. The same training lands six different ways, and AI-driven code volume raises the stakes. The SECUR-E self-assessment is still being validated, and he asked for feedback."
+  ],
+  "keyPoints": [
+    "Mandatory training produces green compliance dashboards without behaviour change; six months later the same pen-test findings return.",
+    "COM-B frames secure behaviour as Capability, Opportunity and Motivation, giving three diagnostic questions: can I do it, can I do it here, will I do it.",
+    "Six patterns are identified: Skeptic, Enthusiast, Compliant, Unaware, Resistant and Embedded; a person can mix two or move between them.",
+    "Each pattern maps to a different intervention: evidence for Skeptics, support and recognition for Enthusiasts, meaning for Compliant developers, foundations for Unaware ones, co-design and autonomy for Resistant ones, amplification for Embedded ones.",
+    "Adding pressure to a Resistant developer increases resistance, while making them co-authors of a control can turn them into advocates.",
+    "The SECUR-E self-assessment is anonymous by design so results support teams rather than label individuals in reviews or hiring."
+  ],
+  "takeaways": [
+    "Before launching another security training, find out whether your team's real blocker is skill, time, tooling, autonomy or trust.",
+    "Ask your team the three COM-B questions in a safe, blame-free retrospective and look for the predominant pattern.",
+    "Give your security enthusiasts protected time and a formal champion role instead of extra unrecognised work.",
+    "Invite the most vocal critics of a security control to help redesign it.",
+    "Try the OWASP Security Culture Project's SECUR-E self-assessment and send the project feedback on how well it fits your context."
+  ],
+  "quotes": [
+    {
+      "text": "Just knowing is totally different than doing.",
+      "at": "06:48"
+    },
+    {
+      "text": "Before prescribing, you should diagnose.",
+      "at": "13:25"
+    },
+    {
+      "text": "All enthusiasts deserve a good charging station in their organizations.",
+      "at": "22:39"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Keys and doors"
+    },
+    {
+      "at": "03:36",
+      "title": "Why training alone fails"
+    },
+    {
+      "at": "07:50",
+      "title": "Doors as behavioural barriers"
+    },
+    {
+      "at": "11:14",
+      "title": "The COM-B model"
+    },
+    {
+      "at": "16:02",
+      "title": "Diagnose without labelling"
+    },
+    {
+      "at": "18:16",
+      "title": "Six developer patterns"
+    },
+    {
+      "at": "29:54",
+      "title": "Matching support to barriers"
+    },
+    {
+      "at": "35:12",
+      "title": "Trust and the SECUR-E assessment"
+    }
+  ],
+  "tech": [
+    "OWASP Security Culture Project",
+    "COM-B",
+    "SECUR-E"
+  ],
+  "watchIf": "You run a security champions programme or lead a team where security training keeps being repeated without fewer findings.",
+  "themes": [
+    "Security & supply chain",
+    "Teams, careers & leadership"
+  ],
+  "demo": false
+}

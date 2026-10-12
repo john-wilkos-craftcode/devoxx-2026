@@ -1,0 +1,90 @@
+{
+  "id": 22947,
+  "source": "transcript",
+  "tldr": "Sevarac explains how Deep Netts calls CUDA through jextract-generated FFM bindings and falls back to the Vector API on CPU, with fraud-detection benchmarks showing where each pays off.",
+  "summary": [
+    "Sevarac, of Deep Netts, argues that Java fell behind in AI because of slow numerical computing: GPU access through JNI was painful and unstable, and auto-vectorisation rarely kicked in. Two Panama APIs change that. The FFM API (final since Java 21, and very stable on Java 25 in their benchmarks) brings jextract to generate bindings from header files, Arena-scoped off-heap memory freed by try-with-resources with single- or multi-thread access, and library loading through the operating system's loader. The Vector API lets code explicitly fill SIMD registers via a VectorSpecies and loopBound, with a scalar loop for the leftovers.",
+    "He is frank about CUDA's costs: thread blocks and grids, explicit copies from heap to native to device memory and back, functions with six or more pointer and integer parameters that fail with 'bad parameter', and about ten native libraries (cuBLAS, cuDNN, CUDA Runtime and more) totalling 1.5 GB. Some have hidden platform dependencies such as zlib for cuDNN on Windows, and library names and install paths differ by OS and Linux distribution, so you either assume a matching install or bundle around 3 GB. jextract output is a raw C API full of generic pointers, so Deep Netts stacks a higher-level Java API, a tensor abstraction and an accelerator service provider interface on top, with CUDA and Vector API implementations and room for Babylon, TornadoVM or oneAPI.",
+    "The use case is fraud detection on a generated set of a million transactions, using features such as distance from home, distance from the last transaction, ratio to median purchase price, repeat retailer and online order, trained as a small feed-forward network through a fluent Java API. Enabling acceleration takes --add-modules jdk.incubator.vector or --enable-native-access=ALL-UNNAMED plus a single Deep Netts setting. At 1 million rows the Vector API and GPU both run about 2x faster than a single CPU thread; from 10 to 50 million rows the Vector API stays at about 2x while the GPU reaches 9 to 10x, because data transfer dominates small workloads. The trained model is saved, loaded into a Spring Boot service and scored against a probability threshold. Sevarac said Deep Netts had been open-sourced two days earlier, and that their training benchmarks via FFM matched PyTorch."
+  ],
+  "keyPoints": [
+    "FFM API benefits over JNI: jextract-generated bindings from header files, Arena-scoped off-heap memory with try-with-resources, and OS-level library loading.",
+    "CUDA from Java is mostly a packaging problem: about ten native libraries totalling 1.5 GB, version and driver matrices, OS-specific names and paths, and hidden dependencies such as zlib on Windows.",
+    "Raw jextract bindings expose a C API with generic pointers; wrap them in a domain-specific Java layer such as a tensor class.",
+    "Deep Netts uses an accelerator service provider interface with CUDA (via FFM) and Vector API implementations, designed to add Babylon, TornadoVM or oneAPI later.",
+    "Fraud benchmark: at 1M rows Vector API and GPU are both about 2x a single CPU thread; at 10 to 50M rows the GPU is 9 to 10x and the Vector API about 2x.",
+    "Moving data between host and device memory is the main GPU bottleneck, so small workloads may not need a GPU at all.",
+    "--enable-native-access=ALL-UNNAMED currently only removes a warning, but Sevarac expects it to become mandatory."
+  ],
+  "takeaways": [
+    "Before buying GPUs for a small model, benchmark it on CPU with the Vector API.",
+    "Replace hand-written JNI glue with jextract bindings and Arena-scoped memory segments.",
+    "Decide early whether you will ship CUDA libraries with your application or rely on a system install, and automate library discovery per OS.",
+    "Put a Java-idiomatic abstraction between generated native bindings and your application code."
+  ],
+  "quotes": [],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why Java lagged in AI"
+    },
+    {
+      "at": "04:07",
+      "title": "FFM API features"
+    },
+    {
+      "at": "08:14",
+      "title": "Vector API and CUDA model"
+    },
+    {
+      "at": "14:42",
+      "title": "Pains of shipping CUDA"
+    },
+    {
+      "at": "18:28",
+      "title": "CUDA via jextract"
+    },
+    {
+      "at": "23:20",
+      "title": "SIMD with the Vector API"
+    },
+    {
+      "at": "28:57",
+      "title": "Deep Netts accelerator architecture"
+    },
+    {
+      "at": "33:08",
+      "title": "Fraud detection use case"
+    },
+    {
+      "at": "40:12",
+      "title": "Benchmarks and Spring Boot"
+    },
+    {
+      "at": "45:56",
+      "title": "Open source and Q&A"
+    }
+  ],
+  "tech": [
+    "Deep Netts",
+    "Foreign Function & Memory API",
+    "jextract",
+    "Vector API",
+    "CUDA",
+    "cuBLAS",
+    "cuDNN",
+    "CUDA Runtime",
+    "JNI",
+    "Spring Boot",
+    "PyTorch",
+    "TornadoVM",
+    "Project Babylon"
+  ],
+  "watchIf": "You want to call native GPU libraries from Java with FFM instead of JNI, or need to know whether the Vector API is enough for your ML workload.",
+  "themes": [
+    "Java language & JDK",
+    "LLMs in Java apps",
+    "JVM performance & runtime"
+  ],
+  "demo": false
+}

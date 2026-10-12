@@ -1,0 +1,92 @@
+{
+  "id": 9029,
+  "source": "transcript",
+  "tldr": "Lobanov explains how Bitvavo replaced a Redis/MySQL-centred exchange core with a deterministic, Raft-replicated state machine on Aeron, reaching flat sub-millisecond P99 and 5-microsecond order processing.",
+  "summary": [
+    "Lobanov, a staff engineer at Bitvavo, starts with the 2018 startup architecture: an API gateway, Redis Pub/Sub feeding matching engines, a shared MySQL database and Debezium CDC into Kafka for post-trade systems. It let the company grow, but it was not deterministic (heavily parallel Go code meant replaying the same input could produce different output), shared MySQL and Redis caused lock contention and noisy neighbours, and P99 latency swung between 5 and 200 ms. That unpredictability hurts market makers, whose pricing models look about 10 ms ahead. The goals for a rebuild were 10x throughput, low and stable tail latency, high availability and provable determinism.",
+    "The chosen pattern is a replicated state machine: a single ordered input log and a single-threaded function of (state, event) that emits state transitions, replicated with Raft. Lobanov walks through a Raft commit and then the discipline determinism demands: only the leader performs side effects such as bank API calls and writes the responses back into the log; never read the wall clock, only the timestamp the leader stamps on each message; seed randomness from the event sequence number; and sort before iterating a HashMap or HashSet. A bonus is debugging: copy the production log locally and replay it under a breakpoint.",
+    "JSON between services was replaced by SBE (Simple Binary Encoding: schema-first, fixed offsets, flyweight, zero-copy and zero-allocation), and TCP by reliable UDP with sequence numbers, NAK-based retransmission of single missing packets and heartbeats. Rather than spend an estimated three years building this, Bitvavo adopted Aeron, which provides SBE, reliable UDP and Aeron Cluster (Raft), with enterprise support. Gateways translate client JSON to SBE; archive tailers feed post-trade systems, regulatory reporting and adapters that still populate MySQL for the rest of the company.",
+    "Operating the cluster has costs: feature flags must be sent as input commands so that every node switches at the same log position; upgrades need replay-and-compare checks in CI, a production-like environment and divergence detection in production; and history cannot be rewritten, so bugs are fixed with compensating admin commands. Code-level rules: preallocate with pools and ring buffers, avoid strings and boxed types (map market names to integer IDs at the gateway), use primitive collections, follow the single-writer principle, avoid false sharing, pin and isolate CPUs, and consider kernel bypass (Solarflare, DPDK). The migration took about a year: P99 is now under 1 ms and flat, processing takes about 5 µs per order including risk and balance checks, and throughput rose from 20,000 to 100,000 orders per second."
+  ],
+  "keyPoints": [
+    "The old stack (gateway, Redis Pub/Sub, matching engines, shared MySQL, Debezium to Kafka) had P99 latency of 5 to 200 ms and non-deterministic processing.",
+    "Core pattern: single ordered input log plus single-threaded state machine, replicated via Raft; events are only applied after a majority commit.",
+    "Determinism rules: side effects only on the leader with results fed back into the log, leader-stamped timestamps instead of the wall clock, randomness seeded from the sequence number, sorted iteration over hash collections.",
+    "SBE replaced JSON to remove parsing garbage; reliable UDP with NAKs and heartbeats replaced TCP; Aeron supplies both plus Raft-based Aeron Cluster.",
+    "Feature flags are sent as cluster input commands so every node changes behaviour at the same log position.",
+    "Production bugs are corrected with compensating commands, never by changing code and replaying, because downstream systems and regulators have already consumed the output.",
+    "Results after a year-long migration: flat sub-millisecond P99, about 5 µs internal processing per order, 20,000 to 100,000 orders per second, with headroom beyond that."
+  ],
+  "takeaways": [
+    "If you need replayable, auditable processing, consider a single-threaded state machine over an ordered log instead of database-centred concurrency.",
+    "Audit deterministic code for wall-clock reads, unseeded randomness and iteration over HashMap or HashSet.",
+    "Add a CI check that replays a recorded input log on the old and new version and compares state and output.",
+    "On hot paths, preallocate objects, replace strings with integer IDs and use primitive collections to keep GC out of your tail latency."
+  ],
+  "quotes": [
+    {
+      "text": "We don't need reliable connectivity, we need a reliable stream.",
+      "at": "23:27"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Bitvavo and its scale"
+    },
+    {
+      "at": "04:51",
+      "title": "The 2018 startup stack"
+    },
+    {
+      "at": "10:34",
+      "title": "Replicated state machine and Raft"
+    },
+    {
+      "at": "15:51",
+      "title": "Rules for determinism"
+    },
+    {
+      "at": "19:59",
+      "title": "SBE instead of JSON"
+    },
+    {
+      "at": "22:25",
+      "title": "Reliable UDP and Aeron"
+    },
+    {
+      "at": "30:48",
+      "title": "Operating the cluster"
+    },
+    {
+      "at": "36:09",
+      "title": "Low-latency coding checklist"
+    },
+    {
+      "at": "42:52",
+      "title": "Results"
+    }
+  ],
+  "tech": [
+    "Aeron",
+    "Aeron Cluster",
+    "Raft",
+    "SBE (Simple Binary Encoding)",
+    "UDP",
+    "Redis",
+    "MySQL",
+    "Kafka",
+    "Debezium",
+    "Node.js",
+    "Go",
+    "Solarflare",
+    "DPDK"
+  ],
+  "watchIf": "You build latency-sensitive or audit-heavy systems and want a concrete account of event-sourced, deterministic design on the JVM, including its operational costs.",
+  "themes": [
+    "Architecture & design",
+    "JVM performance & runtime",
+    "Legacy modernization"
+  ],
+  "demo": false
+}
