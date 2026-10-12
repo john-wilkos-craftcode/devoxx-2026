@@ -435,6 +435,7 @@ function titleCard(t) {
     ctx.fillText(t.speakers.map((sp) => sp.name).join(", "), 120, 290 + lines.length * 124 + 40);
   });
 }
+const screenPlanes = new Map();
 for (const d of venue.decor.filter((x) => x.material === "screen" && x.room)) {
   const room = venue.rooms.find((r) => r.id === d.room);
   if (!room || room.floor !== 1) continue;
@@ -448,6 +449,7 @@ for (const d of venue.decor.filter((x) => x.material === "screen" && x.room)) {
   plane.position.copy(v3(faceX, b.y + b.h / 2, (z0 + z1) / 2));
   plane.rotation.y = west ? Math.PI / 2 : -Math.PI / 2;
   scene.add(plane);
+  screenPlanes.set(n, plane);
 }
 
 // ---------- close every auditorium floor to ceiling (Ghost Light's walls stop at 3.2 m), door left open ----------
@@ -554,9 +556,10 @@ if (devMode) {
   document.getElementById("dev").remove();
   const { startExperience } = await import("./experience.js");
   tick = startExperience({ THREE, scene, camera, renderer, v3, venue, talks, doors, corridor, auditoriums,
-    FH, CLEAR, lightRoom, roomLights, point, ledMat, mat, M, params, plateUnder });
+    FH, CLEAR, lightRoom, roomLights, point, ledMat, mat, M, params, plateUnder, screenPlanes });
 }
 
+window.__renderOnce = () => { composer.render(); if (window.__css) window.__css(); };
 // ?still renders a couple of frames and stops: for headless screenshots on software WebGL.
 const still = params.has("still");
 let frames = 0;

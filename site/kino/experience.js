@@ -51,8 +51,8 @@ const CSS = `
 .kx-talk { display: grid; grid-template-columns: 64px 1fr; gap: 14px; text-align: left; background: #0d1024; border: 2px solid #1b2047; border-radius: 12px;
   padding: 12px 14px; cursor: pointer; min-height: 112px; }
 .kx-talk:hover { border-color: #FFC93C; background: #141936; }
-.kx-room { display: grid; place-items: center; background: #f0641e; color: #fff; font: 900 40px/1 "Big Shoulders Display", sans-serif; border-radius: 6px; height: 64px; }
-.kx-room.is-bof { background: #2f3f86; font-size: 22px; }
+.kx-talk .kx-room { display: grid; place-items: center; background: #f0641e; color: #fff; font: 900 40px/1 "Big Shoulders Display", sans-serif; border-radius: 6px; height: 64px; margin: 0; }
+.kx-talk .kx-room.is-bof { background: #2f3f86; font-size: 22px; }
 .kx-talk b { display: block; font: 800 27px/1.08 "Big Shoulders Display", sans-serif; letter-spacing: .01em; }
 .kx-talk span { display: block; color: #9aa3c9; font-size: 19px; margin-top: 6px; }
 .kx-empty { color: #9aa3c9; font-size: 30px; padding: 40px 0; }
@@ -166,13 +166,14 @@ export function startExperience(k) {
   cssScene.add(wallObj);
 
   // ---------- camera poses ----------
-  const fitDistance = (w, h, fov) => {
+  // fill: how much of the viewport the surface takes. Under 1 so the venue frames it.
+  const fitDistance = (w, h, fov, fill = 0.92) => {
     const t = Math.tan(THREE.MathUtils.degToRad(fov) / 2);
-    return Math.max(h / 2 / t, w / 2 / (t * camera.aspect)) * 1.04;
+    return Math.max(h / 2 / t, w / 2 / (t * camera.aspect)) / fill;
   };
   const LOBBY_FOV = 50, SEAT_FOV = 52;
   const lobbyPose = () => {
-    const d = fitDistance(WALL.w, WALL.h, LOBBY_FOV);
+    const d = fitDistance(WALL.w, WALL.h, LOBBY_FOV, 0.8);
     return { pos: new THREE.Vector3(WALL.x, WALL.y - d, WALL.z), look: new THREE.Vector3(WALL.x, WALL.y, WALL.z), fov: LOBBY_FOV };
   };
   const toThree = (p) => v3(p.x, p.y, p.z);
@@ -325,6 +326,7 @@ export function startExperience(k) {
     }
     buildScreen(info, t);
     lightRoom(info.room);
+    for (const [n2, plane] of k.screenPlanes) plane.visible = n2 !== n;
     const arrive = () => { state = "seated"; setPose(seatPose(info)); exitBtn.hidden = false; live.textContent = `Seated in Room ${n} for ${t.title}.`; };
     if (instant || reduceMotion) { arrive(); return; }
     state = "walking";
@@ -356,7 +358,10 @@ export function startExperience(k) {
     animate(curve, toThree(end.look), LOBBY_FOV, 2600, () => { state = "lobby"; setPose(lobbyPose()); });
   }
   // test hooks for headless checks
-  window.__kino = { goTalk: (id) => goTalk(talks.find((t) => t.id === id), { instant: true }), goLobby: () => goLobby({ instant: true }) };
+  window.__kino = {
+    walkFrame: (id, u) => { const t = talks.find((x) => x.id === id), info = infoFor(roomNo(t)), c = pathTo(info);
+      lightRoom(info.room); camera.fov = SEAT_FOV; camera.updateProjectionMatrix();
+      camera.position.copy(c.getPointAt(u)); camera.lookAt(c.getPointAt(Math.min(1, u + 0.06))); }, goTalk: (id) => goTalk(talks.find((t) => t.id === id), { instant: true }), goLobby: () => goLobby({ instant: true }) };
 
   return (now) => { if (anim) anim.tick(now ?? performance.now()); };
 }

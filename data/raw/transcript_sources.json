@@ -1,4 +1,5 @@
 {
+ "10016": "whisper:large-v3-turbo",
  "10031": "whisper:large-v3-turbo",
  "10038": "whisper:large-v3-turbo",
  "11556": "youtube-transcript-api",
@@ -47,6 +48,7 @@
  "25652": "whisper:large-v3-turbo",
  "25657": "whisper:large-v3-turbo",
  "25671": "whisper:large-v3-turbo",
+ "27453": "whisper:large-v3-turbo",
  "29351": "youtube-transcript-api",
  "31451": "whisper:large-v3-turbo",
  "31452": "whisper:large-v3-turbo",
