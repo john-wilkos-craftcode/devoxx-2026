@@ -92,7 +92,7 @@ def main():
             yt.run(["--skip-download", "--write-auto-subs", "--sub-langs", "en-orig", "--sub-format", "json3",
                     "--sleep-subtitles", str(args.sleep_subtitles), "--ignore-errors",
                     "-o", str(CAPTIONS / "%(id)s.%(ext)s"), "-a", str(batch)], on_line=progress)
-        except yt.Blocked as e:
+        except (yt.Blocked, yt.Forbidden) as e:
             wait = min(backoff, max(0, deadline - time.time()))
             print(f"captions: blocked ({e}); waiting {wait / 60:.0f} min before one more try", flush=True)
             time.sleep(wait)

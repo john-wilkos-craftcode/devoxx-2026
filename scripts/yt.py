@@ -16,11 +16,17 @@ import sys
 from pathlib import Path
 
 BLOCKED = re.compile(r"HTTP Error 429|Too Many Requests|confirm you.re not a bot|"
-                     r"content isn.t available, try again later|HTTP Error 403", re.I)
+                     r"content isn.t available, try again later", re.I)
+# A 403 on a stream is usually a stale or token-bound media URL, not rate limiting: retry soon.
+FORBIDDEN = re.compile(r"HTTP Error 403", re.I)
 
 
 class Blocked(Exception):
-    pass
+    """Rate limited or bot-checked: back off for a long time."""
+
+
+class Forbidden(Exception):
+    """A one-off 403: worth a retry after a short pause."""
 
 
 def yt_dlp_cmd():
@@ -32,17 +38,18 @@ def yt_dlp_cmd():
 
 
 def run(args, on_line=None):
-    """Run yt-dlp, streaming its output. Raises Blocked (after killing the process) on the first
-    rate-limit or bot-check message. Returns (returncode, output)."""
+    """Run yt-dlp, streaming its output. Kills it and raises Blocked on the first rate-limit or
+    bot-check message, Forbidden on a 403. Returns (returncode, output)."""
     proc = subprocess.Popen(yt_dlp_cmd() + args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             text=True, bufsize=1)
     out = []
     for line in proc.stdout:
         out.append(line)
-        if BLOCKED.search(line):
-            proc.kill()
-            proc.wait()
-            raise Blocked(line.strip())
+        for pattern, exc in ((BLOCKED, Blocked), (FORBIDDEN, Forbidden)):
+            if pattern.search(line):
+                proc.kill()
+                proc.wait()
+                raise exc(line.strip())
         if on_line:
             on_line(line)
     proc.wait()

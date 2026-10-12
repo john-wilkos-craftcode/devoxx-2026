@@ -7,7 +7,8 @@ Per talk: download the audio with yt-dlp (see yt.py for the request etiquette) i
 data/raw/audio/, transcribe it on the GPU with Whisper primed with the title, speaker names and
 keywords, write data/raw/transcripts/<id>.txt, and delete the audio. The next talk's audio
 downloads while the current one is transcribed, which also spaces requests about a minute apart.
-On a rate limit it waits (45 min, doubling up to 4 h) instead of retrying.
+On a rate limit (429, bot check) it waits 45 min, doubling up to 4 h, instead of retrying;
+a one-off 403 on a stream gets two retries a minute apart.
 
 Usage:
   python scripts/transcribe_whisper.py              # every recorded talk without a transcript,
@@ -48,13 +49,21 @@ def preload_cuda_libs():
 
 
 def download_audio(video_id):
-    """Returns the audio path, None if the download failed, or raises yt.Blocked."""
+    """Returns the audio path, None if the download failed, or raises yt.Blocked.
+    A 403 gets two retries a minute apart (stream URLs are flaky); a 429 propagates."""
     AUDIO.mkdir(parents=True, exist_ok=True)
     existing = [p for p in AUDIO.glob(f"{video_id}.*") if not p.name.endswith(".part")]
     if existing:
         return existing[0]
-    yt.run(["-f", "bestaudio[ext=m4a]/bestaudio", "-o", str(AUDIO / "%(id)s.%(ext)s"),
-            f"https://www.youtube.com/watch?v={video_id}"])
+    for attempt in range(3):
+        try:
+            yt.run(["-f", "bestaudio[ext=m4a]/bestaudio", "-o", str(AUDIO / "%(id)s.%(ext)s"),
+                    f"https://www.youtube.com/watch?v={video_id}"])
+            break
+        except yt.Forbidden:
+            if attempt == 2:
+                return None
+            time.sleep(60)
     return next((p for p in AUDIO.glob(f"{video_id}.*") if not p.name.endswith(".part")), None)
 
 
