@@ -1,0 +1,88 @@
+{
+  "id": 5519,
+  "source": "transcript",
+  "tldr": "Bujon shows how the OpenTelemetry Java agent rewrites classes as they load, diffs its changes with a meta-agent, and measures the startup cost, including under Leyden.",
+  "summary": [
+    "Bujon, a Datadog engineer who leads the Paris JUG, instruments a demo app built on the JDK HTTP server and client and the Jedis Redis client, none of which know OpenTelemetry. He adds the agent through JAVA_TOOL_OPTIONS in Docker Compose and gets server, client and Redis spans with automatic attributes. He then explains the mechanism: premain receives an Instrumentation instance and registers a ClassFileTransformer that sees, and may rewrite, the bytes of every loaded class. Rewriting means ASM or Byte Buddy, since OpenTelemetry supports Java 8 and cannot use the JDK 24 ClassFile API, and the JVM throws a VerifyError if the result is invalid.",
+    "To show what really runs, he puts Johannes Bechberger's meta-agent in front of the OpenTelemetry agent; it serves decompiled before-and-after diffs. The JDK HTTP server gets a filter injected, ForkJoinPool's execute and submit gain extra work, and Jedis grows from about 5,000 to 43,000 lines. Costs include allocation and GC pressure, CPU, slower hot paths, thread contention and, specific to agents, startup spent matching classes. Native Image support is partial, and AppCDS and Leyden do not work with the OpenTelemetry agent. On PetClinic an agent cost 50-75% in time to first response; Datadog's agent with a Leyden AOT cache got back to baseline."
+  ],
+  "keyPoints": [
+    "The agent is zero-code instrumentation: one -javaagent flag (for example via JAVA_TOOL_OPTIONS) plus OTEL_* configuration, and it instruments libraries such as Jedis and the JDK HTTP client that know nothing about OpenTelemetry.",
+    "ClassFileTransformer.transform receives the class loader, class name and class-file byte array for every loaded class and returns rewritten bytes, so the code running in production is not the code you compiled or downloaded.",
+    "Johannes Bechberger's meta-agent, run before the OpenTelemetry agent, shows decompiled diffs of every transformed class, including JDK internals like ForkJoinPool.",
+    "Startup is the agent-specific cost: every loaded class is matched against hundreds of instrumentation patterns, which Bujon measured as a 50-75% slower time to first response on PetClinic.",
+    "Bujon said the Datadog agent works with a Leyden AOT cache and matches no-agent startup, whereas the OpenTelemetry agent currently crashes under Leyden."
+  ],
+  "takeaways": [
+    "Try OpenTelemetry on an existing container by adding -javaagent through JAVA_TOOL_OPTIONS before writing any SDK code.",
+    "Run the meta-agent alongside your observability agent to see which classes it rewrites, including JDK classes.",
+    "Measure startup and time to first response with and without the agent, especially for serverless or autoscaled services.",
+    "Sample and filter spans deliberately (for example 1% plus all application errors) to limit CPU and allocation overhead on hot paths."
+  ],
+  "quotes": [
+    {
+      "text": "The code that runs is no longer the code you wrote and compiled, or the code you downloaded, or even the code from the JDK you carefully kept updated and paid support for.",
+      "at": "13:46"
+    },
+    {
+      "text": "If you don't use OpenTelemetry today, your observability journey is only one line away.",
+      "at": "28:27"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "OpenTelemetry for Java"
+    },
+    {
+      "at": "03:09",
+      "title": "Zero-code agent demo"
+    },
+    {
+      "at": "08:08",
+      "title": "How Java agents work"
+    },
+    {
+      "at": "12:25",
+      "title": "Diffing with the meta-agent"
+    },
+    {
+      "at": "21:34",
+      "title": "Runtime performance costs"
+    },
+    {
+      "at": "22:55",
+      "title": "Startup overhead and Leyden"
+    },
+    {
+      "at": "26:58",
+      "title": "Wrap-up"
+    }
+  ],
+  "tech": [
+    "OpenTelemetry",
+    "OTLP",
+    "OpenTelemetry Collector",
+    "Java agents",
+    "java.lang.instrument",
+    "ClassFileTransformer",
+    "ASM",
+    "Byte Buddy",
+    "ClassFile API",
+    "meta-agent",
+    "Jedis",
+    "Redis",
+    "Docker Compose",
+    "GraalVM Native Image",
+    "AppCDS",
+    "Project Leyden",
+    "Spring PetClinic",
+    "Datadog"
+  ],
+  "watchIf": "You run the OpenTelemetry Java agent in production and want to see what it changes inside your JVM and what it costs at startup.",
+  "themes": [
+    "JVM performance & runtime",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}

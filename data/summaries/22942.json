@@ -1,0 +1,109 @@
+{
+  "id": 22942,
+  "source": "transcript",
+  "tldr": "Heitzmann argues documentation needs a defined audience and altitude, belongs in the repository as AsciiDoc rather than Markdown or Confluence, and is the context AI depends on.",
+  "summary": [
+    "Heitzmann opens with a new hire whose Confluence setup instructions are outdated and who ends up reverse-engineering the codebase. He rejects three excuses: Agile never said 'no documentation', the time pays for itself in onboarding, and self-explanatory code can describe 'a brick' but never the house. His first principle is audiences and altitudes. Documentation is a spectrum, and each piece targets one audience (users, developers, architects, product owners, managers) at one level: architecture in diagrams, APIs in Javadoc, function internals in comments. He suggests Simon Brown's C4 model as a starting point.",
+    "His other principles are lightweight markup and docs as code: plain text in the same IDE, repository, reviews and pipeline as the code. After surveying 23 markup languages he rates Textile, MediaWiki, reStructuredText and AsciiDoc highest, and tells the audience not to use Markdown, which has competing flavours and no standard tables, cross-references or footnotes. In IntelliJ he demos AsciiDoc tables, LaTeX math, source includes by line range or by a searchable random tag such as T9NK, callouts, and live PlantUML and blockdiag diagrams.",
+    "He calls wikis places 'where information kills itself' and lists Confluence's faults: poor search, a WYSIWYG editor whose content is hard to export, a push to cloud with tiered licensing, and a security ticket closed by a bot. He wants a tool per altitude, such as Javadoc, Antora or Sphinx, not one hub. On AI, docs should be handed to people, and asking a chatbot is still searching. Good docs capture decisions, rejected designs, history, how-tos, debt and warnings, which is the context RAG systems and agents need. Make the specification the source of truth, and use LLMs for language, not reverse engineering."
+  ],
+  "keyPoints": [
+    "Each piece of documentation needs a defined audience and altitude: architecture in diagrams and external documents, APIs in Javadoc, function internals in source comments, never mixed.",
+    "Docs as code means plain-text docs in the same IDE, repository, pull-request reviews and CI pipeline as the code; Word files in Git do not count because they are binary.",
+    "Heitzmann's verdict is not to use Markdown (fragmented flavours, no native tables, cross-references or footnotes) and to use AsciiDoc as a drop-in replacement.",
+    "Include code snippets in AsciiDoc by tag rather than line range; a random tag ID in a code comment also tells developers that documentation references that code.",
+    "Diagrams as text (PlantUML, blockdiag) inside AsciiDoc replace draw.io or PowerPoint and can be versioned and reviewed.",
+    "He favours several documentation systems, one per altitude (Javadoc, Antora, Sphinx), over a single Confluence hub, and prefers a fresh start to cleaning up an existing wiki.",
+    "Documentation should capture what code cannot: decisions, history, rejected designs, how-tos, technical debt and warnings, which is also the context AI agents need.",
+    "Make the specification, not the source code (bugs included), the single source of truth, and use LLMs for spelling, grammar and clarity."
+  ],
+  "takeaways": [
+    "For your next document, write down its audience and altitude before writing anything else.",
+    "Move one Confluence page into the repository as AsciiDoc and generate it in CI, for example with Antora.",
+    "Replace line-range code includes with tagged snippets so docs follow the code when it moves.",
+    "Add a decisions and rejected-designs section to your architecture docs and feed it to your AI tools as context.",
+    "Name a few people who own documentation and adopt a style guide such as GitLab's documentation style guide."
+  ],
+  "quotes": [
+    {
+      "text": "Self-explanatory code is only self-explanatory to the person who wrote it.",
+      "at": "04:50"
+    },
+    {
+      "text": "Good documentation is more important than ever today because you use AI.",
+      "at": "44:30"
+    },
+    {
+      "text": "Use AI for language, but definitely don't use it for reverse engineering.",
+      "at": "50:18"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "The new hire's first day"
+    },
+    {
+      "at": "03:23",
+      "title": "Three excuses rebutted"
+    },
+    {
+      "at": "08:44",
+      "title": "Audiences and altitudes"
+    },
+    {
+      "at": "12:58",
+      "title": "Lightweight markup languages"
+    },
+    {
+      "at": "15:53",
+      "title": "Docs as code"
+    },
+    {
+      "at": "21:04",
+      "title": "Markdown versus AsciiDoc"
+    },
+    {
+      "at": "23:34",
+      "title": "AsciiDoc demo"
+    },
+    {
+      "at": "29:18",
+      "title": "Wikis and Confluence"
+    },
+    {
+      "at": "37:04",
+      "title": "Documentation generators"
+    },
+    {
+      "at": "39:16",
+      "title": "AI and documentation"
+    }
+  ],
+  "tech": [
+    "AsciiDoc",
+    "Markdown",
+    "reStructuredText",
+    "Textile",
+    "MediaWiki markup",
+    "LaTeX",
+    "Antora",
+    "Sphinx",
+    "Docusaurus",
+    "Hugo",
+    "GitBook",
+    "Javadoc",
+    "C4 model",
+    "PlantUML",
+    "blockdiag",
+    "reveal.js",
+    "IntelliJ AsciiDoc plugin",
+    "Confluence"
+  ],
+  "watchIf": "Your team's documentation lives in a decaying wiki and you want a concrete docs-as-code setup with AsciiDoc and a clear argument for why AI does not remove the need to write docs.",
+  "themes": [
+    "Developer experience & tooling",
+    "Architecture & design"
+  ],
+  "demo": true
+}

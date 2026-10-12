@@ -1,0 +1,49 @@
+{
+  "id": 17786,
+  "source": "transcript",
+  "tldr": "Tzolov live-codes Spring AI from ChatClient basics to skills, subagents and durable memory, showing that every agentic pattern is built from context, advisors, recursion and tool calls.",
+  "summary": [
+    "Christian Tzolov, Spring AI lead and MCP Java SDK maintainer, frames the three hours around one rule: a model's output is only as good as its context. Context can be curated prescriptively (you decide what goes in) or agentically (the model asks via tool calls), and repeated rounds of the latter form the agent loop. His claim is that four concepts explain every pattern: context and generation, advisors that intercept input and output, recursion, and tools. He demonstrates with ChatClient on Anthropic and a web-based inspector he built the week before that shows the advisor chain, the exact wire payload and a sequence diagram per request.",
+    "The foundations cover structured output (generic schema-in-prompt or the provider's native mode, with a validation advisor that feeds schema errors back to the model for a retry), and conversation memory via an advisor. He previews Spring AI Session for 2.1 in November, which adds events and summarising compaction, and warns that history must be cut at turn boundaries, not mid tool exchange. A Hurricane Milton RAG demo shows naive retrieval filling context with chunks from the article's references; modular RAG adds query rewriting, multi-query expansion, a similarity threshold, then filtering and re-ranking, which cut seven chunks to two. A local embedding model failed to download live, so he switched to OpenAI embeddings.",
+    "Several demos use a new non-generative \"System 1\" model that answers batches of yes/no, choice and score questions with confidence, faster and cheaper than an LLM and more consistent, though weak on general knowledge. He uses it for RAG filtering, input/output guardrails that blocked a jailbreak and a self-harm prompt, and a self-refining advisor that retried when a tool returned -252 degrees. Tool calling is explained step by step, then the tool search tool: instead of sending every tool definition, the model gets one search tool and pulls in tools on demand, which dropped a 30-plus-tool request from about 7,000 to 4,000 tokens. Unlike vector, Lucene or regex indexes, the System 1 index can say no tool fits.",
+    "The second half builds patterns from tools, using the Spring AI Agent Utils community project (file system, shell, Brave web search, a smart web fetch that summarises with an LLM). Agent skills are a skill tool listing SKILL.md names and descriptions, plus file and shell tools for resources and scripts; skills can also ship as JARs. A todo-write tool keeps multi-step plans on track, an ask-user tool interviews the user before answering, and a task tool runs subagents defined in Markdown with their own model, tools and clean context. Auto-memory tools keep durable Markdown memory with an \"auto dream\" compaction pass. He ends with MCP sampling, A2A and ACP, and an experimental agentic layer for Spring AI 2.1."
+  ],
+  "keyPoints": [
+    "Spring AI's ChatClient is a chain of around-advisors; a recursive advisor that re-invokes the downstream chain is how both validation retries and the tool-calling loop are built.",
+    "Conversation memory should be truncated at turn boundaries; cutting between a tool request and its response confuses the model or makes the API reject the call.",
+    "Modular RAG with query rewriting, multi-query expansion, threshold search, filtering and re-ranking reduced seven retrieved chunks to two relevant ones.",
+    "The tool search tool registers one discovery tool instead of all definitions; in the demo it cut a request with 30-plus tools from about 7,000 to 4,000 tokens.",
+    "Non-generative \"System 1\" judgment models answer several yes/no, choice or score questions in parallel with confidence, which suits guardrails, RAG filtering and evaluator loops, but they lack general knowledge.",
+    "Agent skills, todo planning, ask-user questions, subagents and auto memory are each implemented as one more tool plus a description; LLMs only understand tool calls.",
+    "Subagents defined in Markdown run with isolated context, their own model and a filtered tool set, so the lead agent's memory holds only the task call and its final result.",
+    "Spring AI 2.1 (November) is planned to bring Spring AI Session, support for the new stateless MCP specification and an experimental agentic layer with durability hooks such as Temporal."
+  ],
+  "takeaways": [
+    "Inspect the actual payload sent to the model, with a logging advisor or an inspector, before tuning prompts.",
+    "Add query rewriting, relevance filtering and re-ranking to a RAG pipeline instead of trusting raw similarity search.",
+    "Enable tool search when an agent connects to several MCP servers, rather than sending every tool definition on each call.",
+    "Delegate noisy research steps to subagents with their own context, and use a cheaper model for them where it is good enough.",
+    "Run skills that execute scripts, and any shell tool, only inside a sandbox."
+  ],
+  "quotes": [
+    {"text": "The output, the result of your foundation models, is only as good as the context you provide to them.", "at": "00:31"},
+    {"text": "We cannot remove the non-deterministic nature of the LLMs, but instead we're building fences around them.", "at": "04:18"},
+    {"text": "LLMs are fine-tuned to support tool calling, and this is the only abstraction they know to ask for additional information.", "at": "118:34"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Context curation and agent loops"},
+    {"at": "08:02", "title": "ChatClient, advisors and inspector"},
+    {"at": "14:02", "title": "Structured output and memory"},
+    {"at": "28:35", "title": "Prompt stuffing and RAG"},
+    {"at": "58:45", "title": "Guardrails and System 1 models"},
+    {"at": "69:27", "title": "Tool calling and tool search"},
+    {"at": "89:29", "title": "Agentic patterns and LLM judges"},
+    {"at": "106:39", "title": "Agent skills"},
+    {"at": "122:49", "title": "Todo, ask-user and subagents"},
+    {"at": "147:25", "title": "Durable memory and protocols"}
+  ],
+  "tech": ["Spring AI", "Spring Boot", "Spring AI Agent Utils", "MCP", "MCP Java SDK", "A2A", "Agent Client Protocol", "Anthropic Claude", "OpenAI", "Ollama", "Brave Search", "Agent Skills", "Temporal", "Micrometer"],
+  "watchIf": "You build LLM features in Java and want to see how agent skills, tool search, subagents and memory are actually implemented on top of Spring AI's advisors and tool calls.",
+  "themes": ["LLMs in Java apps", "AI agents & agentic coding", "Spring & frameworks"],
+  "demo": true
+}

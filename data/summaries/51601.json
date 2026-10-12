@@ -1,0 +1,103 @@
+{
+  "id": 51601,
+  "source": "transcript",
+  "tldr": "Attard works through a checklist for production Java containers: pinned and layered images, jlink runtimes on slim or scratch bases, AOT cache, compact object headers, memory flags, lifecycle and hardening.",
+  "summary": [
+    "Attard, from Oracle's Java team, starts with the environment variables the JVM reads. _JAVA_OPTIONS overrides the command line, JDK_JAVA_OPTIONS is where VM flags belong so one image can run with different settings, and agents need JAVA_TOOL_OPTIONS because it is read earlier. Tags such as jdk:25 on the Oracle Container Registry are mutable, so he pins images by digest. Using Dive, he compares a Spring Boot fat JAR, one 56 MB layer, with the extracted Spring layers, where dependencies take 56 MB and the application an 18 KB final layer, so a code change rebuilds and ships only that.",
+    "Next he trims the runtime. jlink builds a runtime with only the needed modules; keep jdk.jcmd and jdk.jfr for diagnostics. The OS layer drops from about 100 MB on Oracle Linux slim to 28 MB distroless and about 6 MB on a scratch image holding only Java's native libraries, which he frames as less attack surface. Multi-arch base images give AMD64 and ARM64 builds. The JDK 25 AOT cache gave the biggest startup gain on an unchanged JAR. Because it depends on classpath order, he writes a sorted classpath into an argument file during the training run and reuses that file at runtime.",
+    "Compact object headers (8 instead of 12 bytes, opt-in in JDK 25 and, he said, default in 27) slightly raised throughput, cut latency from 15 to 14 ms and reduced GC runs. In a 1 GB container Java defaults to the Serial GC and a 25% heap, so he sets MaxRAMPercentage=75. He separates OutOfMemoryError from the kernel OOM-killing PID 1, showing that a 256 MB heap in a 256 MB container starts and only dies under load unless AlwaysPreTouch is set. He finishes with ExitOnOutOfMemoryError, heap dumps to a volume, graceful shutdown with readiness probes, and non-root, read-only, capability-dropped containers."
+  ],
+  "keyPoints": [
+    "Use JDK_JAVA_OPTIONS for VM flags so one image can be run and benchmarked with different settings; agents must go in JAVA_TOOL_OPTIONS; JAVA_OPTS is not read by the JVM at all.",
+    "Pin base images by digest, because tags such as jdk:25 move with every update.",
+    "Layered Spring Boot images put the 56 MB of dependencies and the 18 KB application in separate layers, so code changes rebuild and transfer only the small one.",
+    "A jlink runtime on a scratch image with hand-copied native libraries brings the OS layer to about 6 MB, against 100 MB for Oracle Linux slim and 28 MB for distroless; keep jdk.jcmd and jdk.jfr for diagnostics.",
+    "The JDK 25 AOT cache is tied to classpath order; generate and run from the same sorted argument file, and decide whether AOTMode=on (fail if the cache is unusable) is right for production.",
+    "Without flags, a 1 GB container gets the Serial GC and a 25% max heap; MaxRAMPercentage=75 makes the heap scale with container memory.",
+    "OutOfMemoryError and the container OOM killer are different failures; AlwaysPreTouch exposes an oversized heap at startup instead of under load.",
+    "Recommended flags: ExitOnOutOfMemoryError, HeapDumpOnOutOfMemoryError and HeapDumpPath pointing at a persistent volume."
+  ],
+  "takeaways": [
+    "Check whether your containers set a heap size; if not, add -XX:MaxRAMPercentage (Attard uses 75) through JDK_JAVA_OPTIONS.",
+    "Split your Spring Boot image into dependency and application layers and confirm the result with Dive.",
+    "Build a jlink runtime for one service, including jdk.jcmd and jdk.jfr, and run it as a non-root user on a read-only filesystem.",
+    "Try the JDK 25 AOT cache and compact object headers, measuring startup, throughput and GC against a baseline first.",
+    "Add -XX:+ExitOnOutOfMemoryError and heap dumps to a mounted path, and remove any flag that measurement shows does nothing."
+  ],
+  "quotes": [
+    {
+      "text": "The issue is not size, but it is reducing attack surface area.",
+      "at": "13:26"
+    },
+    {
+      "text": "If you added a flag which is not giving you anything, it's better to remove it.",
+      "at": "46:36"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "What production-ready means"
+    },
+    {
+      "at": "02:47",
+      "title": "JVM environment variables"
+    },
+    {
+      "at": "05:24",
+      "title": "Base images and digests"
+    },
+    {
+      "at": "09:17",
+      "title": "Layering the application"
+    },
+    {
+      "at": "12:02",
+      "title": "jlink custom runtimes"
+    },
+    {
+      "at": "17:03",
+      "title": "Slim, distroless and scratch"
+    },
+    {
+      "at": "20:42",
+      "title": "Multi-arch images"
+    },
+    {
+      "at": "22:05",
+      "title": "AOT cache and object headers"
+    },
+    {
+      "at": "33:16",
+      "title": "Memory defaults and OOM kills"
+    },
+    {
+      "at": "40:56",
+      "title": "Lifecycle and hardening"
+    }
+  ],
+  "tech": [
+    "Oracle JDK",
+    "Oracle Container Registry",
+    "Oracle Linux",
+    "Docker",
+    "Dive",
+    "Spring Boot",
+    "jlink",
+    "JDK Flight Recorder",
+    "jcmd",
+    "Distroless images",
+    "AOT cache",
+    "Compact object headers",
+    "G1 GC",
+    "Serial GC",
+    "JDK 25"
+  ],
+  "watchIf": "You package Java services as containers and want a practical list of image, JVM flag and hardening settings, each backed by a measurement.",
+  "themes": [
+    "Cloud native & Kubernetes",
+    "JVM performance & runtime",
+    "Java language & JDK"
+  ],
+  "demo": false
+}

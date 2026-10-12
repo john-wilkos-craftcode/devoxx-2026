@@ -1,0 +1,39 @@
+{
+  "id": 25657,
+  "source": "transcript",
+  "tldr": "Šelajev argues that containers, command allowlists and AI classifiers cannot safely contain autonomous coding agents, and demos Docker Sandboxes: microVMs with network policy, injected secrets and reusable kits.",
+  "summary": [
+    "Oleg Šelajev (Docker) starts from the point that agents only pay off when they run autonomously, so the brakes have to be outside the agent. He walks through why common approaches fall short. A plain container cannot run the extra containers a coding agent needs for tests, and mounting the Docker socket is as good as root. Seatbelt or bubblewrap-style command rules are a regex game the agent wins with tricks like chaining after an allowed cd. A second model as judge is \"two foxes whispering about a henhouse\": he describes getting Claude Code's auto-mode classifier to refuse a secret-hunting script, then run it once the code was hidden in a dependency module and the context was cleared. Developer laptops, he notes, hold SSH keys, cloud tokens and old API keys in shell history.",
+    "Docker Sandboxes is a separate CLI, sbx, that starts each agent (Claude Code, Codex, Copilot, OpenCode or a bare shell) in a KVM-based microVM with its own Docker daemon, YOLO mode on and only the project directory mounted. A network proxy allows only listed hosts and injects real credentials into outbound requests, so the agent sees only placeholder values and cannot leak keys. Šelajev frames the goal as four Cs: containment, control, choice and capacity. To fix the empty-VM experience, kits package tools, skills and network and secret config as OCI images built once, and a per-project sbx env YAML file committed to the repo gives the whole team the same setup. He demos a YouTube-transcript kit. Paid Docker AI governance adds central policies and audit; fine-grained application-level policies are still in progress."
+  ],
+  "keyPoints": [
+    "A coding agent needs to run containers for tests and databases; giving a containerised agent the Docker socket hands it root on the host.",
+    "Command allowlists and LLM classifiers can be bypassed; Šelajev got a secret-stealing script run by hiding it in a Python dependency and clearing the context.",
+    "sbx run <agent> starts a microVM with its own Docker daemon and a mounted project directory, behind a proxy with a host allowlist and credential injection so real secrets never enter the sandbox.",
+    "Kits are built once and stored as OCI images, so sandbox creation copies cached files instead of reinstalling tools; an sbx env YAML file per repo selects agent, kits and secret sources.",
+    "Current policies work at host level (allow Google Docs, block Pastebin); per-service rules such as read-only GitHub access for one organisation are not built yet, apart from tool-level MCP policies written in Cedar."
+  ],
+  "takeaways": [
+    "Run your coding agent through sbx (or another microVM sandbox) instead of directly on your laptop before enabling autonomous mode.",
+    "Keep API keys out of the agent's environment and inject them at a proxy outside the sandbox.",
+    "Clean long-lived tokens out of your shell history and dotfiles, and set expiry dates on new keys.",
+    "Commit a shared sandbox environment definition to the repo so the team runs agents with the same tools and network policy."
+  ],
+  "quotes": [
+    {"text": "You can always use more AI to control your AI. But it becomes just two foxes whispering to each other about a henhouse.", "at": "12:00"},
+    {"text": "You are like one npm install away from exposing your machine.", "at": "14:53"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Powerful engines, weak brakes"},
+    {"at": "05:03", "title": "How agents go wrong"},
+    {"at": "08:05", "title": "Why containers and guardrails fail"},
+    {"at": "16:19", "title": "Docker Sandboxes demo"},
+    {"at": "23:53", "title": "The four Cs and governance"},
+    {"at": "28:10", "title": "Application-level policies"},
+    {"at": "30:43", "title": "Kits and environment files"}
+  ],
+  "tech": ["Docker Sandboxes", "sbx", "KVM", "Docker", "Claude Code", "OpenAI Codex", "GitHub Copilot", "OpenCode", "MCP", "Cedar", "OCI images", "Testcontainers"],
+  "watchIf": "You want to run coding agents in autonomous mode on a laptop full of credentials and need an isolation setup a security team could sign off on.",
+  "themes": ["Security & supply chain", "AI agents & agentic coding"],
+  "demo": true
+}

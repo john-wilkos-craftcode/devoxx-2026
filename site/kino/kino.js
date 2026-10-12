@@ -512,46 +512,58 @@ const VIEWS = {
 VIEWS.room8 = (() => { const r = door(8).room.bounds; return { pos: [r.x + 2, r.y + 2, FH + 4.8], look: [r.x + r.w, r.y + r.h, FH - 2.5], fov: 75 }; })();
 VIEWS.side8 = (() => { const r = door(8).room.bounds; return { pos: [r.x + r.w / 2, r.y - 25, FH + 1], look: [r.x + r.w / 2, r.y + r.h / 2, FH - 1], fov: 60, plan: true, cutaway: r }; })();
 VIEWS.plan = { pos: [cx, -10, 120], look: [cx, -9.9, 0], fov: 60, plan: true };
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-function setView(name) {
-  const v = VIEWS[name] || VIEWS.corridor;
-  for (const c of ceilings) c.visible = !v.plan;
-  if (v.cutaway) camera.near = 24.5;
-  scene.fog.density = v.plan ? 0 : 0.012;
-  const inRoom = venue.rooms.find((r) => r.kind === "auditorium" && r.floor === 1 &&
-    v.pos[0] > r.bounds.x && v.pos[0] < r.bounds.x + r.bounds.w && v.pos[1] > r.bounds.y && v.pos[1] < r.bounds.y + r.bounds.h);
-  if (inRoom) lightRoom(inRoom); else for (const l of roomLights) l.intensity = 0;
-  camera.position.copy(v3(...v.pos));
-  camera.fov = v.fov;
-  camera.updateProjectionMatrix();
-  controls.target.copy(v3(...v.look));
-  controls.update();
-  for (const b of document.querySelectorAll("#dev button")) b.setAttribute("aria-pressed", String(b.dataset.view === name));
-}
-const dev = document.getElementById("dev");
-for (const name of Object.keys(VIEWS)) {
-  const b = document.createElement("button");
-  b.type = "button"; b.textContent = name; b.dataset.view = name;
-  b.addEventListener("click", () => setView(name));
-  dev.append(b);
-}
-setView(params.get("view") || "corridor");
-
+// ---------- run: the experience by default, free-look camera views with ?dev or ?view ----------
 addEventListener("resize", () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
   composer.setSize(innerWidth, innerHeight);
 });
-
 document.getElementById("loading").remove();
+
+const devMode = params.has("dev") || params.has("view");
+let tick = () => {};
+if (devMode) {
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  const setView = (name) => {
+    const v = VIEWS[name] || VIEWS.corridor;
+    for (const c of ceilings) c.visible = !v.plan;
+    if (v.cutaway) camera.near = 24.5;
+    scene.fog.density = v.plan ? 0 : 0.012;
+    const inRoom = auditoriums.find((r) =>
+      v.pos[0] > r.bounds.x && v.pos[0] < r.bounds.x + r.bounds.w && v.pos[1] > r.bounds.y && v.pos[1] < r.bounds.y + r.bounds.h);
+    if (inRoom) lightRoom(inRoom); else for (const l of roomLights) l.intensity = 0;
+    camera.position.copy(v3(...v.pos));
+    camera.fov = v.fov;
+    camera.updateProjectionMatrix();
+    controls.target.copy(v3(...v.look));
+    controls.update();
+    for (const b of document.querySelectorAll("#dev button")) b.setAttribute("aria-pressed", String(b.dataset.view === name));
+  };
+  const dev = document.getElementById("dev");
+  for (const name of Object.keys(VIEWS)) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = name; b.dataset.view = name;
+    b.addEventListener("click", () => setView(name));
+    dev.append(b);
+  }
+  setView(params.get("view") || "corridor");
+  tick = () => controls.update();
+} else {
+  document.getElementById("dev").remove();
+  const { startExperience } = await import("./experience.js");
+  tick = startExperience({ THREE, scene, camera, renderer, v3, venue, talks, doors, corridor, auditoriums,
+    FH, CLEAR, lightRoom, roomLights, point, ledMat, mat, M, params, plateUnder });
+}
+
 // ?still renders a couple of frames and stops: for headless screenshots on software WebGL.
 const still = params.has("still");
 let frames = 0;
-renderer.setAnimationLoop(() => {
-  controls.update();
+renderer.setAnimationLoop((t) => {
+  tick(t);
   composer.render();
+  if (window.__css) window.__css();
   if (++frames === 2) {
     window.__ready = true;
     if (still) renderer.setAnimationLoop(null);

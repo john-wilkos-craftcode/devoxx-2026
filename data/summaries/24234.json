@@ -1,0 +1,38 @@
+{
+  "id": 24234,
+  "source": "transcript",
+  "tldr": "Schudel shows how an AsyncAPI spec, split into shared and per-service files, generates docs, message records and a working Spring Cloud Stream Kafka publisher and consumer.",
+  "summary": [
+    "Michel Schudel (Craftsmen) starts from a REST order service described in OpenAPI, then adds a stock service that must learn about new orders through an OrderCreated event. Too often such messages are documented on a Confluence page, with questions like \"is quantity always an int?\" and no formal way to announce breaking changes. OpenAPI does not fit because it has no publish/subscribe or fan-out concept, no protocol bindings, and request/response tooling. AsyncAPI, created by Fran Méndez, applies the same spec-first idea to event-driven systems. A spec has JSON Schema components, messages with example payloads, channels (an abstraction of a Kafka topic or Pub/Sub topic), send or receive operations, and server and protocol bindings. He recommends putting schemas, messages and channels in a shared YAML file and keeping each service's operation in its own file that references it.",
+    "In the demo, both services use Spring Cloud Stream with Redpanda as a Kafka-compatible broker. The asyncapi CLI validates the spec (warning that 3.1.0 has replaced the 3.0.0 he used) and renders HTML docs from the built-in template. The built-in Java model generation gives plain beans in one directory, and the bundled Spring Boot template is outdated, so Schudel wrote his own JavaScript templates for the AsyncAPI generator. Run through the Maven exec plugin, they write records, a StreamBridge-based publisher, a consumer and Spring Cloud Stream binding config into target. Posting an order through the Swagger UI produced an event the stock service consumed."
+  ],
+  "keyPoints": [
+    "AsyncAPI specs consist of schemas, messages, channels, operations (send or receive) and optional server and protocol bindings, such as Kafka settings or Google Pub/Sub retention and subscription names.",
+    "Spec distribution: shared schemas, messages and channels in one YAML file, and each service's send or receive operation in a separate file that references it.",
+    "The asyncapi CLI validates specs, generates HTML documentation and generates models for about 10 to 15 languages, but the Java models are plain beans and the Spring Boot template is outdated.",
+    "Custom JavaScript generator templates, called from the Maven exec plugin, can produce Java records, Spring Cloud Stream publishers and consumers, and binding config into target at build time."
+  ],
+  "takeaways": [
+    "Replace wiki pages describing event payloads with an AsyncAPI spec that consumers can validate and generate code from.",
+    "Split the spec into a shared message/channel file and per-service operation files.",
+    "Write your own generator templates for your stack rather than relying on the bundled Spring Boot template.",
+    "Wire asyncapi generate into your Maven build so generated code and docs never drift from the spec."
+  ],
+  "quotes": [
+    {"text": "This is already way much nicer than a Confluence page, right?", "at": "19:35"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "OpenAPI recap"},
+    {"at": "02:52", "title": "Adding an order event"},
+    {"at": "05:32", "title": "Why not OpenAPI"},
+    {"at": "06:55", "title": "AsyncAPI spec structure"},
+    {"at": "09:47", "title": "Operations and spec distribution"},
+    {"at": "13:35", "title": "Demo: services and specs"},
+    {"at": "17:53", "title": "CLI validation, docs and models"},
+    {"at": "20:38", "title": "Custom templates and Maven"}
+  ],
+  "tech": ["AsyncAPI", "AsyncAPI CLI", "AsyncAPI Generator", "OpenAPI", "Spring Boot", "Spring Cloud Stream", "Apache Kafka", "Redpanda", "Google Cloud Pub/Sub", "JSON Schema", "Maven"],
+  "watchIf": "You publish or consume Kafka or Pub/Sub events between teams and want contracts and code generated from one spec instead of a wiki page.",
+  "themes": ["Architecture & design", "Developer experience & tooling"],
+  "demo": true
+}

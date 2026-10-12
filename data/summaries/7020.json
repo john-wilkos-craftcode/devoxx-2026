@@ -1,0 +1,42 @@
+{
+  "id": 7020,
+  "source": "transcript",
+  "tldr": "Sepehrifar puts four real AI-tooling CVEs on mock trial, lets the audience vote on who is to blame, and concludes that model providers, tool builders and developers share responsibility.",
+  "summary": [
+    "Makan Sepehrifar (Productboard) runs this lunch talk as a jury trial with Slido votes. For each case he explains the attack, then the audience blames the model developer, the tool developer or the end user, and he argues the defence. CamoLeak: a prompt hidden in a PR made GitHub Copilot Chat spell out secrets as ASCII art built from per-letter images routed through GitHub's camo image proxy, which the content security policy allowed; GitHub fixed it by disabling image rendering. Probllama: Ollama had no authentication, its container image bound to 0.0.0.0, and /api/pull accepted a manifest with path traversal, so an attacker could write a library plus ld.so.preload and get remote code execution. Fixes were path checks and digest-validated manifests. The AWS MCP server concatenated agent-supplied parameters into shell strings (OS command injection, CWE-78); the GitHub Copilot extension could set its own auto-approve flag in settings, turning a prompt injection into YOLO mode and code execution. The audience blamed the tool developer every time.",
+    "Sepehrifar then describes the \"invisible collaborator\": instructions hidden in PRs, dependencies, issues or agent config files (Cursor rules, Copilot instructions, Claude files) that the agent follows faithfully. He mentions the GitHub MCP issue where one token spanning public and private repos let an issue leak private code, malicious AI plugins on the JetBrains marketplace, and Anthropic's finding that about 250 documents can poison a model. His core argument is the mental model gap: like early email users trusting the sender field, developers picture an agent they control, while an attacker sees a credentialed instruction-follower with a shared, poisonable context. The common chain runs from prompt injection through context manipulation, path traversal and RCE to overwritten guardrails and tool impersonation. His answer is shared responsibility: providers ship safe models, tool builders threat-model, developers consume safely and share what they find."
+  ],
+  "keyPoints": [
+    "CamoLeak exfiltrated secrets from GitHub Copilot Chat by encoding them as a sequence of image URLs through GitHub's own camo proxy, which bypassed the content security policy.",
+    "Probllama (Ollama, CVSS 9.8) combined no authentication, a default 0.0.0.0 binding and path traversal in /api/pull to write ld.so.preload and achieve remote code execution.",
+    "The AWS MCP server built shell commands by string concatenation, so a prompt injection could run arbitrary commands under the developer's AWS identity.",
+    "Letting a coding agent edit its own IDE settings, such as an auto-approve flag, turns prompt injection into code execution; Sepehrifar says Claude Code, Gemini, Cursor and Roo Code had similar issues.",
+    "Most attacks followed one chain: prompt injection, context manipulation, path traversal, remote code execution, then guardrail overwrite or tool impersonation."
+  ],
+  "takeaways": [
+    "Review agent configuration files (rules, instructions, settings) in your repositories as you would code.",
+    "Bind local AI services such as Ollama to 127.0.0.1 and put authentication in front of anything you expose.",
+    "Use separate, narrowly scoped tokens per MCP server and per repository visibility level.",
+    "Never pass agent-provided parameters into shell strings; use argument arrays and validate intent."
+  ],
+  "quotes": [
+    {"text": "It's an instruction follower, but it's not always loyal to you as the developer. It's loyal to the instructions.", "at": "33:33"},
+    {"text": "Millions of tokens is a very good place to hide.", "at": "33:33"},
+    {"text": "It's not about not using AI, but it's about knowing what you are doing.", "at": "37:20"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Rules of the trial"},
+    {"at": "04:40", "title": "The usual suspects"},
+    {"at": "06:02", "title": "CamoLeak in Copilot Chat"},
+    {"at": "12:18", "title": "Probllama: Ollama RCE"},
+    {"at": "17:30", "title": "AWS MCP shell injection"},
+    {"at": "23:27", "title": "Copilot changing IDE settings"},
+    {"at": "27:56", "title": "The invisible collaborator"},
+    {"at": "30:49", "title": "The mental model gap"},
+    {"at": "34:34", "title": "Shared responsibility"}
+  ],
+  "tech": ["GitHub Copilot", "Ollama", "AWS MCP Server", "MCP", "VS Code", "Claude Code", "Cursor", "Slido"],
+  "watchIf": "You use coding agents or MCP servers and want a concrete, entertaining tour of how real AI-tool vulnerabilities were exploited and fixed.",
+  "themes": ["Security & supply chain", "AI agents & agentic coding"],
+  "demo": false
+}

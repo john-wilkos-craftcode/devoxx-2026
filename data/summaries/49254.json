@@ -1,0 +1,98 @@
+{
+  "id": 49254,
+  "source": "transcript",
+  "tldr": "Finkelshtein hardens a naive Temurin JDK 25 image in five steps, ending with a signed distroless image with SBOMs, and argues someone must own the base layer under an SLA.",
+  "summary": [
+    "Finkelshtein, a developer advocate at BellSoft, starts with a one-stage Dockerfile on Eclipse Temurin 25 JDK. In August 2026 Trivy found 46 vulnerabilities in it, 42 from the base image and none from Java; he said the base alone now shows 135. The goal is 'zero unmanaged risk': every CVE patched or accepted by a named owner with an expiry date. Step one needs no rebuild: a non-root user, dropped capabilities, no-new-privileges and a read-only filesystem. Step two ships a JRE or jlink runtime through a multi-stage build on a minimal base, taking the image from 46 vulnerabilities and about 1 GB to 7 and 200 MB.",
+    "Step three triages in context, since CVSS ignores reachability and exposure: Spring4Shell scores 9.8 but only affects WAR files on standalone Tomcat. Step four handles CVEs with no patch, such as the critical zlib issue Debian Bookworm marked 'will not fix' although zlib 1.3.1 fixed it in January 2024. Since backporting takes days of specialist work, a team or vendor should own the base layer under an SLA. Step five proves it to auditors: a distroless JRE 25 base scanned at zero CVEs, digest pinning, cosign signatures, separate OS and application SBOMs, attestations, and Renovate for updates. He noted the EU Cyber Resilience Act requires SBOMs from 11 December 2027."
+  ],
+  "keyPoints": [
+    "Four runtime flags work on images you already ship: non-root user, --cap-drop=ALL with selective --cap-add, no-new-privileges, and a read-only root filesystem with tmpfs on /tmp.",
+    "Moving from a single-stage JDK image to a multi-stage JRE build cut the sample app from 46 vulnerabilities and about 1 GB to 7 vulnerabilities and 200 MB; a distroless JRE base brought it to zero.",
+    "Sorting by CVSS sorts by 'someone else's worst case'; Spring4Shell (9.8) only affects WAR deployments on standalone Tomcat.",
+    "A free base image is 'a gift, not a commitment': Debian Bookworm still ships zlib 1.2.13 with a critical CVE marked will-not-fix.",
+    "To pass an audit you must show who built the image (signature), what is inside (SBOMs, OS and app kept separate) and how it was built (attestation), with base images pinned by digest."
+  ],
+  "takeaways": [
+    "Add USER, --cap-drop=ALL, no-new-privileges and a read-only filesystem to one production container this week.",
+    "Switch to a multi-stage build that runs on a JRE or jlink runtime on a minimal or distroless base.",
+    "Write down escalation rules (internet-facing, hot path, lateral movement) and record every accepted CVE with an owner and an expiry date.",
+    "Pin base images by digest, verify them with cosign, and let Renovate open PRs that run your tests when the digest changes.",
+    "Scan one production image and find out who, if anyone, owns its base layer and patch SLA."
+  ],
+  "quotes": [
+    {
+      "text": "Our objective is not having zero CVEs. Our mission is zero unmanaged risk.",
+      "at": "09:48"
+    },
+    {
+      "text": "Sorting only by CVSS is essentially sorting by someone else's worst case scenario.",
+      "at": "21:28"
+    },
+    {
+      "text": "A free image is essentially a gift, not a commitment. Nobody in the chain owes you a date.",
+      "at": "28:29"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Scanning a naive Dockerfile"
+    },
+    {
+      "at": "07:14",
+      "title": "Why CVEs cost money"
+    },
+    {
+      "at": "10:52",
+      "title": "Limiting container privileges"
+    },
+    {
+      "at": "15:18",
+      "title": "Shrinking the attack surface"
+    },
+    {
+      "at": "19:21",
+      "title": "Classifying beyond CVSS"
+    },
+    {
+      "at": "25:59",
+      "title": "Patching and base-layer ownership"
+    },
+    {
+      "at": "37:24",
+      "title": "Proving it to the auditor"
+    },
+    {
+      "at": "40:57",
+      "title": "Keeping images hardened"
+    }
+  ],
+  "tech": [
+    "Docker",
+    "Eclipse Temurin",
+    "JDK 25",
+    "jlink",
+    "Trivy",
+    "OSV-Scanner",
+    "CVSS",
+    "Spring4Shell",
+    "Debian Bookworm",
+    "Alpine Linux",
+    "Alpaquita Linux",
+    "Wolfi",
+    "UBI",
+    "Distroless images",
+    "Cosign",
+    "CycloneDX",
+    "SBOM",
+    "Renovate",
+    "Cyber Resilience Act"
+  ],
+  "watchIf": "You ship Java in containers, own nobody's base image, and want a concrete sequence of Dockerfile and pipeline changes to get CVE counts and audit questions under control.",
+  "themes": [
+    "Security & supply chain",
+    "Cloud native & Kubernetes"
+  ],
+  "demo": false
+}

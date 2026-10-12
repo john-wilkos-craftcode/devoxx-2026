@@ -1,0 +1,100 @@
+{
+  "id": 8169,
+  "source": "transcript",
+  "tldr": "Kolaxis ranks software's footprint as devices, then networks, then data centers, and walks through the sustainability trade-offs at each layer, arguing AI coding agents now make several greener options affordable.",
+  "summary": [
+    "Kolaxis, who works on green software in Accenture's global innovation team, defines green software as reducing energy use, carbon footprint and, as a by-product, cloud bills. He treats architecture as 'the things that are hard to change' and opens with a quiz: devices have the largest footprint, then data networks (worse since the shift to wireless), and data centers the smallest, at least on the data of the past two years. The talk follows that priority order, presenting each green technique next to the other '-ilities' it pulls against.",
+    "For devices, about 80% of a smartphone's lifetime carbon comes from manufacturing and transport, so keeping phones four or five years matters most. People replace working hardware because apps drop old OS versions or get slow, so Kolaxis asks architects to support older devices and build frugal apps. His examples are Facebook Lite, a thin client that renders screens server-side and works on 2009-era Android phones over 2G, and Shopify, which he said used AI agents to rewrite its React Native app natively, with 50% and 23% faster startup and ten times fewer crashes.",
+    "For networks: compress data (costing CPU, and not worth it at low compression ratios), cache locally or through CDNs (more storage), and process at the edge or on-device, which needs newer hardware. For data centers he compares PUE and WUE using Azure figures: PUE is about 1.26 in Europe and the Americas alike, but European sites use far less water, so the right choice depends on local water scarcity. Carbon intensity comes from Electricity Maps, and Google Cloud's region picker weighs carbon against price and latency; in one scenario moving from Ireland to Sweden cut emissions 87% and cost 5%.",
+    "On availability, he contrasts the triple-redundant Airbus A321 with the single-engine F-35. Up to half of data-center servers idle as standbys, yet four nines allows about four minutes of downtime a month, enough for Terraform or a container orchestrator to restart a failed instance. ARM servers (AWS Graviton, Google Axion, Azure Cobalt, Ampere) use up to 60% less energy, and AI agents lower the porting effort. In Q&A he said his bare-metal measurements show agent-driven porting pays back its energy for widely used apps, and that agents write inefficient code unless told explicitly to optimise."
+  ],
+  "keyPoints": [
+    "Footprint ranking given: end-user devices first, data networks second, data centers last, though Kolaxis expects AI adoption may change the order.",
+    "Around 80% of a smartphone's carbon is emitted before purchase, so extending device life through backward-compatible, lightweight apps is the biggest lever software has.",
+    "Facebook Lite renders UI server-side and pushes images to the phone, supporting Android devices from 2009 and 2G networks.",
+    "PUE is total facility energy divided by server energy (example: 1,400 kWh in, 1,000 kWh to servers = 1.4); WUE is litres of cooling water per kWh of server energy. Azure's regions look equal on PUE but differ sharply on WUE.",
+    "Pick regions on PUE, WUE and grid carbon intensity together, using Electricity Maps and Google Cloud's region picker, and weigh price and latency too.",
+    "Rather than idle active-standby servers, rely on automated restart (Terraform or a single container that gets rescheduled) when the availability target permits a few minutes of downtime.",
+    "ARM servers can use up to 60% less electricity than comparable x86 servers and reduce cooling load; the cost is porting work and running dual build and test pipelines.",
+    "LLMs trained on existing code produce inefficient code by default; prompts need to spell out the efficiency goal."
+  ],
+  "takeaways": [
+    "Check which old OS versions and low-spec devices your mobile app could keep supporting, and do not drop them lightly.",
+    "Measure the compression ratio of what you send before turning compression on everywhere.",
+    "Compare candidate cloud regions on PUE, WUE and carbon intensity as well as price and latency.",
+    "Work out the downtime your availability target actually allows and see whether automated restart can replace hot standbys.",
+    "Revisit an earlier rejected ARM migration and see whether AI coding agents make the porting cheap enough now."
+  ],
+  "quotes": [
+    {
+      "text": "There was some software architect who made that decision not to support the operating system of my smartphone and forced me to buy a new device.",
+      "at": "09:04"
+    },
+    {
+      "text": "Do you design them like commercial aircraft or like fighter jets? That's the key question.",
+      "at": "36:17"
+    },
+    {
+      "text": "Nothing is set in stone. These trade-offs are changing with the introduction of AI coding agents.",
+      "at": "44:59"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "What green software is"
+    },
+    {
+      "at": "04:30",
+      "title": "Devices, networks, data centers"
+    },
+    {
+      "at": "08:02",
+      "title": "Extending device lifetime"
+    },
+    {
+      "at": "17:12",
+      "title": "Reducing network traffic"
+    },
+    {
+      "at": "22:03",
+      "title": "PUE, WUE and carbon intensity"
+    },
+    {
+      "at": "31:51",
+      "title": "Choosing a cloud region"
+    },
+    {
+      "at": "34:51",
+      "title": "Redundancy versus sustainability"
+    },
+    {
+      "at": "40:51",
+      "title": "Energy-efficient ARM servers"
+    },
+    {
+      "at": "44:59",
+      "title": "Wrap-up and Q&A"
+    }
+  ],
+  "tech": [
+    "Facebook Lite",
+    "React Native",
+    "CDNs",
+    "Electricity Maps",
+    "Google Cloud region picker",
+    "Microsoft Azure",
+    "Terraform",
+    "AWS Graviton",
+    "Google Axion",
+    "Azure Cobalt",
+    "Ampere",
+    "ARM"
+  ],
+  "watchIf": "You make infrastructure or mobile-platform decisions and want a structured list of where sustainability conflicts with latency, availability, cost and portability.",
+  "themes": [
+    "Sustainability",
+    "Architecture & design"
+  ],
+  "demo": false
+}
