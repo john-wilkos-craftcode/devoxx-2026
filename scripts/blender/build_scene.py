@@ -347,13 +347,15 @@ M = {
     "extinguisher": material("extinguisher", 0xb3121a, 0.3),
     "exitSign": emissive("exitSign", 0x18c060, 4.0),
     "downlight": emissive("downlight", 0xfff1e0, 25.0),
-    "bezel": material("bezel", 0x070708, 0.6),
+    "bezel": material("bezel", 0x0b0b0e, 0.28, 0.4, bevel=0.006),     # satin black, catching a highlight on its edge
+    "plate": material("plate", 0xf6921e, 0.5, emission=0xd9741a, strength=0.6),   # backlit room-number plate
+    "plateText": material("plateText", 0x0a0f2e, 0.4),
     "foliage": material("foliage", 0x4a7a3a, 0.55, sheen=0.3),
     "tableFrame": material("tableFrame", 0x111114, 0.4, 0.6),
     "audFloor": material("audFloor", 0x111218, 1.0, noise_bump=0.2),
     "ceiling": material("ceiling", 0x121318, 1.0),
     "vault": material("vault", 0xe6e6e8, 0.85),
-    "starDot": emissive("starDot", 0xfff4e8, 60.0),
+    "starDot": emissive("starDot", 0xfff4e8, 30.0),
     "wordX": material("wordX", 0xff9a2a, 0.5, emission=0xff8a1e, strength=0.4),
     "trussLamp": emissive("trussLamp", 0xf2f4ff, 400.0),
     "aisleLed": emissive("aisleLed", 0xff2030, 30.0),
@@ -379,7 +381,7 @@ M = {
     "cove": emissive("cove", 0x8c9cff, 6.0),
     "panelLight": emissive("panelLight", 0xfff3e6, 8.0),       # the look of the panels; area lights below do the lighting      # about 4000 K, like the photos
     # the HTML is pinned over these in the browser: they glow the panels' navy, so their light on the room matches
-    "screen": emissive("screen", 0x1c2658, 9.0),      # bright enough to light the letters and the front rows
+    "screen": emissive("screen", 0x22306a, 16.0),     # bright enough to light the letters and the front rows
     "masking": material("masking", 0x050507, 1.0, noise_bump=0.6),
     "programme": emissive("programme", 0x1d2c7a, 6.0),
     "schedule": emissive("schedule", 0x1c2a6b, 1.5),
@@ -638,6 +640,7 @@ for fx in (grand["x"] + grand["w"] * 0.17, grand["x"] + grand["w"] * 0.5, grand[
 
 # ---------------------------------------------------------------------------------- rooms: doors, screens
 FONT = bpy.data.fonts.load(str(ROOT / "scripts" / "blender" / "fonts" / "BigShouldersDisplay.ttf"))
+WORD_FONT_EARLY = bpy.data.fonts.load(str(ROOT / "scripts" / "blender" / "fonts" / "ArchivoBlack.ttf"))
 
 
 def text_object(body, size, loc, rot, mat, extrude=0.01, offset=0.02):
@@ -705,9 +708,9 @@ for r in auditoriums:
     text_object(str(n), 2.6, (wall_x + face * 0.2, panel_y, FH + 1.85), (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2), M["white"], 0.02, 0.03)
     # the schedule totem in front of the room-number panel, facing the corridor (on phones, the talk is shown on it,
     # with the big numeral rising behind it)
-    sy = panel_y
+    sy = yc + side_y * 2.05          # just past the portal's jamb: the doorway on one side, the number panel on the other
     sx = wall_x + face * 1.1
-    tw, th, tz = 0.70, 1.24, FH + 1.42
+    tw, th, tz = 0.70, 1.42, FH + 1.45
     B.box("bezel", {"x": sx - 0.035, "y": sy - tw / 2 - 0.035, "w": 0.07, "h": tw + 0.07}, tz - th / 2 - 0.09, tz + th / 2 + 0.035)
     B.box("tableFrame", {"x": sx - face * 0.07 - 0.03, "y": sy - 0.06, "w": 0.06, "h": 0.12}, FH + 0.04, tz - th / 2)
     B.box("tableFrame", {"x": sx - 0.21, "y": sy - 0.3, "w": 0.42, "h": 0.6}, FH, FH + 0.04)
@@ -716,8 +719,9 @@ for r in auditoriums:
                   (fx, sy - side_y * tw / 2, tz + th / 2), (fx, sy + side_y * tw / 2, tz + th / 2)]
     B.mesh("programme", door_totem, [(0, 1, 2, 3)] if face * side_y < 0 else [(0, 3, 2, 1)])
     # an orange header plate with the room's number on top of the totem, as on Kinepolis signage
-    B.box("numeral", {"x": sx - 0.04, "y": sy - tw / 2 - 0.035, "w": 0.08, "h": tw + 0.07}, tz + th / 2 + 0.05, tz + th / 2 + 0.42)
-    text_object(str(n), 0.3, (sx + face * 0.045, sy, tz + th / 2 + 0.235), (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2), M["white"], 0.008, 0.01)
+    B.box("plate", {"x": sx - 0.04, "y": sy - tw / 2 - 0.035, "w": 0.08, "h": tw + 0.07}, tz + th / 2 + 0.05, tz + th / 2 + 0.3)
+    plate_txt = text_object(str(n), 0.2, (sx + face * 0.06, sy, tz + th / 2 + 0.175), (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2), M["plateText"], 0.006, 0.0)
+    plate_txt.data.font = WORD_FONT_EARLY
     doors[n] = {"room": r, "wall_x": wall_x, "yc": yc, "face": face, "leaves": leaves, "west": west,
                 "totem": {"x": sx, "y": sy, "z": tz, "w": tw, "h": th, "corners": door_totem}}
 
@@ -1128,7 +1132,7 @@ B.mesh("programme", screen_corners, [(0, 1, 2, 3)])
 
 
 # the phone's programme: a portrait schedule totem standing in front of the curtains, right of the big screen
-TOTEM = {"x": SX + 3.9, "y": NORTH - 2.6, "z": 1.42, "w": 0.70, "h": 1.24}
+TOTEM = {"x": SX + 3.9, "y": NORTH - 2.6, "z": 1.5, "w": 0.70, "h": 1.42}
 tb = 0.035
 B.box("bezel", {"x": TOTEM["x"] - TOTEM["w"] / 2 - tb, "y": TOTEM["y"] - 0.03, "w": TOTEM["w"] + 2 * tb, "h": 0.07},
       TOTEM["z"] - TOTEM["h"] / 2 - 0.09, TOTEM["z"] + TOTEM["h"] / 2 + tb)
@@ -1520,7 +1524,7 @@ pos, look, fov = hall_pose()
 hall_cam = still_cam("cam-hall", pos, look, fov)
 tdist = 1.7                           # the totem fills 90% of a phone's width; a little stand, floor and room round it
 _hfov = 2 * math.atan(TOTEM["w"] / 2 / 0.9 / tdist)
-phone_hall_cam = still_cam("cam-hall-phone", (TOTEM["x"], TOTEM["y"] - tdist, TOTEM["z"] + 0.04), (TOTEM["x"], TOTEM["y"], TOTEM["z"] - 0.02),
+phone_hall_cam = still_cam("cam-hall-phone", (TOTEM["x"], TOTEM["y"] - tdist, TOTEM["z"]), (TOTEM["x"], TOTEM["y"], TOTEM["z"]),
                            2 * math.degrees(math.atan(math.tan(_hfov / 2) * PHONE[1] / PHONE[0])), dof=(tdist, 1.8))
 bpy.context.view_layer.update()       # matrix_world is stale until the depsgraph runs
 set_res(LAPTOP)
@@ -1563,7 +1567,7 @@ ddist = 2.0                                   # square on (text pinned flat neve
 _dh = 2 * math.atan(tot["w"] / 2 / 0.82 / ddist)
 door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist, tot["y"], tot["z"] + 0.2), (tot["x"], tot["y"], tot["z"] + 0.2),
                      2 * math.degrees(math.atan(math.tan(_dh / 2) * PHONE[1] / PHONE[0])), dof=(ddist, 2.8))
-door_cam.data.shift_y = 0.02                  # the numeral plate on top in view, less floor
+door_cam.data.shift_y = 0.05                  # the numeral plate on top in view, less floor
 bpy.context.view_layer.update()
 set_res(PHONE)
 shots[f"door-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(grow(tot["corners"]), door_cam)}, "size": {"screen": [tot["w"], tot["h"]]}}

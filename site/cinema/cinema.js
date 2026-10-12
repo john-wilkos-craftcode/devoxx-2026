@@ -229,8 +229,8 @@ function why(t, terms) {
     const a = i;                                                     // start at the match, so it's always in view
     if (name === "Tools" || name === "Topics" || name === "Speaker") {        // lists: the matching item first, then whole items
       const items = text.split(/,\s*/), hit = items.find((x) => x.toLowerCase().includes(w));
-      const rest = items.filter((x) => x !== hit).slice(0, 3);
-      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), rest.length ? `, ${rest.join(", ")}` : "");
+      const more = items.length - 1;
+      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? ` +${more} more` : "");
     }
     const word = text.slice(i).match(/^\S+/)[0].replace(/[,.;:]$/, "");    // the whole matched word, e.g. "Kotlin"
     return el("span", { class: "why" }, el("b", { text: `${name}: ` }), a > 0 ? "…" : "", el("mark", { text: word }), text.slice(i + word.length, i + word.length + 70));
@@ -252,7 +252,7 @@ function card(t, { when: showWhen = null, terms = null } = {}) {
 }
 
 function programme(tall) {
-  const search = el("input", { class: "search", type: "search", placeholder: tall ? "Search talks, speakers, topics" : "Search talks, people", "aria-label": "Search all talks", value: query });
+  const search = el("input", { class: "search", type: "search", placeholder: tall ? "Search talks, speakers, topics" : "Search", "aria-label": "Search all talks", value: query });
   const dayRow = el("div", { class: "strip days", role: "group", "aria-label": "Day" });
   const timeRow = el("div", { class: "strip times", role: "group", "aria-label": "Start time" });
   const nav = el("div", { class: "nav" }, tall ? dayRow : null, timeRow);
@@ -260,7 +260,7 @@ function programme(tall) {
   const panel = el("section", { class: `face prog is-lcd${tall ? " is-tall" : ""}`, "aria-label": "Programme" },
     el("div", { class: "prog-head" },
       el("h1", { class: "brand", "aria-label": "Devoxx Belgium 2026, 5 to 9 October" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })),
-        tall ? el("small", { text: "Belgium 2026: every talk, summarised" }) : el("small", { text: "every talk, summarised" })),
+        el("small", { text: "Belgium 2026, summarised" })),
       tall ? null : dayRow,
       search),
     nav, body);
@@ -293,7 +293,7 @@ function programme(tall) {
     const cards = el("div", { class: `cards scroller${tall ? "" : fill.length ? " is-packed" : " is-exact"}`, tabindex: "-1" },
       here.map((t) => {
         const c = card(t, { when: fill.length ? "time" : null });
-        if (fill.length) c.classList.add(here.length === 1 ? "is-now-wide" : "is-now");
+        if (fill.length) c.classList.add(here.length === 1 ? "is-now-wide" : "is-now");   // a lone talk takes the whole row
         if (fill.length && here.length === 1 && t.s && t.s.tldr) c.append(el("span", { class: "gist", text: t.s.tldr }));
         return c;
       }),
@@ -327,7 +327,7 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
   };
   const fill = (id) => {
     pane.textContent = "";
-    if (id === "short") put(pane, el("p", { text: s.tldr }), s.watchIf ? el("p", { class: "note", text: `Worth it if ${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.` }) : null);
+    if (id === "short") put(pane, el("p", { text: s.tldr }));
     if (id === "points") put(pane, el("ul", {}, s.keyPoints.map((p) => el("li", { text: p }))));
     if (id === "monday") put(pane, el("ol", {}, s.takeaways.map((p) => el("li", { text: p }))));
     if (id === "chapters") put(pane, el("div", {}, s.chapters.map(chapter)));
@@ -346,15 +346,15 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
   const intro = () => {
     main.textContent = "";
     put(main,
-      doorRoom && tall ? el("div", { class: "door-sign" }, el("small", { text: "Room" }), el("b", { text: String(doorRoom) }), el("span", { text: t.start ? `Recorded ${fShort.format(new Date(t.start))} Oct` : "" })) : null,
       el("div", { class: "meta", text: [doorRoom && tall ? null : (!onFloor && /^BOF/.test(t.room || "") ? `${t.room} (downstairs)` : t.room),
-        doorRoom && tall ? (t.start ? fTime.format(new Date(t.start)) : null) : whenShort(t), typeLabel(t)].filter(Boolean).join(", ") }),
+        whenShort(t), typeLabel(t)].filter(Boolean).join(", ") }),
       el("h2", { text: t.title, style: `--title:${onFloor ? titleSize(t.title, 40, 30) : titleSize(t.title, 34, 26)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
+      s.watchIf ? el("p", { class: "verdict", text: `Worth it if ${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.` }) : null,
       !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
       el("div", { class: "actions" }, watch(), el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
         t.videoId ? null : el("span", { class: "note", text: "No recording yet." })),
-      !tall && s.watchIf ? el("p", { class: "verdict", text: `Worth it if ${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.` }) : null);
+      null);
   };
   playAt = (sec) => {
     main.textContent = "";
