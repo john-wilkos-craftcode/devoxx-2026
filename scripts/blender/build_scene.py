@@ -138,8 +138,8 @@ M = {
     "funnel": material("funnel", 0xf3f4f8, 0.7),
     "led": emissive("led", 0x3f74ff, 12.0),
     "ledWhite": emissive("ledWhite", 0xdfe7ff, 8.0),
-    "screen": emissive("screen", 0x1c2236, 1.2),       # the HTML is pinned over this in the browser
-    "ledWall": emissive("ledWall", 0x101a44, 1.6),
+    "screen": emissive("screen", 0x2a3350, 4.0),       # the HTML is pinned over this in the browser
+    "ledWall": emissive("ledWall", 0x16224f, 4.0),
     "glassDoors": emissive("glassDoors", 0x2c58ff, 3.0),
     "redFunnel": material("redFunnel", 0x8f1026, 0.7, emission=0xb0132f, strength=0.8),
     "schedule": emissive("schedule", 0x1c2a6b, 1.5),
@@ -464,7 +464,7 @@ for sxn in (-1, 1):
     while y > WALL["y"] - 17:
         B.box("seatFrame", {"x": bx - 0.12, "y": y - 0.12, "w": 0.24, "h": 0.24}, 5.4, 5.7)
         spot = bpy.data.lights.new(f"track-{sxn}-{y:.1f}", "SPOT")
-        spot.energy, spot.spot_size, spot.spot_blend, spot.color = 120, math.radians(38), 0.6, (1.0, 0.93, 0.82)
+        spot.energy, spot.spot_size, spot.spot_blend, spot.color = 900, math.radians(38), 0.6, (1.0, 0.93, 0.82)
         so = bpy.data.objects.new(spot.name, spot)
         so.location = (bx, y, 5.38)
         so.rotation_euler = (0, -sxn * 0.5, 0)
@@ -483,7 +483,12 @@ B.finish()
 world = bpy.data.worlds.new("night")
 world.use_nodes = True
 world.node_tree.nodes["Background"].inputs["Color"].default_value = srgb(0x07060c)
-world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.4
+world.node_tree.nodes["Background"].inputs["Strength"].default_value = 1.0
+# a little haze in the air: spots and LEDs throw visible beams, as in the venue photos
+vol = world.node_tree.nodes.new("ShaderNodeVolumeScatter")
+vol.inputs["Density"].default_value = 0.012
+vol.inputs["Anisotropy"].default_value = 0.55
+world.node_tree.links.new(vol.outputs["Volume"], world.node_tree.nodes["World Output"].inputs["Volume"])
 scene.world = world
 
 
@@ -506,20 +511,28 @@ def point(name, loc, power, color=(1, 1, 1), radius=0.2):
 
 y = -44
 while y <= 62:
-    area(f"corridor-{y}", (cx, y, FH + CLEAR - 0.05), 1.2, 260, (0.9, 0.92, 1.0))
+    area(f"corridor-{y}", (cx, y, FH + CLEAR - 0.05), 1.2, 900, (0.9, 0.92, 1.0))
     y += 12
 for fx in (grand["x"] + grand["w"] * 0.17, grand["x"] + grand["w"] * 0.5, grand["x"] + grand["w"] * 0.83):
-    point(f"funnel-{fx:.1f}", (fx, grand["y"] + grand["h"] + 1.8, FH + 0.6), 400, (0.35, 0.5, 1.0), 0.4)
+    point(f"funnel-{fx:.1f}", (fx, grand["y"] + grand["h"] + 1.8, FH + 0.6), 1500, (0.35, 0.5, 1.0), 0.4)
 for sid in ("stair-west", "stair-east"):
     sb = next(l for l in venue["links"] if l["id"] == sid)["bounds"]
-    point(f"{sid}-low", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] * 0.7, 2.6), 150, (0.8, 0.85, 1.0))
-    point(f"{sid}-high", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] * 0.25, FH - 0.6), 150, (0.8, 0.85, 1.0))
-area("ledwall-spill", (WALL["x"], WALL["y"] - 1.0, WALL["z"]), 4.0, 600, (0.45, 0.55, 1.0), rot=(math.pi / 2, 0, 0))
-point("portal-glow-w", (WALL["x"] - 9.8, WALL["y"] - 5, 2.2), 120, (1.0, 0.25, 0.35))
-point("portal-glow-e", (WALL["x"] + 9.8, WALL["y"] - 5, 2.2), 120, (1.0, 0.25, 0.35))
+    point(f"{sid}-low", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] * 0.7, 2.6), 500, (0.8, 0.85, 1.0))
+    point(f"{sid}-high", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] * 0.25, FH - 0.6), 500, (0.8, 0.85, 1.0))
+area("ledwall-spill", (WALL["x"], WALL["y"] - 1.0, WALL["z"]), 4.0, 2500, (0.45, 0.55, 1.0), rot=(math.pi / 2, 0, 0))
+point("portal-glow-w", (WALL["x"] - 9.8, WALL["y"] - 5, 2.2), 500, (1.0, 0.25, 0.35))
+point("portal-glow-e", (WALL["x"] + 9.8, WALL["y"] - 5, 2.2), 500, (1.0, 0.25, 0.35))
+# the auditorium we walk to: dim house lights, the screen's own spill does the rest
+_room = doors[args.room]["room"]["bounds"] if args.room in doors else None
+if _room:
+    _west = _room["x"] < corridor["x"]
+    _mx = _room["x"] + _room["w"] * 0.55
+    area("house-1", (_mx, _room["y"] + _room["h"] * 0.3, FH + CLEAR - 0.1), 2.0, 700, (0.85, 0.88, 1.0))
+    area("house-2", (_mx, _room["y"] + _room["h"] * 0.7, FH + CLEAR - 0.1), 2.0, 700, (0.85, 0.88, 1.0))
 
 # ---------------------------------------------------------------------------------- shots
 cam_data = bpy.data.cameras.new("cam")
+cam_data.sensor_fit = "VERTICAL"     # fov values below are vertical, as in the browser version
 cam = bpy.data.objects.new("cam", cam_data)
 scene.collection.objects.link(cam)
 scene.camera = cam
@@ -546,7 +559,7 @@ def set_cam(loc, target, fov):
 
 
 def hall_pose():
-    d = fit_distance(WALL["w"], WALL["h"], 50, 0.66)
+    d = fit_distance(WALL["w"], WALL["h"], 50, 0.5)
     return (WALL["x"], WALL["y"] - d, WALL["z"]), (WALL["x"], WALL["y"], WALL["z"]), 50
 
 
@@ -674,6 +687,7 @@ scene.collection.objects.link(hall_cam)
 pos, look, fov = hall_pose()
 hall_cam.location, hall_cam.rotation_euler = pos, aim(pos, look)
 hall_data.sensor_fit, hall_data.angle_y = "VERTICAL", math.radians(fov)
+bpy.context.view_layer.update()       # matrix_world is stale until the depsgraph runs
 shots["hall"] = {"kind": "still", "overlay": {"ledWall": screen_quad(wall_corners, hall_cam)}}
 frames = walk(n)
 shots[f"walk-{n}"] = {"kind": "clip", "frames": frames, "fps": FPS}

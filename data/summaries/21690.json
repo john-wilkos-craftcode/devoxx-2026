@@ -1,0 +1,82 @@
+{
+  "id": 21690,
+  "source": "transcript",
+  "tldr": "Ward and Tzolov build a task/arm/judge eval matrix with Spring AI to compare the javadocs.dev MCP server with shell and web-search agents, and show evals exposing their own bias.",
+  "summary": [
+    "Ward and Tzolov define an eval as a matrix: tasks (a prompt plus reference answer and required facts), arms (fixed model and system prompt, different tools) and judges grading each run on success, tokens and time. Judges are deterministic code checks such as regexes; LLM-as-judge, which should use a different model than the arm to avoid bias; and a newly announced classification ('System 1') model that answers many yes/no, score or multiple-choice questions about one output with confidence values, cheaply but with little general knowledge. The harness is a Spring AI ChatClient with advisors tracking tokens and turn budgets. Hard-coded versions in reference facts make evals brittle.",
+    "For javadocs.dev, which serves Javadoc from Maven Central over MCP, they ran four tasks (a week-old library, Jackson package renames, a milestone-only Spring AI class, and a trap) against four arms on Kimi K2.5: model only, a Docker-sandboxed shell, Brave web search, and the MCP server. The shell arm grepped downloaded jars for 318 seconds and passed one of four code checks; web search failed; the MCP arm averaged 19 seconds; the bare model hallucinated. LLM-suggested server changes then caused a regression, because one task relied on the server calling a milestone 'latest'. Tzolov's Spring AI Inspector replays runs as sequence diagrams to find such problems."
+  ],
+  "keyPoints": [
+    "An eval run is the product of tasks, arms and judges, so even 4 tasks and 4 arms means 16 runs and real token cost.",
+    "Use a different model for the LLM judge than for the arm under test, otherwise the judge tends to approve its own kind of answer.",
+    "Classification ('System 1') models can answer many structured questions about one output with confidence scores, cheaply, but lack general knowledge; another such model failed to judge whether a temperature was plausible.",
+    "The javadocs.dev MCP arm answered in about 19 seconds; the shell arm took 318 seconds grepping downloaded jars and passed one of four code checks.",
+    "A regression after the LLM-suggested fixes came from an eval biased towards the old server returning a milestone as 'latest', which raised the question of who should decide what 'latest' means.",
+    "Run evals several times rather than once; single runs hide variance and outliers."
+  ],
+  "takeaways": [
+    "Build an eval matrix for your MCP server or skill that compares it against model-only, shell and web-search baselines.",
+    "Fetch reference facts such as latest versions from an authoritative source instead of hard-coding them in tasks.",
+    "Combine cheap deterministic checks (regex, which tools were called) with an LLM or classifier judge.",
+    "Feed eval transcripts to an LLM for improvement ideas, then re-run against a local server and inspect regressions before trusting the change."
+  ],
+  "quotes": [
+    {
+      "text": "Sometimes your evals have actually biased themselves towards the correct answer.",
+      "at": "26:42"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Introduction"
+    },
+    {
+      "at": "01:40",
+      "title": "Tasks, arms and judges"
+    },
+    {
+      "at": "10:24",
+      "title": "Spring AI harness and judges"
+    },
+    {
+      "at": "18:07",
+      "title": "javadocs.dev MCP demo"
+    },
+    {
+      "at": "19:11",
+      "title": "Eval setup and first results"
+    },
+    {
+      "at": "24:02",
+      "title": "Improving from transcripts"
+    },
+    {
+      "at": "26:42",
+      "title": "Regression and eval bias"
+    },
+    {
+      "at": "28:47",
+      "title": "Spring AI Inspector replay"
+    }
+  ],
+  "tech": [
+    "Spring AI",
+    "Model Context Protocol",
+    "javadocs.dev",
+    "LLM-as-a-judge",
+    "Kimi K2.5",
+    "Brave Search",
+    "Docker",
+    "Maven Central",
+    "Claude.ai",
+    "Spring AI Inspector"
+  ],
+  "watchIf": "You maintain an MCP server or agent skill and want evidence, not anecdotes, that it beats letting the agent use a shell or web search.",
+  "themes": [
+    "LLMs in Java apps",
+    "Testing & quality",
+    "AI agents & agentic coding"
+  ],
+  "demo": true
+}

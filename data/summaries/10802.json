@@ -1,0 +1,92 @@
+{
+  "id": 10802,
+  "source": "transcript",
+  "tldr": "Chantier, a Python advocate who left Java around Java 8-11, tells how friends, JBang, picocli and TamboUI drew him back, comparing modern Java and Python in short demos.",
+  "summary": [
+    "Chantier, a developer advocate at Dataiku who also promotes Python in France, spends the first half on his path through languages: BASIC on a ZX Spectrum, GFA Basic and the demo scene on the Atari, Silicon Graphics workstations at university, game audio and Nintendo 64 work at Infogrames, then QA automation where he met Python. Java spread through one company after an engineer built an internal time tracker in JSP on Tomcat instead of the requested ASP on IIS. He later moved into data and ETL work, through Oracle, and drifted to shell and Python, with Groovy in Jenkins the exception, as Python grew with machine learning.",
+    "What brought him back was community: a former colleague's talks on JBang and picocli, his interest in terminal UIs (Textual in Python, Bubble Tea in Go, Ratatui in Rust), and TamboUI, a Java TUI framework Cédric Champeau started as an experiment in AI-assisted porting from Ratatui that has since become its own design. JBang plus picocli made quick experiments possible again, Quarkus's dev console impressed him, and AI assistants helped him catch up on the language.",
+    "The demos pair both ecosystems. Compact source files and JBang scripts with picocli sit next to uv running a Typer CLI with inline dependencies. Python type hints fail only at runtime unless mypy checks them, while sealed interfaces and records give Java compile-time exhaustive switches. Python 3.14's free-threaded build removes the GIL bottleneck, and Java virtual threads ran 10,000 blocking tasks in about 1 second against 10 seconds on 1,000 platform threads. He ends with a TamboUI app driving a small desktop robot, and argues Python's AI lead is narrowing as LangChain4j matures."
+  ],
+  "keyPoints": [
+    "An engineer building an internal tool in JSP on Tomcat, against instructions, was enough to bring Java into a whole company.",
+    "Community contact (talks on JBang and picocli, conference friends) brought him back more than any feature did.",
+    "TamboUI began as an experiment in using AI to port Rust's Ratatui to Java and is now an independent Java TUI framework.",
+    "uv brought Cargo-style project, dependency and Python version management to Python, and inline script metadata parallels JBang's single-file dependencies.",
+    "Sealed interfaces with records give compile-time exhaustiveness errors, where Python type hints need mypy to catch mistakes before runtime.",
+    "In his demo, virtual threads cut 10,000 blocking tasks from about 10 seconds on 1,000 platform threads to about 1 second."
+  ],
+  "takeaways": [
+    "Try JBang with picocli for your next small command-line tool instead of a shell or Python script.",
+    "Look at TamboUI if you want to build a terminal UI in Java.",
+    "Use sealed interfaces and records to get exhaustive switch checks from the compiler.",
+    "Revisit a language or tool you gave up on years ago; it may have fixed what drove you away."
+  ],
+  "quotes": [
+    {
+      "text": "There is no bad language or framework. A context, a team, specific things in the situation at that moment.",
+      "at": "39:52"
+    },
+    {
+      "text": "If all your stuff in your company is done with Java, why will you use Python stuff just for AI? That's nonsense.",
+      "at": "38:27"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Introduction"
+    },
+    {
+      "at": "02:35",
+      "title": "Home computers and the demo scene"
+    },
+    {
+      "at": "08:07",
+      "title": "Video games and Python"
+    },
+    {
+      "at": "12:10",
+      "title": "Java, Tomcat and leaving"
+    },
+    {
+      "at": "18:38",
+      "title": "The way back: CLIs and TUIs"
+    },
+    {
+      "at": "23:35",
+      "title": "Modern Java first impressions"
+    },
+    {
+      "at": "26:20",
+      "title": "Demos: Java versus Python"
+    },
+    {
+      "at": "36:19",
+      "title": "Robot TUI and conclusions"
+    }
+  ],
+  "tech": [
+    "TamboUI",
+    "picocli",
+    "JBang",
+    "Quarkus",
+    "Compact source files",
+    "Records",
+    "Sealed interfaces",
+    "Virtual threads",
+    "Python",
+    "uv",
+    "Typer",
+    "mypy",
+    "Textual",
+    "Ratatui",
+    "Tomcat"
+  ],
+  "watchIf": "You drifted from Java to Python or shell scripting and want a light, personal look at whether modern Java tooling is worth another try.",
+  "themes": [
+    "Developer experience & tooling",
+    "Java language & JDK",
+    "Teams, careers & leadership"
+  ],
+  "demo": true
+}

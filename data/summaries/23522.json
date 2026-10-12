@@ -1,0 +1,104 @@
+{
+  "id": 23522,
+  "source": "transcript",
+  "tldr": "Morling explains Parquet's internals and how Hardwood, a dependency-free Java Parquet library, gets its speed, and how he built it with Claude Code under tight test feedback.",
+  "summary": [
+    "Morling started Hardwood because parquet-java pulls in the Hadoop stack (100+ jars, a supply-chain and version-conflict liability) and decodes on one thread. He explains Parquet as the columnar format under Iceberg, Trino, DuckDB and Spark: a footer with schema and statistics read from the end of the file, then row groups, column chunks and pages, with definition and repetition levels for nested and nullable data. The format keeps growing (variant type, encryption, Bloom filters), so a project he expected to take a month was still going in October. The goals: no mandatory dependencies, speed on many cores and on one, full compatibility, and GraalVM native-image support.",
+    "The API offers a row cursor that allocates no per-row objects, projections, filters, memory-mapped local files and an optional S3 module, plus a columnar reader that returns primitive arrays in batches for your own vectorised or parallel processing. A writer arrived in the 1.1 betas. Row groups and column chunks proved too coarse to parallelise, so Hardwood decodes pages in parallel on virtual threads and gives slow columns more resources. It uses the Vector API for SIMD null checks, the FFM API for optional native gzip, and emits custom JFR events such as a late prefetch.",
+    "On the New York taxi dataset, the 1.0 columnar reader decoded 16.5 million rows per second on an 8-vCPU AWS machine and beat parquet-java even on one core; row access by column index is much faster than by name. Predicate pushdown skips data using min/max statistics, Bloom filters and dictionary-space filtering. For fixed-length lists such as embeddings, Hardwood detects repeating patterns in the encoded repetition levels instead of materialising them: over 2x faster for the columnar reader and about 4x for rows. A community-built CLI ships as a native binary (under 60 ms per command), with a TUI, an agent skill and an experimental WebAssembly build running in the browser.",
+    "Morling found Parquet a sweet spot for agentic coding: a solid spec plus hundreds of reference files allow differential testing against parquet-java and DuckDB, which also exposed parquet-java bugs. A Claude Code skill SSHes into a fanless 8-core box of about 500 euros to profile and read assembly, and runs git bisect when the performance regression suite flags a slowdown. Weak spots were duplicated code (up to five value formatters), the agent wanting to stop for the day, and tests fixed by disabling them. AI shifted make-or-buy too: AWS request signing was reimplemented against AWS's test vectors instead of depending on the SDK. Contributors must understand their AI-generated pull requests."
+  ],
+  "keyPoints": [
+    "parquet-java brings in Hadoop and more than 100 jars and reads on one thread; Hardwood has no mandatory dependencies and uses all cores.",
+    "Parallelising by row group or column chunk is too coarse, since files may have one row group or few projected columns, so Hardwood decodes pages in parallel on virtual threads.",
+    "The row API avoids allocating per-row objects, and looking columns up by index instead of name is much faster in hot loops.",
+    "Predicate pushdown skips data using min/max statistics, Bloom filters (which only prove absence) and filtering in dictionary space.",
+    "Detecting repeating patterns in encoded repetition levels speeds fixed-length lists such as embeddings by over 2x (columnar) and up to about 4x (row reader).",
+    "Hardwood emits custom JFR events, such as late prefetches, so users can see why a file was not read optimally.",
+    "Differential testing against parquet-java and DuckDB on the reference files, plus a remote profiling box, gave Claude Code the tight feedback loop it needs.",
+    "With published test vectors, reimplementing AWS SigV4 signing on the JDK HTTP client became a better trade-off than depending on the AWS SDK."
+  ],
+  "takeaways": [
+    "Before letting an agent build a component, find or build an oracle for it: reference test files, test vectors or a second implementation to diff against.",
+    "Give your coding agent a profiling environment and a performance regression suite so it can measure changes and bisect slowdowns.",
+    "Emit custom JFR events from your own libraries for situations users need to diagnose, such as stalls or fallback paths.",
+    "Use projections and filters when reading Parquet so statistics and Bloom filters can skip I/O and decoding.",
+    "Watch agent output for duplicated helpers and disabled tests, and require contributors to understand AI-generated pull requests."
+  ],
+  "quotes": [
+    {
+      "text": "When building a Parquet library, you kind of build half a query engine if you want to do all this in a good and efficient way.",
+      "at": "12:47"
+    },
+    {
+      "text": "I can literally look at the assembly of the code, and this is the ultimate truth.",
+      "at": "38:12"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why a new Parquet library"
+    },
+    {
+      "at": "01:49",
+      "title": "Parquet file format internals"
+    },
+    {
+      "at": "07:50",
+      "title": "Goals and dependency problem"
+    },
+    {
+      "at": "11:29",
+      "title": "Hardwood API tour"
+    },
+    {
+      "at": "15:09",
+      "title": "Page-level parallelism and modern Java"
+    },
+    {
+      "at": "19:25",
+      "title": "Benchmarks and predicate pushdown"
+    },
+    {
+      "at": "24:53",
+      "title": "Fixed-length list optimisation"
+    },
+    {
+      "at": "30:12",
+      "title": "CLI, TUI and Wasm demo"
+    },
+    {
+      "at": "35:22",
+      "title": "Building it with Claude Code"
+    },
+    {
+      "at": "47:05",
+      "title": "Roadmap and Q&A"
+    }
+  ],
+  "tech": [
+    "Hardwood",
+    "Apache Parquet",
+    "parquet-java",
+    "Apache Hadoop",
+    "Apache Iceberg",
+    "DuckDB",
+    "Virtual threads",
+    "Vector API",
+    "Foreign Function & Memory API",
+    "JDK Flight Recorder",
+    "GraalVM Native Image",
+    "WebAssembly",
+    "Amazon S3",
+    "AWS SDK for Java",
+    "Claude Code"
+  ],
+  "watchIf": "You read Parquet files on the JVM and are tired of Hadoop dependencies, or want a realistic account of using Claude Code on performance-critical library code.",
+  "themes": [
+    "Data & databases",
+    "JVM performance & runtime",
+    "AI agents & agentic coding"
+  ],
+  "demo": false
+}

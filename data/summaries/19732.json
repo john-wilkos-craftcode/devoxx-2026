@@ -1,0 +1,38 @@
+{
+  "id": 19732,
+  "source": "transcript",
+  "tldr": "TornadoVM's library tasks let Java code mix its own GPU kernels with NVIDIA's cuFFT, cuBLAS, cuDNN and cuDF in one task graph, without JNI, Python or C++.",
+  "summary": [
+    "The TornadoVM team starts from a familiar problem. Java runs the enterprise, but NVIDIA's tuned libraries (cuBLAS, cuFFT, cuDNN, CUTLASS, cuDF, cuVS) are reached through a Python sidecar, JNI or FFM bindings, or a C++ rewrite. TornadoVM works on any JDK 21+ distribution, compiles Java to OpenCL, CUDA PTX or Metal, and now offers four programming levels: the @Parallel loop annotation, the low-level KernelContext API, a new TileContext API that mirrors NVIDIA's tile programming model, and library tasks. A library task names a provider and calls a function such as cuFFT's R2C forward transform, with the same name and arguments as in the NVIDIA documentation, on FFM-backed data. It then chains in a task graph with Java-written JIT kernels, so data can stay on the GPU between steps.",
+    "Demos showed a low-pass filter built from cuFFT plus custom Java kernels, and a 'tile ladder' profiled with NVIDIA Nsight Systems. In that comparison the hand-tuned KernelContext and TileContext matrix multiplications reached about 90% of cuBLAS. The team's Java LLM inference engine on TornadoVM reached 90-95% of llama.cpp throughput on Gemma and Qwen models, and 12% better prefill in some cases, after being about 30x slower a year earlier. Mary Xekalaki showed Apache Flink SQL queries offloaded through a config flag to a task graph of cuDF Parquet reading, cuDF string matching and a JIT kernel, up to 17x faster on 64 million rows than one Flink slot (5x versus four slots). They also reported 90x faster JVector graph builds with Cassandra and 98% of hand-written CUDA kernel performance."
+  ],
+  "keyPoints": [
+    "TornadoVM ships as JARs on Maven Central and SDKs via SDKMAN, and runs on OpenJDK, GraalVM, Temurin, Zulu and other JDK 21+ builds.",
+    "Library tasks are named so the runtime can optimise data movement across a task graph. Runtime features such as CUDA graphs, multiple streams and grid scheduling cut transfer overhead.",
+    "TileContext moves thread, prefetch and cache decisions to NVIDIA's compiler and is much more compact than equivalent KernelContext code using tensor-core MMA fragments.",
+    "Profiling combines JFR for the JVM side with NVIDIA Nsight for the GPU timeline, plus TornadoVM's own tools.",
+    "The Flink integration analyses the query IR and maps operations to library tasks where possible and JIT tasks otherwise, with no change to the SQL."
+  ],
+  "takeaways": [
+    "Install TornadoVM via SDKMAN and run a first kernel on your laptop GPU before targeting NVIDIA servers.",
+    "Use library tasks for operations NVIDIA already optimises (GEMM, FFT, Parquet decode), and write only the glue steps as Java kernels.",
+    "Profile with JFR together with Nsight Systems to see where data transfers, not compute, dominate."
+  ],
+  "quotes": [
+    {"text": "We have reached a point that Java can access the GPU like any other native.", "at": "19:00"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why Java needs NVIDIA libraries"},
+    {"at": "03:18", "title": "TornadoVM overview"},
+    {"at": "06:07", "title": "Four GPU programming APIs"},
+    {"at": "08:32", "title": "Anatomy of a library task"},
+    {"at": "12:37", "title": "Low-pass filter and tile demos"},
+    {"at": "17:29", "title": "LLM inference engine"},
+    {"at": "20:02", "title": "Accelerating Apache Flink"},
+    {"at": "24:42", "title": "Results and getting started"}
+  ],
+  "tech": ["TornadoVM", "CUDA", "cuBLAS", "cuFFT", "cuDNN", "CUTLASS", "cuDF", "cuVS", "OpenCL", "Metal", "FFM API", "NVIDIA Nsight Systems", "JFR", "Apache Flink", "Apache Cassandra", "JVector", "llama.cpp", "SDKMAN"],
+  "watchIf": "You want GPU acceleration or NVIDIA libraries in a Java application without JNI, Python or C++, and want to see actual performance numbers.",
+  "themes": ["JVM performance & runtime", "Hardware, robots & fun"],
+  "demo": true
+}

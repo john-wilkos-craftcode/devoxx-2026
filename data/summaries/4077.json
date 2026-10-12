@@ -1,0 +1,81 @@
+{
+  "id": 4077,
+  "source": "transcript",
+  "tldr": "Winterhalter demos Jenesis, a 24 KB build tool that runs from Java source, uses module-info.java as the build descriptor, and pins dependency hashes and PGP signatures by default.",
+  "summary": [
+    "Winterhalter, creator of Byte Buddy, argues Java builds have barely moved in 20 years of Maven POMs, while module-info.java already describes most of a POM: the module name stands in for the coordinate, requires lists dependencies, and exports declares the public API. Jenesis uses it as the build file, with versions and hash pins as Javadoc tags and the rest in properties files. It has zero dependencies, is 24 KB, and runs from source with plain java, against about 30 MB for the Maven Wrapper and plugins and 158 MB for Gradle's wrapper. Module names resolve to Maven coordinates through a self-hostable Maven Central index.",
+    "Live demos build a single-module project using SLF4J, then a multi-module one in dependency order (0.56 seconds including tests on a cached rebuild). Tests live in their own module, which the main module exports internal packages to, avoiding split packages. A tampered dependency fails on a digest mismatch before its jar loads, and recorded OpenPGP key fingerprints keep verifying artifacts across upgrades, when hashes change. Jenesis also builds plain Maven projects on the classpath and produces jpackage images, Dockerfiles and Kotlin builds without plugins. He says Claude helped test it against thousands of projects, and expects nobody to use Maven 4's module-info patch format."
+  ],
+  "keyPoints": [
+    "module-info.java replaces the build file: module name as coordinate, requires as dependencies, exports as public API, with versions and pins as Javadoc tags.",
+    "Every dependency is pinned by secure hash and checked against its publisher's OpenPGP key; a tampered jar fails the build before it is loaded.",
+    "Jenesis is 24 KB and runs from source with no wrapper download, against about 30 MB for the Maven Wrapper and plugins and 158 MB for Gradle's.",
+    "Tests sit in a separate module, and the main module exports internal packages only to that test module, avoiding split packages.",
+    "Existing Maven projects build on the classpath; jpackage images, Dockerfiles and Kotlin compilation are derived without plugins."
+  ],
+  "takeaways": [
+    "Record hashes for all your build dependencies so a rebuild cannot silently pick up a changed artifact.",
+    "Verify the PGP signatures Maven Central already requires, pinning each library to its publisher's key fingerprint.",
+    "Run Jenesis against one of your existing Maven projects to compare build time and see what it supports.",
+    "Try jpackage for shipping a self-contained runtime image containing only the modules your application needs."
+  ],
+  "quotes": [
+    {
+      "text": "In Jenesis, this is the second thing I built in, and this is actually how I started: signature validation for GPG and pinning of artifacts. This is automatic, because I think if it's easy, people would do it.",
+      "at": "22:52"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why Java builds lag"
+    },
+    {
+      "at": "02:00",
+      "title": "module-info as build descriptor"
+    },
+    {
+      "at": "05:46",
+      "title": "Wrappers and supply chain risk"
+    },
+    {
+      "at": "09:56",
+      "title": "Single-module build demo"
+    },
+    {
+      "at": "14:11",
+      "title": "Multi-module builds and tests"
+    },
+    {
+      "at": "20:01",
+      "title": "Hash pinning and signatures"
+    },
+    {
+      "at": "24:19",
+      "title": "Building Maven projects"
+    },
+    {
+      "at": "26:22",
+      "title": "Executables, jpackage and Docker"
+    }
+  ],
+  "tech": [
+    "Jenesis",
+    "Java Platform Module System",
+    "Maven",
+    "Gradle",
+    "Maven Central",
+    "OpenPGP",
+    "jpackage",
+    "SLF4J",
+    "Kotlin",
+    "SDKMAN!"
+  ],
+  "watchIf": "You are tired of POM and Gradle files, teach Java to beginners, or want dependency pinning and signature checks without extra tooling.",
+  "themes": [
+    "Developer experience & tooling",
+    "Security & supply chain",
+    "Java language & JDK"
+  ],
+  "demo": true
+}
