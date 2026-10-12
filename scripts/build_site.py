@@ -78,6 +78,19 @@ def build_artifact():
         shutil.copy(site / name, out / name)
     print(f"{out.relative_to(ROOT)}: index.html, styles.css, app.js, data.js")
 
+    # The 3D prototype, as its own artifact: same unwrapping, data.js next to the page.
+    kino, kout = site / "kino", ROOT / "build" / "kino"
+    kout.mkdir(parents=True, exist_ok=True)
+    page = (kino / "index.html").read_text().replace('src="../data.js"', 'src="data.js"')
+    head = page[page.index("<head>") + 6:page.index("</head>")]
+    body = page[page.index("<body>") + 6:page.index("</body>")]
+    head = "\n".join(l for l in head.splitlines() if "<meta charset" not in l and 'name="viewport"' not in l)
+    (kout / "index.html").write_text(head.strip() + "\n" + body.strip() + "\n")
+    for name in ("kino.js", "venue.json"):
+        shutil.copy(kino / name, kout / name)
+    shutil.copy(site / "data.js", kout / "data.js")
+    print(f"{kout.relative_to(ROOT)}: index.html, kino.js, venue.json, data.js")
+
 
 if __name__ == "__main__":
     main()
