@@ -31,7 +31,7 @@ for src in srcs:
         if png.stem.endswith("-front"):         # what stands in front of the screen: keeps its transparency
             Image.open(png).save(OUT / f"{png.stem}.webp", quality=88, method=6)
             print(f"{png.stem}.webp")
-        elif png.stem in ("hall", "hall-phone") or png.stem.startswith("seat-"):
+        elif png.stem in ("hall", "hall-phone") or png.stem.startswith(("seat-", "door-")):
             Image.open(png).convert("RGB").save(OUT / f"{png.stem}.jpg", quality=86, optimize=True, progressive=True)
             print(f"{png.stem}.jpg")
 

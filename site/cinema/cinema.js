@@ -17,7 +17,7 @@ const ytUrl = (t, sec = 0) => `https://www.youtube.com/watch?v=${t.videoId}${sec
 const EMBED = window.self === window.top;      // YouTube can't be embedded inside the artifact sandbox
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const IMG = { laptop: [1920, 1080], phone: [1080, 2340] };
-const CANVAS = { hall: 1060, "hall-phone": 340, seat: 1300, "seat-phone": 360 };   // design widths in css px
+const CANVAS = { hall: 1060, "hall-phone": 340, seat: 1300, "door-phone": 340 };   // design widths in css px
 
 const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -81,12 +81,17 @@ const shots = await fetch("media/shots.json").then((r) => r.json());
 const walkable = new Set(Object.keys(shots).filter((k) => /^seat-\d+$/.test(k)).map((k) => Number(k.split("-")[1])));
 const form = () => (stage.clientWidth / stage.clientHeight < 0.8 ? "phone" : "laptop");
 let shape = form();
-// the phone version of a shot when there is one: "hall" -> "hall-phone", "seat-8" -> "seat-phone-8"
+// the phone version of a shot: the hall totem instead of the hall screen, and the totem at the room's door instead
+// of the seat (a cinema screen is far too wide to read in portrait)
 const shotKey = (base) => {
   if (shape !== "phone") return base;
-  const m = /^([a-z]+)-(\d+)$/.exec(base);
-  const k = m ? `${m[1]}-phone-${m[2]}` : `${base}-phone`;
+  const k = base === "hall" ? "hall-phone" : base.replace(/^seat-(\d+)$/, "door-phone-$1");
   return shots[k] ? k : base;
+};
+// on a phone the walk stops at the door: the time into walk-<n>.mp4 when the camera passes it
+const doorTime = (n) => {
+  const b = shots[`walk-b-${n}`], a = b && shots[`walk-a-${b.side}`];
+  return a && b.door_frame != null ? (a.frames + b.door_frame) / b.fps : null;
 };
 const canvasFor = (key) => CANVAS[key.replace(/-\d+$/, "")];
 
@@ -136,7 +141,7 @@ function watchScroll(s) {
     if (s.classList.contains("strip")) {
       s.classList.toggle("more-l", s.scrollLeft > 4);
       s.classList.toggle("more-r", s.scrollLeft + s.clientWidth < s.scrollWidth - 4);
-    } else s.classList.toggle("more-b", s.scrollTop + s.clientHeight < s.scrollHeight - 4);
+    } else s.classList.toggle("more-b", s.scrollTop + s.clientHeight < s.scrollHeight - 12);
   };
   s.addEventListener("scroll", update, { passive: true });
   requestAnimationFrame(update);
@@ -163,16 +168,18 @@ const showStill = (key) => new Promise((resolve) => {
 });
 
 let skipWalk = null;
-function playClip(name) {
+function playClip(name, { from = 0, until = null } = {}) {
   return new Promise((resolve) => {
     if (reduceMotion) { resolve(); return; }
-    const done = () => { clip.onended = clip.onerror = null; skipWalk = null; skipBtn.hidden = true; resolve(); };
+    const done = () => { clip.onended = clip.onerror = clip.ontimeupdate = null; skipWalk = null; skipBtn.hidden = true; resolve(); };
     skipWalk = done;
     clip.src = `media/${name}.mp4`;
     clip.hidden = false;
     clip.onended = done;
     clip.onerror = done;                       // a missing clip is a cut, not a dead end
-    clip.play().then(() => { skipBtn.hidden = false; }).catch(done);
+    if (until != null) clip.ontimeupdate = () => { if (clip.currentTime >= until) { clip.pause(); done(); } };
+    const go = () => { if (from) clip.currentTime = from; clip.play().then(() => { skipBtn.hidden = false; }).catch(done); };
+    if (clip.readyState >= 1) go(); else clip.addEventListener("loadedmetadata", go, { once: true });
   });
 }
 const hideClip = () => { clip.pause(); clip.hidden = true; clip.removeAttribute("src"); clip.load(); };
@@ -189,14 +196,30 @@ let query = "";
 const blob = (t) => [t.title, ...t.speakers.map((s) => s.name), t.room, t.track, t.s && t.s.tldr, ...((t.s && t.s.tech) || []), ...(t.keywords || [])]
   .join(" ").toLowerCase();
 
-function card(t, { withWhen = false, next = false } = {}) {
+// where a search term was found, as a short highlighted snippet (title matches need none)
+function why(t, terms) {
+  if (terms.every((w) => t.title.toLowerCase().includes(w))) return null;
+  const s = t.s || {};
+  const fields = [["", speakers(t)], ["", (s.tech || []).join(", ")], ["", (t.keywords || []).join(", ")], ["", s.tldr || ""], ["", (t.abstract || []).join(" ")]];
+  for (const [, text] of fields) {
+    const lower = text.toLowerCase(), w = terms.find((x) => lower.includes(x));
+    if (!w) continue;
+    const i = lower.indexOf(w), a = Math.max(0, i - 28), b = Math.min(text.length, i + w.length + 40);
+    return el("span", { class: "why" }, a ? "…" : "", text.slice(a, i), el("mark", { text: text.slice(i, i + w.length) }), text.slice(i + w.length, b), b < text.length ? "…" : "");
+  }
+  return null;
+}
+function card(t, { when: showWhen = null, terms = null } = {}) {
   const n = roomNo(t), on = walkable.has(n);
-  const label = withWhen ? `${fShort.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : typeLabel(t);
-  return el("button", { class: `card${on ? "" : " is-off"}${next ? " is-next" : ""}`, type: "button", onclick: () => goTalk(t),
-      "aria-label": [t.title, speakers(t), t.room, withWhen ? when(t) : null, on ? "walks you to your seat" : null].filter(Boolean).join(", ") },
-    el("span", { class: "room" }, el("b", { text: n ? String(n) : (t.room || "TBC") }), el("span", { text: label })),
+  const label = showWhen === "day" ? `${fShort.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : showWhen === "time" ? fTime.format(new Date(t.start)) : typeLabel(t);
+  const hint = terms && why(t, terms);
+  return el("button", { class: `card${on ? "" : " is-off"}`, type: "button", onclick: () => goTalk(t),
+      "aria-label": [t.title, speakers(t), t.room, showWhen ? when(t) : null, on ? "walks you to your seat" : null].filter(Boolean).join(", ") },
+    el("span", { class: "room" }, n ? el("span", { class: "where" }, el("small", { text: "Room" }), el("b", { text: String(n) })) : el("span", { class: "where" }, el("b", { class: "is-text", text: t.room || "Room TBC" })),
+      el("span", { class: "label", text: label })),
     el("span", { class: "title", text: t.title }),
-    el("span", { class: "who", text: speakers(t) }));
+    el("span", { class: "who", text: speakers(t) }),
+    hint);
 }
 
 function programme(tall) {
@@ -217,9 +240,9 @@ function programme(tall) {
     nav.hidden = terms.length > 0;
     if (terms.length) {
       const hits = talks.filter((t) => terms.every((w) => blob(t).includes(w))).sort((a, b) => (a.start || "").localeCompare(b.start || ""));
-      put(body, el("div", { class: "slot-head" }, el("b", { text: String(hits.length) }),
-          el("span", { text: `${hits.length === 1 ? "talk matches" : "talks match"} “${query}”` })),
-        hits.length ? el("div", { class: "cards scroller", tabindex: "0", "aria-label": "Search results" }, hits.map((t) => card(t, { withWhen: true })))
+      put(body, el("div", { class: "slot-head is-plain" },
+          el("span", { text: `${hits.length} ${hits.length === 1 ? "talk matches" : "talks match"} “${query}”, in programme order` })),
+        hits.length ? el("div", { class: "cards scroller", tabindex: "0", "aria-label": "Search results" }, hits.map((t) => card(t, { when: "day", terms })))
           : el("p", { class: "empty", text: "Nothing matches. Try a speaker's surname or a tool, like Kotlin or Quarkus." }));
       if (face) for (const s of panel.querySelectorAll(".scroller")) watchScroll(s);
       return;
@@ -233,21 +256,16 @@ function programme(tall) {
         onclick: () => { slot = s; draw(); } }));
     }
     const here = inSlot(slot);
-    const cards = el("div", { class: "cards scroller", tabindex: "-1" }, here.map((t) => card(t)));
-    // a short slot leaves room for what's on next: carry on through the day, each slot under its own time
-    let count = here.length;
-    for (const s of startsOn(day).filter((x) => x > slot)) {
-      if (count >= (tall ? 6 : 8)) break;
-      const more = inSlot(s);
-      put(cards, el("div", { class: "divider" }, el("b", { text: fTime.format(new Date(s)) }), el("span", { text: `${more.length} ${more.length === 1 ? "session" : "sessions"}` })),
-        more.map((t) => card(t)));
-      count += more.length + (tall ? 1 : 4);
-    }
+    // a short slot leaves room for what's on next: fill the screen with the following talks, each with its time
+    const later = talks.filter((t) => t.start && dayKey(t.start) === day && t.start > slot).sort((a, b) => a.start.localeCompare(b.start) || (roomNo(a) || 99) - (roomNo(b) || 99));
+    const fill = here.length < (tall ? 4 : 8) ? later.slice(0, (tall ? 6 : 8) - here.length) : [];
+    const cards = el("div", { class: `cards scroller${fill.length || tall ? "" : " is-exact"}`, tabindex: "-1" },
+      here.map((t) => card(t)), fill.map((t) => card(t, { when: "time" })));
     const allWalk = here.every((t) => walkable.has(roomNo(t)));
     const someWalk = here.some((t) => walkable.has(roomNo(t)));
-    const hint = allWalk ? "Pick one and we'll walk you to your seat." : someWalk ? "Orange ones walk you to your seat; the others open right here." : "These open right here.";
+    const hint = allWalk ? "Pick one and we'll walk you to your seat." : someWalk ? "Orange: we'll walk you to the cinema room. Others: the summary opens here." : "The summary opens here.";
     put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
-        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}. ${hint}` })),
+        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}${fill.length ? ", then what's next" : ""}. ${hint}` })),
       cards);
     requestAnimationFrame(() => { centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
   }
@@ -258,7 +276,7 @@ function programme(tall) {
 
 // ---------- the talk ----------
 const toSeconds = (at) => { const [m, sec] = String(at).split(":").map(Number); return (m || 0) * 60 + (sec || 0); };
-function talkScreen(t, tall, onFloor) {
+function talkScreen(t, tall, onFloor, doorRoom = null) {
   const s = t.s || {};
   const tabs = [["short", "In short"], ["points", "Key points"], ["monday", "Try this on Monday"], ["chapters", "Chapters"], ["story", "Full summary"]]
     .filter(([id]) => (id === "short" && tall && s.tldr) || (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
@@ -292,7 +310,8 @@ function talkScreen(t, tall, onFloor) {
   const intro = () => {
     main.textContent = "";
     put(main,
-      el("div", { class: "meta", text: [t.room, when(t), typeLabel(t)].filter(Boolean).join(", ") }),
+      doorRoom && tall ? el("div", { class: "door-sign" }, el("small", { text: "Room" }), el("b", { text: String(doorRoom) }), el("span", { text: "Now showing" })) : null,
+      el("div", { class: "meta", text: [doorRoom && tall ? null : t.room, when(t), typeLabel(t)].filter(Boolean).join(", ") }),
       !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? "A meeting room downstairs: no cinema seat for this one." : "No cinema seat to walk you to for this one." }) : null,
       el("h2", { text: t.title, style: `--title:${titleSize(t.title, 40, 31)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
@@ -310,7 +329,7 @@ function talkScreen(t, tall, onFloor) {
   };
   intro();
   fill(tabs[0][0]);
-  return el("section", { class: `face talk ${onFloor ? "is-projected" : "is-lcd"}${tall ? " is-tall" : ""}`, "aria-label": t.title },
+  return el("section", { class: `face talk ${onFloor && !tall ? "is-projected" : "is-lcd"}${tall ? " is-tall" : ""}`, "aria-label": t.title },
     main, el("div", { class: "talk-side" }, tabRow, pane));
 }
 
@@ -319,7 +338,11 @@ let room = null, current = null, busy = false;
 
 async function toHall(withWalk) {
   unmount();
-  if (withWalk && room) { say("Back to the hall"); await playClip(`walk-${room}-back`); }
+  if (withWalk && room) {
+    say("Back to the hall");
+    const d = shape === "phone" ? doorTime(room) : null, total = shots[`walk-${room}`] ? shots[`walk-${room}`].frames / 30 : 0;
+    await playClip(`walk-${room}-back`, { from: d != null && total ? Math.max(0, total - d) : 0 });
+  }
   room = null; current = null;
   await showStill(shotKey("hall"));
   hideClip();
@@ -330,12 +353,12 @@ async function toHall(withWalk) {
 async function toSeat(t, withWalk) {
   const n = roomNo(t);
   unmount();
-  if (withWalk) { say(`Walking to Room ${n}`); await playClip(`walk-${n}`); }
+  if (withWalk) { say(`Walking to Room ${n}`); await playClip(`walk-${n}`, { until: shape === "phone" ? doorTime(n) : null }); }
   await showStill(shotKey(`seat-${n}`));
   hideClip();
   say("");
   room = n; current = t;
-  mount(talkScreen(t, shape === "phone", true), shotKey(`seat-${n}`), "screen");
+  mount(talkScreen(t, shape === "phone", true, n), shotKey(`seat-${n}`), "screen");
 }
 
 async function toOffFloor(t) {   // no seat to walk to (BOFs downstairs): the summary stays on the hall screen

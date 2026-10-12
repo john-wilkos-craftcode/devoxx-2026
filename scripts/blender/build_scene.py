@@ -360,7 +360,7 @@ M = {
     "posterA": emissive("posterA", 0x3a5cff, 3.0),
     "posterB": emissive("posterB", 0xff6a2a, 3.0),
     "posterC": emissive("posterC", 0xc9d6ff, 3.0),
-    "seat": material("seat", 0x27304d, 0.85, sheen=0.8, noise_bump=0.5, speckle=0.12),
+    "seat": material("seat", 0x34416e, 0.85, sheen=0.9, noise_bump=0.5, speckle=0.14),
     "seatFrame": material("seatFrame", 0x15161b, 0.5, 0.4),
     "steel": material("steel", 0xb8bcc4, 0.3, 0.9),
     "portal": material("portal", 0xc61d3b, 0.55, emission=0xc61d3b, strength=0.15),
@@ -379,7 +379,8 @@ M = {
     "cove": emissive("cove", 0x8c9cff, 6.0),
     "panelLight": emissive("panelLight", 0xfff3e6, 8.0),       # the look of the panels; area lights below do the lighting      # about 4000 K, like the photos
     # the HTML is pinned over these in the browser: they glow the panels' navy, so their light on the room matches
-    "screen": emissive("screen", 0x111a4a, 3.0),
+    "screen": emissive("screen", 0x1c2658, 9.0),      # bright enough to light the letters and the front rows
+    "masking": material("masking", 0x050507, 1.0, noise_bump=0.6),
     "programme": emissive("programme", 0x1d2c7a, 6.0),
     "schedule": emissive("schedule", 0x1c2a6b, 1.5),
     "scheduleCard": emissive("scheduleCard", 0xff7a1a, 2.5),
@@ -701,12 +702,19 @@ for r in auditoriums:
     panel_y = yc + side_y * 2.75
     B.box("numeral", {"x": wall_x + (0.0 if west else -0.06), "y": panel_y - 0.95, "w": 0.06, "h": 1.9}, FH + 0.33, FH + 3.38)
     text_object(str(n), 2.6, (wall_x + face * 0.07, panel_y, FH + 1.85), (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2), M["white"], 0.02, 0.03)
-    # schedule screen on a stand (its programme is drawn in HTML in the browser)
+    # the schedule totem beside the door, facing the corridor (on phones, the talk is shown on it)
     sy = yc - side_y * 2.4
     sx = wall_x + face * 1.2
-    B.box("steel", {"x": sx - 0.02, "y": sy - 0.02, "w": 0.04, "h": 0.04}, FH, FH + 1.2)
-    B.box("schedule", {"x": sx - 0.02, "y": sy - 0.33, "w": 0.04, "h": 0.66}, FH + 1.2, FH + 2.3)
-    doors[n] = {"room": r, "wall_x": wall_x, "yc": yc, "face": face, "leaves": leaves, "west": west}
+    tw, th, tz = 0.70, 1.24, FH + 1.42
+    B.box("bezel", {"x": sx - 0.035, "y": sy - tw / 2 - 0.035, "w": 0.07, "h": tw + 0.07}, tz - th / 2 - 0.09, tz + th / 2 + 0.035)
+    B.box("tableFrame", {"x": sx - face * 0.07 - 0.03, "y": sy - 0.06, "w": 0.06, "h": 0.12}, FH + 0.04, tz - th / 2)
+    B.box("tableFrame", {"x": sx - 0.21, "y": sy - 0.3, "w": 0.42, "h": 0.6}, FH, FH + 0.04)
+    fx = sx + face * 0.036
+    door_totem = [(fx, sy + side_y * tw / 2, tz - th / 2), (fx, sy - side_y * tw / 2, tz - th / 2),
+                  (fx, sy - side_y * tw / 2, tz + th / 2), (fx, sy + side_y * tw / 2, tz + th / 2)]
+    B.mesh("programme", door_totem, [(0, 1, 2, 3)] if face * side_y < 0 else [(0, 3, 2, 1)])
+    doors[n] = {"room": r, "wall_x": wall_x, "yc": yc, "face": face, "leaves": leaves, "west": west,
+                "totem": {"x": sx, "y": sy, "z": tz, "w": tw, "h": th, "corners": door_totem}}
 
     # the cinema screen: a clean emissive plane on the screen wall
     sd = next((d for d in venue["decor"] if d.get("material") == "screen" and d.get("room") == r["id"]), None)
@@ -723,6 +731,11 @@ for r in auditoriums:
         zc = z0 + h / 2
         corners = [(x, sb["y"], zc - h / 2), (x, sb["y"] + w, zc - h / 2), (x, sb["y"] + w, zc + h / 2), (x, sb["y"], zc + h / 2)]
         B.mesh("screen", corners, [(0, 1, 2, 3)])
+        # black masking round the screen, as in a real cinema (and it hides the screen's edge)
+        mx, mw = x + (0.03 if west else -0.03), 0.45
+        for (ya, yb, za, zb) in ((sb["y"] - mw, sb["y"] + 0.02, zc - h / 2 - mw, zc + h / 2 + mw), (sb["y"] + w - 0.02, sb["y"] + w + mw, zc - h / 2 - mw, zc + h / 2 + mw),
+                                 (sb["y"], sb["y"] + w, zc + h / 2 - 0.02, zc + h / 2 + mw), (sb["y"], sb["y"] + w, zc - h / 2 - mw, zc - h / 2 + 0.02)):
+            B.box("masking", {"x": min(mx, mx + (0.02 if west else -0.02)), "y": ya, "w": 0.02, "h": yb - ya}, za, zb)
         screens[n] = {"corners": corners, "x": x, "y": sb["y"] + w / 2, "z": zc, "w": w, "h": h, "west": west}
 
 # ---------------------------------------------------------------------------------- seats
@@ -1252,7 +1265,7 @@ if _room:
     for (hx, hy, hz, rn) in house_spots:
         if rn == args.room:
             li = bpy.data.lights.new(f"house-{hx:.1f}-{hy:.1f}", "SPOT")
-            li.energy, li.spot_size, li.spot_blend, li.color = 350, math.radians(40), 0.4, (1.0, 0.93, 0.85)
+            li.energy, li.spot_size, li.spot_blend, li.color = 750, math.radians(44), 0.4, (1.0, 0.93, 0.85)
             so = bpy.data.objects.new(li.name, li)
             so.location = (hx, hy, hz)
             scene.collection.objects.link(so)
@@ -1445,6 +1458,15 @@ def walk_b(n, first):
     length = sum((Vector(pts[i + 1]) - Vector(pts[i])).length for i in range(len(pts) - 1))
     level_look, shift = level_shift(seat, (look_end[0], look_end[1], look_end[2]), fov_end, WALK_ASPECT)
     frames = keyframe_segment(pts, jlook, level_look, jfov, fov_end, first, min(4.2, 2.6 + length / 30), shift)
+    # the frame where the walk passes the door (phones stop there, at the door's totem)
+    at = Vector((wx + face * 2.6, yc, FH + 1.7))
+    best, door_frame = 1e9, 0
+    for f in range(frames + 1):
+        scene.frame_set(first + f)
+        d = (cam.location - at).length
+        if d < best:
+            best, door_frame = d, f
+    door["door_frame"] = door_frame
     # the doors open as you reach them and stay open
     for hinge, side in door["leaves"]:
         hinge.rotation_euler = (0, 0, 0)
@@ -1506,7 +1528,7 @@ frames_a = walk_a(west, 1)
 first_b = frames_a + 2
 frames_b = walk_b(n, first_b)
 shots[f"walk-a-{side}"] = {"kind": "clip", "frames": frames_a + 1, "fps": FPS, "first": 1}
-shots[f"walk-b-{n}"] = {"kind": "clip", "frames": frames_b + 1, "fps": FPS, "first": first_b, "side": side}
+shots[f"walk-b-{n}"] = {"kind": "clip", "frames": frames_b + 1, "fps": FPS, "first": first_b, "side": side, "door_frame": doors[n]["door_frame"]}
 
 # the seat: laptop sees the whole screen; phone sees the middle of it, and the talk goes on what it sees
 seat, look_end, fov_end, _ = seat_for(n)
@@ -1514,28 +1536,25 @@ seat_cam = still_cam(f"cam-seat-{n}", seat, look_end, fov_end, level_for=WALK_AS
 scr = screens[n]
 dist = abs(scr["x"] - seat[0])
 pfov = 2 * math.degrees(math.atan(scr["h"] / 2 / 0.8 / dist))     # the screen fills 80% of a phone's height
-# phones see the left end of the screen: its edge and the black wall show, the talk sits on what's in view
-edge_y = scr["y"] + scr["w"] / 2 if not scr["west"] else scr["y"] - scr["w"] / 2      # the viewer's left
-inward = -1 if not scr["west"] else 1
-vis_w = 2 * dist * math.tan(math.radians(pfov) / 2) * PHONE[0] / PHONE[1]
-phone_look_y = edge_y + inward * (0.5 * vis_w - 0.07 * vis_w)
-seat_phone_cam = still_cam(f"cam-seat-phone-{n}", (seat[0], phone_look_y, seat[2]), (scr["x"], phone_look_y, scr["z"]), pfov, level_for=PHONE[0] / PHONE[1])
 bpy.context.view_layer.update()
 set_res(LAPTOP)
-# the talk goes on the screen above the "#DEVOXX" standing in front of it
-# the talk fills the screen; the "#DEVOXX" and the seats in front of it come back on top as a cut-out layer
 zlow, zhigh = scr["z"] - scr["h"] / 2, scr["z"] + scr["h"] / 2
 full = [(scr["x"], scr["y"] - scr["w"] / 2, zlow), (scr["x"], scr["y"] + scr["w"] / 2, zlow),
         (scr["x"], scr["y"] + scr["w"] / 2, zhigh), (scr["x"], scr["y"] - scr["w"] / 2, zhigh)]
 shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(full, seat_cam)}, "size": {"screen": [scr["w"], zhigh - zlow]},
-                      "front": f"seat-{n}-front", "clear_bottom": round((word_top.get(n, zlow) + 0.15 - zlow) / (zhigh - zlow), 4)}
+                      "front": f"seat-{n}-front"}
+
+# phones: the walk stops at the door, and the talk is on the totem beside it (a cinema screen is far too wide to
+# read in portrait); the red portal and the corridor are soft behind it
+tot = doors[n]["totem"]
+dface, dside = doors[n]["face"], (1 if doors[n]["totem"]["y"] > doors[n]["yc"] else -1)
+ddist = 1.9                                   # a little from the side away from the door, so the red portal shows behind
+_dh = 2 * math.atan(tot["w"] / 2 / 0.86 / ddist)
+door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist * 0.96, tot["y"] + dside * ddist * 0.27, tot["z"] + 0.05),
+                     (tot["x"], tot["y"], tot["z"] - 0.02), 2 * math.degrees(math.atan(math.tan(_dh / 2) * PHONE[1] / PHONE[0])), dof=(ddist, 2.0))
+bpy.context.view_layer.update()
 set_res(PHONE)
-far_y = edge_y + inward * min(scr["w"], 0.95 * vis_w)          # the frame's right side crops the rest of the screen
-y0, y1 = min(edge_y, far_y), max(edge_y, far_y)
-z0, z1 = zlow, zhigh
-sub = [(scr["x"], y0, z0), (scr["x"], y1, z0), (scr["x"], y1, z1), (scr["x"], y0, z1)]
-shots[f"seat-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(sub, seat_phone_cam)}, "size": {"screen": [y1 - y0, z1 - z0]},
-                            "front": f"seat-phone-{n}-front", "clear_bottom": round((word_top.get(n, z0) + 0.15 - z0) / (z1 - z0), 4)}
+shots[f"door-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(tot["corners"], door_cam)}, "size": {"screen": [tot["w"], tot["h"]]}}
 (OUT / f"shots-{n}.json").write_text(json.dumps(shots, indent=1))
 
 # ---------------------------------------------------------------------------------- render settings
@@ -1683,9 +1702,8 @@ for what in [w for w in args.render.split(",") if w]:
     elif what == "seat":
         still(seat_cam, LAPTOP, f"seat-{n}")
         front_layer(seat_cam, LAPTOP, f"seat-{n}-front")
-    elif what == "seat-phone":
-        still(seat_phone_cam, PHONE, f"seat-phone-{n}")
-        front_layer(seat_phone_cam, PHONE, f"seat-phone-{n}-front")
+    elif what == "door-phone":
+        still(door_cam, PHONE, f"door-phone-{n}")
     elif what.startswith("walk@"):
         walk_settings()
         for fr in what[5:].split("+"):
