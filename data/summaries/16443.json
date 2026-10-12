@@ -1,0 +1,96 @@
+{
+  "id": 16443,
+  "source": "transcript",
+  "tldr": "Biarozkin argues static LLM API keys don't fit agentic systems and demos a Quarkus LangChain4j app on OpenShift calling Anthropic with SPIFFE-issued tokens exchanged through Workload Identity Federation.",
+  "summary": [
+    "Biarozkin, of the Quarkus security team, starts with why API keys are a poor fit once agents call tools and other agents: they need a trusted intermediary such as HashiCorp Vault, carry no identity or proof of possession, can't express current intent, and can't tell a receiving agent which workload sent them. Citing an industry group's figure that only about 20% of organisations have formal processes for issuing and revoking keys, he admits to two forgotten, never-expiring OpenAI keys of his own. He adds scenarios such as a reassigned developer who keeps using a key, and a pre-commit check that fails to catch a pushed secret.",
+    "The emerging specs (OAuth Transaction Tokens, the identity assertion grant used in MCP authorization, the IETF WIMSE drafts) all rely on tokens that name the caller, target and permissions, and get exchanged hop by hop. User-delegated OAuth login, as offered for Azure OpenAI and Gemini, adds tokens but doesn't cover decisions an agent makes later. Workload Identity Federation does: the workload gets a token from an OIDC provider and exchanges it with the LLM provider for a short-lived federated token whose lifecycle that provider controls. Anthropic and OpenAI both support Kubernetes and SPIFFE as sources, and he found Anthropic's documentation particularly clear.",
+    "SPIFFE gives workloads IDs and verifiable identity documents (JWTs, X.509 certificates, or newer proof-of-possession tokens). A SPIRE server attests nodes, SPIRE agents attest workloads, and an OIDC discovery endpoint publishes the keys. In the demo on OpenShift, deployed with the Red Hat Zero Trust Workload Identity Manager operator, a sidecar writes the SPIFFE JWT to a file. Quarkus LangChain4j's model authentication provider, with the Quarkus OIDC client, exchanges it via a JWT bearer grant using Anthropic's federation rule, organization ID and service account ID. In the Anthropic console, a custom OIDC provider points at SPIRE and a rule accepts one subject. A live chat call worked, though without conversation memory."
+  ],
+  "keyPoints": [
+    "API keys only prove someone knows a shared secret: no identity, no proof of possession, no intent, no per-workload audit trail, and they are often long-lived and never rotated.",
+    "Biarozkin considers API keys still acceptable for Quarkus Dev Mode, test profiles and simple single-hop chatbots.",
+    "Workload Identity Federation: workload token from an OIDC provider, exchanged at the LLM provider's token endpoint for a short-lived federated token the provider controls.",
+    "SPIRE server attests nodes (for example with Kubernetes tokens), SPIRE agents attest workloads at kernel and process level, and an OIDC discovery provider exposes verification keys.",
+    "Kubernetes projected tokens are the simpler option for a single self-managed cluster; SPIFFE spans multiple clusters, bare metal and laptops.",
+    "In Quarkus LangChain4j the application config has no API key: just the token file location plus provider-specific federation settings (for Anthropic: federation rule, organization ID, service account ID). Reading the SPIFFE token in-process without a sidecar is in progress, with early support in a Quarkus beta according to Biarozkin."
+  ],
+  "takeaways": [
+    "Audit your organisation's LLM API keys today, revoke unused ones and set expiry dates on the rest.",
+    "Plan a move to Workload Identity Federation for any agentic or multi-service LLM use, with your platform team owning the SPIRE or Kubernetes side.",
+    "Restrict each federation rule to a specific workload subject so only that workload can obtain tokens.",
+    "Try the Quarkus LangChain4j Workload Identity Federation with SPIFFE demo against Anthropic."
+  ],
+  "quotes": [
+    {
+      "text": "Static API keys are an anti-pattern for agent identity.",
+      "at": "04:34"
+    },
+    {
+      "text": "Undoubtedly, it's more complex to set up. DevOps will do it for us. And code-wise, it's really straightforward.",
+      "at": "39:52"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "What an LLM API key is"
+    },
+    {
+      "at": "03:33",
+      "title": "Why keys fail zero trust"
+    },
+    {
+      "at": "09:00",
+      "title": "Key leak stories"
+    },
+    {
+      "at": "10:27",
+      "title": "The token-based spec landscape"
+    },
+    {
+      "at": "16:10",
+      "title": "Workload Identity Federation"
+    },
+    {
+      "at": "21:39",
+      "title": "SPIFFE and SPIRE"
+    },
+    {
+      "at": "27:40",
+      "title": "Kubernetes versus SPIFFE"
+    },
+    {
+      "at": "30:07",
+      "title": "Quarkus LangChain4j demo"
+    },
+    {
+      "at": "40:59",
+      "title": "Q&A on standards"
+    }
+  ],
+  "tech": [
+    "Workload Identity Federation",
+    "SPIFFE",
+    "SPIRE",
+    "Quarkus",
+    "Quarkus LangChain4j",
+    "Quarkus OIDC client",
+    "Anthropic Claude API",
+    "OpenShift",
+    "Kubernetes",
+    "OAuth 2.0",
+    "OpenID Connect",
+    "JWT bearer grant",
+    "Transaction Tokens",
+    "WIMSE",
+    "HashiCorp Vault"
+  ],
+  "watchIf": "You run LLM-backed services in production with API keys in config and want a concrete path to short-lived, workload-bound credentials.",
+  "themes": [
+    "Security & supply chain",
+    "LLMs in Java apps",
+    "Cloud native & Kubernetes"
+  ],
+  "demo": true
+}

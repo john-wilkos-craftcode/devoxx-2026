@@ -1,0 +1,112 @@
+{
+  "id": 25661,
+  "source": "transcript",
+  "tldr": "Pollack, founder of Spring AI, applies the feedback loop from control theory to coding agents: define success, judge with evidence, read the agent's session log, change one variable, repeat.",
+  "summary": [
+    "Pollack opens with the questions enterprises ask of any agent: is it working, how would I know, can it be cheaper, am I locked in? 'The agent said it's done' is no answer. Citing Andrew Ng on disciplined evals, he frames an edit-compile loop for AI. His example is a JetBrains developer advocate's spec-driven Pet Clinic feature using Timefold: seven use cases written as EARS requirements plus RFC 2119 architectural rules. The agent produced 290 tests in about 20 minutes, yet evaluation found a lock-ordering violation and most architectural rules failing.",
+    "The evaluation comes from his Agent Judge library, with a JUnit and AssertJ-style API. Judges return judgments (pass, fail, inconclusive, not applicable), juries of judges return verdicts, and reports carry the evidence: line numbers and tests, not a boolean. Judges can run on any agentic CLI or Java framework; numeric scores, he says, are meaningless. Under a 'principle of least intelligence' he prefers deterministic tools, and bundled PMD, JaCoCo, mutation testing, Error Prone, Lincheck, ArchUnit, SpotBugs, NullAway and complexity metrics into a skill that configures them on a brownfield codebase and drives findings to zero, trying it on the Java MCP SDK.",
+    "Attention is limited: one skill asked to raise coverage and adopt new Spring testing utilities ignored the second goal. Hence a workflow engine mixing deterministic and AI steps, branching on verdicts, with steps swappable as DI beans; he uses it to triage open-source PRs. Agent Client puts one API over any agentic CLI, so switching model or provider is configuration, and he advises calling an existing CLI before building a harness. The stop criterion is cost per verified result: prove the task on the biggest model, then step down while quality holds, and finally freeze the evals into a benchmark (Agent Bench, inspired by Terminal-Bench).",
+    "'Reading the agent's diary' means classifying every tool call in the session log. A refined prompt cut a coverage run from 86 to 60 calls at nearly the same cost ($3.60 versus $3.46), and repeated 10-15-call JaCoCo parsing became a candidate tool. Planning artifacts live in a separate 'steward' Git repository bound to one or more code repos. A judge run against the ACP spec found a missed 'must' in his own, well-tested ACP Java SDK. His closing warning: keep business logic out of vendor agent workflows, because the system should run the model, not the reverse."
+  ],
+  "keyPoints": [
+    "An agent-built Pet Clinic feature with 290 tests passed 51 of 52 behavioural criteria, but evaluation surfaced a lock-ordering bug and most of the 13 architectural rules failing.",
+    "Agent Judge: judges produce judgments, juries of judges produce verdicts, and reports carry the evidence. Outcomes include inconclusive and not applicable, and Pollack considers numeric scores meaningless.",
+    "Principle of least intelligence: lean on deterministic tools (ArchUnit, PMD, NullAway, Lincheck, mutation testing, cognitive complexity) because a number gives the agent a real signal to iterate against.",
+    "Split work into focused steps; a single skill asked to add coverage and adopt new Spring testing utilities ignored the second goal.",
+    "Agent Client is one Java API over many agentic CLIs, making the model or harness a configuration change inside a workflow of deterministic and AI steps.",
+    "Performance index: total cost of all attempts divided by verified acceptable results. Start with the biggest model, then step down while quality holds.",
+    "Session-log analysis (tool-call categories, transition heat maps) showed a refined prompt cut calls from 86 to 60 with almost no cost difference ($3.60 vs $3.46).",
+    "A separate 'steward' Git repository holds project knowledge, plans and evals so they outlive any CLI or model and don't pollute the codebase."
+  ],
+  "takeaways": [
+    "Write requirements in a structured form (EARS or RFC 2119 must/shall) so a judge can check the agent's output against each one with evidence.",
+    "Wire ArchUnit, mutation testing, NullAway and complexity metrics into the build and hand the agent the report to drive to zero.",
+    "Read your agent's session logs and turn repeated multi-call chores, such as parsing a JaCoCo report, into tools.",
+    "Measure cost per verified result on the strongest model first, then try cheaper models against the same evals, changing one variable at a time.",
+    "Keep workflow logic in your own code rather than a vendor's agent workflow feature to avoid lock-in."
+  ],
+  "quotes": [
+    {
+      "text": "Show me evidence. Just don't tell me.",
+      "at": "10:15"
+    },
+    {
+      "text": "Rely on the compiler first.",
+      "at": "20:58"
+    },
+    {
+      "text": "It's not that the model is running the system, it's the other way around. Our system is running the model.",
+      "at": "48:38"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Right way, but faster"
+    },
+    {
+      "at": "04:05",
+      "title": "Evals drive progress"
+    },
+    {
+      "at": "06:39",
+      "title": "Spec-driven Pet Clinic case"
+    },
+    {
+      "at": "10:15",
+      "title": "Judges, juries and verdicts"
+    },
+    {
+      "at": "16:04",
+      "title": "Deterministic code quality tools"
+    },
+    {
+      "at": "22:24",
+      "title": "Workflows and Agent Client"
+    },
+    {
+      "at": "29:55",
+      "title": "Cost, quality and benchmarks"
+    },
+    {
+      "at": "33:51",
+      "title": "Reading the agent's diary"
+    },
+    {
+      "at": "42:06",
+      "title": "Steward repositories"
+    },
+    {
+      "at": "45:35",
+      "title": "Agent Control Theory and Q&A"
+    }
+  ],
+  "tech": [
+    "Agent Judge",
+    "Agent Client",
+    "Agent Client Protocol (ACP)",
+    "Claude Code",
+    "Codex",
+    "JUnit",
+    "AssertJ",
+    "ArchUnit",
+    "PMD",
+    "JaCoCo",
+    "Error Prone",
+    "SpotBugs",
+    "NullAway",
+    "JSpecify",
+    "Lincheck",
+    "Timefold",
+    "EARS",
+    "RFC 2119",
+    "Terminal-Bench",
+    "Spring Pet Clinic"
+  ],
+  "watchIf": "You let coding agents produce real code and want a concrete, Java-centric method to verify their output and compare models on cost and quality.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Testing & quality"
+  ],
+  "demo": false
+}

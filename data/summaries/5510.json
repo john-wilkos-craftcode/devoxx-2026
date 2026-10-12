@@ -1,0 +1,101 @@
+{
+  "id": 5510,
+  "source": "transcript",
+  "tldr": "Andrianakis and Mihalceanu show how Project Leyden's AOT cache, together with Quarkus changes, took a Quarkus REST app from about 350 ms to about 80 ms startup, and what constraints apply.",
+  "summary": [
+    "Andrianakis (Quarkus team, IBM) opens with what Quarkus has done since 2019: moving config parsing, classpath scanning and metamodel building to build time. Mihalceanu (Oracle) then covers Leyden as it ships today. JDK 24 added a three-phase workflow: training run, assembly into an AOT cache, deployment run. JDK 25 added AOT method profiling, which needs no extra flag, and JEP 514's single-step workflow, which costs double the heap during training. JDK 26's JEP 516 added a GC-agnostic, streamable object format so ZGC can use the cache too.",
+    "On the Quarkus side, flame graphs of startup were dominated by class loading. Running a plain Quarkus app with Leyden halved startup from 400 to 200 ms. But Leyden only caches classes loaded by the JDK's built-in class loaders, so Quarkus's own class loaders were bypassed. Switching to an uber-jar got 130 ms. With class loading gone from the flame graph, small costs became visible and were removed one by one: BigDecimal static initialisation used to print the startup time, UUID triggering security providers, needless ServiceLoader lookups, annotation reflection in Hibernate, and slow negative class-presence checks.",
+    "Mihalceanu lists the AOT cache requirements. Training, assembly and production must use the same JDK release, OS and architecture. Jar timestamps must be preserved. The classpath must be a list of jars, with no wildcards, directories or nested jars, and the production classpath must be a superset of the training one. Train with smoke tests rather than full regression suites. Use -verbose:class or JFR class-load events to see what gets loaded, and jcmd AOT.end_recording to stop a long training run early.",
+    "In the demo, building with the Quarkus AOT jar flag runs the @QuarkusIntegrationTest suite as the training run against a black-box process. It produces a dedicated AOT jar and a 38 MB AOT file, and startup drops from about 350 ms to about 80 ms. A synthetic app with 1,000 resources and 1,000 entities goes from about 3.1 s to under 1 s, but baking the cache into the image grows it from 517 to 715 MB. The talk closes with AOT code compilation, which the speakers said is coming in JDK 28, to remove JIT compilation work from startup."
+  ],
+  "keyPoints": [
+    "Leyden's AOT cache only holds classes loaded by JDK built-in class loaders, which clashed with Quarkus's custom class loaders. Quarkus now ships a dedicated AOT jar that hands class loading to the JDK and keeps resource and service-file handling in Quarkus.",
+    "JEP 514's one-step workflow is simpler but needs double the heap during training. The three-phase workflow suits memory-constrained environments; the speakers advise trying both.",
+    "For ZGC, large heaps over 32 GB, or with compressed oops off, use -XX:+AOTStreamableObjects to get the GC-agnostic cache format from JEP 516 (JDK 26).",
+    "Once class loading disappears from the flame graph, millisecond-level costs show up: BigDecimal and UUID static initialisers, ServiceLoader lookups, annotation reflection and negative Class.forName checks.",
+    "Cache requirements: same JDK build, OS and architecture across phases; preserved jar timestamps; a classpath of plain jars with production as a superset of training; the same rules for the module path.",
+    "Quarkus runs @QuarkusIntegrationTest tests as the training run and can optionally bake the AOT file into a container image built with Docker, Jib or Podman. Some large users mount the file from a volume instead because of its size.",
+    "Measured results: a hello-world REST app went from about 350 ms to about 80 ms, and a 1,000-entity CRUD app from about 3.1 s to under 1 s. The speakers reported no peak-performance regressions from using the cache."
+  ],
+  "takeaways": [
+    "Build your Quarkus app with the AOT jar option on a recent LTS release and let the integration tests act as the training run.",
+    "Train with smoke tests that cover the startup path, and use -verbose:class or JFR to check that training loads the same classes as production.",
+    "Keep the JDK build identical across training and production, and stop your CI from rewriting jar timestamps.",
+    "Decide whether the AOT file goes inside your container image or is mounted separately, depending on its size.",
+    "Profile startup with a flame graph after enabling Leyden and remove the small static-initialiser and ServiceLoader costs that become visible."
+  ],
+  "quotes": [
+    {
+      "text": "I don't want to see 100, I want to see 99.",
+      "at": "18:37"
+    },
+    {
+      "text": "Developers, we were lazy. Sometimes you just do the first thing that works.",
+      "at": "22:34"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "How Quarkus tackled startup"
+    },
+    {
+      "at": "06:09",
+      "title": "Leyden training workflows"
+    },
+    {
+      "at": "11:09",
+      "title": "AOT cache and ZGC"
+    },
+    {
+      "at": "15:05",
+      "title": "First Quarkus experiments with Leyden"
+    },
+    {
+      "at": "19:56",
+      "title": "Hunting milliseconds in flame graphs"
+    },
+    {
+      "at": "25:14",
+      "title": "AOT cache requirements and tips"
+    },
+    {
+      "at": "28:55",
+      "title": "Demo: 350 ms to 80 ms"
+    },
+    {
+      "at": "32:54",
+      "title": "How the Quarkus AOT build works"
+    },
+    {
+      "at": "38:57",
+      "title": "AOT code compilation next"
+    },
+    {
+      "at": "44:55",
+      "title": "Questions"
+    }
+  ],
+  "tech": [
+    "Quarkus",
+    "Project Leyden",
+    "AOT cache",
+    "JEP 483",
+    "JEP 514",
+    "JEP 515",
+    "JEP 516",
+    "ZGC",
+    "AppCDS",
+    "JFR",
+    "jcmd",
+    "Hibernate",
+    "REST Assured",
+    "Jib"
+  ],
+  "watchIf": "You run Quarkus or another JVM framework where startup time matters and want to know what Leyden gives you today and what it requires from your build and deployment.",
+  "themes": [
+    "JVM performance & runtime",
+    "Spring & frameworks"
+  ],
+  "demo": true
+}

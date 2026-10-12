@@ -1,0 +1,86 @@
+{
+  "id": 11558,
+  "source": "transcript",
+  "tldr": "Dubois demos BootUI, a drop-in jar that adds 400+ rule checks and a live runtime console to Spring Boot and Quarkus apps, and argues its real users are AI coding agents.",
+  "summary": [
+    "Dubois, creator of JHipster and now at GitHub, built BootUI because existing tools either read source code or, like Actuator, show little about what happens at runtime. Adding one dependency exposes a /bootui console with adapters for Spring MVC, WebFlux and Quarkus. BootUI writes its own JDBC proxy, OpenTelemetry implementation and JavaMail and Kafka proxies rather than pulling in transitive dependencies. A scorecard runs more than 400 rules, flagging for example field injection or eager Hibernate fetching, with location and fix. A live-activity view graphs each request through cache, transactions and SQL. Further panels cover Micrometer metrics, a JVM memory tuner for Kubernetes, heap and thread dumps, startup timeline, GraalVM reachability-metadata generation, PostgreSQL/MySQL/MariaDB internals, N+1 detection, Spring Security failures, Resilience4j, Spring AI, LangChain4j and Sentry-style grouped exceptions.",
+    "Dubois says there are too many panels for a human, and that the real audience is coding agents. An MCP server, an agent skill and a CLI expose the same data. In the demo, GitHub Copilot found 6 problematic transactions out of 28, and teams use the CLI to block deployment on a poor score. The upcoming V2 stores events in a graph database for change-impact analysis and run-to-run diffs, so an agent can confirm a fix worked. It runs algorithms to spot problems such as held connections or errors behind a 200 response, and adds an optional bytecode-instrumentation agent costing about 5% for code paths, network calls (it caught Liquibase calling home), files and processes."
+  ],
+  "keyPoints": [
+    "Setup is one dependency in Maven or Gradle, which exposes a /bootui URL. The same engine and UI serve Spring MVC, Spring WebFlux and Quarkus through separate adapters.",
+    "Over 400 rules (architecture, Spring, Hibernate mappings, REST practices, SQL configuration, memory) report the issue, the location and the fix, which suits agents as well as humans.",
+    "Database panels go from PostgreSQL/MySQL session and index data, through Spring transactions and rollbacks, to JDBC-level SQL capture with N+1 detection, plus Flyway and Liquibase control.",
+    "An MCP server, an agent skill and a CLI expose all panels, and the CLI can be used as a CI quality gate on score, rollbacks or exception counts.",
+    "V2 adds an event graph for change-impact analysis and run-to-run diffs, and an optional bytecode agent with roughly 5% overhead that is not meant for production."
+  ],
+  "takeaways": [
+    "Add the BootUI dependency to a real Spring Boot or Quarkus app in development and run the scorecard.",
+    "Turn on the BootUI MCP server or skill so your coding agent can inspect transactions, SQL and exceptions at runtime instead of guessing from source.",
+    "Use the CLI in CI to fail a build on a poor scorecard or too many rolled-back transactions."
+  ],
+  "quotes": [
+    {
+      "text": "The target audience, of course, is AI agents, AI coding agents, who are going to connect to your app, see all those issues, and fix them.",
+      "at": "16:56"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why BootUI"
+    },
+    {
+      "at": "04:18",
+      "title": "Scorecard and 400 rules"
+    },
+    {
+      "at": "07:09",
+      "title": "Live activity and JVM panels"
+    },
+    {
+      "at": "11:17",
+      "title": "Database, security and services"
+    },
+    {
+      "at": "14:06",
+      "title": "Traces and exceptions"
+    },
+    {
+      "at": "16:56",
+      "title": "MCP server, skill and CLI"
+    },
+    {
+      "at": "20:51",
+      "title": "V2 event graph"
+    },
+    {
+      "at": "24:58",
+      "title": "Bytecode instrumentation"
+    }
+  ],
+  "tech": [
+    "BootUI",
+    "Spring Boot",
+    "Spring WebFlux",
+    "Quarkus",
+    "Hibernate",
+    "OpenTelemetry",
+    "Micrometer",
+    "GraalVM",
+    "PostgreSQL",
+    "Flyway",
+    "Liquibase",
+    "Resilience4j",
+    "Spring AI",
+    "LangChain4j",
+    "MCP",
+    "GitHub Copilot"
+  ],
+  "watchIf": "You build Spring Boot or Quarkus apps and want runtime insight into transactions, SQL and exceptions that you or a coding agent can act on.",
+  "themes": [
+    "Developer experience & tooling",
+    "Spring & frameworks",
+    "AI agents & agentic coding"
+  ],
+  "demo": true
+}

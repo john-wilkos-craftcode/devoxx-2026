@@ -1,0 +1,78 @@
+{
+  "id": 24227,
+  "source": "transcript",
+  "tldr": "Yurenko demos a Micronaut, LangChain4j and GraalVM travel assistant that uses embeddings only for meaning and enforces location and price constraints in application code through tools.",
+  "summary": [
+    "Yurenko (GraalVM team, Oracle) builds a Swiss travel assistant on Micronaut, LangChain4j, Oracle Database for both relational data and vector search, OpenAI for embeddings and chat, and a GraalVM native image. Take a query like 'a quiet lakeside hotel near Lucerne under 250 francs': only 'quiet lakeside' belongs in vector similarity, where it can match 'peaceful' or 'waterfront'. 'Near Lucerne' becomes a geographic radius with a 15 km default, and the budget becomes a hard filter, because an LLM may reinterpret or drop such constraints. Embeddings cover stable fields such as hotel name, destination and description, while volatile data like price and offers stays in application filters. A Micronaut-generated AI service interface, a long system message, and tools backed by Micronaut Data repositories limit what the model can see and do.",
+    "The live demo returns Lucerne hotels within budget and saves items to a wishlist, then checks the results against the database with SQL. Arize Phoenix, recommended by Thomas Vitale, shows each trace: the extracted semantic query ('luxury'), the tool called, and the vector distance next to destination and price. Phoenix also shows annotation scores from rules Yurenko defined herself, such as expecting the search tool for 'find' or 'recommend' and the wishlist tool for 'save' or 'bookmark', plus user feedback. LangChain4j listeners log tool calls, results and token usage, which helped debug hallucinated tool calls. The native image used under 200 MB of memory."
+  ],
+  "keyPoints": [
+    "Split a user request into semantic intent, which goes to vector search, and hard constraints such as location radius and price, which go to application filters, rather than trusting the LLM to respect them.",
+    "Embed stable attributes (name, destination, description) and keep frequently changing data (prices, discounts, events) as structured fields.",
+    "Tools give the model deterministic, narrow access and keep fields like customer ID or balance out of its reach.",
+    "Arize Phoenix traces show tool selection, vector distance and filter values per query, and custom rules can score whether the expected tool was chosen.",
+    "LangChain4j listeners can log every tool call, result and token count, which helps find where a conversation went wrong."
+  ],
+  "takeaways": [
+    "Implement budget, distance and similar hard constraints as filters in your search tool instead of instructions in the prompt.",
+    "Choose embedding text from fields that rarely change, and regenerate embeddings only when they do.",
+    "Add tracing (for example Arize Phoenix) and simple rule-based checks of tool selection before shipping an assistant.",
+    "Turn on LangChain4j logging listeners to debug hallucinated or missing tool calls."
+  ],
+  "quotes": [
+    {
+      "text": "I would much rather implement this requirement in my business logic and not rely on the LLM for this.",
+      "at": "08:03"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "A grounded travel assistant"
+    },
+    {
+      "at": "02:58",
+      "title": "Architecture and stack"
+    },
+    {
+      "at": "05:22",
+      "title": "Semantic meaning versus hard constraints"
+    },
+    {
+      "at": "08:03",
+      "title": "Assistant interface and tools"
+    },
+    {
+      "at": "09:16",
+      "title": "What to embed"
+    },
+    {
+      "at": "13:55",
+      "title": "Live demo"
+    },
+    {
+      "at": "21:44",
+      "title": "Tracing with Phoenix"
+    },
+    {
+      "at": "27:00",
+      "title": "LangChain4j logging and takeaways"
+    }
+  ],
+  "tech": [
+    "Micronaut",
+    "Micronaut Data",
+    "LangChain4j",
+    "GraalVM Native Image",
+    "Oracle Database",
+    "Vector search",
+    "OpenAI",
+    "Arize Phoenix"
+  ],
+  "watchIf": "You are adding semantic search or a tool-calling assistant to a Java app and need results that respect real data and business rules.",
+  "themes": [
+    "LLMs in Java apps",
+    "Data & databases"
+  ],
+  "demo": true
+}

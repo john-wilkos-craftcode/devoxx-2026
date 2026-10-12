@@ -1,0 +1,102 @@
+{
+  "id": 19714,
+  "source": "transcript",
+  "tldr": "Gageot builds a Pokémon-arena agent in YAML with Docker Agent, measures it with repeated evals, fixes failures with tools rather than bigger models, and serves it over HTTP or MCP.",
+  "summary": [
+    "Gageot, who worked on Docker Desktop before building Docker's AI assistant Gordon, argues that 'the model is not the product'. A specialised agent can use the same models as a coding agent, but with a lean harness it is cheaper and more predictable; he notes Claude Code spends about 4,000 tokens on configuration before your prompt. Docker Agent, the open-source harness behind Gordon v2, defines agents in YAML (with a Go SDK when needed) and runs without a Docker engine. A one-line pirate agent works immediately. 'docker agent doctor' lists available credentials, any OpenAI-compatible endpoint or AI gateway can supply models, and the '/cost' command compares spending across models.",
+    "Pokémon stands in for 'your business'. An OpenAPI toolset turns a PokéAPI clone into 102 tools; he restricts it to one and adds a built-in hook that trims the JSON response to name, type and stats to keep the context small. Because LLMs can't count or pick random numbers, a script toolset provides a random-integer tool instead of a full shell. Team-building guidelines load from a file, and a plain 'API' toolset wraps a colleague's sparring endpoint that has no OpenAPI spec. Permissions let lookups run freely but require confirmation before sparring; hooks handle finer-grained checks, tokens can pass through from HTTP callers, and a JSON schema enforces structured output.",
+    "After the break: evaluation. Eval cases are JSON files with a first user message, structural assertions and natural-language relevance checks scored by an LLM judge. Cases can be saved from real sessions or generated synthetically; Gordon uses about 4,000 synthetic questions written by a stronger model, plus manual and regression cases. Each case ran five times in its own container: pass@5 was 100% but pass^5 only 60%, and session replay showed the model miscounting stats after replacing a duplicate Pokémon. A 'flavor' patch adding a summing tool reached 100% on both, while a model five to ten times more expensive without the fix stayed flaky.",
+    "He also uses a file-restricted agent to rewrite agents against their evals, and warns about overfitting by 'training on the final exam', admitting Gordon's own prompt is partly overfitted. Sub-agents (a coordinator, a team builder and a cheaper coach) can isolate tools and use smaller models, but coordination costs tokens and added nothing here. For production he serves the same YAML as an OpenAI-compatible HTTP endpoint (his preference over MCP, whose spec still changes), as an MCP server, or in Docker Compose. Jaeger traces show four LLM calls dominating latency, agents can be pushed to Docker Hub as OCI artifacts, and agents finally compete in a 32-player arena."
+  ],
+  "keyPoints": [
+    "A specialised agent shares models with coding agents but drops their overhead; Gageot cites about 4,000 tokens of Claude Code configuration for every request.",
+    "Docker Agent toolsets include OpenAPI (every operation becomes a tool, filterable to a subset), plain HTTP API, script commands with typed arguments, read-only files and MCP servers.",
+    "Built-in response hooks such as JSON trimming keep tool output from flooding the context; hooks can also redact secrets before or after tool calls.",
+    "Put arithmetic and randomness in deterministic tools; telling an LLM 'don't make mistakes' is not a constraint.",
+    "Evals combine regex and schema assertions with LLM-as-judge relevance checks, run N times in isolated containers, and report pass@k, pass^k and cost outliers.",
+    "In the demo, a better prompt plus a summing tool beat a five to ten times more expensive model without them.",
+    "Flaky scores can come from the judge, not the agent: a check for a 'valid Dockerfile' passed an empty Dockerfile in Gordon's evals.",
+    "The same YAML can be exposed as a TUI, headless exec with JSON events, an OpenAI-compatible server, an MCP server, ACP or A2A, and pushed to a registry as an OCI artifact."
+  ],
+  "takeaways": [
+    "Expose only the API operations your agent needs and trim tool responses to the fields it uses.",
+    "Require user confirmation for side-effecting tools and leave read-only lookups unprompted.",
+    "Save real sessions as eval cases, run each several times, and track how many pass every time (pass^k), not just at least once.",
+    "Before paying for a bigger model, test whether a better prompt or a deterministic tool fixes the failing evals.",
+    "Run any agent that optimises other agents in a sandbox with access only to the files it needs."
+  ],
+  "quotes": [
+    {
+      "text": "If you say don't make mistakes, it's going to make mistakes.",
+      "at": "52:19"
+    },
+    {
+      "text": "I used an agent to create an agent to optimize my agent.",
+      "at": "106:04"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why specialised agents"
+    },
+    {
+      "at": "09:22",
+      "title": "The agent loop and Docker Agent"
+    },
+    {
+      "at": "16:18",
+      "title": "Models, gateways and cost"
+    },
+    {
+      "at": "23:32",
+      "title": "Ways to run an agent"
+    },
+    {
+      "at": "29:51",
+      "title": "Pokémon knowledge via OpenAPI"
+    },
+    {
+      "at": "43:35",
+      "title": "Scripts, guidelines and APIs"
+    },
+    {
+      "at": "57:43",
+      "title": "Permissions and structured output"
+    },
+    {
+      "at": "67:08",
+      "title": "Evals and LLM judges"
+    },
+    {
+      "at": "99:38",
+      "title": "Models, optimisers and overfitting"
+    },
+    {
+      "at": "118:19",
+      "title": "Serving in production"
+    }
+  ],
+  "tech": [
+    "Docker Agent",
+    "Docker Desktop",
+    "Docker Compose",
+    "Docker Model Runner",
+    "Ollama",
+    "OpenAPI",
+    "OpenAI-compatible API",
+    "MCP",
+    "ACP",
+    "A2A",
+    "Jaeger",
+    "OCI artifacts",
+    "1Password",
+    "Go"
+  ],
+  "watchIf": "You want to build a narrow, cost-controlled agent on top of existing APIs and need a practical eval loop to prove it works before shipping.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Testing & quality"
+  ],
+  "demo": true
+}

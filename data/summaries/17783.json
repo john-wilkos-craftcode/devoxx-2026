@@ -1,0 +1,90 @@
+{
+  "id": 17783,
+  "source": "transcript",
+  "tldr": "Petrov and McGrath show how Google's open-source Project Oak uses confidential computing, remote attestation and binary transparency to let users and agents verify the tools, models and agents that handle their data.",
+  "summary": [
+    "Petrov argues that asking an agent not to leak data is not a guarantee, and that agents inherit risk from everything they connect to. Third-party MCP tools can leak data or carry prompt injections in their descriptions, inference providers may log prompts, and agents can pass data on to other agents. Project Oak's answer combines several pieces. Trusted execution environments encrypt data in use, and remote attestation proves which binary is running. Open-source, reproducible builds let auditors match that hash. A binary transparency log, modelled on certificate transparency, prevents a split view where auditors and users are shown different binaries. End-to-end encryption terminates inside the TEE rather than at a cloud load balancer. From these come trusted tools, confidential-GPU inference, signed evaluation results for closed models, and an agent sandbox that may only call attested tools and models.",
+    "McGrath walks through the open-source implementation. A WebAssembly tool sandbox is torn down after every request. Oak Functions serves a read-only database through private information retrieval. An agent sandbox runs Google's Agent Development Kit (ADK) agents compiled to Wasm, isolated per session. OakProxy is a TCP proxy that adds attestation and an encrypted channel without code changes. The demo runs on Google Cloud Confidential Space with a Gemma model evaluated for prompt-injection resistance on AgentDojo. Editing the signed evaluation score fails verification. A medical agent combines blood tests from two clinic MCP servers. A new session cannot see an earlier one. A tampered agent image is refused at the attestation handshake. In Q&A they put the overhead at roughly 3 to 5% and said Oak is used in Gemini's private AI compute."
+  ],
+  "keyPoints": [
+    "Remote attestation only proves something if the attested code is open source and reproducibly buildable, so auditors can rebuild the binary and compare its hash.",
+    "Publishing every release and every MCP tool description to an append-only transparency log makes a malicious deployment or a poisoned tool description publicly visible. Clients require an inclusion proof before connecting.",
+    "Closed-source code or models can still be trusted if they run inside an audited open-source sandbox, or if open-source benchmarks run inside a TEE and the results are signed with the hardware key.",
+    "The Oak agent sandbox exposes only calls to models and tools and enforces that the agent connects only to attested services. It can hold credentials outside the agent and run attested prompt-injection filters.",
+    "In the demos, a hand-edited AgentDojo score and an agent image with injected exfiltration code were both rejected because the hashes did not match."
+  ],
+  "takeaways": [
+    "Map every component your agent sends user data to (MCP tools, inference, other agents) and decide which ones need verifiable guarantees rather than policy promises.",
+    "Make sure TLS terminates inside your trusted environment, not at a cloud load balancer, when you claim confidentiality.",
+    "Try OakProxy in front of an existing service to add attestation and an encrypted channel without changing application code."
+  ],
+  "quotes": [
+    {
+      "text": "They can ask the agent nicely to please not share the data with everyone else, but obviously this is not enough.",
+      "at": "00:33"
+    },
+    {
+      "text": "It's mainly accountability, not prevention.",
+      "at": "32:56"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why agents lack trust"
+    },
+    {
+      "at": "02:50",
+      "title": "Confidential computing and attestation"
+    },
+    {
+      "at": "06:54",
+      "title": "Binary transparency and encryption"
+    },
+    {
+      "at": "08:22",
+      "title": "Trusted tools, models and agents"
+    },
+    {
+      "at": "15:24",
+      "title": "Project Oak implementation"
+    },
+    {
+      "at": "19:19",
+      "title": "Demo: trusted evaluations"
+    },
+    {
+      "at": "23:15",
+      "title": "Demo: trusted medical agent"
+    },
+    {
+      "at": "26:07",
+      "title": "Demo: tampered agent rejected"
+    },
+    {
+      "at": "28:52",
+      "title": "Questions"
+    }
+  ],
+  "tech": [
+    "Project Oak",
+    "Confidential computing",
+    "Remote attestation",
+    "Binary transparency",
+    "WebAssembly",
+    "MCP",
+    "A2A",
+    "Agent Development Kit",
+    "Google Cloud Confidential Space",
+    "Gemma",
+    "AgentDojo",
+    "OakProxy",
+    "Oak Functions"
+  ],
+  "watchIf": "You build agents or MCP services that handle personal data and want verifiable guarantees about where that data goes, rather than policy promises.",
+  "themes": [
+    "Security & supply chain",
+    "AI agents & agentic coding"
+  ],
+  "demo": true
+}

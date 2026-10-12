@@ -1,0 +1,107 @@
+{
+  "id": 5537,
+  "source": "transcript",
+  "tldr": "Three Quarkus engineers show how build-time indexing and bytecode generation replace reflection, and how a reflection-free Jackson serializer was slower until they fixed register spilling and profile pollution.",
+  "summary": [
+    "Andrianakis sets out the core idea: what other frameworks do at startup (classpath scanning, annotation reading, config parsing) Quarkus does once during the Maven or Gradle build, cutting startup time and memory and simplifying GraalVM native images. Nigro then explains why reflection is costly. Before JDK 18, metadata sat in GC-clearable soft references, an accessor was generated after 15 calls, field access used Unsafe, and non-public calls stack-walked behind a one-slot caller cache. Since JDK 18, reflection is built on method handles and VarHandles, but he points out that performance was an explicit non-goal of that change.",
+    "In a live demo, Fusco shows that for each REST endpoint Quarkus generates an invoker class at build time that downcasts and calls the method directly. Extensions are written as build steps that consume and produce build items; Jandex indexes classes without loading them, and Gizmo generates bytecode through a Java-like DSL. Andrianakis shows RESTEasy Reactive's chain of about 18 handlers moving from megamorphic interface calls to a generated tableswitch dispatcher, avoiding instanceof chains and the JDK type-pollution issue. Build time can also generate GraalVM reflection JSON, substitutions and Feature classes, and rewrite Netty's reflective process-ID lookup into a direct ProcessHandle call.",
+    "After the break, Fusco presents a feature that generates Jackson serializers at build time from the REST endpoints' return types (the code a developer would write by hand); it is off by default. On JDK 25, Jackson 3 and a Quarkus 4 snapshot, a benchmark returning 20 nested objects ran at about 144,000 requests per second with Jackson's reflection, and the generated serializer was slightly slower. A flame graph showed the same Jackson writeString method taking 50% of serialization time instead of 15%. Since he started two years earlier on JDK 17 and Jackson 2, both JDK reflection and Jackson 3 had moved to method handles.",
+    "Nigro walked through the hsdis assembly. Inlining writeString into a large generated method caused register spilling in the character loop, and the JIT refused to unroll the loop because of profile pollution: a single UTF-16 string, used by a Jackson date-parsing fallback, had sent String.charAt down its non-Latin branch once. A patch to Jackson made that string lazy, and rewriting the escape-table lookup let the JIT unroll four characters at a time instead of one. The result was about 8% end to end (40-50% in JMH); the reflection path improved too. The talk ended around 2.5 hours; the REST Client and LangChain4j examples from the abstract were not covered."
+  ],
+  "keyPoints": [
+    "Pre-JDK 18 reflection: soft-referenced metadata the GC can drop, an inflation threshold of 15 calls before bytecode accessors are generated, Unsafe-based field access and a one-slot caller cache that thrashes in real applications.",
+    "JDK 18 reimplemented reflection on method handles and VarHandles; performance was a stated non-goal, and trusted final fields stay read-only even after setAccessible.",
+    "Quarkus generates one invoker class per REST endpoint at build time, so stack traces show a direct call instead of layers of reflective frames.",
+    "Extension anatomy: build steps consume and produce build items, Jandex indexes bytecode without class loading, Gizmo emits bytecode. Reflection is used only at build time, where it costs little.",
+    "RESTEasy Reactive's handler chain went from megamorphic interface calls to a generated tableswitch dispatcher, with a megamorphic fallback for handlers that lack the metadata.",
+    "Build-time knowledge also produces GraalVM reflection JSON, substitutions and Feature classes, and bytecode transformations of third-party code such as Netty's reflective process-ID lookup.",
+    "A JFR event added at the Quarkus team's request reports any reflective call, so tests can fail if reflection sneaks in.",
+    "The generated Jackson serializer was initially slower on JDK 25 and Jackson 3. Fixing profile pollution in Jackson and restructuring the escape-table loop gave about 8% end to end and 40-50% in JMH."
+  ],
+  "takeaways": [
+    "Remeasure performance claims from a few years ago; JDK and library changes (JEP 416, Jackson 3 method handles) can erase or reverse an optimization.",
+    "When writing a Quarkus extension, look for an existing build item before scanning anything yourself, and generate code with Gizmo instead of using runtime reflection.",
+    "Replace instanceof chains over a known set of types with an integer id and a switch so the JIT gets a tableswitch.",
+    "When a hot loop underperforms, inspect the JIT output with hsdis and check for register spilling, missing loop unrolling or a polluted branch profile.",
+    "Try the opt-in reflection-free Jackson serializers in Quarkus and report any corner cases you hit."
+  ],
+  "quotes": [
+    {
+      "text": "There's nothing better for performance than making something disappear completely.",
+      "at": "67:33"
+    },
+    {
+      "text": "If you have a single non-Latin string in your JVM, you are doomed.",
+      "at": "138:27"
+    },
+    {
+      "text": "Measure, but not only today, also tomorrow and check. Keep on measuring.",
+      "at": "146:12"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Build time versus runtime"
+    },
+    {
+      "at": "04:04",
+      "title": "How reflection really works"
+    },
+    {
+      "at": "21:08",
+      "title": "Generated REST endpoint invokers"
+    },
+    {
+      "at": "31:20",
+      "title": "Build steps, Jandex and Gizmo"
+    },
+    {
+      "at": "47:45",
+      "title": "Handler dispatch with tableswitch"
+    },
+    {
+      "at": "68:51",
+      "title": "GraalVM and bytecode transformation"
+    },
+    {
+      "at": "89:39",
+      "title": "Reflection-free Jackson serializers"
+    },
+    {
+      "at": "104:14",
+      "title": "The disappointing benchmark"
+    },
+    {
+      "at": "114:51",
+      "title": "Register spilling and profile pollution"
+    },
+    {
+      "at": "136:48",
+      "title": "Results and lessons"
+    }
+  ],
+  "tech": [
+    "Quarkus",
+    "Jandex",
+    "Gizmo",
+    "RESTEasy Reactive",
+    "Jackson",
+    "GraalVM Native Image",
+    "Netty",
+    "Method handles",
+    "JEP 416",
+    "JDK Flight Recorder",
+    "JMH",
+    "Hyperfoil",
+    "async-profiler",
+    "hsdis",
+    "OpenJ9"
+  ],
+  "watchIf": "You write Quarkus extensions or performance-sensitive Java libraries and want to know what reflection and JIT heuristics actually cost.",
+  "themes": [
+    "JVM performance & runtime",
+    "Spring & frameworks"
+  ],
+  "demo": true
+}

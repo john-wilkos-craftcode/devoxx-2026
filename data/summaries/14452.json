@@ -1,0 +1,100 @@
+{
+  "id": 14452,
+  "source": "transcript",
+  "tldr": "Peterssen presents Quixotic's pure-Java inference engine, a 3.3 MB jar that runs 17 open model families on the CPU and that, by his benchmarks, matches llama.cpp on decode and beats it on prefill.",
+  "summary": [
+    "Peterssen, who worked on the GraalVM team and wrote llama3.java, founded Quixotic AI to run AI inside the JVM instead of calling out to Python, native processes or remote APIs. The pieces are a pure-Java tokenizer library, an inference engine (tokens in, logits out) and a set of matrix-multiplication kernels. Everything ships in a 3.3 MB jar with no dependencies and needs Java 25 or later. It supports 17 model families, including Gemma 4, Qwen, Liquid AI's LFM, Mistral, IBM Granite, JetBrains Mellum, gpt-oss and NVIDIA Nemotron, plus vision, audio, TTS and speech recognition. It also handles quantisation formats, tool calling, constrained generation, prompt caching and multi-token prediction. A JBang script pulls a model from Hugging Face and answers in a few lines.",
+    "A detour into transformer anatomy explains why prefill is compute-bound and decode memory-bound even though both do the same arithmetic: decode streams every weight from memory once per token, while prefill multiplies each loaded matrix against all prompt tokens. Even on one thread, prefill measured 7.4x faster than decode, and 19x with all eight laptop cores. Peterssen contrasts this with API pricing, where input is typically only 5x cheaper than output.",
+    "On performance, Peterssen reports decode on par with llama.cpp and prefill ahead, sometimes 2 to 3x, as a geometric mean over 121 public benchmark runs. Matrix multiplication is the one operation the Vector API cannot yet match natively, because it lacks some specialised instructions. That kernel is therefore native by default, with a pure Vector API fallback. With Q8_0, a 4x4-tiled Vector API kernel compiled by the latest GraalVM Community Edition beats llama.cpp, while on OpenJDK it spills registers and regresses.",
+    "Further demos: Kokoro text-to-speech at 3x real time, a 16 MB GraalVM native image that memory-maps an embedded TTS model from its own executable, a 15-minute speech transcribed in about 8 seconds, and live captioning with NVIDIA Parakeet. The LangChain4j and Spring AI integrations need three dependencies and replace a remote chat model with a local one. Prompt caches are stored as a token tree and can be saved to disk, so a pre-filled system prompt is 'compiled' into the app. A Gemma audio-transcription demo and an OpenAI-compatible server demo did not work on stage."
+  ],
+  "keyPoints": [
+    "The whole runtime (tokenizers, model definitions, kernels) fits in a 3.3 MB dependency-free jar, requires Java 25+, and also compiles with GraalVM Native Image.",
+    "Prefill and decode do the same computation in a different order, and decode is memory-bound because weights are re-read for every token. Peterssen measured prefill 7.4x faster single-threaded and 19x with eight threads.",
+    "Only matrix multiplication needs native code for peak speed. Everything else, including attention, runs at full speed on the Vector API, and a pure Vector API matmul is available when native libraries are not allowed.",
+    "Peterssen recommends Q8_0 quantisation. Lower quants run faster but lose capability, and a 27B Qwen model decodes at about 2.8 tokens/s on a laptop CPU.",
+    "Prompt caches form a token tree that can be persisted to a file, so an app restarts with its system prompt already pre-filled.",
+    "LangChain4j and Spring AI integrations cover chat, embeddings, re-ranking, text-to-speech and transcription. Switching to local inference is a dependency plus a model definition, with no API key or network.",
+    "A backup demo showed that a 'roll a fair die' prompt yields a skewed distribution, a reminder that language-model classifiers carry biases."
+  ],
+  "takeaways": [
+    "Try running a small open model in-process from a JBang script before adding a Python sidecar or remote API to a Java service.",
+    "Swap a remote chat model in your LangChain4j or Spring AI app for a local one to test whether a local model is good enough for that task.",
+    "Benchmark prefill and decode separately when sizing CPU inference, because decode hits the memory-bandwidth limit with only a few threads.",
+    "Cache and persist long system prompts so the app does not pay prefill on every start."
+  ],
+  "quotes": [
+    {
+      "text": "Every single component is embedded in this jar, and it's only 3.3 megabytes.",
+      "at": "05:47"
+    },
+    {
+      "text": "They can bend the rule, but they cannot break it.",
+      "at": "22:01"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "From llama3.java to Quixotic"
+    },
+    {
+      "at": "03:21",
+      "title": "AI in a jar"
+    },
+    {
+      "at": "09:01",
+      "title": "Supported models and features"
+    },
+    {
+      "at": "14:44",
+      "title": "Anatomy of an LLM"
+    },
+    {
+      "at": "17:36",
+      "title": "Prefill versus decode benchmark"
+    },
+    {
+      "at": "23:31",
+      "title": "Beating llama.cpp"
+    },
+    {
+      "at": "30:52",
+      "title": "Speech and native image demos"
+    },
+    {
+      "at": "35:23",
+      "title": "LangChain4j and Spring AI"
+    },
+    {
+      "at": "37:57",
+      "title": "Persistent prompt caching"
+    },
+    {
+      "at": "44:39",
+      "title": "Wrap-up and backup slides"
+    }
+  ],
+  "tech": [
+    "Vector API",
+    "GraalVM",
+    "GraalVM Native Image",
+    "llama.cpp",
+    "JBang",
+    "LangChain4j",
+    "Spring AI",
+    "Hugging Face",
+    "Gemma 4",
+    "Qwen",
+    "Liquid AI LFM",
+    "Kokoro",
+    "NVIDIA Parakeet",
+    "Nemotron"
+  ],
+  "watchIf": "You want local LLM, speech or embedding inference inside a Java application without Python or native servers, and want to see how fast pure Java can be on a CPU.",
+  "themes": [
+    "LLMs in Java apps",
+    "JVM performance & runtime"
+  ],
+  "demo": true
+}

@@ -1,0 +1,80 @@
+{
+  "id": 25654,
+  "source": "transcript",
+  "tldr": "Borges demos the GitHub Copilot app as an 'intent-driven environment': write a spec, split it into issues, dispatch parallel agents, and extend the tool with custom Canvas panels.",
+  "summary": [
+    "Tracing a line from punch cards to the VT100 to the Smalltalk IDE, Borges argues that writing code was never the real problem engineers solved: turning requirements into predictable, scalable software was. In the standalone GitHub Copilot app he initialises a Spring Boot and Thymeleaf repo and has the agent draft a spec.md for a to-do app. He then turns the spec into GitHub issues that can run in parallel and launches a 'fleet' of agent sessions to implement them. An orchestrator session coordinates the child sessions to avoid merge conflicts. In parallel, an interactive session plans a fix for a real setup-java issue about JDK version strings.",
+    "His own mistake made a point: he started the fleet before the spec was committed and reviewed, so his intent was 'poorly drafted' and the workflow still needs the discipline of ordinary development. He also showed Canvas extensions, custom panels installed from a URL that use the Copilot SDK to access the session. One of his own runs a Spring Boot sample, collects JFR and GC logs through an agent-generated script, and charts throughput, p99 pause, allocation rate and peak heap. The to-do app built by the fleet ran at the end but still had a bug in task creation, which he left as the next intent to resolve."
+  ],
+  "keyPoints": [
+    "The Copilot app offers Interactive, Plan and Autopilot modes, selectable models or an automatic model router, plus automations such as a daily issue triage.",
+    "Spec-driven flow shown: an init prompt that only inspects the stack, an AI-expanded spec.md, issues for parallelisable work, then a fleet of parallel agent sessions coordinated by an orchestrator.",
+    "Canvas extensions are shareable custom UI panels with access to the Copilot session; Borges's own profiling Canvas turns JFR and GC logs into dashboards without the user knowing JFR configuration.",
+    "Ordering still matters: launching agents before the spec was reviewed and pushed produced confusion, which Borges called his own badly formed intent."
+  ],
+  "takeaways": [
+    "Commit and review the specification before handing its issues to parallel agents.",
+    "Split a spec into independent GitHub issues so several agent sessions can work without stepping on each other.",
+    "Use interactive mode for sensitive changes (such as a widely used GitHub Action) so the agent asks before acting, and keep CI and code review on agent PRs."
+  ],
+  "quotes": [
+    {
+      "text": "Was writing code the main problem that you were solving?",
+      "at": "03:58"
+    },
+    {
+      "text": "My intent was poorly drafted in my mind.",
+      "at": "22:34"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "From punch cards to agents"
+    },
+    {
+      "at": "05:24",
+      "title": "Tour of the Copilot app"
+    },
+    {
+      "at": "07:55",
+      "title": "Initialising a Spring Boot repo"
+    },
+    {
+      "at": "13:02",
+      "title": "Spec to parallel issues"
+    },
+    {
+      "at": "17:26",
+      "title": "A fleet of agents"
+    },
+    {
+      "at": "22:34",
+      "title": "Intent still needs process"
+    },
+    {
+      "at": "25:43",
+      "title": "Canvas extensions for profiling"
+    },
+    {
+      "at": "33:40",
+      "title": "Result and wrap-up"
+    }
+  ],
+  "tech": [
+    "GitHub Copilot",
+    "Copilot SDK",
+    "Visual Studio Code",
+    "Spring Boot",
+    "Thymeleaf",
+    "GitHub Actions setup-java",
+    "JDK Flight Recorder",
+    "MCP"
+  ],
+  "watchIf": "You want to see what a spec-to-PR workflow with parallel agents looks like in GitHub's Copilot tooling, including where it trips up.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}
