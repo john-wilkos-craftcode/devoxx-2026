@@ -1,0 +1,46 @@
+{
+  "id": 24245,
+  "source": "transcript",
+  "tldr": "Rawool explains vectors, embeddings, similarity metrics and indexing (HNSW) through seven Spring Boot demos that build from a hand-rolled Java Vector API store to RAG and a Google Lens-style image search.",
+  "summary": [
+    "Balkrishna Rawool of ING Bank opens with Google Lens and asks how you would build image similarity search yourself; his answer is a vector database. He explains that a vector with magnitude and direction is equivalent to an array of n numbers, that an embedding model maps data to vectors so that similar meanings land close together, and that vector databases add insert, update, delete, indexing and search on top. To make the mechanics concrete he writes a small in-memory vector DB in Java: a record wrapping a double array, with dot product, magnitude and normalisation implemented using the incubating Vector API (SIMD), a HashMap from vector to data, and a k-nearest-neighbours method that takes a pluggable similarity or distance calculator.",
+    "The first demos use that store. Ten greys mapped to one-dimensional vectors return their neighbours by Euclidean distance. RGB colours normalised into three-dimensional vectors are matched by cosine similarity, which runs from 1 for identical vectors to -1 for opposite ones. Along the way he defines Manhattan distance, dot product, Euclidean distance and cosine similarity. A Word2Vec demo (Google News model, 300 dimensions, loaded with Deeplearning4j) embeds every word of the Wikipedia pages for man, woman, king and queen. 'King' returns kings, queen and monarch, and king minus man plus woman puts queen second in the results.",
+    "He then covers indexing: tree-based (KD-tree, R-tree, Annoy), hash-based (locality-sensitive hashing, which deliberately maximises collisions) and graph-based HNSW, whose layered small-world graph is searched from a fixed top-layer entry point down to the densest layer. Sentences from ten maths Wikipedia pages are embedded with nomic-embed-text through Ollama and stored in PostgreSQL with pgvector and an HNSW index, which serves queries like 'what is algebra' or 'Newton'. A RAG demo stores a made-up comic shop FAQ in Elasticsearch: without retrieval, GPT-OSS hallucinates a return policy, and with it the model gives the correct 15-day, unopened, in-store rule.",
+    "The finale stores world-wonder photos as image embeddings in Weaviate (classes and fields rather than tables, queried with GraphQL) and finds similar pictures of the Taj Mahal or the pyramids from an uploaded image. A celebrity lookalike variant with about 300 photos matches a volunteer's selfie, and the speaker's own photo returns George Clooney. The source code for all seven examples is published."
+  ],
+  "keyPoints": [
+    "A minimal vector DB is a map from vector to payload plus a k-nearest-neighbours search over a pluggable similarity or distance function.",
+    "The Java Vector API uses SIMD so one CPU instruction processes many vector components; Llama3.java was cited as evidence of its power.",
+    "Cosine similarity is the dot product divided by the product of magnitudes; on normalised vectors only direction matters.",
+    "Word2Vec embeddings encode relationships: vector arithmetic king minus man plus woman lands near queen.",
+    "Locality-sensitive hashing inverts the usual hash goal by making similar inputs collide.",
+    "HNSW builds a layered proximity graph and searches greedily from the sparse top layer down to the dense bottom layer.",
+    "PostgreSQL becomes a vector store with the pgvector extension, an HNSW index on the embedding column, and plain SQL for nearest-neighbour queries.",
+    "With RAG off, the model invented a shop return policy; with RAG on, it returned the FAQ's actual policy."
+  ],
+  "takeaways": [
+    "Choose the distance metric that matches how your embedding model was trained, typically cosine similarity on normalised vectors.",
+    "Add pgvector with an HNSW index to an existing PostgreSQL database before adopting a dedicated vector database.",
+    "Ground LLM answers about private data with retrieval and test the same questions with retrieval switched on and off.",
+    "Clone the speaker's examples and implement k-NN yourself once to understand what a vector database does for you."
+  ],
+  "quotes": [
+    {"text": "The UI for this example and also all previous examples show that I am a backend engineer and I'm not a frontend engineer.", "at": "41:12"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Google Lens as motivation"},
+    {"at": "02:50", "title": "Vectors and embeddings"},
+    {"at": "05:19", "title": "Vector DB with Vector API"},
+    {"at": "10:40", "title": "Grey colours demo"},
+    {"at": "14:36", "title": "Distance and similarity metrics"},
+    {"at": "21:45", "title": "Embedding models and Word2Vec"},
+    {"at": "27:34", "title": "Indexing algorithms and HNSW"},
+    {"at": "31:27", "title": "Semantic search with pgvector"},
+    {"at": "35:45", "title": "RAG with Elasticsearch"},
+    {"at": "41:12", "title": "Image search and lookalikes"}
+  ],
+  "tech": ["Java Vector API", "Spring Boot", "PostgreSQL", "pgvector", "Elasticsearch", "Weaviate", "Word2Vec", "Deeplearning4j", "nomic-embed-text", "Ollama", "GPT-OSS", "HNSW", "Llama3.java"],
+  "watchIf": "You use vector stores or RAG without being sure what embeddings, cosine similarity or HNSW actually do, and like learning from small runnable examples.",
+  "themes": ["Data & databases", "LLMs in Java apps"],
+  "demo": true
+}

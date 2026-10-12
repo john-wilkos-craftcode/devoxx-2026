@@ -1,0 +1,100 @@
+{
+  "id": 8164,
+  "source": "transcript",
+  "tldr": "Clark and Rohrer use 70 years of software history to argue that developers won't disappear with coding agents, that Taylorist de-skilling is the real risk, and that team size still depends on context.",
+  "summary": [
+    "Katie Clark and Simon Rohrer reject the 'death of the two-pizza team' headlines and set out to knock down three claims: we no longer need developers, developers should just type prompts without thinking or talking, and a 100% correct spec is all agents need. They take Andrej Karpathy's remark that coding agents started working around December 2025 as the current earthquake, then show it is not the first. 'End of programmers' headlines greeted Fortran (1956), SQL, Visual Basic and low-code. Jean Sammet on COBOL, Alistair Cockburn on objects and the BDD originators all described these tools as aids to collaboration between developers and business, not replacements.",
+    "On ways of working they argue that waterfall was always a myth (SAGE was iterative, and Royce warned against strict sequencing), that agile drifted from conversations into processes and Jira, and that feature factories are not value factories (Tom Gilb, Melissa Perri). On people they cover the 1960s 'computer girl' era, the antisocial-programmer stereotype from a 1966 study, the 10x myth that Laurent Bossavit takes apart, and offshoring's view of coding as tedious work that follows a perfect spec. The central contrast is Taylor's de-skilled worker against Drucker's self-managing knowledge worker, together with sociotechnical systems design from the British coal mines and Calvin Pava's point that office work is messy and runs on conversation.",
+    "For the future they cite Dario Amodei's claim that software engineering will go away, then Gergely Orosz and Kent Beck pushing back. Developer roles shift toward Adam Tornhill's 'expert generalist builders' and 'enablers' (harness and platform engineers). They warn against single-player mode with 50 agent windows, argue for hiring juniors (Charity Majors, Dan North) and note emerging archetypes at Anthropic. On spec-driven dark factories they cite Dex Horthy shutting one down over a primary-key bug nobody could fix, and offer a two-by-two of local versus systemic change and conventional versus novel change: only local, conventional work suits 'spec as source' with the lights out.",
+    "The answer on team size is that it depends. Prototyping may need two slices, a business-critical stable team at least five people (with a seat for a junior), internal tools one pizza. Two-pizza teams, five to seven people in Bezos's 2004 formulation, were never a template to copy everywhere. Their verdict: Taylorism of the work, linearising and automating the predictable parts, is fine. Taylorism of the workers is not, and humans remain responsible for deciding what is valuable."
+  ],
+  "keyPoints": [
+    "Predictions that programmers would become unnecessary date back to Fortran in 1956 and recurred with SQL, Visual Basic and low-code.",
+    "Waterfall was never practised as described: SAGE was written up in 1983 as iterative and prototype-driven.",
+    "Dan North argues the Tuckman forming-storming-norming model failed replication, which weakens the case for permanently stable teams; he proposes bringing people to the work instead.",
+    "Adam Tornhill's two emerging paths: expert generalist builders who decide what to build with agents, and enablers who build guardrails, tests and harnesses.",
+    "Dex Horthy shut down a lights-out software factory after an agent spread an unfixable primary-key error through the code base.",
+    "Spec-as-source and dark factories fit local, conventional changes; systemic or novel changes need lights up, with humans reading tests and code and judging results.",
+    "Anthropic, by the speakers' account, still runs two-pizza teams because on-call, holidays and ownership have not gone away.",
+    "Peter Naur's theory building and production (Charity Majors) are presented as the two sources of truth, more than any spec."
+  ],
+  "takeaways": [
+    "Decide per change whether it is local or systemic, conventional or novel, before handing it to a spec-driven agent pipeline.",
+    "Keep hiring and mentoring juniors, and reserve a seat for one in critical teams.",
+    "Push back on roles reduced to reviewing agent output; keep developers in conversations about value and design.",
+    "Work with agents in multiplayer mode: share context and decisions with the team instead of running solo agent swarms.",
+    "Pick team size from criticality and context rather than copying a two-pizza or one-slice rule."
+  ],
+  "quotes": [
+    {
+      "text": "Treat the machine like a machine and the people like people.",
+      "at": "35:42"
+    },
+    {
+      "text": "The barrier to writing software has collapsed, but the barrier to engineering definitely hasn't.",
+      "at": "35:42"
+    },
+    {
+      "text": "Taylorism of the work is actually fine. Taylorism of the workers? Absolutely no.",
+      "at": "49:59"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Three pins to knock down"
+    },
+    {
+      "at": "05:35",
+      "title": "Languages and the end of programmers"
+    },
+    {
+      "at": "08:07",
+      "title": "Waterfall, agile and feature factories"
+    },
+    {
+      "at": "12:13",
+      "title": "Stereotypes, 10x and offshoring"
+    },
+    {
+      "at": "21:01",
+      "title": "Taylor versus Drucker"
+    },
+    {
+      "at": "25:44",
+      "title": "How developer roles shift"
+    },
+    {
+      "at": "30:54",
+      "title": "Jobs to be done, juniors"
+    },
+    {
+      "at": "37:02",
+      "title": "Dark factories and spec as source"
+    },
+    {
+      "at": "46:13",
+      "title": "How many pizzas"
+    },
+    {
+      "at": "48:35",
+      "title": "Bowling scorecard"
+    }
+  ],
+  "tech": [
+    "Coding agents",
+    "Spec-driven development",
+    "Harness engineering",
+    "Wardley mapping",
+    "Cynefin",
+    "Domain-driven design",
+    "Extreme Programming",
+    "Team Topologies"
+  ],
+  "watchIf": "You lead or shape software teams and want historically grounded arguments against 'developers are obsolete' and 'just write the perfect spec' thinking.",
+  "themes": [
+    "Teams, careers & leadership",
+    "AI agents & agentic coding"
+  ],
+  "demo": false
+}

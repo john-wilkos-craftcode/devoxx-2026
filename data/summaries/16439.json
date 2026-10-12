@@ -1,0 +1,49 @@
+{
+  "id": 16439,
+  "source": "transcript",
+  "tldr": "Vermeer attacks and then hardens a Quarkus/LangChain4j app (chat-memory poisoning, RAG poisoning, over-privileged tools, prompt injection) and shows how MCP servers and agent skills compromise developer machines.",
+  "summary": [
+    "Brian Vermeer of Snyk starts from one premise: an LLM is stateless, and everything in its context (system message, chat history, RAG chunks, tool descriptions and results) is resent on every call, so any text that reaches the context is an attack vector. Attacks are now instructions rather than exploits, and because output is non-deterministic, validating input is no longer enough; output has to be validated too, which is why insecure output handling ranks high in the OWASP LLM Top 10. His demo app is 'Really Good Rentals', a vibe-coded Quarkus car-rental site with a LangChain4j chatbot that has booking tools.",
+    "In the first attack he uses a SQL injection to insert a fake chat history in which the bot promised the user an exception, and the model then cancels a booking the terms forbid. The fix is HMAC-signing every stored message with a vault-held secret and refusing to load history that fails verification; a plain SHA hash could be recomputed by the attacker. In the second, a path-traversal upload in Burp Suite overwrites the terms-of-service RAG document with a 'Vroom Vroom' clause that waives cancellation fees and adds $100 credit, and it takes effect at the next re-ingestion. The fix is a custom ingestor that runs regex and LLM-as-judge checks before embedding, then either fails closed or drops the document.",
+    "Third, a single assistant with every tool, including a 'perform SQL on database' tool, tries DROP TABLE when told to on GPT-3.5 Turbo. He splits it into one assistant per role, removes generic tools, and takes the username from the Quarkus SecurityIdentity instead of letting the model supply it. He then demonstrates prompt injection techniques against a 'RogerBot' system prompt: structured-output demands, role-play, virtualization, delimiter confusion, multi-turn manipulation, payload splitting and encoding. By his count, combined techniques extracted the system prompt within 2 to 12 attempts even on newer models. A CFP-rating demo exfiltrates titles and ratings through a Markdown image URL. The mitigations he covers are a stronger model, limits on input length, a strict system prompt, JSON-schema structured output enforced in the API call, a regex image-blocking output guardrail, and sanitizer-agent flows with human approval.",
+    "The last hour turns to agentic coding. LLM code review is non-deterministic: in the VulnBench research he cites, no model found the same vulnerability in all five runs. He recommends running a deterministic scanner CLI from a Claude Code stop hook rather than relying on an MCP call. An 'evil' Java conferences MCP server, trusted once and launched with @latest, later opens a calculator and gains a tool description telling the agent to call an email tool silently and inject a fake conference. Three malicious skills hide hex-encoded instructions in HTML comments, download a GraalVM-compiled binary, and exfiltrate git config from an attached Python script. Snyk Agent Scan flags all three. His advice: sandbox agents (he uses Docker Sandboxes), pin versions, and keep an inventory of vetted skills."
+  ],
+  "keyPoints": [
+    "Every text entering the context window (chat memory, RAG chunks, tool output, tool descriptions, skills) can change model behaviour; attackers persuade rather than hack.",
+    "Persisted chat memory can be poisoned to fake a model's earlier promises; HMAC-signing stored messages detects tampering, while a plain hash does not.",
+    "RAG poisoning is a delayed attack that fires at the next ingestion; check documents with deterministic rules plus an LLM judge before embedding.",
+    "Derive identity and permissions from the framework's security context (for example Quarkus SecurityIdentity) and give each user role its own assistant and tool set.",
+    "Combining structured-output, role-play, delimiter-confusion and payload-splitting techniques can extract system prompts even from current models.",
+    "Rendered Markdown images can exfiltrate conversation data to an attacker's URL; an output guardrail that strips images blocks this cheaply.",
+    "Enforcing a JSON schema with strict mode in the API call, not just in the prompt, narrows what an injected instruction can make the model output.",
+    "Unpinned MCP servers (npx/uvx @latest) allow rug pulls: same tool signatures, new malicious implementation running with your local permissions."
+  ],
+  "takeaways": [
+    "Sign persisted chat history with an HMAC and refuse to load conversations that fail verification.",
+    "Add an ingestion-time check to your RAG pipeline and decide whether flagged documents fail closed or are dropped.",
+    "Remove generic tools like 'run SQL' from LLM assistants and pass user identity from the security context, not from the prompt.",
+    "Run deterministic security scanners from agent hooks after each task instead of trusting an LLM review.",
+    "Pin MCP server versions, run them in containers, and scan your installed skills, including their scripts, today."
+  ],
+  "quotes": [
+    {"text": "We don't need to hack anymore, we need to persuade.", "at": "23:22"},
+    {"text": "With security, nothing is 100% secure, ever. We just hope it is. With AI, everything is now hope-driven development.", "at": "50:14"},
+    {"text": "You vibe code your code, I vibe code my hacks.", "at": "139:04"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Context is the attack surface"},
+    {"at": "15:32", "title": "Chat memory injection and HMAC"},
+    {"at": "31:56", "title": "RAG poisoning via path traversal"},
+    {"at": "50:14", "title": "Over-privileged tools, least privilege"},
+    {"at": "62:39", "title": "Prompt injection techniques"},
+    {"at": "81:13", "title": "Structured output and guardrails"},
+    {"at": "95:05", "title": "Sanitizer agents and human approval"},
+    {"at": "100:54", "title": "Agentic coding and deterministic scans"},
+    {"at": "107:16", "title": "Malicious MCP servers"},
+    {"at": "118:07", "title": "Poisoned agent skills, Q&A"}
+  ],
+  "tech": ["Quarkus", "LangChain4j", "OpenAI GPT models", "Claude Code", "MCP", "Agent Skills", "HMAC", "Burp Suite", "GraalVM", "Snyk Agent Scan", "Docker Sandboxes", "OWASP Top 10 for LLM Applications", "VulnBench"],
+  "watchIf": "You ship LLM features in Java apps or run coding agents with MCP servers and skills, and want concrete attacks with matching fixes.",
+  "themes": ["Security & supply chain", "LLMs in Java apps", "AI agents & agentic coding"],
+  "demo": true
+}

@@ -1,0 +1,46 @@
+{
+  "id": 5530,
+  "source": "transcript",
+  "tldr": "Aronson explains how mutation testing finds lax tests and meaningless code that coverage misses, how tools generate and kill mutants, what surviving mutants mean, and where it fits in a pipeline.",
+  "summary": [
+    "Dave Aronson presents mutation testing as different from other testing techniques: it assumes the code passes its tests and checks two other qualities instead. One is whether the test suite is strict, meaning a semantic change makes at least one test fail. The other is whether the code is meaningful, so that every small semantic change has a visible effect on behaviour. Coverage cannot show either, because a test with its assertion commented out still counts as covering the code. He compares the approach to Chaos Monkey turned upside down (faults injected into copies of the code, in the test environment, where 'everything still passes' signals a problem) and to fuzzing applied to the code rather than the inputs, though not random.",
+    "The mechanics: the tool parses the code into an AST, finds each function and the tests that cover it (through annotations, naming conventions, call analysis or coverage data), then makes one mutant per possible change. Mutations include swapping arithmetic, logical or bitwise operators, flipping comparisons, adding or removing negation, deleting statements, removing if or loop conditions, replacing a function body with a constant, an argument or an error, and changing values or types. Each mutant runs against the function's tests: a failure kills it, and a mutant that passes every test survives.",
+    "Two Python examples show how to read survivors. For a power function tested only with 2 to the power 2, the addition, multiplication and argument-swap mutants survive because 2+2, 2*2 and 2^2 are all 4. Asserting that 2 cubed is 8 kills all of them. In a send-message loop, a mutant with the loop removed survives either because the tests never send a message larger than one chunk (add a test with max chunk size plus one) or because the loop is redundant and the function can be deleted.",
+    "On history, Richard Lipton proposed the idea in 1971 and Timothy Budd built the first tool in 1980. His rough cost model: 10 lines per function, 5 change points per line and 20 alternatives each give about 1,000 mutants, so a 10-second suite becomes over half an hour. Pruning equivalent mutants cuts that to about a third. One mutation per mutant follows the competent programmer hypothesis and avoids combinatorial explosion. He suggests gating merges on no surviving mutants in new code and no increase in old code, and points Java users to PIT."
+  ],
+  "keyPoints": [
+    "Code coverage only shows that code ran during a test, not that any assertion depended on its correctness.",
+    "A surviving mutant points to lax tests, meaningless (redundant or unreachable) code, or both; occasionally to an equivalent mutant that is a false alarm.",
+    "A mutant is killed as soon as one test fails; the tool stops running further tests against it.",
+    "Choose test inputs where only the correct operation gives the expected result: 2^3 = 8 rules out 2+3 and 2*3 as well as 3^2.",
+    "A surviving 'loop removed' mutant means either no test exceeds one chunk or the loop, and perhaps the whole function, is redundant.",
+    "By Aronson's estimate, about 1,000 mutants per function turn a 10-second test suite into roughly 2,000 seconds of mutation testing.",
+    "Most tools support targeting a single file, class or function, incremental runs since the last commit or branch, and comments to skip lines such as debug traces.",
+    "The competent programmer hypothesis, that real bugs are usually one small substitution, justifies one mutation per mutant."
+  ],
+  "takeaways": [
+    "Run PIT (or your language's equivalent) on one well-tested class and see how many mutants survive despite high coverage.",
+    "Use incremental or diff-based modes to mutation-test only changed code in CI or before review.",
+    "Set a merge rule such as 'no surviving mutants in new code, no increase in existing code'.",
+    "When a mutant survives, ask whether the test inputs are too narrow or whether the mutated code can simply be deleted."
+  ],
+  "quotes": [
+    {"text": "If everything still goes well, in the sense that our tests still pass, that doesn't mean all is well. That means that there is a problem.", "at": "10:58"},
+    {"text": "Yes, the coverage tools are good for something, just not what most people think.", "at": "17:17"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Strict tests, meaningful code"},
+    {"at": "05:22", "title": "Drawbacks and costs"},
+    {"at": "09:37", "title": "Chaos Monkey and fuzzing comparison"},
+    {"at": "12:00", "title": "How tools generate mutants"},
+    {"at": "18:43", "title": "Kinds of mutations"},
+    {"at": "21:15", "title": "Power function example"},
+    {"at": "29:22", "title": "Send-message loop example"},
+    {"at": "34:52", "title": "History, cost and one mutation"},
+    {"at": "40:36", "title": "Process fit, tools, Q&A"}
+  ],
+  "tech": ["Mutation testing", "PIT", "Python", "Abstract syntax tree", "Chaos Monkey", "Fuzzing", "CI/CD"],
+  "watchIf": "You trust code coverage numbers and want to see a technique that shows whether your tests would actually catch a bug.",
+  "themes": ["Testing & quality"],
+  "demo": false
+}

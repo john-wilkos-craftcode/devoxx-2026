@@ -41,7 +41,23 @@ def check(path):
             errs.append(f"bad quote {q}")
     if s["source"] == "transcript" and len(s["chapters"]) < 3:
         errs.append("transcript talk needs chapters")
+    times = [to_seconds(c["at"]) for c in s["chapters"] if TS.match(str(c.get("at", "")))]
+    if times != sorted(times):
+        errs.append("chapters out of order")
+    transcript = ROOT / "data" / "raw" / "transcripts" / f"{path.stem}.txt"
+    if transcript.exists():
+        marks = [to_seconds(m) for m in re.findall(r"\[(\d{2,3}:\d{2})\]", transcript.read_text())]
+        end = (max(marks) + 60) if marks else 0
+        late = [c["at"] for c in s["chapters"] + s["quotes"]
+                if TS.match(str(c.get("at", ""))) and to_seconds(c["at"]) > end]
+        if late:
+            errs.append(f"timestamps past the end of the recording: {late}")
     return errs
+
+
+def to_seconds(at):
+    m, sec = at.split(":")
+    return int(m) * 60 + int(sec)
 
 
 ids = sys.argv[1:] or [p.stem for p in sorted(SUMMARIES.glob("*.json"))]

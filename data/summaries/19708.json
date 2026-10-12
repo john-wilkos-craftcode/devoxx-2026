@@ -1,0 +1,90 @@
+{
+  "id": 19708,
+  "source": "transcript",
+  "tldr": "Laforge walks through agentic design patterns (programmatic planning, RAG, progressive disclosure, hierarchical decomposition, LLM-as-judge, goal-oriented planning, agent loops) with Java demos in LangChain4j and ADK for Java.",
+  "summary": [
+    "Guillaume Laforge, a Google Cloud developer advocate and committer on LangChain4j and ADK for Java, frames an agent as an LLM brain plus memory, tools, planning and a loop toward a goal, and lists the concerns that patterns address: planning, context engineering (avoiding context rot), tool overload, evaluation and multi-agent orchestration. Security and observability are explicitly out of scope. He describes each pattern by name, problem, solution and trade-offs, starting with what he calls almost an anti-pattern: giving agents full autonomy when the workflow can be drawn as a flowchart.",
+    "His 'programmatic' pattern is a deep-research app that simply chains calls: a Gemini Flash call with Google Search proposes subtopics, the Gemini Interactions API launches Google's hosted Deep Research agent (stateful, background, streamed; one run took 43 minutes), another call writes a one-page summary, and Nano Banana draws a sketchnote. No agent framework is needed. He recaps RAG as early context engineering, then explains Anthropic-style skills: only the SKILL.md front-matter description sits in context, the body loads when relevant, and referenced files or scripts load last. A LangChain4j demo loads a 'deslopify' skill from the classpath to tone down an over-excited draft.",
+    "Hierarchical decomposition is shown with an ADK comic-strip app: a sequential flow analyses uploaded photos for location and description, then a parallel flow finds nearby points of interest with Google Maps while generating pop-art panels, sharing results through common state. For LLM-as-judge he generates three summaries with a cheap Flash model, has a small-model judge pick the best, then compares it with a large-model summary. By his prices (about $0.30 per million input tokens for Flash-Lite against $2 for the large model), three small summaries cost less than one big one, and the small model won roughly one time in three.",
+    "Goal-oriented action planning, which he credits to Rod Johnson's Embabel and which LangChain4j and ADK for Java adopted, declares each agent's input and output keys and lets an A*-style planner chain agents to reach a goal, such as an infographic or a YouTube Shorts script, from different starting inputs. He ends with a coding-agent loop inspired by Max Rydahl Andersen's minimal Java agent: a supervisor delegating to file, system and web sub-agents inside a plain while loop, in a bit over 300 lines of LangChain4j."
+  ],
+  "keyPoints": [
+    "If a task can be drawn as a deterministic flowchart, code it programmatically: easier to debug, at the cost of adaptability.",
+    "The Gemini Interactions API is stateful and can invoke hosted agents such as Deep Research in background mode with streamed thoughts.",
+    "Skills use three-stage progressive disclosure: front-matter description, then the SKILL.md body, then referenced files and scripts.",
+    "In LangChain4j, skills are exposed to the model through a skill tool provider that lets it load skills on demand.",
+    "Sequential and parallel sub-agent flows in ADK share a common state map; running independent steps in parallel cuts latency.",
+    "LLM-as-judge removes human review bottlenecks but is non-deterministic: the same judge can rate the same output differently.",
+    "Goal-oriented action planning (GOAP) lets one pool of agents serve different goals by searching a path through their declared inputs and outputs.",
+    "A working coding-agent loop with sub-agents fits in about 300 lines of Java with LangChain4j."
+  ],
+  "takeaways": [
+    "Reach for plain programmatic orchestration before an agent framework when the steps are known in advance.",
+    "Keep tool and skill lists out of the context window until needed, using progressive disclosure.",
+    "Try generating several cheap small-model outputs and picking one with a judge before defaulting to the most expensive model.",
+    "Declare agent inputs and outputs explicitly so a goal planner, or a future you, can recombine them."
+  ],
+  "quotes": [
+    {
+      "text": "You don't need a real agent or an agent framework for a lot of use cases that benefit from AI integrated in your projects.",
+      "at": "14:15"
+    },
+    {
+      "text": "There are things where Java is innovating more than what the Python ecosystem is doing.",
+      "at": "38:48"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Agent basics and concerns"
+    },
+    {
+      "at": "06:32",
+      "title": "Programmatic planning"
+    },
+    {
+      "at": "14:15",
+      "title": "RAG as context engineering"
+    },
+    {
+      "at": "16:28",
+      "title": "Skills and progressive disclosure"
+    },
+    {
+      "at": "23:05",
+      "title": "Hierarchical agent decomposition"
+    },
+    {
+      "at": "29:31",
+      "title": "LLM as judge"
+    },
+    {
+      "at": "38:48",
+      "title": "Goal-oriented action planning"
+    },
+    {
+      "at": "44:57",
+      "title": "Coding agent loop"
+    }
+  ],
+  "tech": [
+    "LangChain4j",
+    "ADK for Java",
+    "Gemini",
+    "Gemini Interactions API",
+    "Gemini Deep Research",
+    "Nano Banana",
+    "Google Search",
+    "Google Maps",
+    "Agent Skills",
+    "Embabel",
+    "GOAP"
+  ],
+  "watchIf": "You build agents in Java and want a catalogue of when to use workflows, sub-agents, judges or goal-based planning, with code for each.",
+  "themes": [
+    "AI agents & agentic coding",
+    "LLMs in Java apps"
+  ],
+  "demo": true
+}

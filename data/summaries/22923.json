@@ -1,0 +1,47 @@
+{
+  "id": 22923,
+  "source": "transcript",
+  "tldr": "Schrottner introduces OpenFeature's core concepts (evaluation API, providers, evaluation context, hooks) through three common feature-flag problems: vendor lock-in, dynamic targeting and obsolete flags.",
+  "summary": [
+    "Simon Schrottner, an OpenFeature maintainer and technical steering committee member contracted by Flagsmith, opens with Knight Capital's 2012 incident, where a repurposed flag and a deploy that reached only seven of eight servers lost, in his telling, half a billion dollars within an hour. He defines a feature flag as changing behaviour at runtime without redeploying or restarting, which rules out environment variables. He covers the uses (coordinated releases, A/B tests, targeting, trunk-based merging, kill switches, canary rollouts), Pete Hodgson's four flag categories (release, ops, permission, experiment) and a maturity model ending at 'operationalized' flags with audit trails and evaluation insights.",
+    "OpenFeature, a CNCF incubating project that started as a vendor round table at KubeCon Valencia in 2022 with Dynatrace pushing for it for observability reasons, is a vendor-agnostic specification with SDKs in Java, Node.js, Go, PHP, .NET, Ruby, Rust and more. Developers talk to a singleton evaluation API, for example a Boolean evaluation of 'v2-enabled' with a mandatory fallback value that is returned whenever anything fails, so flag evaluation never breaks the code. Flags can also be strings, numbers (careful: Python treats integer 1 as true) or objects.",
+    "The three problems each introduce a concept. Vendor lock-in is handled by the provider abstraction: swapping the in-memory provider for flagd (the open source reference implementation), Flagsmith or any of more than 130 providers is one line at initialization, and a multi-provider helps during migrations. Dynamic evaluation uses an evaluation context (a map of attributes, user or operational, such as cloud, JVM version or Android version) set globally, per transaction, per client or per call and merged in order, plus a targeting key so percentage rollouts stay deterministic. flagd expresses rules in JSON Logic.",
+    "For obsolete flags (Dynatrace had more than 2,000, the oldest one marked temporary), OpenFeature cannot tell you when deletion is safe, but its hooks (before, after, error, finally) feed an OpenTelemetry hook that follows the feature-flag semantic conventions, so traces show which flag evaluated to which value. He briefly mentions the Track API and provider events, and admits the string-based API is brittle; a manifest-driven code generator, currently an npm tool, is meant to fix that."
+  ],
+  "keyPoints": [
+    "A feature flag changes behaviour at runtime; flags read from environment variables need a restart and do not count.",
+    "The evaluation API always takes a fallback value, which OpenFeature returns on any error (provider unreachable, missing flag, wrong type).",
+    "Switching vendors means changing the provider set at initialization; more than 130 providers exist, and a multi-provider supports gradual migration.",
+    "Evaluation context can carry operational data (hyperscaler, Java runtime, device OS) so an incident can be contained by disabling a feature for one segment instead of hotfixing.",
+    "A user-defined targeting key keeps users in the same bucket during percentage rollouts.",
+    "OpenFeature and OpenTelemetry defined semantic conventions for feature flags; the OTel hook adds flag key, value, provider and reason to spans.",
+    "Logging is not done on the hot path by default; add a logging hook if you want it.",
+    "Schrottner cited 6.2 million weekly npm downloads of the core JS SDK, Google's OpenFeature-compliant public preview and Spotify's Confidence as adoption signals."
+  ],
+  "takeaways": [
+    "Code against the OpenFeature evaluation API rather than a vendor SDK, so changing flag backends is a one-line provider swap.",
+    "Always pass a safe fallback value and treat it as the behaviour when the flag system is down.",
+    "Set a deterministic targeting key (user, session or device ID) before running percentage rollouts.",
+    "Add the OpenTelemetry hook to see which flags are actually evaluated, and use that data to find flags you can delete.",
+    "Try flagd locally or as a sidecar to experiment with JSON Logic targeting rules."
+  ],
+  "quotes": [
+    {"text": "It's just glorified conditionals. How hard can it be?", "at": "15:04"},
+    {"text": "When is it safe to remove a feature flag? I have to really disappoint you. I also do not know.", "at": "25:24"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Knight Capital cautionary tale"},
+    {"at": "03:10", "title": "What feature flags are for"},
+    {"at": "05:46", "title": "Flag categories and maturity"},
+    {"at": "08:26", "title": "OpenFeature and its history"},
+    {"at": "11:06", "title": "The evaluation API"},
+    {"at": "15:04", "title": "Vendor lock-in and providers"},
+    {"at": "17:33", "title": "Dynamic evaluation and context"},
+    {"at": "25:24", "title": "Obsolete flags, hooks, OpenTelemetry"},
+    {"at": "30:51", "title": "Recap, adoption, brittle API"}
+  ],
+  "tech": ["OpenFeature", "flagd", "Flagsmith", "OpenTelemetry", "JSON Logic", "CNCF", "LaunchDarkly", "Unleash", "Spotify Confidence"],
+  "watchIf": "You have homegrown or vendor-specific feature flags spread across several languages and want a standard API with observability built in.",
+  "themes": ["Developer experience & tooling", "Architecture & design"],
+  "demo": false
+}
