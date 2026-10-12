@@ -1,0 +1,49 @@
+{
+  "id": 17556,
+  "source": "transcript",
+  "tldr": "Przybyl explains how Lucene and Elasticsearch use the incubating Panama Vector API for dot products and BBQ quantization, and why Elasticsearch now goes further with a native C++ SIMD kernel called through FFM.",
+  "summary": [
+    "Przybyl starts from the hottest loop in vector search: the dot product over hundreds or thousands of embedding dimensions (Lucene and Elasticsearch support up to 4,096), repeated millions of times per query. SIMD fits that shape: one instruction applied to several primitive values packed into a register, with the number of lanes set by register width (128 bits on his Apple M3 with Neon, 256 or 512 bits with AVX2 or AVX-512 on x86). Lanes are not threads, he stresses, and SIMD does not multiply with core count. His first demo showed a 6-10x Vector API speed-up over a naive loop, until he compared it against a scalar loop that also used four accumulators for instruction-level parallelism and the gain roughly halved. His point: benchmarks lie unless you compare like with like.",
+    "He walks through the Vector API vocabulary (VectorSpecies as type plus shape, lanes, fma, reduceLanes), Lucene's dot product with four accumulators and a scalar tail for the remainder, and how C2 turns it into native SIMD instructions. Workloads with branching or avalanche-style hashing, such as Elasticsearch's routing hash for auto-generated document IDs, are poor fits. Lucene enables the Vector API only on HotSpot with C2, when jdk.incubator.vector is added as a module and when the preferred vector size is at least 128 bits; otherwise it falls back to scalar code silently. He showed the 'Java vector incubator API enabled, preferred bit size 128' log line from a local Elasticsearch.",
+    "The main case study is Better Binary Quantization (BBQ): documents are stored at 1 bit per dimension using a centroid rather than a zero threshold, while queries use 4 bits (asymmetric encoding). Query nibbles are rearranged into bit planes so scoring becomes bitwise AND, popcount and shifts, with no multiplication. One million 768-dimension vectors shrink from about 3 GB to about 100 MB, and a two-phase search oversamples candidates and rescores them. He used PrintAssembly with hsdis to confirm Neon and YMM registers were actually in use.",
+    "Przybyl said that from Elasticsearch 9.5 the vector search path no longer relies on the Vector API on supported Linux machines: a C++ library (simdvec) with per-architecture kernels ships as .so files inside the JAR and is called through the Foreign Function and Memory API on JDK 22+ heap segments, falling back to the Vector API and then to scalar code. The reason is that the Java abstraction still leaks: fma is slower than mul plus add on Apple Silicon, and Lucene has a heuristic for exactly that. The Vector API is still used elsewhere, for example for SIMD probing of Swiss-style hash tables in ES|QL bucketing."
+  ],
+  "keyPoints": [
+    "A naive Vector API dot product looked 6-10x faster than scalar code, but against a scalar loop with four accumulators (instruction-level parallelism) the gain was roughly half that.",
+    "Lucene only activates its Panama implementation on HotSpot with C2, with the jdk.incubator.vector module added and a preferred vector size of at least 128 bits; otherwise it uses a scalar fallback without any user action.",
+    "SIMD suits simple arithmetic over large primitive arrays; branchy code and avalanche-style hashing such as document ID routing are poor fits, and SIMD gains do not multiply with core count.",
+    "BBQ stores document vectors at 1 bit per dimension (centroid-based) and queries at 4 bits, scoring with AND, popcount and shifts; 1 million 768-dimension vectors go from about 3 GB to about 100 MB.",
+    "Use -XX:+PrintAssembly with hsdis to verify that intended vectorization, not long-standing auto-vectorization, produced the SIMD instructions (Neon registers on ARM, YMM with AVX2).",
+    "fma versus mul followed by add performs differently per CPU: mul plus add is faster on Apple Silicon and they are on par on his Intel machine, so Lucene includes an Apple Silicon heuristic and a flag to override it.",
+    "According to Przybyl, Elasticsearch 9.5 calls a bundled native C++ SIMD kernel through FFM first, then falls back to the Vector API, then to scalar code; the native path does not run on Windows.",
+    "ES|QL uses SIMD probing of a cache-friendly Swiss-table structure to speed up hash lookups when bucketing large time ranges."
+  ],
+  "takeaways": [
+    "Benchmark Vector API code against a scalar baseline that uses the same accumulator and ILP tricks before claiming a speed-up.",
+    "Run with --add-modules jdk.incubator.vector and check Elasticsearch or Lucene logs to confirm the vectorized path is active on your hardware.",
+    "Check JIT output with PrintAssembly and hsdis on the actual production CPU type, since ARM and x86 behave differently.",
+    "Try BBQ or other quantization tiers for large vector indexes when RAM and disk, not recall, are the constraint.",
+    "Keep a scalar fallback and runtime capability checks whenever you adopt an incubating API in production code."
+  ],
+  "quotes": [
+    {"text": "There are lies, damn lies, and there are benchmarks.", "at": "14:49"},
+    {"text": "Lanes are not threads.", "at": "12:17"},
+    {"text": "Even if you're reaching the limits of Java, Java allows you to then go beyond it in C++.", "at": "51:06"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why vector search needs speed"},
+    {"at": "05:31", "title": "Dot product as hot loop"},
+    {"at": "08:51", "title": "SIMD registers and lanes"},
+    {"at": "13:37", "title": "Demo: honest benchmarking"},
+    {"at": "18:45", "title": "Vector API in Lucene"},
+    {"at": "23:49", "title": "When SIMD does not fit"},
+    {"at": "25:11", "title": "Runtime detection and fallback"},
+    {"at": "29:01", "title": "Better Binary Quantization"},
+    {"at": "38:15", "title": "Native C++ kernel via FFM"},
+    {"at": "47:41", "title": "ES|QL hash tables and wrap-up"}
+  ],
+  "tech": ["Panama Vector API", "jdk.incubator.vector", "Foreign Function & Memory API", "Elasticsearch", "Lucene", "ES|QL", "HNSW", "Better Binary Quantization (BBQ)", "HotSpot C2", "hsdis", "AVX2", "AVX-512", "ARM Neon", "Apple Silicon", "Kibana"],
+  "watchIf": "You write numeric hot loops in Java, run Elasticsearch vector search, or want to know whether the incubating Vector API is ready for production use.",
+  "themes": ["JVM performance & runtime", "Java language & JDK", "Data & databases"],
+  "demo": true
+}

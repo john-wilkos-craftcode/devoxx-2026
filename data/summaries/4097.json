@@ -1,0 +1,49 @@
+{
+  "id": 4097,
+  "source": "transcript",
+  "tldr": "Touret walks through designing a multi-cloud fleet-tracking platform on AWS and GCP, arguing for one bounded context per provider, explicit cross-cloud flows, and trade-offs driven by cost, SLAs and customer needs.",
+  "summary": [
+    "Touret, a software architect at Magellan, opens with the claim that about 70% of organisations mix on-premise and public cloud but only about 20% run a real multi-cloud strategy, mostly because the operational cost is hard to justify. He separates multi-cloud (combining the best services of several providers into one platform, or running redundantly on two) from hybrid cloud, and lists the downsides: teams trained twice, duplicated infrastructure as code, more vendor partnerships. Avoiding every provider-specific feature to dodge lock-in is, in his view, like avoiding application-server features fifteen years ago: you lose BigQuery or Spanner. Kubernetes alone does not make you agnostic either.",
+    "The running example is a real-time vehicle fleet tracking platform with analytics, predictive maintenance, customer-facing web and mobile apps, and payment processing. His rule of thumb is one bounded context per cloud provider, loosely coupled: HiveMQ Cloud for tracking, BigQuery and Vertex AI on GCP for analytics and ML, EC2 or Elastic Beanstalk on AWS for applications and payments. He maps cross-cloud transactions with a BPMN diagram using one swimlane per provider, since each such call brings the fallacies of distributed computing, latency, security and egress cost. Rather than having the AWS application server call BigQuery's REST API directly, he puts a facade API in front of it, with timeouts, retries, exponential backoff and circuit breakers.",
+    "On non-functional requirements, he warns that a 99% SLA on the application is capped by a dependency at 95%, so cross-cloud paths should get their own lower NFRs, caching at a few hundred transactions per second, and the customer's targets should be challenged (he talked one client out of an unnecessary 99.99%). PCI DSS forces payment isolation, which he treats as an opportunity to narrow the audit scope. For identity he recommends a single end-user SSO such as Keycloak issuing OIDC tokens with roles for both clouds, and local JWT signature validation with short-lived tokens instead of per-request introspection, which became a bottleneck on a past project.",
+    "For data, each entity needs a declared source of truth; synchronous APIs are simple but chatty, while CDC or Kafka-based streaming is more robust but couples organisations. Bidirectional sync between a cache and the analytics DB invites split-brain; use a read-through cache with eviction instead. His cost example: 100 transactions per second at 0.5 KB in and 1 KB out is about 260 GB a month, roughly 20 euros over the internet versus about 1,600 euros on a dedicated interconnect, so he prefers the internet with co-located regions. He ends with a lock-in assessment per managed service, a global API gateway plus backend-for-frontend, centralised observability, and a design checklist."
+  ],
+  "keyPoints": [
+    "Multi-cloud means composing services from several providers into one platform (or running redundantly); separate user groups on different clouds is hybrid, not multi-cloud.",
+    "Rule of thumb: one bounded context per cloud provider, loosely coupled, with cross-cloud transactions mapped in a BPMN diagram with one swimlane per provider.",
+    "Wrap provider APIs such as BigQuery behind a facade so changes on one cloud do not ripple into services run on another, and add timeouts, retries, backoff and circuit breakers on cross-cloud calls.",
+    "End-to-end availability is capped by the weakest dependency: a 99% app on top of a 95% GCP path delivers 95%, so define separate, lower NFRs for cross-cloud transactions.",
+    "Use one SSO (Keycloak via OIDC) for end users, and validate tokens locally against the IdP's public keys with short-lived tokens; per-request introspection became a bottleneck in production.",
+    "Avoid bidirectional data synchronisation between clouds because of split-brain risk; use a single source of truth with an API or CDC/Kafka streaming, plus caches with eviction.",
+    "Touret's GCP calculator example: about 260 GB/month of traffic costs roughly 20 euros over the internet versus about 1,600 euros on a dedicated interconnect.",
+    "Isolating PCI DSS payment workloads is mandatory and also shrinks the scope for audits, delivery and training."
+  ],
+  "takeaways": [
+    "Draw a BPMN diagram with one swimlane per cloud provider and list every cross-cloud transaction before committing to a design.",
+    "Put a facade API in front of any managed service called from another cloud, with timeouts, retries and circuit breakers.",
+    "Compute composite availability across clouds and negotiate lower or separate SLAs for cross-cloud paths instead of accepting 99.99% by default.",
+    "Estimate egress and interconnect costs early with the providers' calculators, and co-locate regions (for example both in Paris or Brussels).",
+    "For each managed service, write down the alternative and the cost of switching, rather than banning provider-specific features outright."
+  ],
+  "quotes": [
+    {"text": "One sad reality is your user won't care about it. Frankly, a user just wants one unified service. They don't want a multi-cloud platform.", "at": "04:09"},
+    {"text": "Just one bounded context per one cloud provider.", "at": "07:11"},
+    {"text": "Be pragmatic. Usually, like in music, less is more.", "at": "34:06"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Multi-cloud versus hybrid"},
+    {"at": "04:09", "title": "Lock-in and agnosticism myths"},
+    {"at": "05:39", "title": "Fleet tracking example"},
+    {"at": "07:11", "title": "Bounded contexts per provider"},
+    {"at": "11:36", "title": "Facades and cross-cloud calls"},
+    {"at": "12:36", "title": "SLAs and compliance"},
+    {"at": "15:44", "title": "Identity and token validation"},
+    {"at": "21:18", "title": "Data ownership and sync"},
+    {"at": "24:56", "title": "Performance, FinOps and lock-in"},
+    {"at": "29:58", "title": "Customer view and checklist"}
+  ],
+  "tech": ["AWS", "Google Cloud", "BigQuery", "Vertex AI", "HiveMQ Cloud", "Amazon EC2", "AWS Elastic Beanstalk", "Keycloak", "OpenID Connect", "Kafka", "Apache ActiveMQ Artemis", "Kubernetes", "PCI DSS", "BPMN", "C4 model"],
+  "watchIf": "You are asked to spread a platform across AWS and GCP and want a concrete checklist for boundaries, SLAs, identity, data sync and egress costs.",
+  "themes": ["Cloud native & Kubernetes", "Architecture & design"],
+  "demo": false
+}

@@ -1,0 +1,39 @@
+{
+  "id": 50106,
+  "source": "transcript",
+  "tldr": "Kühnau compares tool calling, structured output and a hybrid approach in Spring AI for turning natural-language filter requests into JPA queries for a Vaadin grid, benchmarked on local models.",
+  "summary": [
+    "Kühnau, from Vaadin, starts from a common UI problem: a grid with one filter field per column can't express 'Berlin or Munich', negations or date ranges, while a full filter form gets cluttered. He rejects sending the whole table to the LLM (leaks data, burns tokens) and instead has the model extract filter values that become a Spring Data JPA Specification. His first version uses Spring AI tool calling: a search method annotated with @Tool(returnDirect = true) and @ToolParam descriptions, plus a tool that returns the current date. It handles single values, German city names like München and exact dates, but not multiple values, negations or ranges. Adding an operator and a negation flag per field fixes that, but the number of parameters, descriptions and tokens grows quickly. The LLM call runs on a background thread so the UI stays responsive.",
+    "Structured output sends everything in one round trip: the current date goes into the system prompt, and the model must return a CustomerFilter record holding a list of conditions (field, operator enum, values, negated), documented with Jackson description annotations. A hybrid version adds a date tool but cannot enforce the return type, so the result must be checked. In integration tests with low temperature and thinking turned off, structured output and the hybrid passed every capability test; structured output used about 812 input tokens at about 1.5 seconds. A 60-case benchmark over 12 fields put Qwen3 8B at 97% success (1.6 s, P95 3.6 s structured; 2.8 s, P95 5.8 s hybrid); Gemma 4 26B scored higher but needed too much RAM on his 32 GB laptop. Which approach did best varied by model. His conclusions: approach and precise prompts matter more than model size, and relative dates (yesterday, last quarter) should be pre-computed in Java because models are bad at date arithmetic."
+  ],
+  "keyPoints": [
+    "Plain tool calling with one parameter per field cannot express multiple values, negations or date ranges; adding operator and negation parameters per field works but inflates parameters, descriptions and tokens.",
+    "Structured output with a CustomerFilter record (a list of field/operator/values/negated conditions) handled every test query in one LLM round trip, at about 812 input tokens and about 1.5 seconds.",
+    "The hybrid approach (tool plus typed result) also passed all tests but cannot enforce the return type, and tool round trips cost extra tokens and latency.",
+    "On a 60-case benchmark, Qwen3 8B reached 97% success locally; which approach performed best differed between models.",
+    "Pre-computing relative dates in Java and putting them in the system prompt was more reliable than letting the model do date arithmetic."
+  ],
+  "takeaways": [
+    "Have the LLM produce a typed filter object and translate it into a JPA Specification yourself, rather than handing table data to the model.",
+    "Default to structured output for extraction tasks and add tools only when the model genuinely needs extra context.",
+    "Calculate dates such as 'yesterday' and 'last quarter' in Java and pass them in the prompt.",
+    "Build a repeatable integration-test benchmark over your own queries and run it per model and approach before choosing either."
+  ],
+  "quotes": [
+    {"text": "The approach beats the model choice.", "at": "30:54"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why filter forms fall short"},
+    {"at": "03:24", "title": "Java LLM frameworks and tools"},
+    {"at": "07:18", "title": "Extracting filters via tool calling"},
+    {"at": "15:21", "title": "Negations, ranges and token cost"},
+    {"at": "18:08", "title": "Structured output and hybrid"},
+    {"at": "23:31", "title": "Integration test comparison"},
+    {"at": "28:20", "title": "Local model benchmark"},
+    {"at": "33:36", "title": "Live demo and Q&A"}
+  ],
+  "tech": ["Spring AI", "Vaadin", "Spring Data JPA", "JPA Specifications", "LangChain4j", "Koog", "Jackson", "Qwen3", "Gemma 4"],
+  "watchIf": "You want users to filter a data grid in plain language and need to choose between tool calling and structured output, ideally on a local model.",
+  "themes": ["LLMs in Java apps", "Spring & frameworks", "Frontend & UI"],
+  "demo": true
+}

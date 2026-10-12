@@ -1,0 +1,40 @@
+{
+  "id": 9024,
+  "source": "transcript",
+  "tldr": "Dohndorf presents Tiberius, an open-source Java tool that runs LLM jailbreak and prompt-injection probes as JUnit tests, stores results as JSON fixtures and asserts statistical security contracts via PUnit.",
+  "summary": [
+    "Dohndorf opens with real LLM failures: the Chevrolet of Watsonville chatbot that agreed to sell a car for $1 as a 'legally binding offer', a Microsoft Copilot exfiltration in June 2025 triggered by hidden text in an email, and what she described as an August 2026 attack chain against Claude Code's auto mode. In that case, she said, a website steered the agent into running its own detector script in a folder holding a poisoned import, with no injection phrase at all, and researchers reached 60-80% success where the vendor's benchmark reported 0%. Her point is that LLMs are non-deterministic, so a single passing test proves nothing. Existing scanners (NVIDIA garak, Microsoft PyRIT, Promptfoo, Praetorian's Augustus and Julius) are Python, which does not fit Java build pipelines.",
+    "Her answer is Tiberius, inspired by Augustus and Julius. Probes cover the OWASP Top 10 for LLM applications categories (jailbreaks, prompt injection, encoding such as Base64, XML smuggling, data extraction, multi-turn styles like Crescendo, format exploits), with mutations, an LLM generator and a detector. Her demo was 'VeloElite', a Spring Boot and LangChain4j sales bot on a local Ollama Llama 3.2 1B with a naive keyword-based input guardrail; a 'deceased grandmother' prompt got it to offer a high-end road bike for five euros. In JUnit, a Tiberius scanner runs selected categories against Ollama, Anthropic or Mistral and saves hits to a versioned JSON fixture (prompt, category, severity, probe ID, indicators). That fixture then drives deterministic regression tests of the guardrail, asserting block rates and checking false positives and negatives. With PUnit, a probabilistic security contract sets a minimum resistance rate and confidence level, and the number of trials follows from those, about 50 samples in her demo. Fingerprinting and bias testing exist but were only mentioned."
+  ],
+  "keyPoints": [
+    "Because LLM output is non-deterministic, a single-run pass or fail says nothing about an application's attack resistance; security has to be expressed statistically.",
+    "Tiberius runs attack probes grouped by OWASP LLM Top 10 categories (jailbreak, prompt injection, encoding, XML smuggling, multi-turn, data extraction) from JUnit tests in a Maven project.",
+    "Scan results are saved as versioned JSON fixtures that freeze the non-determinism, so guardrails can be regression-tested deterministically for block rate, false positives and false negatives.",
+    "Integration with PUnit lets a test assert a probabilistic security contract with a minimum resistance rate and confidence level, which determines the number of trials.",
+    "A naive keyword guardrail on a small local model was bypassed by a role-play 'grandmother' prompt that produced a five-euro bike offer."
+  ],
+  "takeaways": [
+    "Replace one-shot LLM safety tests with multi-trial tests that assert a minimum pass rate at a stated confidence level.",
+    "Capture successful attack prompts as versioned fixtures and use them as regression tests for your guardrails.",
+    "Test guardrails for false positives on legitimate input as well as for blocked attacks.",
+    "Include multi-turn and indirect injection probes, not just 'ignore all previous instructions' strings."
+  ],
+  "quotes": [
+    {"text": "If you have ever shipped an LLM feature which passed all tests and then failed in production with exactly the same input, then you already know that assertEquals is not going to save you.", "at": "00:31"},
+    {"text": "Single sample scans are actually telling you nothing about model behavior.", "at": "30:10"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Chatbots failing in public"},
+    {"at": "03:16", "title": "Agent and Copilot attack chains"},
+    {"at": "08:24", "title": "Non-determinism and existing scanners"},
+    {"at": "12:31", "title": "Tiberius architecture and probes"},
+    {"at": "15:00", "title": "VeloElite sales bot demo"},
+    {"at": "23:31", "title": "Scans and JSON fixtures"},
+    {"at": "30:10", "title": "Probabilistic contracts with PUnit"},
+    {"at": "34:05", "title": "Fingerprinting, bias and wrap-up"}
+  ],
+  "tech": ["Tiberius", "PUnit", "JUnit", "Spring Boot", "LangChain4j", "Ollama", "Llama 3.2", "garak", "PyRIT", "Promptfoo", "Augustus", "OWASP Top 10 for LLM Applications", "Maven"],
+  "watchIf": "You ship a Java app with an LLM behind it and want security and guardrail tests that run in your normal JUnit build rather than a separate Python scanner.",
+  "themes": ["Security & supply chain", "Testing & quality", "LLMs in Java apps"],
+  "demo": true
+}
