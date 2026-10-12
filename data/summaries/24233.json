@@ -1,0 +1,98 @@
+{
+  "id": 24233,
+  "source": "transcript",
+  "tldr": "Briliantov vibe-codes a Koog-based coding agent with a typed workflow, connects it to IntelliJ through the Agent Client Protocol, and shows IDE skills that cut agents' token use.",
+  "summary": [
+    "Briliantov, who leads ACP at JetBrains and was tech lead of the Koog agent framework, argues that building your own agent lets you control context and enforce organisational guardrails as code rather than prompts. He models an agent as a typed graph of nodes on the JVM: an implement step outputs a ChangesSummary data class, a verify step outputs a VerificationResult, and the flow loops back to reprogramming until verification passes. The agent fills in a type instead of being asked nicely. Koog provides workflows today; Spring AI and LangChain4j offer models and tool calling, and he says Spring AI has announced workflows too.",
+    "He explains ACP, the Agent Client Protocol created by JetBrains and Zed. It covers initialize and new-session requests, streamed session updates for tool calls and edits, permission requests, and the final prompt result. It now connects more than 42 agents (Claude, Codex, Gemini CLI, Junie and others) to JetBrains IDEs, Zed, Neovim and, recently, Xcode. An ACP agent can itself be a client of other agents, there is a TCK for checking compatibility, sub-agent support has just landed, and actor-style agent-to-agent messaging is being explored. Live, he has Codex in JetBrains Air generate the agent, adds ACP streaming with the Kotlin SDK, and registers it as a custom ACP agent.",
+    "Slow conference Wi-Fi stalled the Gradle build for most of the demo, so the orchestrator idea (Claude implements, the custom agent verifies, Codex repairs) was prompted but not shown running. His closing argument is that agents waste tokens without IDE intelligence. A rename across 100 files costs more than 100 tool calls plus full build logs for a plain agent, but one call to the IDE's refactoring. The bundled IJ Debugger skill exposes XDebug MCP tools such as log points on a running JVM, so agents need not add println calls and rebuild. He ends with Codex using that skill to debug his own agent."
+  ],
+  "keyPoints": [
+    "Use typed inputs and outputs (data classes) between agent workflow steps as guardrails instead of prompt instructions.",
+    "Separate tools (operations, local or MCP), skills (how and when to use tools) and guardrails (deterministic logic via hooks or a custom workflow).",
+    "ACP lets any compliant agent run inside any compliant editor, so you do not need a dedicated IDE integration per agent or an AI subscription from the IDE vendor.",
+    "Custom agents are added in JetBrains IDEs through 'Add custom ACP agent', which takes a command, arguments and environment variables such as API keys.",
+    "Briliantov suggests writing a test compatibility kit from your spec so the prompt can be 'comply with the new version of the TCK'.",
+    "IDE skills install per agent (Claude, Codex) into the project, for example as a SKILL.md under .claude, and expose IDE MCP tools to any agent."
+  ],
+  "takeaways": [
+    "Model your agent as a workflow with typed step outputs and a verify loop, using Koog, Spring AI or LangChain4j.",
+    "Make an in-house agent speak ACP (there is a Kotlin SDK) and run the ACP TCK, rather than building a separate IDE plugin.",
+    "Install the IJ Debugger skill so agents use log points on the running JVM instead of println-and-rebuild cycles.",
+    "Give agents IDE refactoring tools for codebase-wide changes instead of letting them edit files one at a time."
+  ],
+  "quotes": [
+    {
+      "text": "In the world when everyone will build their applications using agents, the question is, who's gonna build the builder?",
+      "at": "00:31"
+    },
+    {
+      "text": "Why would you build your own harness from scratch? Well, there is no reason. So let's actually use ACP to talk to Claude and to Codex and then orchestrate them from the top.",
+      "at": "33:14"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why build your own agent"
+    },
+    {
+      "at": "04:20",
+      "title": "Agents as typed workflows"
+    },
+    {
+      "at": "08:27",
+      "title": "Vibe-coding the agent"
+    },
+    {
+      "at": "12:24",
+      "title": "The Agent Client Protocol"
+    },
+    {
+      "at": "19:26",
+      "title": "Sub-agents and agent teams"
+    },
+    {
+      "at": "21:50",
+      "title": "Connecting the agent to IntelliJ"
+    },
+    {
+      "at": "33:14",
+      "title": "Orchestrating Claude and Codex"
+    },
+    {
+      "at": "35:25",
+      "title": "IDE intelligence and skills"
+    },
+    {
+      "at": "43:50",
+      "title": "Debugging with the IJ Debugger skill"
+    }
+  ],
+  "tech": [
+    "Agent Client Protocol (ACP)",
+    "Koog",
+    "Kotlin",
+    "Java",
+    "IntelliJ IDEA",
+    "JetBrains Air",
+    "Junie",
+    "Codex",
+    "Claude Code",
+    "Gemini CLI",
+    "Zed",
+    "Xcode",
+    "Spring AI",
+    "LangChain4j",
+    "MCP",
+    "Agent skills",
+    "Gradle"
+  ],
+  "watchIf": "You want to build an in-house coding agent on the JVM, or understand how ACP lets agents and IDEs work together.",
+  "themes": [
+    "AI agents & agentic coding",
+    "LLMs in Java apps",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}

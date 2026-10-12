@@ -1,0 +1,115 @@
+{
+  "id": 23529,
+  "source": "transcript",
+  "tldr": "A three-hour, demo-heavy tour of Grall's move from Copilot completions to parallel autopilot sessions in the Copilot CLI and app, covering cost, review, security and governance.",
+  "summary": [
+    "Grall, at GitHub for five and a half years and a self-described passionate Java developer, opens with numbers from inside GitHub: the 10-person Copilot CLI team merging about 500 pull requests a week and averaging 1.21 releases a day, and one engineer rewriting the CLI from TypeScript to Rust in three weeks. He said that rewrite cost about $120,000 in tokens, against an estimate of 18 months to two years for a small team. He traces his own path from VS Code completions in 2021 through agent mode to the CLI and then the Copilot desktop app, because delegated tasks mean waiting, so you want parallel sessions.",
+    "He judges cost in AI credits (one credit is one cent) rather than tokens: get the output right first, then try other models, and optimise only when it is too expensive. Enterprise admins can restrict models, experimental features and the CLI per team and set monthly budgets per developer. Demos cover VS Code's agent debug log, terminal inline chat, generated commit messages, and the CLI copying Spring PetClinic to a new repo for 13 cents. He runs Autopilot ('YOLO') mode with a credit cap, git worktrees for parallel tasks, and a 'grill me' skill that questions him until the plan can serve as the spec, replacing Spec Kit for him.",
+    "After the break he shows Copilot as a pull request reviewer, configured through repository rulesets and running on GitHub Actions infrastructure, plus usage metrics available via API. He tracks PRs merged and time to merge, not lines generated. In the Copilot app he labels issues 'AI auto', schedules a session that picks them up every two minutes, works each in a worktree and opens a PR with a screenshot. One prompt rewrote PetClinic as a TypeScript REST back end with a Next.js front end, SQLite default, test ratios and a RubberDuck second-model check: 53 million input tokens, mostly cached, for $80.",
+    "On quality he says not to code this way without solid CI, and to enable Dependabot, CodeQL and secret scanning, which find issues before AI proposes fixes. He reviews large diffs with three models, re-benchmarks tools with a fixed prompt (PetClinic to .NET and Angular), and runs the Chronicle command weekly for tips from past sessions. He now puts fewer skills and instructions in place because harnesses know Java well, and keeps the remaining ones per repository. He warns that third-party skills can carry prompt injection. Closing demos: /spar debating Electron against Tauri, a vet chat assistant built on the Copilot SDK, and Canvas plugins that add custom panels."
+  ],
+  "keyPoints": [
+    "Grall said GitHub Copilot is the largest committer on GitHub's own codebase and that every GitHub employee uses it daily.",
+    "Look at cost per interaction in credits first; optimise tokens only when quality is fine but the price is too high.",
+    "Agents increasingly prefer CLIs such as gh over MCP servers, which is more efficient and easier to control for authentication.",
+    "Git worktrees (around since 2015) are what let several agent sessions work on one repo at once; the Copilot app manages them for you.",
+    "Plan mode plus a 'grill me' skill turns a short request into a detailed plan that doubles as a functional and technical spec.",
+    "Copilot code review runs in the cloud on GitHub Actions infrastructure, can be triggered by rulesets, and follows review rules in your instruction file.",
+    "Rerun a fixed benchmark prompt on new models and harness versions; instructions and skills written six months ago are probably out of date.",
+    "Keep Autopilot for coding, but go step by step when deploying or touching production data."
+  ],
+  "takeaways": [
+    "Ask your Copilot admin to enable the CLI and Copilot code review if they are blocked, and add review rules to your instruction file.",
+    "Use git worktrees (or a tool that manages them) to run a second agent task without stashing or recloning.",
+    "Before a complex task, run a planning session that interrogates you, and review the plan before letting the agent implement it.",
+    "Turn on Dependabot, CodeQL and secret scanning before increasing the volume of AI-generated pull requests.",
+    "Keep a standard benchmark prompt and rerun it on new models to compare quality and cost."
+  ],
+  "quotes": [
+    {
+      "text": "Expensive doesn't mean anything. Expensive is compared with something.",
+      "at": "63:25"
+    },
+    {
+      "text": "When I push code or when I modify the database in production, I am very, very careful. I do that step by step.",
+      "at": "59:47"
+    },
+    {
+      "text": "Do not code like I code if you don't have a perfect CI.",
+      "at": "144:09"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "How GitHub builds with Copilot"
+    },
+    {
+      "at": "11:23",
+      "title": "From completion to agents"
+    },
+    {
+      "at": "25:28",
+      "title": "Governance and cost"
+    },
+    {
+      "at": "32:26",
+      "title": "Copilot tips in the IDE"
+    },
+    {
+      "at": "48:45",
+      "title": "Copilot CLI and Autopilot"
+    },
+    {
+      "at": "64:51",
+      "title": "Worktrees and planning"
+    },
+    {
+      "at": "100:54",
+      "title": "Cloud code review and metrics"
+    },
+    {
+      "at": "113:49",
+      "title": "The Copilot desktop app"
+    },
+    {
+      "at": "144:09",
+      "title": "Quality, security and benchmarks"
+    },
+    {
+      "at": "162:16",
+      "title": "Spar, Copilot SDK and canvases"
+    }
+  ],
+  "tech": [
+    "GitHub Copilot",
+    "Copilot CLI",
+    "GitHub Copilot app",
+    "Copilot SDK",
+    "VS Code",
+    "IntelliJ IDEA",
+    "GitHub Actions",
+    "gh CLI",
+    "git worktree",
+    "Spring PetClinic",
+    "CodeQL",
+    "Dependabot",
+    "MCP",
+    "Agent skills",
+    "Spec Kit",
+    "Tauri",
+    "Electron",
+    "Next.js",
+    "SQLite",
+    "Rust",
+    "TypeScript",
+    "Playwright"
+  ],
+  "watchIf": "Your team uses GitHub Copilot mostly for completions and chat, and you want to see the CLI, desktop app, cloud agents and admin controls in real use.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Developer experience & tooling",
+    "Security & supply chain"
+  ],
+  "demo": true
+}

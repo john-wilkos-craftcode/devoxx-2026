@@ -1,0 +1,92 @@
+{
+  "id": 25652,
+  "source": "transcript",
+  "tldr": "After an outage in an agent-written app he couldn't debug, Gavrilescu built Groma.md: a live, Markdown-backed C4 map of a repo, so humans review architecture instead of code.",
+  "summary": [
+    "Gavrilescu, creator of Backlog.md, describes ramping up from one or two agent-built features a day to around 50, and quietly stopping code review. Then his hackathon platform (a Next.js app on Cloudflare Workers with D1) threw 500s in front of 100 users. Having never read the code, he did not know where the logs were; Codex tailed them, found a WHERE IN clause that had grown too large, deleted rows as a hotfix and later replaced it with a JOIN. The next day he found the same button component built 20 times, tests that only checked labels, and dead code: a 'dark software factory'.",
+    "Fixes to AGENTS.md, linter rules and an AI simplification pass helped only temporarily, because each PR is valid in isolation. Groma.md, now in its fourth iteration (one attempt produced 700 broken commits in 72 unattended hours), runs deterministic, offline, per-language scanners (javac for Java, Roslyn for C#, the TypeScript AST) that write components as Markdown files committed with the code. An agent then curates names and groupings, and stable IDs keep that curation as the code evolves. Live, he mapped Keycloak: the raw scan was unreadable, but the Claude Opus-curated view showed actors, components and a password sign-in flow."
+  ],
+  "keyPoints": [
+    "Agent-reviewed PRs miss whole-codebase problems: each change is valid alone, so duplication such as 20 copies of a button component piles up.",
+    "Installing many skills up front backfired; some taught the agent React patterns in a Vue.js project.",
+    "Groma scanning is deterministic and offline; output is Markdown in the repo, rendered as a C4-model map (isometric or 2D) with actors, external systems, components and flows.",
+    "Backlog.md tasks show on the map in real time, with a ring for acceptance-criteria progress, so you see which components agents are touching.",
+    "A groma-action GitHub Action exports a static HTML architecture diff for each PR; Gavrilescu says he relies on Gherkin end-to-end scenarios more than unit tests for agent-written code."
+  ],
+  "takeaways": [
+    "Practise connecting to your production logs and database yourself before an incident, even on agent-built projects.",
+    "Audit the skills and AGENTS.md rules in your repo and remove any that do not match your actual stack.",
+    "Add an architecture-level diff (generated diagram or component list) to PRs so reviewers can spot duplicated or unused components.",
+    "Try Groma.md on a brownfield repo and let an agent curate the first scan into meaningful components."
+  ],
+  "quotes": [
+    {
+      "text": "Because AI wrote every single thing of this platform, I had no idea how to start.",
+      "at": "01:57"
+    },
+    {
+      "text": "I ended up realizing I was running a dark software factory, a factory where the human is not in the loop.",
+      "at": "06:13"
+    },
+    {
+      "text": "That 20th component is valid. It's just the agents that reviewed the code, they don't really look at the whole context.",
+      "at": "10:06"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Fifty features a day"
+    },
+    {
+      "at": "01:57",
+      "title": "Production outage in an AI-built app"
+    },
+    {
+      "at": "06:13",
+      "title": "Inside a dark software factory"
+    },
+    {
+      "at": "10:06",
+      "title": "Why static diagrams fall short"
+    },
+    {
+      "at": "11:28",
+      "title": "Four iterations of Groma"
+    },
+    {
+      "at": "15:29",
+      "title": "Live map of agents at work"
+    },
+    {
+      "at": "19:14",
+      "title": "Mapping Keycloak live"
+    },
+    {
+      "at": "23:07",
+      "title": "Wrap-up and Q&A"
+    }
+  ],
+  "tech": [
+    "Groma.md",
+    "Backlog.md",
+    "Codex",
+    "Claude Opus",
+    "Cloudflare Workers",
+    "Cloudflare D1",
+    "Next.js",
+    "C4 model",
+    "Keycloak",
+    "Roslyn",
+    "TypeScript AST",
+    "GitHub Actions",
+    "Gherkin"
+  ],
+  "watchIf": "You let coding agents ship most of your code and want a way to review what the system has become without reading every diff.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Architecture & design",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}

@@ -1,0 +1,100 @@
+{
+  "id": 49751,
+  "source": "transcript",
+  "tldr": "Caudron argues the post-war order is over and Europe should build sovereignty on energy and technology, pay for resilience, and swap the frontier AI race for broad adoption.",
+  "summary": [
+    "Introduced by a humanoid robot, Jo Caudron says 80-year post-war era of growth, welfare and US-backed rules is ending, buried under a 'meta storm' of overlapping crises. He calls the White House ambush of Zelensky Europe's Pearl Harbor. Since then, he notes, Europe announced €800 billion for resilience, France and the UK discussed a shared nuclear umbrella, and Germany loosened its constitutional debt brake. Citing US security strategy documents, he argues this is not just Trump rhetoric, so trust will not return after the midterms. Momentum is not enough, though. He describes sovereignty as a pyramid of energy first, then technology, then the economy and military, which together give agency.",
+    "Europe lost its tech industry by taking the path of least resistance (US money and markets, Chinese manufacturing), he says, and now over 80% of its applications, data and cloud run on American platforms while technology is being used as a weapon. Examples: Starlink switched off over Ukraine, ICC judges cut off from Microsoft, Google, Apple and card payments, and an Anthropic model he said was withdrawn for everyone for about 19 days after a US restriction. Given the CLOUD Act and FISA, he calls US sovereign-cloud promises 'bullshit'. He presents EuroStack, and public bodies going first: France replacing Teams, Zoom and Meet with Visio by 2027, Germany requiring ODF.",
+    "His prescriptions: 'copy back' technology Europe once invented, by reverse-engineering rather than rebuilding; add a 'return on sovereignty' line to business cases, since replacing hackable Chinese solar inverters for about €50 billion is cheap insurance against a multi-day blackout; and use 'transition thinking', treating energy as a technology that follows Moore's law-style curves and shifting from selling cars to selling rides. On AI he argues the compute race (255 GW in the US against 21 GW in Europe) cannot be won. Building gigafactories filled with US chips deepens dependency, so Europe should run a marathon of absorbing smaller, cheaper models into its economy, protected by the AI Act."
+  ],
+  "keyPoints": [
+    "Sovereignty pyramid: energy, then technology, then economy and military; defence spending alone does not deliver agency.",
+    "Digital sovereignty has at least three separate dimensions: data, apps and cloud; AI; and platforms such as social media.",
+    "Caudron puts European spending at around €400 billion a year in licence fees to mostly US vendors, with about €4 trillion of European savings invested in US tech.",
+    "Sovereignty, autonomy and dependence are different things: mutual dependence is acceptable, being taken hostage is not.",
+    "Public-sector procurement can bootstrap European alternatives such as Nextcloud, LibreOffice and OnlyOffice by exposing employees and contractors to them.",
+    "He said most everyday business AI does not need frontier models; he pointed to small on-board models in autonomous vehicles and robots, and to open-weight models.",
+    "Loss aversion makes Europe 1.0 feel decline sharply; framing a 'Europe 2.0' at the start of a new curve (energy, urban mining, climate adaptation) creates hope."
+  ],
+  "takeaways": [
+    "Map which parts of your stack would stop working if a US or Chinese vendor switched you off, and design a fallback path.",
+    "Add a 'return on sovereignty' or resilience line to technology business cases instead of comparing on price alone.",
+    "Evaluate European or open-source alternatives (Nextcloud, LibreOffice, Mistral models) when a workload does not need the market leader.",
+    "Check whether a smaller or open-weight model is good enough before defaulting to a frontier model."
+  ],
+  "quotes": [
+    {
+      "text": "The first reflex is we have to buy more arms. But I think this is bullshit. Arms are a fundamental part of this pyramid, but it doesn't start with arms.",
+      "at": "16:37"
+    },
+    {
+      "text": "Europe has to get out of this race, but not out of AI. Europe has to get its own race.",
+      "at": "50:51"
+    },
+    {
+      "text": "For the first time in our recent history, the Americans and the Chinese are the incumbents and the Europeans are the challengers.",
+      "at": "58:06"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "The old normal is over"
+    },
+    {
+      "at": "07:28",
+      "title": "Europe's Pearl Harbor moment"
+    },
+    {
+      "at": "16:37",
+      "title": "The sovereignty pyramid"
+    },
+    {
+      "at": "19:03",
+      "title": "How Europe lost its tech"
+    },
+    {
+      "at": "23:05",
+      "title": "Technology as a weapon"
+    },
+    {
+      "at": "27:09",
+      "title": "Sovereign cloud and EuroStack"
+    },
+    {
+      "at": "34:52",
+      "title": "Copy back and return on sovereignty"
+    },
+    {
+      "at": "42:52",
+      "title": "Transition thinking"
+    },
+    {
+      "at": "46:39",
+      "title": "Leaving the AI race"
+    },
+    {
+      "at": "56:51",
+      "title": "Loss aversion and a new curve"
+    }
+  ],
+  "tech": [
+    "EuroStack",
+    "CLOUD Act",
+    "FISA",
+    "GDPR",
+    "AI Act",
+    "Starlink",
+    "Nextcloud",
+    "LibreOffice",
+    "OnlyOffice",
+    "OpenDocument Format",
+    "Mistral AI",
+    "Visio"
+  ],
+  "watchIf": "You make technology or vendor choices and want a European geopolitical argument for weighing sovereignty and resilience alongside price.",
+  "themes": [
+    "Security & supply chain"
+  ],
+  "demo": false
+}

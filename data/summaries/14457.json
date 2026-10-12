@@ -1,0 +1,46 @@
+{
+  "id": 14457,
+  "source": "transcript",
+  "tldr": "Mazur gives senior technologists a coaching starter kit (active listening, three coaching formats and five question types) to stop absorbing everyone's problems and help colleagues grow instead.",
+  "summary": [
+    "Mazur, a consultant and coach with over 20 years in software, starts from a pattern he sees in individual contributors around their tenth year: trained to produce correct answers, they take every problem left 'at their desk', become the team hero, and then burn out or turn into the snarky 'black hole' nobody brings work to. Typical advice ('just say no', 'delegate more', 'care less') does not help. His answer is basic coaching, defined via tennis coach Timothy Gallwey: point at where the error is rather than prescribing the fix, so the behaviour changes for the long term. You work on the person, not on the problem they brought.",
+    "The one skill everything rests on is active listening: no phone or laptop, eye contact, verbal cues, paraphrasing, and empathy as accepting that what you hear is the speaker's truth even when you disagree. He contrasts formal coaching (needs an agreement and follow-up), impromptu 5-15 minute coaching at the desk or coffee machine (the most useful kind), and team coaching (saves time but requires switching to facilitator or mediator). He then walks through a scripted conversation between tech lead Taylor and developer Sam, who is drowning in late requirement changes, showing each of the five question types in turn.",
+    "The same technique handles requests for advice. When Sam asks 'React or Vue?', Taylor asks which criteria matter, keeps asking 'and what else?', and only then adds the missing ones (scalability, licensing), leaving Sam with a reusable heuristic instead of an answer. Every answer you hand out ties a rubber band that pulls people back to you. Anyone can coach, even in domains they do not know; coaching up the hierarchy starts with a permission question. Mazur closes with four pitfalls, the first being psychological issues, where you stop coaching and help the person find professional support."
+  ],
+  "keyPoints": [
+    "Solving other people's problems overloads you and robs them of the chance to learn: the 'you problem' and the 'them problem'.",
+    "Practise active listening with a pair exercise: person two may only ask 'why is that?', 'what was that about?' and 'how was that for you?'.",
+    "Initiation: 'What's on your mind?'. Avoid yes/no, status-check, emotionally loaded ('how are you?') or problem-prompting questions.",
+    "Excavation: 'And what else?', asked repeatedly; staying silent works even better because people fill the silence.",
+    "Focus: 'What is the real challenge here for you?'. Dropping 'for you' sends people into things outside their control.",
+    "Options: a set of questions such as what have you tried, what worked before, and what resources you have. Do not offer your own war stories, because they remove agency and accountability.",
+    "Action: 'What are you going to do about it?' or milder forms like 'What's the smallest next step?', plus 'When?' and an optional check-in later.",
+    "Pitfalls: psychological issues (refer on), the shoulder to cry on ('What do you need from me?'), gossip ('What did Ted say when you talked to them?') and blaming third parties (use the focus question)."
+  ],
+  "takeaways": [
+    "Next time someone says 'can you help?', reply with 'What's on your mind?' and 'And what else?' before offering anything.",
+    "When asked for advice, ask for the person's decision criteria first and only fill in the gaps, so they leave with a reusable heuristic.",
+    "Let people run with their own solution unless it is truly dangerous, and follow up later at the coffee machine or on Slack.",
+    "Run the 'why is that?' listening exercise at your next team day."
+  ],
+  "quotes": [
+    { "text": "So what happens to overburdened heroes? They either die a hero or live long enough to see themselves being a villain.", "at": "05:29" },
+    { "text": "The best way of doing excavation is actually really hard, and it's to shut up.", "at": "27:21" },
+    { "text": "It's their problem, so it's their solution. You have to let it go unless they're going to set the building on fire.", "at": "36:16" }
+  ],
+  "chapters": [
+    { "at": "00:00", "title": "One skill, three formats, five questions" },
+    { "at": "02:51", "title": "From hero to villain" },
+    { "at": "09:03", "title": "What coaching means" },
+    { "at": "12:54", "title": "Active listening and empathy" },
+    { "at": "18:18", "title": "Formal, impromptu and team coaching" },
+    { "at": "23:11", "title": "The five questions in a scenario" },
+    { "at": "38:33", "title": "Coaching towards heuristics" },
+    { "at": "42:37", "title": "Coaching up with permission" },
+    { "at": "45:12", "title": "Four pitfalls" }
+  ],
+  "tech": [],
+  "watchIf": "You are a senior developer or tech lead who has become the person everyone brings their problems to, and you are running out of time.",
+  "themes": ["Teams, careers & leadership"],
+  "demo": false
+}

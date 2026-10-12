@@ -1,0 +1,100 @@
+{
+  "id": 8171,
+  "source": "transcript",
+  "tldr": "Martignole on Back Market's organic Claude Code rollout, its four 'collisions' (huge PRs, cross-team changes, an $86,000 bill, people) and the fixes: OpenRouter, OpenCode, budgets, elected experts.",
+  "summary": [
+    "Martignole, principal engineer at Back Market and a Devoxx France co-founder, brought Cursor and Claude Code to the company in June 2025. There was no executive mandate: volunteers asked for licences, product managers, data scientists and marketing joined, and opening Claude Code to all employees via Okta passed 100 users by late November. The first collision: juniors opening 50-file PRs generated in minutes with green tests, which seniors cannot really review, so they approve them anyway. He blames vague 'fix the bug' prompts, week-long bloated sessions, tests written by the same session as the code, and scolding the agent instead of rewinding.",
+    "The fixes are back-to-basics engineering: specifications, small PRs (Google's engineering practices, Kent Beck), Matt Pocock's skills, and human review for AI-written code. In the second collision, a team blocked by another team's legacy Python pricing service rewrote it themselves. Agents remove the friction that used to protect repositories, but on-call accountability stays with the owners, so Back Market cleaned up CODEOWNERS and asked teams for CONTRIBUTING.md files telling humans and agents what they accept. Third, in June 2026 the monthly Anthropic API bill hit $86,000 for under 300 users, and reaching the workspace limit blocked every Claude Code user until the next month.",
+    "Coaching the top spenders one by one did not scale. Back Market moved to OpenRouter, restricted to 31 GDPR and zero-data-retention providers including open-weight models, and replaced Claude Code with OpenCode, which imports existing skills and CLAUDE.md files. Each user has a fixed monthly budget, a Slack bot grants $20 top-ups, and 41 projects have justified exception budgets. He says this saved $171,000 in three months with more users. The fourth collision was people: instead of AI champions, each of 40-plus teams elects an SME who meets weekly on skills, MCP and tools, and he ran a workshop for engineering managers, only 35% of whom had used Claude Code."
+  ],
+  "keyPoints": [
+    "Generating code is not velocity: code costs almost nothing to write now, but human review time has not changed.",
+    "Splitting work across sessions avoids the 'green test echo chamber', where the same session writes both the code and the tests that pass it.",
+    "Martignole said Anthropic's advanced spend controls required roughly a $1M commitment, leaving mid-sized companies stuck between fixed-price plans and pay-as-you-go.",
+    "OpenRouter's prompt classifier showed coding was only about 23-24% of activity for 229 tech users; most use is specs, commits, analysis and other non-code work.",
+    "He claimed about 75% of tokens on OpenRouter now go to open-weight, mostly Chinese, models, and that GLM models hosted by European or US providers are good enough for much of the work.",
+    "Product managers who want to ship code needed GitHub access and an internal deployment platform, because Vercel was not allowed for security reasons.",
+    "Impact is measured by stories and time to deploy or fix, not by PR counts or lines of code, which he calls vanity metrics.",
+    "Small companies (under about 150 users) should use fixed-price business plans, never personal licences, because leaking customer data through a personal account is a GDPR problem."
+  ],
+  "takeaways": [
+    "Write a CONTRIBUTING.md and tidy CODEOWNERS in every repo so agents and other teams know which changes you accept.",
+    "Set a per-user monthly AI budget with a lightweight top-up and exception process before the invoice surprises your CFO.",
+    "Put a model router (such as OpenRouter) and a provider-agnostic agent (such as OpenCode) in front of your models so you can switch providers and filter for GDPR compliance.",
+    "Ask each team to elect one peer as an AI subject-matter expert instead of appointing central AI champions.",
+    "Start fresh agent sessions per task and use rewind rather than arguing with the agent."
+  ],
+  "quotes": [
+    {
+      "text": "We increase the number of tokens per second for agents, but we haven't increased the number of tokens for humans.",
+      "at": "08:18"
+    },
+    {
+      "text": "Agents don't care about your organization. They are very unpolite.",
+      "at": "19:32"
+    },
+    {
+      "text": "I don't think personally that AI will replace developers. I personally think that developers that use AI are going to replace us.",
+      "at": "43:11"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Back Market and an organic rollout"
+    },
+    {
+      "at": "06:55",
+      "title": "Collision 1: the monster PR"
+    },
+    {
+      "at": "12:41",
+      "title": "Back to engineering basics"
+    },
+    {
+      "at": "15:30",
+      "title": "Collision 2: cross-team contributions"
+    },
+    {
+      "at": "19:32",
+      "title": "Collision 3: the $86,000 bill"
+    },
+    {
+      "at": "23:25",
+      "title": "OpenRouter, OpenCode and budgets"
+    },
+    {
+      "at": "29:41",
+      "title": "Collision 4: people and SMEs"
+    },
+    {
+      "at": "35:29",
+      "title": "Measuring impact"
+    },
+    {
+      "at": "38:09",
+      "title": "Lessons and next steps"
+    }
+  ],
+  "tech": [
+    "Claude Code",
+    "Cursor",
+    "OpenCode",
+    "OpenRouter",
+    "Anthropic API",
+    "Okta",
+    "CODEOWNERS",
+    "CONTRIBUTING.md",
+    "MCP",
+    "Agent skills",
+    "GLM",
+    "Mistral AI",
+    "Fireworks AI"
+  ],
+  "watchIf": "You are rolling out coding agents beyond a pilot team and need to control cost, review load and cross-team ownership.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Teams, careers & leadership"
+  ],
+  "demo": false
+}

@@ -33,7 +33,8 @@
   "room": "Room 9",
   "videoId": "5W4o_aYOaIY",
   "videoTitle": "java raspberry Pi and the art of by Matti Tahvonen",
-  "matchScore": 1.05
+  "matchScore": 1.044,
+  "twin": null
  },
  {
   "id": 8156,
@@ -69,7 +70,8 @@
   "room": "Room 6",
   "videoId": "P14Fy05Gs38",
   "videoTitle": "I Hired a Real Robot as My Junior Dev — and Now My Kids Don't Want to Learn Java Anymore  by Jan Van",
-  "matchScore": 1.0
+  "matchScore": 0.998,
+  "twin": null
  },
  {
   "id": 7011,
@@ -105,7 +107,8 @@
   "room": "Room 8",
   "videoId": "GLJGhkxMdgU",
   "videoTitle": "Secure Your Coding Agent Like It’s Malware by Richard Gross",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 7012,
@@ -141,7 +144,8 @@
   "room": "Room 5",
   "videoId": "wcghmWdu-HY",
   "videoTitle": "Destructoring is the future of Javas Encapsulation  by  Richard Gross",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 5507,
@@ -177,7 +181,8 @@
   "room": "Room 8",
   "videoId": "K3kD89Y1YCk",
   "videoTitle": "Stopping AI Generated Architectural Drift: Deterministic Guardrails for Agentic Coding by Sasha Podl",
-  "matchScore": 1.0
+  "matchScore": 0.99,
+  "twin": null
  },
  {
   "id": 23527,
@@ -213,7 +218,8 @@
   "room": "Room 10",
   "videoId": "JWFZY0aJTjg",
   "videoTitle": "Project Detroit: From Foreign Libraries to Foreign Language Runtimes  by Maurizio Cimadamore",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 25042,
@@ -249,7 +255,8 @@
   "room": "Room 5",
   "videoId": "SQUrHzMie3o",
   "videoTitle": "Owning the Code You Didn't Type by Renato Guerra Cavalcanti",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 11556,
@@ -285,7 +292,8 @@
   "room": "Room 8",
   "videoId": "0A2jqCqSIjg",
   "videoTitle": "223 Pull Requests in 11 Days: The Recipe for Building Real Software with AI Agents  by Julien Dubois",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 4090,
@@ -321,7 +329,8 @@
   "room": "Room 5",
   "videoId": "sWP9osLV45I",
   "videoTitle": "Help! I hate my team mate! by Jessica Siewert",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 52105,
@@ -357,7 +366,8 @@
   "room": "Room 5",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 21654,
@@ -393,7 +403,8 @@
   "room": "Room 5",
   "videoId": "j3aEB0i3Up8",
   "videoTitle": "Your AI Agent Trusts Strangers  Let Me Show You   by  Elder Moraes",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 31455,
@@ -429,7 +440,8 @@
   "room": "Room 8",
   "videoId": "qFTuteOEtsE",
   "videoTitle": "Half of a billion Idle GPUs: The Case for On Device AI  by Prince Canuma",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 16426,
@@ -465,7 +477,8 @@
   "room": "Room 4",
   "videoId": "a5cQAl0g2AM",
   "videoTitle": "No Country For Old APIs  Wrapping legacy Java services as MCP tools without rewriting them   by Žel",
-  "matchScore": 1.0
+  "matchScore": 0.995,
+  "twin": null
  },
  {
   "id": 8194,
@@ -501,7 +514,8 @@
   "room": "Room 9",
   "videoId": "Upd5ZqUn1qY",
   "videoTitle": "Write Java Code Like a Seasoned Hacker: 2026 Edition  by Soroosh Khodami",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 31454,
@@ -537,7 +551,8 @@
   "room": "Room 3",
   "videoId": "DseVLPC4Qjs",
   "videoTitle": "Run Frontier Open Models on consumer hardware  by Prince Canuma",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 9752,
@@ -583,7 +598,8 @@
   "room": "Room 5",
   "videoId": "QBQ11aL2aZc",
   "videoTitle": "Learning modern Java the playful way  by Marit van Dijk, Piotr Przybyl",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 8186,
@@ -619,7 +635,8 @@
   "room": "Room 8",
   "videoId": "m9viRAIRAUQ",
   "videoTitle": "The Hexagonal Hangover  by Ties van de Ven",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 14463,
@@ -665,7 +682,8 @@
   "room": "Room 6",
   "videoId": "yePre1hOvHE",
   "videoTitle": "When benchmarks go bad   what we learned from measuring performance wrong  by Francesco Nigro, Holly",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 17791,
@@ -701,7 +719,8 @@
   "room": "Room 5",
   "videoId": "8JuQaWFKk4w",
   "videoTitle": "Consistency Patterns in Event Driven Architecture  by Emanuel Trandafir",
-  "matchScore": 1.1
+  "matchScore": 1.095,
+  "twin": null
  },
  {
   "id": 7035,
@@ -737,7 +756,8 @@
   "room": "Room 9",
   "videoId": "PGpKfdXZrpc",
   "videoTitle": "Their API Went Down  So Why Is My App on Fire?  by Ines Panker",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 14459,
@@ -783,7 +803,8 @@
   "room": "Room 8",
   "videoId": "W-OKVLMtPAw",
   "videoTitle": "Bootiful Security  by Daniel Garnier Moiroux, Josh Long",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 10046,
@@ -819,7 +840,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 29351,
@@ -865,7 +887,8 @@
   "room": "Room 5",
   "videoId": "aow56RgptLA",
   "videoTitle": "Structured Concurrency Looms  by Alan Bateman, Viktor Klang",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 22946,
@@ -901,7 +924,8 @@
   "room": "Room 7",
   "videoId": "CuvV3Aud3Q0",
   "videoTitle": "Decoding the Cosmos: Voyager's 1970s Algorithms Meet Today's Cutting Edge Tech  by Pieter van der Me",
-  "matchScore": 1.0
+  "matchScore": 0.991,
+  "twin": null
  },
  {
   "id": 4079,
@@ -947,7 +971,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 17759,
@@ -983,7 +1008,8 @@
   "room": "Room 8",
   "videoId": "AxhLQZqZdIg",
   "videoTitle": "Kubernetes for Developers  by Alain Regnier",
-  "matchScore": 1.1
+  "matchScore": 1.097,
+  "twin": null
  },
  {
   "id": 24206,
@@ -1039,7 +1065,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 10022,
@@ -1085,7 +1112,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 52102,
@@ -1121,7 +1149,8 @@
   "room": "Room 3",
   "videoId": "4hXQoN8co80",
   "videoTitle": "Hey Belfius! Meet our new bank AI assistant—and discover how we’re building and securing AI across B",
-  "matchScore": 0.97
+  "matchScore": 0.962,
+  "twin": null
  },
  {
   "id": 49252,
@@ -1157,7 +1186,8 @@
   "room": "Room 6",
   "videoId": "vhDwy1eCXbs",
   "videoTitle": "Big Runtimes Make Efficient Programs  by Ron Pressler",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 22933,
@@ -1193,7 +1223,8 @@
   "room": "Room 6",
   "videoId": "U9pOWsERF6o",
   "videoTitle": "30 minutes to build your first Vidocq app, the 100% European Sovereign Java stack with zero external",
-  "matchScore": 0.95
+  "matchScore": 0.949,
+  "twin": null
  },
  {
   "id": 22909,
@@ -1229,7 +1260,8 @@
   "room": "Room 10",
   "videoId": "yB6FIQPgsWE",
   "videoTitle": "What rules the virtual? How our systems obey physical laws   by Marianne Hoornenborg",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 21687,
@@ -1265,7 +1297,8 @@
   "room": "Room 5",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 22923,
@@ -1301,7 +1334,8 @@
   "room": "Room 8",
   "videoId": "Ij5RsREpjBg",
   "videoTitle": "Fun with Flags: How OpenFeature Solves Your Feature Flag Headaches  by Simon Schrottner",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 8169,
@@ -1337,7 +1371,8 @@
   "room": "Room 6",
   "videoId": "bqwtnKLU35E",
   "videoTitle": "How to Architect Green Software by Ioannis Kolaxis",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 5510,
@@ -1383,7 +1418,8 @@
   "room": "Room 10",
   "videoId": "cbSl8UVdMVg",
   "videoTitle": "Quarkus Meets Leyden at the JVM Performance Edge  by Georgios Andrianakis, Ana Maria Mihalceanu",
-  "matchScore": 1.1
+  "matchScore": 1.09,
+  "twin": null
  },
  {
   "id": 25652,
@@ -1419,7 +1455,8 @@
   "room": "Room 6",
   "videoId": "_dcauZC9ST8",
   "videoTitle": "In the loop, not in the dark: staying in control in the era of dark software factories  by Alex Gavr",
-  "matchScore": 1.0
+  "matchScore": 0.998,
+  "twin": 52104
  },
  {
   "id": 19733,
@@ -1455,7 +1492,8 @@
   "room": "Room 8",
   "videoId": "1PtdpItmzTo",
   "videoTitle": "Bootiful Spring Boot 4  by Josh Long",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 7017,
@@ -1491,7 +1529,8 @@
   "room": "Room 8",
   "videoId": "t9e9FtHB-48",
   "videoTitle": "The Importance of HITL to Avoid Chaos and EU Regulations for AI  by Juan Antonio Breña 🇪🇸🇪🇺",
-  "matchScore": 1.1
+  "matchScore": 1.083,
+  "twin": null
  },
  {
   "id": 49256,
@@ -1527,7 +1566,8 @@
   "room": "Room 8",
   "videoId": "wzN6qq08w0U",
   "videoTitle": "ADRs: The Why and How  by Venkat Subramaniam",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 5051,
@@ -1563,7 +1603,8 @@
   "room": "Room 8",
   "videoId": "eyJ5LO-Kyuw",
   "videoTitle": "🧰 Dev Containers: the ultimate toolbox for developers?  by Stéphane Philippart",
-  "matchScore": 1.1
+  "matchScore": 1.089,
+  "twin": null
  },
  {
   "id": 5538,
@@ -1599,7 +1640,8 @@
   "room": "Room 8",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 7018,
@@ -1644,8 +1686,9 @@
   "end": "2026-10-07T12:50:00Z",
   "room": "Room 8",
   "videoId": "nEW0kosJjc8",
-  "videoTitle": "A Year of Agentic AI Evolution: Lessons Learned Building Production grade Agentic Systems  by Mario",
-  "matchScore": 1.0
+  "videoTitle": "A Year of Agentic AI Evolution by Mario Fusco & Kevin Dubois",
+  "matchScore": 1.048,
+  "twin": null
  },
  {
   "id": 24229,
@@ -1691,7 +1734,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 51951,
@@ -1727,7 +1771,8 @@
   "room": "Room 8",
   "videoId": "vAfQ4f8wIVI",
   "videoTitle": "Agentic Engineering Reconversion  by Victor Rentea",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 9035,
@@ -1763,7 +1808,8 @@
   "room": "Room 6",
   "videoId": "c4F7Iy3XqaY",
   "videoTitle": "Toxic Flows in MCP Servers and Skills: What Your Agent Blindly Trusts by Brian Vermeer",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 22912,
@@ -1809,7 +1855,8 @@
   "room": "Room 8",
   "videoId": "A7ZIf8LkSvE",
   "videoTitle": "Loop Engineering, beyond prompt, context, and harness engineering  by  Guillaume Laforge, Wietse Ven",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 7008,
@@ -1845,7 +1892,8 @@
   "room": "Room 5",
   "videoId": "BLBwQpczk7M",
   "videoTitle": "How to survive and thrive as a dev team in the exponential age of AI  Real world AI adoption, smarte",
-  "matchScore": 0.95
+  "matchScore": 0.948,
+  "twin": null
  },
  {
   "id": 14457,
@@ -1881,7 +1929,8 @@
   "room": "Room 5",
   "videoId": "yhk1qvy6A_4",
   "videoTitle": "Coder, Coach, Catalyst   using questions to make people grow  by Martin Mazur",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 9029,
@@ -1917,7 +1966,8 @@
   "room": "Room 4",
   "videoId": "vcL6eCAwLwY",
   "videoTitle": "From a startup stack to 5 microseconds: inside a crypto trading engine  by Oleg Lobanov",
-  "matchScore": 1.1
+  "matchScore": 1.095,
+  "twin": null
  },
  {
   "id": 17783,
@@ -1963,7 +2013,8 @@
   "room": "Room 4",
   "videoId": "dWF5HMkKiLg",
   "videoTitle": "Building the Trusted Agent Ecosystem by Ivan Petrov, Patrick McGrath",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 23531,
@@ -1999,7 +2050,8 @@
   "room": "Room 9",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 24244,
@@ -2035,7 +2087,8 @@
   "room": "Room 6",
   "videoId": "Mdu5_gndYn0",
   "videoTitle": "Green Maven builds: sustainable CI in practice by Jan Boonen",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 17782,
@@ -2071,7 +2124,8 @@
   "room": "Room 8",
   "videoId": "jFxR6YYWdmI",
   "videoTitle": "Is the IDE dead ?  by Martin Lippert",
-  "matchScore": 1.1
+  "matchScore": 1.094,
+  "twin": null
  },
  {
   "id": 22905,
@@ -2107,7 +2161,8 @@
   "room": "Room 9",
   "videoId": "ePBmAdRYl10",
   "videoTitle": "When ORM Becomes OMG: Performance Pitfalls in JPA and Friends  by Jos Roseboom",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 7006,
@@ -2143,7 +2198,8 @@
   "room": "Room 9",
   "videoId": "d6D8nef-32c",
   "videoTitle": "Prompt It Right: Spring Boot Testing in the AI Era by Philip Riecks",
-  "matchScore": 1.1
+  "matchScore": 1.093,
+  "twin": null
  },
  {
   "id": 5549,
@@ -2179,7 +2235,8 @@
   "room": "Room 10",
   "videoId": "wJ7R4qkVs8Y",
   "videoTitle": "Underneath the Black Marker: AI Techniques for Detecting and Reversing Redactions  by David vonThene",
-  "matchScore": 1.0
+  "matchScore": 1.0,
+  "twin": null
  },
  {
   "id": 21152,
@@ -2215,7 +2272,8 @@
   "room": "Room 5",
   "videoId": "5VjB4t8aFWE",
   "videoTitle": "Beyond system out println: Applying a Debugging Mindset at Scale  by  Cees Bos",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 22914,
@@ -2261,7 +2319,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 50108,
@@ -2297,7 +2356,8 @@
   "room": "Room 4",
   "videoId": "JzFelLDiVJQ",
   "videoTitle": "Introduction to Spring AI by Timo Salm",
-  "matchScore": 1.1
+  "matchScore": 1.097,
+  "twin": null
  },
  {
   "id": 16414,
@@ -2333,7 +2393,8 @@
   "room": "Room 5",
   "videoId": "zEUSFvDOiCo",
   "videoTitle": "From vibe coding to harness engineering: modernizing a regulated environment with AI by Anyul Rivas",
-  "matchScore": 1.1
+  "matchScore": 1.091,
+  "twin": null
  },
  {
   "id": 23539,
@@ -2379,7 +2440,8 @@
   "room": "Room 6",
   "videoId": "5y_82lCevHg",
   "videoTitle": "Everyday JSON by Viktor Klang, Alan Bateman",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 9036,
@@ -2425,7 +2487,8 @@
   "room": "Room 4",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 19708,
@@ -2461,7 +2524,8 @@
   "room": "Room 7",
   "videoId": "w2RTFWet_6c",
   "videoTitle": "Choose your own adventure in agentic design patterns  by Guillaume Laforge",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 8164,
@@ -2507,7 +2571,8 @@
   "room": "Room 6",
   "videoId": "Tc2RFLa0ip8",
   "videoTitle": "The pizza party of the future 🍕 by Katie Clark and Simon Rohrer",
-  "matchScore": 1.05
+  "matchScore": 1.049,
+  "twin": null
  },
  {
   "id": 10023,
@@ -2553,7 +2618,8 @@
   "room": "Room 8",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 5503,
@@ -2599,7 +2665,8 @@
   "room": "Room 9",
   "videoId": "E--oDq3X74E",
   "videoTitle": "AI without spaghetti: Clean architecture in these of AI  by Maarten Vandeperre en Lutske van der Mee",
-  "matchScore": 1.064
+  "matchScore": 1.06,
+  "twin": null
  },
  {
   "id": 8196,
@@ -2635,7 +2702,8 @@
   "room": "Room 8",
   "videoId": "asAxisu6EQ0",
   "videoTitle": "Testing Architecture Made Simple by Gunter Rotsaert",
-  "matchScore": 1.1
+  "matchScore": 1.089,
+  "twin": null
  },
  {
   "id": 16408,
@@ -2671,7 +2739,8 @@
   "room": "Room 9",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 14452,
@@ -2707,7 +2776,8 @@
   "room": "Room 4",
   "videoId": "S7x4DxwRnk4",
   "videoTitle": "Quixotic: Pure Java Inference at Native Speed  by Alfonso² Peterssen",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 4098,
@@ -2743,7 +2813,8 @@
   "room": "Room 8",
   "videoId": "z8lal-Yt_04",
   "videoTitle": "From Developer to Builder: A Spec Driven Development Deep Dive by Simon Martinelli",
-  "matchScore": 1.1
+  "matchScore": 1.093,
+  "twin": null
  },
  {
   "id": 21657,
@@ -2779,7 +2850,8 @@
   "room": "Room 4",
   "videoId": "0-1IGpVrFLQ",
   "videoTitle": "Reflect, Transform, Accelerate: Bringing GPU Computing to Java By Juan Fumero",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 11558,
@@ -2815,7 +2887,8 @@
   "room": "Room 9",
   "videoId": "NkstzPeo400",
   "videoTitle": "BootUI, the missing developer console for Spring Boot and Quarkus  by Julien Dubois",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 44601,
@@ -2851,7 +2924,8 @@
   "room": "Room 5",
   "videoId": "oey2TbFvfWE",
   "videoTitle": "Agents Shouldn't Control Control Flow by Jeremy Adams",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 23529,
@@ -2887,7 +2961,8 @@
   "room": "Room 8",
   "videoId": "pMv_39iSXVA",
   "videoTitle": "From Autocomplete to Autopilot: How AI Is Changing the Developer Experience by Tugdual Grall",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 22947,
@@ -2923,7 +2998,8 @@
   "room": "Room 7",
   "videoId": "8NURE3I4AJQ",
   "videoTitle": "High Performance Java Native AI with CUDA and the Vector API  by Zoran Sevarac",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 23524,
@@ -2969,7 +3045,8 @@
   "room": "Room 5",
   "videoId": "zC2tbq7S5UE",
   "videoTitle": "Modern Java in Practice   The Features That Matter by   Nicolai Parlog, Falk Sippach",
-  "matchScore": 1.1
+  "matchScore": 1.095,
+  "twin": null
  },
  {
   "id": 52103,
@@ -3005,7 +3082,8 @@
   "room": "Room 10",
   "videoId": "NT0wyPM58G8",
   "videoTitle": "The Devoxx Robot Games  by Stephan Janssen",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 49257,
@@ -3041,7 +3119,8 @@
   "room": "Room 4",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 21694,
@@ -3077,7 +3156,8 @@
   "room": "Room 6",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 21666,
@@ -3123,7 +3203,8 @@
   "room": "Room 4",
   "videoId": "4ck-T2gaMQ4",
   "videoTitle": "Teaching an Old Handle New Tricks: From Core Reflection to FFM  by Maurizio Cimadamore, Viktor Klang",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 23536,
@@ -3209,7 +3290,8 @@
   "room": "Room 7",
   "videoId": "ewCPBgOrLAE",
   "videoTitle": "Ask the Architects  by Gavin Bierman, Maurizio Cimadamore, Per Ake Minborg, Viktor Klang, Alan Batem",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 50103,
@@ -3265,7 +3347,8 @@
   "room": "Room 10",
   "videoId": "gPtWq_LHL8o",
   "videoTitle": "Let's dance! – Teaching your robot some moves with reinforcement learning  by Thomas Endres, Martin",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 31452,
@@ -3301,7 +3384,8 @@
   "room": "Room 8",
   "videoId": "C10mZ3pCnGo",
   "videoTitle": "Responsibly Dimming the Lights in the Software Factory  by Victor Rentea",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 49255,
@@ -3347,7 +3431,8 @@
   "room": "Room 3",
   "videoId": "FvVe9J0Abjg",
   "videoTitle": "Modernizing legacy code with AI: hands on examples & lessons learned  by Koen Vanderkimpen, Wim Lamb",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 24245,
@@ -3383,7 +3468,8 @@
   "room": "Room 9",
   "videoId": "knE4uy7IYXY",
   "videoTitle": "Making sense of vector databases  by Balkrishna Rawool",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 23543,
@@ -3419,7 +3505,8 @@
   "room": "Room 5",
   "videoId": "rNOzf12RORI",
   "videoTitle": "The Yearly Java Performance Update for 2026 by Per Ake Minborg",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 21675,
@@ -3455,7 +3542,8 @@
   "room": "Room 8",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 23533,
@@ -3491,7 +3579,8 @@
   "room": "Room 5",
   "videoId": "rk22mStXsGU",
   "videoTitle": "Teaching a New Dog Old Tricks: Give the Agent a Debugger  by  Anton Arhipov",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 49254,
@@ -3527,7 +3616,8 @@
   "room": "Room 3",
   "videoId": "1yndLHw9mbo",
   "videoTitle": "Mission Possible: The 45 Minute Path to Bullet Proof Java Container Images  by Pasha Finkelshtein",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 24227,
@@ -3563,7 +3653,8 @@
   "room": "Room 4",
   "videoId": "EnHPYkSAaCo",
   "videoTitle": "Expanding Vector Search Beyond Similarity by Alina Yurenko",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 49751,
@@ -3599,7 +3690,8 @@
   "room": "Room 5",
   "videoId": "wUyQmRriCng",
   "videoTitle": "F*ck The System, and other bad ideas for the future by Jo Caudron",
-  "matchScore": 1.1
+  "matchScore": 1.084,
+  "twin": null
  },
  {
   "id": 21691,
@@ -3635,7 +3727,8 @@
   "room": "Room 9",
   "videoId": "fShgG3jtkXQ",
   "videoTitle": "MCP 2 0   Stateless, New Auth CIMD, and Exciting Extensions  by James Ward",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 5530,
@@ -3671,7 +3764,8 @@
   "room": "Room 5",
   "videoId": "AsVt_dzTmN4",
   "videoTitle": "Kill All Mutants! Intro to Mutation Testing by Dave Aronson",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 4097,
@@ -3707,7 +3801,8 @@
   "room": "Room 10",
   "videoId": "mOmuF5fDiUM",
   "videoTitle": "Pragmatic multi cloud architecture: designing for resilience and portability beyond the hype   by Al",
-  "matchScore": 1.0
+  "matchScore": 0.985,
+  "twin": null
  },
  {
   "id": 25027,
@@ -3753,7 +3848,8 @@
   "room": "Room 6",
   "videoId": "GGEmc6eR8c4",
   "videoTitle": "Codepocalypse Now: LangChain4j vs JetBrains Koog  by Viktor Gamov, Baruch Sadogursky",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 10038,
@@ -3789,7 +3885,8 @@
   "room": "Room 4",
   "videoId": "4qeUklTLyTs",
   "videoTitle": "Eval Driven Development: Why you need it to make your Agentic Application survive Production  by  Ur",
-  "matchScore": 1.0
+  "matchScore": 1.0,
+  "twin": null
  },
  {
   "id": 41301,
@@ -3835,7 +3932,8 @@
   "room": "Room 3",
   "videoId": "QbA-rs7XLEk",
   "videoTitle": "Owning the inference layer: When and how to run your own models  by Maarten Vandeperre, Camille Nigo",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 7036,
@@ -3891,7 +3989,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 48301,
@@ -3927,7 +4026,8 @@
   "room": "Room 8",
   "videoId": "mnoUXIT4nMY",
   "videoTitle": "A Fleet of AI Agents, Each in Its Own Sandbox: Inside Docker's Agentic Platform  by Jean Laurent de",
-  "matchScore": 1.0
+  "matchScore": 0.998,
+  "twin": null
  },
  {
   "id": 5502,
@@ -3963,7 +4063,8 @@
   "room": "Room 4",
   "videoId": "vNeyNkeU4ms",
   "videoTitle": "Taming the Chaos: Security and Predictability in LLM Powered Applications  by Rustam Mehmandarov",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 15354,
@@ -4009,7 +4110,8 @@
   "room": "Room 9",
   "videoId": "vLDbzmiT7Xs",
   "videoTitle": "Will Valhalla Fix Tony's Billion Dollar Mistake? by José Paumard, Remi Forax",
-  "matchScore": 1.1
+  "matchScore": 1.095,
+  "twin": null
  },
  {
   "id": 50102,
@@ -4045,7 +4147,8 @@
   "room": "Room 8",
   "videoId": "ZDocIlx7Zvg",
   "videoTitle": "From Brainless to Brilliant — Giving an Open Source Robot a Mind of Its Own  by Jan Van Wassenhove",
-  "matchScore": 1.1
+  "matchScore": 1.091,
+  "twin": null
  },
  {
   "id": 5519,
@@ -4081,7 +4184,8 @@
   "room": "Room 5",
   "videoId": "Lf_m5dIjjqw",
   "videoTitle": "The Magic of OpenTelemetry: Rewriting Your App in Production   by Bruce Bujon",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 49251,
@@ -4117,7 +4221,8 @@
   "room": "Room 8",
   "videoId": "tle2mA7EwWU",
   "videoTitle": "The Year of the Runtime  by Ron Pressler",
-  "matchScore": 1.1
+  "matchScore": 1.087,
+  "twin": null
  },
  {
   "id": 7032,
@@ -4153,7 +4258,8 @@
   "room": "Room 4",
   "videoId": "zDqS1U5Gnk8",
   "videoTitle": "Don’t burn your fingers in the heat of the AI revolution  And get an OpenClaw   by Maarten Vandeperr",
-  "matchScore": 0.993
+  "matchScore": 0.979,
+  "twin": null
  },
  {
   "id": 9032,
@@ -4189,7 +4295,8 @@
   "room": "Room 8",
   "videoId": "d1SJXp9QeWE",
   "videoTitle": "Agents With Seatbelts: Practical Ways to Keep AI Code Gen Under Control  by Jonathan Vila López",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 10043,
@@ -4225,7 +4332,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 31453,
@@ -4261,7 +4369,8 @@
   "room": "Room 8",
   "videoId": "BOcNjR2lBus",
   "videoTitle": "Architecture Observability and Guardrails  by Victor Rentea",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 17794,
@@ -4307,7 +4416,8 @@
   "room": "Room 5",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 51601,
@@ -4343,7 +4453,8 @@
   "room": "Room 3",
   "videoId": "LPhGSgO5eKE",
   "videoTitle": "Production Ready Java Containers: Smaller, Faster, Smarter  by Albert Attard",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 17556,
@@ -4379,7 +4490,8 @@
   "room": "Room 10",
   "videoId": "adFS-_sCTQ4",
   "videoTitle": "SIMD for Java: how Elasticsearch already benefits from the Panama Vector API  by Piotr Przybyl",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 9024,
@@ -4415,7 +4527,8 @@
   "room": "Room 6",
   "videoId": "MmSvjJhZl3A",
   "videoTitle": "Beyond assertEquals: Probabilistic Security and Bias Testing for Java LLM Applications  by Iryna Doh",
-  "matchScore": 1.0
+  "matchScore": 0.989,
+  "twin": null
  },
  {
   "id": 25661,
@@ -4451,7 +4564,8 @@
   "room": "Room 10",
   "videoId": "KwQ76IvU59M",
   "videoTitle": "Introducing Agent Control Theory: The System Runs the Model  by Mark Pollack",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 22942,
@@ -4487,7 +4601,8 @@
   "room": "Room 6",
   "videoId": "A8TBUalnfdc",
   "videoTitle": "Why Documentation Won’t Write Itself—and AI Won’t Save You  by Christian Heitzmann",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 19707,
@@ -4523,7 +4638,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 52104,
@@ -4557,9 +4673,10 @@
   "start": "2026-10-09T07:30:00Z",
   "end": "2026-10-09T08:20:00Z",
   "room": "Room 4",
-  "videoId": "_dcauZC9ST8",
-  "videoTitle": "In the loop, not in the dark: staying in control in the era of dark software factories  by Alex Gavr",
-  "matchScore": 1.0
+  "videoId": null,
+  "videoTitle": null,
+  "matchScore": 0.0,
+  "twin": 25652
  },
  {
   "id": 10031,
@@ -4595,7 +4712,8 @@
   "room": "Room 8",
   "videoId": "2Yh7LKt8YNw",
   "videoTitle": "The Dark Secrets of Computer Science  by Fabien Marsaud",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 15360,
@@ -4641,7 +4759,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 8166,
@@ -4687,7 +4806,8 @@
   "room": "Room 3",
   "videoId": "_CtnBnmYQC0",
   "videoTitle": "Integration patterns for distributed systems  by Dirk Fröhner, Sabarish Sekar",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 16439,
@@ -4723,7 +4843,8 @@
   "room": "Room 5",
   "videoId": "5AaJ3H9fG6M",
   "videoTitle": "AI Security Deep Dive, Securing Agents and AI Applications  by  Brian Vermeer",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 7022,
@@ -4769,7 +4890,8 @@
   "room": "Room 4",
   "videoId": "9MPYPejgTGo",
   "videoTitle": "Emergent DevEx: The Good, the Bad, and the Legacy  by Makan Sepehrifar, Soroosh Khodami",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 8190,
@@ -4815,7 +4937,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 8153,
@@ -4851,7 +4974,8 @@
   "room": "Room 8",
   "videoId": "v86SfHA5ISw",
   "videoTitle": "Taming Microservice Overload: Our Journey to Modular Monoliths  by Mario Klaver",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 23519,
@@ -4887,7 +5011,8 @@
   "room": "Room 9",
   "videoId": "QvyIzP4-OvM",
   "videoTitle": "AI Doesn’t Click Buttons :APIs for the Agentic Age  by Kim Lauwers",
-  "matchScore": 1.014
+  "matchScore": 1.012,
+  "twin": null
  },
  {
   "id": 17751,
@@ -4923,7 +5048,8 @@
   "room": "Room 4",
   "videoId": "Ycdt7IT7Kdw",
   "videoTitle": "Cheaper or Better? The Strategic Choice Behind AI Adoption  by Miriam Sasse",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 52101,
@@ -4959,7 +5085,8 @@
   "room": "Room 6",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 7020,
@@ -4995,7 +5122,8 @@
   "room": "Room 9",
   "videoId": "VmPMUGImB-M",
   "videoTitle": "Who to blame? The AI, The Programmer, or The Prompt?  by Makan Sepehrifar",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 8171,
@@ -5031,7 +5159,8 @@
   "room": "Room 9",
   "videoId": "HzbNrEDZkYU",
   "videoTitle": "0 to 350 Engineers on Claude Code: What Could Go Wrong?  by Nicolas Martignole",
-  "matchScore": 1.1
+  "matchScore": 1.095,
+  "twin": null
  },
  {
   "id": 25671,
@@ -5067,7 +5196,8 @@
   "room": "Room 3",
   "videoId": "nHRSwiFNQ9E",
   "videoTitle": "State of Agentic Coding  by Daniela Petruzalek",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 22916,
@@ -5103,7 +5233,8 @@
   "room": "Room 9",
   "videoId": "kuUeHD_k5fs",
   "videoTitle": "Java and the Next Generation of Programming Models  by Ana Maria Mihalceanu",
-  "matchScore": 1.1
+  "matchScore": 1.09,
+  "twin": null
  },
  {
   "id": 24233,
@@ -5139,7 +5270,8 @@
   "room": "Room 3",
   "videoId": "y4F1XBtQeDw",
   "videoTitle": "Build the Builder: A Java Coding Agent in Your IDE with ACP  by Vadim Briliantov",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 4087,
@@ -5175,7 +5307,8 @@
   "room": "Room 5",
   "videoId": "6N6qFqn1_Uo",
   "videoTitle": "Harness Engineering: Building the System Around Your AI Coding Agent   by JI Darwish",
-  "matchScore": 1.1
+  "matchScore": 1.09,
+  "twin": null
  },
  {
   "id": 15359,
@@ -5211,7 +5344,8 @@
   "room": "Room 5",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 5537,
@@ -5267,7 +5401,8 @@
   "room": "Room 9",
   "videoId": "SgK0zMNayq0",
   "videoTitle": "The Quarkus advantage: Turning build time metaprogramming into runtime performances by Mario Fusco,",
-  "matchScore": 1.1
+  "matchScore": 1.091,
+  "twin": null
  },
  {
   "id": 16418,
@@ -5303,7 +5438,8 @@
   "room": "Room 5",
   "videoId": "c45C2wNSZFc",
   "videoTitle": "Solving Distributed Transactions with the Saga Pattern and Temporal  by Andrei Sulyz",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 22911,
@@ -5339,7 +5475,8 @@
   "room": "Room 5",
   "videoId": "wWfj4AJahlQ",
   "videoTitle": "One tool to rule them all: bash, a tiny LLM, and the birth of a coding agent  by  Philippe Charrièr",
-  "matchScore": 1.0
+  "matchScore": 1.0,
+  "twin": null
  },
  {
   "id": 17765,
@@ -5395,7 +5532,8 @@
   "room": "Room 4",
   "videoId": "dq5rueVhiIM",
   "videoTitle": "Can AI Build a Jakarta EE Runtime? The Vidocq Experiment by Antoine Sabot Durand, yann Blazart, Seba",
-  "matchScore": 1.1
+  "matchScore": 1.09,
+  "twin": null
  },
  {
   "id": 50107,
@@ -5431,7 +5569,8 @@
   "room": "Room 7",
   "videoId": "q58Y2tyRdCE",
   "videoTitle": "Building an Agent Ready Platform  by Timo Salm",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 5526,
@@ -5467,7 +5606,8 @@
   "room": "Room 4",
   "videoId": "496nv8jsWhQ",
   "videoTitle": "From Developer to Story Builder: Engineering a Novel, an ARG, and a Transmedia World with AI  by Rap",
-  "matchScore": 1.0
+  "matchScore": 1.0,
+  "twin": null
  },
  {
   "id": 10045,
@@ -5503,7 +5643,8 @@
   "room": "Room 6",
   "videoId": "_VZg6dxlGaM",
   "videoTitle": "Java, LEGO & AI: Teaching the Next Generation to Build, Not Just Prompt  by Eddy Vos",
-  "matchScore": 1.1
+  "matchScore": 1.079,
+  "twin": null
  },
  {
   "id": 24224,
@@ -5539,7 +5680,8 @@
   "room": "Room 7",
   "videoId": "yUMnuh5U5k4",
   "videoTitle": "Post Quantum Today: How Your Passwords Will Be Safe in a Quantum Future  by Julian Burr",
-  "matchScore": 1.1
+  "matchScore": 1.086,
+  "twin": null
  },
  {
   "id": 22920,
@@ -5585,7 +5727,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 20651,
@@ -5651,7 +5794,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 4086,
@@ -5697,7 +5841,8 @@
   "room": "Room 9",
   "videoId": "2pSyF44THEc",
   "videoTitle": "AI Made Building Cheap  Now Decisions Are the Bottleneck   by Dave Sammut, João Rosa",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 9046,
@@ -5733,7 +5878,8 @@
   "room": "Room 5",
   "videoId": "Tfrt19d3TEA",
   "videoTitle": "rm  rf self doubt: Debugging Impostor Syndrome for Developers  by Vincent Mayers",
-  "matchScore": 1.1
+  "matchScore": 1.089,
+  "twin": null
  },
  {
   "id": 10021,
@@ -5769,7 +5915,8 @@
   "room": "Room 5",
   "videoId": "pgVJWp-SjxI",
   "videoTitle": "Java Script No, Not That One: Modern Automation with Java  by Loïc Magnette",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 19748,
@@ -5805,7 +5952,8 @@
   "room": "Room 7",
   "videoId": "LD2tKMpToYg",
   "videoTitle": "Snake in 10 Lines: Learning More by Coding Less  by Guus de Wit",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 10020,
@@ -5841,7 +5989,8 @@
   "room": "Room 6",
   "videoId": "IXcQYp51PLM",
   "videoTitle": "From AI to Agent: A Field Guide to Agentic Patterns in LangChain4j  by  Loïc Magnette",
-  "matchScore": 1.1
+  "matchScore": 1.09,
+  "twin": null
  },
  {
   "id": 12751,
@@ -5877,7 +6026,8 @@
   "room": "Room 9",
   "videoId": "eFSEg54mwVU",
   "videoTitle": "Microservices Without the Distributed Mess  by Steven Hillaert",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 24212,
@@ -5913,7 +6063,8 @@
   "room": "Room 4",
   "videoId": "OLQ98Ko4p3Q",
   "videoTitle": "GraalVM Next: Layers, Crema, and WebAssembly in Action  by Alina Yurenko",
-  "matchScore": 1.1
+  "matchScore": 1.097,
+  "twin": null
  },
  {
   "id": 50101,
@@ -5949,7 +6100,8 @@
   "room": "Room 9",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 4051,
@@ -5985,7 +6137,8 @@
   "room": "Room 7",
   "videoId": "QQcsZNf0eWs",
   "videoTitle": "CRAcking Compliance   The EU Cyber Resilience Act  by Christian Schabetsberger",
-  "matchScore": 1.1
+  "matchScore": 1.095,
+  "twin": null
  },
  {
   "id": 50106,
@@ -6021,7 +6174,8 @@
   "room": "Room 5",
   "videoId": "-2vEfnB2mRw",
   "videoTitle": "From User Prompt to JPA Query: Comparing Tool Calling, Structured Output & Hybrid Approach  by Sebas",
-  "matchScore": 1.0
+  "matchScore": 0.999,
+  "twin": null
  },
  {
   "id": 17786,
@@ -6046,7 +6200,7 @@
     "company": "Spring Team @ Broadcom",
     "country": "Netherlands",
     "image": "https://devoxxian-image-thumbnails.s3-eu-west-1.amazonaws.com/profile-970401c2-a699-4f02-8855-f855f219221a.jpg",
-    "bio": "Christian Tzolov is an R&amp;D Software Engineer on Broadcom&#39;s Spring team, where he leads Spring AI and maintains the MCP Java SDK project. He serves as an Ambassador for the Agentic AI Foundation (AAIF) and focuses on integrating AI with enterprise Java and advancing how developers build intelligent applications.",
+    "bio": "Spring AI lead, Model Context Protocol (MCP) Java SDK maintainer, Agentic AI Foundation (AAIF) Ambassador, R&amp;D Engineer in Broadcom&#39;s Spring team and Apache Software Foundation (ASF) committer",
     "linkedin": "tzolov",
     "bluesky": "tzolov.bsky.social",
     "twitter": "christzolov"
@@ -6057,7 +6211,8 @@
   "room": "Room 5",
   "videoId": "Q91obeWeWNQ",
   "videoTitle": "Agent Loops, Decoded: Fundamentals to Agentic Patterns in Spring AI  by  Christian Tzolov",
-  "matchScore": 1.1
+  "matchScore": 1.095,
+  "twin": null
  },
  {
   "id": 25654,
@@ -6093,7 +6248,8 @@
   "room": "Room 4",
   "videoId": "sexe_tnhAOI",
   "videoTitle": "Beyond Code: The Intent Driven IDE for the Agentic Age by Bruno Borges",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 25048,
@@ -6129,7 +6285,8 @@
   "room": "Room 4",
   "videoId": "fszyRIZXjQM",
   "videoTitle": "Java on Kubernetes Without Container Images: The WebAssembly Way By Bruno Borges",
-  "matchScore": 1.1
+  "matchScore": 1.097,
+  "twin": null
  },
  {
   "id": 49253,
@@ -6165,7 +6322,8 @@
   "room": "Room 6",
   "videoId": "Pg5kS8l9CpI",
   "videoTitle": "Engineering for the Long Haul: Operating Open Source at Scale  by Sven Sellen",
-  "matchScore": 1.1
+  "matchScore": 1.091,
+  "twin": null
  },
  {
   "id": 21655,
@@ -6201,7 +6359,8 @@
   "room": "Room 6",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 5516,
@@ -6257,7 +6416,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 24247,
@@ -6293,7 +6453,8 @@
   "room": "Room 6",
   "videoId": "SC5nO6iadsU",
   "videoTitle": "Building AI Agents from First Principles  by Adib Saikali",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 22932,
@@ -6339,7 +6500,8 @@
   "room": "Room 9",
   "videoId": "hHu3rLsbYog",
   "videoTitle": "Why Java Is Perfect for AI   Just Not the AI You’re Thinking Of  by Trisha Gee, Andrey Santrosyan",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 10034,
@@ -6375,7 +6537,8 @@
   "room": "Room 6",
   "videoId": "YEy7AgRO7As",
   "videoTitle": "The day we stopped publishing Kafka event from our API     by Virginie Zinck",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 19713,
@@ -6411,7 +6574,8 @@
   "room": "Room 9",
   "videoId": "EJv0TMNSUjw",
   "videoTitle": "Create your own AI Agents without code  by David Gageot",
-  "matchScore": 1.1
+  "matchScore": 1.095,
+  "twin": null
  },
  {
   "id": 17558,
@@ -6447,7 +6611,8 @@
   "room": "Room 4",
   "videoId": "B5-4mDLrWjM",
   "videoTitle": "From Laptop to Lakehouse: Analytical SQL with DuckDB  by Oliver Geisser",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 19732,
@@ -6503,7 +6668,8 @@
   "room": "Room 4",
   "videoId": "6SPnBmQrYEk",
   "videoTitle": "Tap into the NVIDIA Ecosystem from Java with TornadoVM's Hybrid API  by Thanos Stratikopoulos, Micha",
-  "matchScore": 1.1
+  "matchScore": 1.095,
+  "twin": null
  },
  {
   "id": 31451,
@@ -6539,7 +6705,8 @@
   "room": "Room 8",
   "videoId": "aup9tNzQu7c",
   "videoTitle": "Welcome to Devoxx Belgium 2026 by Stephan Janssen",
-  "matchScore": 1.05
+  "matchScore": 1.034,
+  "twin": null
  },
  {
   "id": 13753,
@@ -6585,7 +6752,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 7040,
@@ -6621,7 +6789,8 @@
   "room": "Room 10",
   "videoId": "ymLlOAB8h_c",
   "videoTitle": "Wrap, Reshape, or Redesign: Retrofitting Your APIs for a World of Agents  by Horacio Gonzalez Zaal 1",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 19730,
@@ -6677,7 +6846,8 @@
   "room": "Room 10",
   "videoId": "HO5CpETzywk",
   "videoTitle": "Building LLM Inference Engines in Java with TornadoVM and the NVIDIA Ecosystem  by Thanos Stratikopo",
-  "matchScore": 1.0
+  "matchScore": 0.995,
+  "twin": null
  },
  {
   "id": 4077,
@@ -6713,7 +6883,8 @@
   "room": "Room 4",
   "videoId": "y9JjxyKc6gU",
   "videoTitle": "Do We Need a Build Language? Java Builds Java  by Rafael Winterhalter",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 25657,
@@ -6749,7 +6920,8 @@
   "room": "Room 7",
   "videoId": "N3VyoNNLDqQ",
   "videoTitle": "Safety, speed, and governance in the agentic era  by Oleg Šelajev",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 11562,
@@ -6785,7 +6957,8 @@
   "room": "Room 3",
   "videoId": "vN9jWqSvJNE",
   "videoTitle": "Surviving the \"AI Slopageddon\": How AI shakes the foundations of Open Source  by Raphael Semeteys",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 10037,
@@ -6821,7 +6994,8 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 27453,
@@ -6857,7 +7031,8 @@
   "room": "Room 6",
   "videoId": "rv2KpWgb0Mw",
   "videoTitle": "Build a private cluster for the office by John Davies",
-  "matchScore": 1.1
+  "matchScore": 1.097,
+  "twin": null
  },
  {
   "id": 17763,
@@ -6893,7 +7068,8 @@
   "room": "Room 4",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 9023,
@@ -6939,7 +7115,8 @@
   "room": "Room 3",
   "videoId": "eSSPOCeoF0c",
   "videoTitle": "How AI transforms engineering and inspiring young minds – Ayoub Hammou Ahabchane & Kamel Zaraoui",
-  "matchScore": 0.946
+  "matchScore": 0.945,
+  "twin": null
  },
  {
   "id": 24234,
@@ -6975,7 +7152,8 @@
   "room": "Room 8",
   "videoId": "A_fp7RaG5UY",
   "videoTitle": "AsyncAPI in action: OpenAPI for event driven applications  by Michel Schudel",
-  "matchScore": 1.1
+  "matchScore": 1.1,
+  "twin": null
  },
  {
   "id": 23520,
@@ -7021,7 +7199,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 19706,
@@ -7057,7 +7236,8 @@
   "room": "Room 5",
   "videoId": "Z64CjgCO5gk",
   "videoTitle": "Software engineering in the age of AI agents: who’s in control? by Bert Jan Schrijver",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 50105,
@@ -7103,7 +7283,8 @@
   "room": "Room 3",
   "videoId": "OCCOIgkCnjE",
   "videoTitle": "Building, Shipping and Governing AI Agents on Kubernetes  by Tom O'Rourke, Ep Heijting",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 16443,
@@ -7139,7 +7320,8 @@
   "room": "Room 7",
   "videoId": "xEAYnXyt3L4",
   "videoTitle": "Say Goodbye to LLM API keys with Workload Identity Federation  by Siarhei Biarozkin",
-  "matchScore": 1.1
+  "matchScore": 1.094,
+  "twin": null
  },
  {
   "id": 23522,
@@ -7175,7 +7357,8 @@
   "room": "Room 10",
   "videoId": "6mzvcPr30kg",
   "videoTitle": "Hardwood: Building a Parquet Parser From Scratch With a Little Help From AI  by Gunnar Morling",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 24218,
@@ -7211,7 +7394,8 @@
   "room": "Room 6",
   "videoId": "wbzpP0T9w6I",
   "videoTitle": "Conquest, time travel and explosions using Git by Alexander Chatzizacharias",
-  "matchScore": 1.1
+  "matchScore": 1.097,
+  "twin": null
  },
  {
   "id": 21690,
@@ -7236,7 +7420,7 @@
     "company": "Spring Team @ Broadcom",
     "country": "Netherlands",
     "image": "https://devoxxian-image-thumbnails.s3-eu-west-1.amazonaws.com/profile-970401c2-a699-4f02-8855-f855f219221a.jpg",
-    "bio": "Christian Tzolov is an R&amp;D Software Engineer on Broadcom&#39;s Spring team, where he leads Spring AI and maintains the MCP Java SDK project. He serves as an Ambassador for the Agentic AI Foundation (AAIF) and focuses on integrating AI with enterprise Java and advancing how developers build intelligent applications.",
+    "bio": "Spring AI lead, Model Context Protocol (MCP) Java SDK maintainer, Agentic AI Foundation (AAIF) Ambassador, R&amp;D Engineer in Broadcom&#39;s Spring team and Apache Software Foundation (ASF) committer",
     "linkedin": "tzolov",
     "bluesky": "tzolov.bsky.social",
     "twitter": "christzolov"
@@ -7257,7 +7441,8 @@
   "room": "Room 6",
   "videoId": "mebPFAKSpzw",
   "videoTitle": "Exquisite Evals for Skills & MCPs  by Christian Tzolov, James Ward",
-  "matchScore": 1.1
+  "matchScore": 1.096,
+  "twin": null
  },
  {
   "id": 10802,
@@ -7293,7 +7478,8 @@
   "room": "Room 3",
   "videoId": "i_VXe0mNicY",
   "videoTitle": "A Deserter Returns: What the Java community helped me rediscover  by Thierry Chantier",
-  "matchScore": 1.1
+  "matchScore": 1.092,
+  "twin": null
  },
  {
   "id": 4100,
@@ -7329,7 +7515,8 @@
   "room": "Room 8",
   "videoId": "nhVRKv8VHKU",
   "videoTitle": "Life in the Ivory Tower   Confessions of a Former Developer Who Turned Into an Architect by Robin cu",
-  "matchScore": 1.0
+  "matchScore": 0.994,
+  "twin": null
  },
  {
   "id": 16435,
@@ -7365,7 +7552,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 10016,
@@ -7401,7 +7589,8 @@
   "room": "Room 8",
   "videoId": "Qdn-I3q50Ww",
   "videoTitle": "Measuring the Unmeasurable: Evaluating Generative AI in Practice  by Erin Pacquetet",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 17800,
@@ -7457,7 +7646,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 8167,
@@ -7493,7 +7683,8 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 9025,
@@ -7529,7 +7720,8 @@
   "room": "Room 9",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.0
+  "matchScore": 0.0,
+  "twin": null
  },
  {
   "id": 12758,
@@ -7565,7 +7757,8 @@
   "room": "Room 4",
   "videoId": "qrtd6svRUnk",
   "videoTitle": "Knocking on the Wrong Door: The Six Developers You’ll Meet in Security  by Enrique Larios Vargas",
-  "matchScore": 1.1
+  "matchScore": 1.091,
+  "twin": null
  },
  {
   "id": 16401,
@@ -7601,7 +7794,8 @@
   "room": "Room 7",
   "videoId": "ePQyy9sLmsY",
   "videoTitle": "Beyond encryption at rest: computing on encrypted data  by Andrea Iacono",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 9008,
@@ -7637,7 +7831,8 @@
   "room": "Room 7",
   "videoId": "8nY-kqwoD_A",
   "videoTitle": "G1, ZGC, Shenandoah,     with all these GCs in Java, which one do I choose?  by Antoine DESSAIGNE",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 19714,
@@ -7673,7 +7868,8 @@
   "room": "Room 6",
   "videoId": "npSWywhFDHo",
   "videoTitle": "Specialized AI Agents: from concept to production  by David Gageot",
-  "matchScore": 1.1
+  "matchScore": 1.089,
+  "twin": null
  },
  {
   "id": 4096,
@@ -7709,7 +7905,8 @@
   "room": "Room 4",
   "videoId": "9vtYvAI2Dtk",
   "videoTitle": "Deterministic by Design   Achieving Reproducible Builds with Maven  by Maarten Mulders",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 9017,
@@ -7745,7 +7942,8 @@
   "room": "Room 6",
   "videoId": "kaT6UpLrzhU",
   "videoTitle": "AI in the Dark: Running LLMs in Air Gapped Production Environments by Mihaela Gheorghe Roman",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 41302,
@@ -7791,7 +7989,8 @@
   "room": "Room 4",
   "videoId": "lsvVJaigNp8",
   "videoTitle": "\"You May Now Optimize the Wedding\": Optimizing the Seating, Bachelor Party, and Honeymoon with Const",
-  "matchScore": 0.96
+  "matchScore": 0.956,
+  "twin": null
  },
  {
   "id": 24202,
@@ -7827,7 +8026,8 @@
   "room": "Room 4",
   "videoId": "3bIiAoYtAPs",
   "videoTitle": "Beyond the Pod: Architecting and Scaling AI Agents on Kubernetes  by Abdellfetah SGHIOUAR",
-  "matchScore": 1.1
+  "matchScore": 1.093,
+  "twin": null
  },
  {
   "id": 16444,
@@ -7873,7 +8073,8 @@
   "room": "Room 7",
   "videoId": "zo6L7bxn4OY",
   "videoTitle": "Faster Development with Java, Python, and Micronaut  by Graeme Rocher, Thomas Wuerthinger",
-  "matchScore": 1.1
+  "matchScore": 1.098,
+  "twin": null
  },
  {
   "id": 5541,
@@ -7909,7 +8110,8 @@
   "room": "Room 10",
   "videoId": "am8adCMJQzk",
   "videoTitle": "Dream Machines & Walled Gardens  by Anders Norås",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  },
  {
   "id": 21671,
@@ -7945,7 +8147,8 @@
   "room": "Room 6",
   "videoId": "wxNQRGPnJ24",
   "videoTitle": "The Rise of Agent Enablement: Coding Agents Don't Scale Themselves  Neither Do Your Teams  by Patric",
-  "matchScore": 1.0
+  "matchScore": 0.997,
+  "twin": null
  },
  {
   "id": 50104,
@@ -7981,7 +8184,8 @@
   "room": "Room 3",
   "videoId": "VaT7DgmVSms",
   "videoTitle": "Engineering Lessons from Working on Software Older Than Me  by Guust Ysebie",
-  "matchScore": 1.1
+  "matchScore": 1.093,
+  "twin": null
  },
  {
   "id": 50109,
@@ -8017,6 +8221,7 @@
   "room": "Room 7",
   "videoId": "-LMWT5OCneA",
   "videoTitle": "Keeping Spring Applications Secure in the Age of AI  by Neven Cvetkovic",
-  "matchScore": 1.1
+  "matchScore": 1.099,
+  "twin": null
  }
 ]

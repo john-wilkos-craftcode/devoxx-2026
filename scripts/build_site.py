@@ -48,6 +48,7 @@ def main():
             "end": t["end"],
             "room": t["room"],
             "videoId": t["videoId"],
+            "twin": t.get("twin"),
             "s": {k: v for k, v in (s or {}).items() if k != "id"} or None,
         })
     recap_path = DATA / "recap.json"

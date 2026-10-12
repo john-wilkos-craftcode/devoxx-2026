@@ -292,6 +292,14 @@
   const ytUrl = (t, seconds = 0) => `https://www.youtube.com/watch?v=${t.videoId}${seconds ? `&t=${seconds}s` : ""}`;
 
   function playerFor(t) {
+    const twin = t.twin && byId.get(t.twin);
+    if (!t.videoId && twin && twin.videoId) {
+      return el("div", { class: "player player-empty" },
+        el("div", {}, el("strong", { text: "Recorded in its other slot" }),
+          el("span", {}, `This session was also given as a ${twin.type} on ${fWeekday.format(new Date(twin.start))}. `,
+            "The summary below is from that recording. ",
+            el("a", { href: `#talk-${twin.id}`, text: "Open that session" }))));
+    }
     if (!t.videoId) {
       return el("div", { class: "player player-empty" },
         el("div", {}, el("strong", { text: "No recording yet" }),

@@ -1,0 +1,98 @@
+{
+  "id": 23543,
+  "source": "transcript",
+  "tldr": "Minborg explains how HotSpot's JIT optimises code, then covers JDK 26 and 27 performance work (G1 barriers, compact headers by default, library fast paths, AOT) and previews JDK 28.",
+  "summary": [
+    "Minborg, from Oracle's Java core libraries team, opens without slides by explaining what happens after javac: the interpreter profiles your code, and C2 builds an IR graph from the inlined bytecode and optimises it. He covers intrinsics, hoisting bounds checks (two checks instead of 128 for a 64-byte copy loop), auto-vectorization with SIMD and its limits (aliasing, early exits), load/store reordering, @Stable fields that become constants once set, loop unrolling, devirtualization from profiles, escape analysis (in effect, stack allocation), and speculation backed by uncommon traps and deoptimization. Most of the changes he discusses later are about feeding this machinery better information.",
+    "From JDK 25 he recalls AOT profiles (a training run between compile time and run time) and stable cached String hashes, which let C2 constant-fold lookups such as a map from strings to method handles. In JDK 26, G1 reduces synchronization on reference stores via a second card table, worth about 5% or more on reference-heavy workloads. Also: G1 as the default collector even on single-CPU instances, cheaper native-to-Java string conversion in the FFM API, record hashCode bootstraps typed to the record class, HashMap copies that reuse cached hash codes, a cost model so tiny loops are not auto-vectorized, and an AOT object cache that works with any GC.",
+    "JDK 27 turns compact object headers on by default (8-byte headers instead of 12, better cache locality), defers G1's concurrent-mark structures and threads for short-lived programs, lets virtual threads unmount while waiting on class initialisation, makes G1 keep up better under allocation spikes, and fixes Object Monitor Table locking. Lazy constants reach a third preview and now fail permanently if initialisation fails. For JDK 28 he points to Valhalla value classes, memory pools attached to the thread for arena allocations (over 10x faster for short-lived native allocations like errno) and AOT-compiled code to cut warm-up. He closes with advice on benchmarking with JMH and Amdahl's law."
+  ],
+  "keyPoints": [
+    "@Stable (an internal annotation) lets the JIT treat a field as constant once it is non-default; String's cached hash, lazy constants and other optimisations build on it.",
+    "Reference stores carry hidden GC barrier work; JDK 26's G1 change simplifies the application-side barrier using an extra card table, for about 5% or more on reference-heavy code at a small memory cost.",
+    "G1 is now the default in all environments; Serial GC stays available via -XX:+UseSerialGC and Minborg said there are no plans to remove it.",
+    "Compact object headers are on by default in JDK 27; headers shrink from 12 to 8 bytes and an empty object from 16 to 8, and Minborg says better locality matters more than the raw memory saving.",
+    "new HashMap(otherHashMap) now reuses already computed hash codes, including through unmodifiable wrappers, which gives a large speed-up on his 150-entry benchmark.",
+    "The AOT cache (created with -XX:AOTCacheOutput in a training run) can now stream objects so it works with any GC, not only the one used during training.",
+    "Virtual threads waiting on another thread's class initialisation no longer pin their carrier thread.",
+    "A 4x speed-up on code that accounts for 10% of runtime yields only about 7% overall, so profile before optimising."
+  ],
+  "takeaways": [
+    "Benchmark your service on JDK 26 and 27 with default settings, then toggle the collector and compact object headers to see their effect on startup, throughput, memory and tail latency.",
+    "Use an AOT cache from a training run for short-lived or fast-starting applications.",
+    "If you run reference-heavy workloads, compare CPU usage and pause times under G1 on both releases.",
+    "Read the per-release performance articles on inside.java (tagged 'performance') before upgrading."
+  ],
+  "quotes": [
+    {
+      "text": "Can you allocate memory on the stack in Java? Most people say no, but actually in this case it can do that, and that is something that's handled automatically for us.",
+      "at": "10:02"
+    },
+    {
+      "text": "If you have a four times gain on just 10% of the work, you only get like 7%.",
+      "at": "38:19"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "How the JIT optimises code"
+    },
+    {
+      "at": "12:53",
+      "title": "Kinds of performance"
+    },
+    {
+      "at": "14:22",
+      "title": "Leftovers from JDK 25"
+    },
+    {
+      "at": "17:05",
+      "title": "G1 barriers and defaults"
+    },
+    {
+      "at": "20:01",
+      "title": "Compact object headers"
+    },
+    {
+      "at": "21:23",
+      "title": "Library and vectorization fast paths"
+    },
+    {
+      "at": "27:17",
+      "title": "AOT cache, GC and virtual threads"
+    },
+    {
+      "at": "33:38",
+      "title": "Looking ahead to JDK 28"
+    },
+    {
+      "at": "38:19",
+      "title": "Benchmarking and what to try"
+    }
+  ],
+  "tech": [
+    "JDK 26",
+    "JDK 27",
+    "JDK 28",
+    "HotSpot C2",
+    "G1 GC",
+    "Serial GC",
+    "Compact object headers",
+    "AOT cache",
+    "Foreign Function & Memory API",
+    "Vector API",
+    "Lazy constants",
+    "Virtual threads",
+    "Project Valhalla",
+    "JMH",
+    "HashMap",
+    "Records"
+  ],
+  "watchIf": "You plan JDK upgrades and want to know which performance gains come for free, which defaults changed under you, and how the JIT actually works.",
+  "themes": [
+    "JVM performance & runtime",
+    "Java language & JDK"
+  ],
+  "demo": false
+}
