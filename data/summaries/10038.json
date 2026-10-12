@@ -1,0 +1,41 @@
+{
+  "id": 10038,
+  "source": "transcript",
+  "tldr": "Peter shows eval-driven development on a JVM agent: golden datasets, deterministic checks, LLM-as-judge and conversation simulations with the Dokimos framework, plus feeding production traces back into failing evals.",
+  "summary": [
+    "Peter argues that agentic systems are uncertain at their core rather than at the edges (prompts, conversation history, RAG chunking, tool and MCP selection, agent-to-agent calls), so pass/fail tests must give way to confidence scores above thresholds. He cites survey figures that 89% of companies observe agents in production but only 52% run evals. The process starts with an explicit goal (what the agent must and must not do), user profiles and happy and rainy-day scenarios, from which an LLM drafts test inputs that you review and later grow into a golden dataset from production data. His demo is a Spring AI Devoxx assistant with venue info, semantic search over the vectorised schedule and personal-track CRUD tools, tested from Kotlin notebooks and unit tests with Dokimos, a JVM eval framework supporting Spring AI, LangChain4j, Koog and Embabel.",
+    "His eval pyramid puts cheap deterministic checks (contains, tool-call correctness via Spring's tool-call recorder) at the bottom, LLM-judged ground-truth evals (faithfulness, hallucination, context relevance) and quality evals (tone) above, and humans at the top. A pirate-speech input fails a formality judge at 0.62 until a system-prompt fix lifts it to 0.95; a parking question exposes invented 'ample parking' through claim-by-claim faithfulness checking; a simulated back-end developer filling a schedule passes the judges but fails a deterministic no-overlap check. Judges must be pinned, at least as strong as the agent's model, checked for score variance on a frozen set, and calibrated against human scores. For production he traces everything to Langfuse via OpenTelemetry, collects user feedback, and uses an LLM triage notebook to turn a 'suggested past sessions' complaint into a failing eval. For security he points to red teaming and Promptfoo."
+  ],
+  "keyPoints": [
+    "Dokimos is a JVM eval framework with integrations for Spring AI, LangChain4j, Koog and Embabel; evals run as ordinary unit tests with a Kotlin DSL or Java builders.",
+    "Build the eval pyramid on deterministic checks (contains, expected tool calls, no overlapping sessions) and add LLM-as-judge for faithfulness, hallucination, context relevance and tone.",
+    "Pin judge model versions and temperature, use a judge at least as capable as the agent's model, measure score standard deviation on a frozen set, and calibrate against human ratings.",
+    "Conversation simulators with a simulated user, max turns and stop conditions reveal failures that single-turn evals miss.",
+    "Production loop: OpenTelemetry traces to Langfuse, user feedback, random sampling, then convert bad traces into failing evals to grow the golden dataset."
+  ],
+  "takeaways": [
+    "Write down what your agent must not do, and generate and review test prompts per user profile and scenario.",
+    "Start each agent test suite with deterministic checks before adding LLM judges.",
+    "Add a feedback button and OpenTelemetry tracing to your agent, and turn every bad-rated trace into a regression eval.",
+    "Run Promptfoo or a red-team exercise before putting an agent in production."
+  ],
+  "quotes": [
+    {"text": "We fight probabilistic behavior with probabilistic behavior.", "at": "18:35"},
+    {"text": "When we create agents, we also get a new role and this new role is agent sitter.", "at": "33:17"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why agents fail in production"},
+    {"at": "07:22", "title": "Eval-driven development mindset"},
+    {"at": "08:49", "title": "Goals and golden datasets"},
+    {"at": "13:09", "title": "First evals with Dokimos"},
+    {"at": "17:10", "title": "LLM as a judge"},
+    {"at": "23:33", "title": "Faithfulness and tool checks"},
+    {"at": "27:26", "title": "Conversation simulation"},
+    {"at": "30:51", "title": "Calibrating judges and security"},
+    {"at": "33:17", "title": "Production monitoring and feedback"}
+  ],
+  "tech": ["Dokimos", "Spring AI", "LangChain4j", "Koog", "Embabel", "Kotlin notebooks", "Langfuse", "OpenTelemetry", "Promptfoo", "MCP", "A2A"],
+  "watchIf": "You're building an agent on the JVM and need a concrete way to test it before and after it reaches production.",
+  "themes": ["AI agents & agentic coding", "Testing & quality", "LLMs in Java apps"],
+  "demo": true
+}

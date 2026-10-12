@@ -1,0 +1,46 @@
+{
+  "id": 5503,
+  "source": "transcript",
+  "tldr": "Van der Meer and Vandeperre vibe-code a recipe app from static HTML to an AI-powered Quarkus app, then refactor it to clean architecture enforced by ArchUnit tests that agents can't edit.",
+  "summary": [
+    "The talk follows Leo, a fictional non-developer who wants to read his nonna's Italian spaghetti recipe, as his vibe-coded app grows branch by branch: a 1990s static site served by Python, then a Quarkus REST backend, Postgres with Hibernate Panache, OCR upload with Tesseract for Java, and finally LangChain4j to turn scanned recipes into readable English. Along the way they report what went wrong: $20 subscriptions running out after minutes with seven-hour waits (and $300 lost in one API-key session), copied agent skills that silently made everything Kotlin, the agent painting the UI red because the Italian flag has red, and the agent rewriting Flyway scripts and dropping the database.",
+    "Vandeperre then explains clean architecture: a dependency-free domain, use cases mapped one-to-one to user actions instead of shared services, and ports and adapters at the edge, with runtimes like Quarkus, Open Liberty or Spring Boot as a thin wiring layer, which he links to sovereignty and avoiding vendor lock-in. Refactors produced by OpenAI and Anthropic models looked layered but differed in where ports lived, and all of it sat in one Gradle module so nothing was enforced. Their cheaper workflow uses OpenCode multi-agents: a product-owner agent writes a functional analysis, an architect agent on a frontier model breaks it into small tasks, and a local Qwen model implements them (with reasoning turned off, since it only has to follow instructions).",
+    "Adding a LangChain4j chatbot leads to guardrails: validate input and output size to control cost, keep prompt-injection and size limits in the infrastructure layer, and place business rules such as 'no pineapple on pizza' in the domain. NeMo Guardrails is suggested as a proxy in front of OpenAI-compatible endpoints. Swapping models or inference engines needs re-validation even when the contract is unchanged. ArchUnit tests enforce the layering, and a demo shows a Jakarta annotation in a domain class failing the build. Because agents edited those tests too, they keep ArchUnit rules, Flyway schemas and end-to-end tests in a separate repository pulled in as a Git submodule."
+  ],
+  "keyPoints": [
+    "Vibe-coded backends let ORM entities and framework annotations leak through the whole codebase; domain entities that mirror the database schema are still a database dependency.",
+    "Use cases map one-to-one to user actions, avoiding a shared updatePerson service reused by hundreds of endpoints; the cost is accidental duplication.",
+    "A clean-architecture folder layout in a single Gradle module enforces nothing; separate build modules make dependencies checkable at compile time.",
+    "Their multi-agent OpenCode setup: product-owner agent writes requirements, architect agent on a frontier model writes small tasks, a local Qwen model implements them with reasoning disabled.",
+    "Changing model, model version or inference engine (vLLM, Ollama, Podman Desktop) can change behaviour, so treat it as a dependency change and re-validate.",
+    "Split guardrails: input and output size limits and prompt-injection checks in infrastructure, business rules in the domain.",
+    "ArchUnit rules such as 'domain classes must not depend on Jakarta, Quarkus or Spring packages' catch architectural drift in CI.",
+    "Agents edited Flyway scripts and architecture tests, so the speakers moved those files into a Git submodule the agent cannot change."
+  ],
+  "takeaways": [
+    "Add ArchUnit tests that forbid framework dependencies in your domain package and run them in CI.",
+    "Put architecture tests, schema migrations and end-to-end tests where your coding agent cannot modify them, for example a Git submodule.",
+    "Split modules by layer in your build tool so violations fail at compile time.",
+    "Limit chatbot input and output size as well as content to keep LLM costs bounded.",
+    "Benchmark cheaper or local models for implementation tasks once a stronger model has written precise instructions."
+  ],
+  "quotes": [
+    {"text": "I sometimes compare the AI and vibe coding with a toddler. You can say you can't do five things. You can be happy if it listens to two out of the five.", "at": "19:01"},
+    {"text": "Never so happy to see an error.", "at": "41:49"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Leo and the recipe"},
+    {"at": "04:49", "title": "Vibe-coding tools and costs"},
+    {"at": "07:39", "title": "Backend, database and OCR"},
+    {"at": "15:47", "title": "LangChain4j recipe extraction"},
+    {"at": "20:24", "title": "Clean architecture explained"},
+    {"at": "25:42", "title": "Refactoring with multiple models"},
+    {"at": "33:31", "title": "Chatbot and guardrails"},
+    {"at": "38:54", "title": "Enforcing with ArchUnit"},
+    {"at": "42:50", "title": "Wrap-up"}
+  ],
+  "tech": ["Quarkus", "Hibernate Panache", "PostgreSQL", "Flyway", "Gradle", "Tesseract", "LangChain4j", "OpenCode", "Claude", "OpenAI", "Qwen", "MLX", "OpenShift", "NeMo Guardrails", "vLLM", "Ollama", "ArchUnit", "Podman", "React"],
+  "watchIf": "You're letting coding agents build features and want a concrete way to keep the architecture from decaying.",
+  "themes": ["Architecture & design", "AI agents & agentic coding", "LLMs in Java apps"],
+  "demo": true
+}

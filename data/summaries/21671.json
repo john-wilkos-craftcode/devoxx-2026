@@ -1,0 +1,49 @@
+{
+  "id": 21671,
+  "source": "transcript",
+  "tldr": "Debois argues scaling coding agents is organizational, not technical: treat context like code with its own lifecycle, enable team, platform and org, and the real new problem is concurrency control across many agents.",
+  "summary": [
+    "Debois, who works on agentic factories at Tessl, frames the talk around Conway's Law working both ways: how an org absorbs AI, and how AI reshapes the org. His central metaphor is that context (skills, AGENT.md, specs, plugins) is the new code, with its own delivery lifecycle mirroring the SDLC: you write context, test it (linters on skill format, evals with LLM-as-judge, security scanners after incidents like a compromised MCP, cost tests), distribute it as versioned packages through marketplaces and package managers, observe it through agent logs and PR feedback, and deal with its drift, tech debt and conflicting opinions between people's skills.",
+    "He then climbs the enablement ladder. Enable the team: developers become conductors who stop touching code and instead fix the agent, its harness and context ('build the thing that builds the thing'), with new planning and retro rituals asking whether a task is fleshed out enough for an agent; team leads must make shared context quality part of the improvement cycle or everyone drifts solo. Enable the platform: an AI platform team (overlapping cloud, DevEx and AI) provides model routing, MCP gateways, sandboxes, skill and harness registries, evals and paved roads, and must actively go out and help teams, which reopens interesting technical work. Enable the org: the VP of Engineering funds and owns it, and measures not just DORA but human-touches-down (agent effectiveness) and how many people an improvement is reused by (org-wide multiplier rather than a solo 10x).",
+    "The weekend insight that reshaped the talk: factories as serial loops are underwhelming, and the real emerging problem is concurrency. As agents run in parallel on shared codebases they trip over each other, as Anthropic's 16-agent C-compiler experiment showed dependencies capping throughput. Debois reframes the pipeline as traffic control across planning (task dependency graphs), isolation (micro-VMs like Forkd, data versioning with Dolt, copy-on-write), semantic merging on intent not just text, cache invalidation across parallel work, stacked PRs and release trains, and risk-based review (auto-merge low-risk CSS changes, human review for auth) toward progressive delivery. He floats concurrent production versions, best-of-N variants, even per-customer versions, and notes at Tessl that sales, marketing and support now work on the same factory, moving the bottleneck to docs and training that cannot keep up."
+  ],
+  "keyPoints": [
+    "Context (skills, AGENT.md, specs) should be managed with a full delivery lifecycle: linters, evals, security scanners, cost tests, versioned packages and observability from agent logs.",
+    "Enablement has four layers: agent, team, platform, organization; adoption stalls when only individuals improve context and the team lead doesn't make shared context quality a ceremony.",
+    "An AI platform team provides model routing, MCP gateways, sandboxes, skill/harness registries, evals and guardrails, and must actively enable teams, not just host infrastructure.",
+    "New leadership metrics: human-touches-down (how few human corrections an agent needs) and reuse (how many people one context improvement benefits), alongside existing DORA metrics.",
+    "Running many agents on a shared codebase surfaces a concurrency problem; Anthropic's 16-agent C-compiler build was limited by inter-task dependencies.",
+    "Concurrency tooling spans task dependency graphs, micro-VM forking (Forkd), Git-like data versioning (Dolt), semantic/intent-level merging, cache invalidation, stacked PRs and release trains.",
+    "Review should be risk-based: auto-merge low-risk changes, require human review and evidence for high-risk areas like authentication, then progressive release.",
+    "Debois proposes concurrent production versions and per-customer variants as a possible new normal, and observes non-engineering teams joining the same factory."
+  ],
+  "takeaways": [
+    "Treat your team's context (skills, AGENT.md, specs) as a versioned, tested, shared artifact, not per-laptop files.",
+    "Make 'did we improve the agents and context?' a standing item in planning and retros.",
+    "Stand up or designate an AI platform team that both runs the substrate and actively enables other teams.",
+    "Track human-touches-down and cross-team reuse as adoption metrics, not just per-commit speed.",
+    "Label code by risk so low-risk changes can auto-merge while high-risk areas get human review and progressive rollout."
+  ],
+  "quotes": [
+    {"text": "Stop building the thing, but build the thing that builds the thing for you.", "at": "09:46"},
+    {"text": "After automation comes the coordination of the automation.", "at": "41:33"},
+    {"text": "The only good staging is production.", "at": "36:15"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Conway's Law both ways"},
+    {"at": "01:33", "title": "Context is the new code"},
+    {"at": "04:17", "title": "Testing and packaging context"},
+    {"at": "08:41", "title": "Enable the team"},
+    {"at": "12:07", "title": "Enable the platform"},
+    {"at": "16:04", "title": "Enable the organization"},
+    {"at": "19:10", "title": "Factories and concurrency"},
+    {"at": "23:08", "title": "Where agents trip up"},
+    {"at": "30:38", "title": "Risk-based review"},
+    {"at": "37:19", "title": "Concurrent production versions"},
+    {"at": "43:55", "title": "Coordination and the moved bottleneck"}
+  ],
+  "tech": ["AGENT.md", "Skills", "MCP", "LLM as a judge", "Forkd", "Dolt", "Stacked PRs", "Release trains", "Feature flags", "Conway's Law", "DORA metrics"],
+  "watchIf": "You lead or enable engineering teams past 'we gave them coding tools' and want a framework for scaling agentic coding across an organization.",
+  "themes": ["AI agents & agentic coding", "Teams, careers & leadership", "Developer experience & tooling"],
+  "demo": false
+}

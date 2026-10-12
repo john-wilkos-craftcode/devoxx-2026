@@ -1,0 +1,47 @@
+{
+  "id": 22905,
+  "source": "transcript",
+  "tldr": "Using a toy 'Fun Fact Store', Roseboom shows how Spring Boot and Hibernate defaults hold pooled connections too long and fire hidden queries, and which settings and query styles fix it.",
+  "summary": [
+    "Roseboom, a Dutch freelance developer, builds the talk around his Fun Fact Store, a Spring Boot, Spring Data JPA and Postgres app. He first measures why pooling matters: a Testcontainers test making 1,000 connections took under a millisecond via HikariCP and over four seconds via DriverManager. Because the pool is fixed-size (10 by default), the goal is to hold a connection as briefly as possible. He adds a Hikari metrics tracker factory that logs when connections are acquired and returned, which shows a shop endpoint holding one for 659 ms, including an email call to an external system.",
+    "The fixes are mostly configuration. Turning off open-session-in-view returns the connection when the transactional method ends instead of after the controller (251 ms). Hibernate grabs the connection at the start of a transaction only to set autocommit to false; setting Hikari autocommit to false and telling Hibernate the provider disables autocommit (automatic since Spring Boot 3.2) delays acquisition, and Spring Boot 4.1 adds a lazy connection-fetch option that defers setAutoCommit and setReadOnly until real JDBC work. Marking a method read-only causes the same early fetch. A TransactionTemplate keeps external calls outside transactions, bringing the total to 26 ms over two short leases.",
+    "The JPA half covers mapping. @ManyToOne and owning-side @OneToOne default to eager fetching, so a findAll quietly loaded app users; the persistence context deduplicated them and provides repeatable reads even under read-committed. Switching to lazy exposes N+1 queries, fixed with JOIN FETCH. Dirty checking makes explicit saveAll calls unnecessary. For reads he prefers DTO projections via JPQL constructor expressions (checked at startup), native queries mapped to records in Hibernate 6+, or interface projections, over entity-plus-MapStruct mapping, which once triggered over a thousand selects on a single screen for him. He closes with IntelliJ's upcoming Hibernate debugger, Vlad Mihalcea's Hypersistence Optimizer and Gatling for load tests."
+  ],
+  "keyPoints": [
+    "In his benchmark, 1,000 connections from HikariCP took under 1 ms versus over 4 s through DriverManager.",
+    "A custom Hikari MetricsTrackerFactory logging acquire/return times makes connection lease duration visible.",
+    "spring.jpa.open-in-view is on by default and keeps the connection until the web request finishes; set it to false.",
+    "Hibernate acquires the connection early just to disable autocommit; disable autocommit in Hikari plus Hibernate's provider-disables-autocommit setting (default since Spring Boot 3.2), or use Spring Boot 4.1's lazy connection fetching.",
+    "Use TransactionTemplate.execute to wrap just the database part and keep slow external calls outside the transaction.",
+    "@ManyToOne and @OneToOne default to EAGER; make them LAZY and use JOIN FETCH where the relation is needed to avoid N+1.",
+    "For read-only screens, DTO projections (JPQL constructor expressions, native queries in Hibernate 6+, interface projections) issue one narrow query and are validated at startup.",
+    "Roseboom maps many-to-many relations as an explicit join entity (e.g. Purchase with a purchase date) instead of @ManyToMany."
+  ],
+  "takeaways": [
+    "Set spring.jpa.open-in-view=false in every Spring Boot app and check what breaks.",
+    "Log HikariCP connection acquire and release times to find endpoints that hold connections during external calls.",
+    "Declare fetch = FetchType.LAZY on every new @ManyToOne and use JOIN FETCH where needed.",
+    "Use DTO projections instead of entities for read-only queries.",
+    "Load-test critical flows with Gatling to find where the connection pool saturates."
+  ],
+  "quotes": [
+    {"text": "So first thing to do when you create a new Spring Boot application is to set this to false.", "at": "10:45"},
+    {"text": "I've been in situations where there was just a simple screen triggering over a thousand selects because it was all just traveling the object tree.", "at": "42:49"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "The Fun Fact Store"},
+    {"at": "03:10", "title": "Why connection pools matter"},
+    {"at": "06:53", "title": "Making connection leases visible"},
+    {"at": "09:20", "title": "Open session in view"},
+    {"at": "12:20", "title": "Autocommit and lazy acquisition"},
+    {"at": "17:27", "title": "TransactionTemplate for external calls"},
+    {"at": "22:08", "title": "JPA mapping and eager fetching"},
+    {"at": "32:44", "title": "N+1 and join fetch"},
+    {"at": "36:12", "title": "DTO projections"},
+    {"at": "45:33", "title": "Tooling"}
+  ],
+  "tech": ["Spring Boot", "Spring Data JPA", "Hibernate", "Jakarta Persistence", "HikariCP", "PostgreSQL", "Testcontainers", "Thymeleaf", "MapStruct", "IntelliJ IDEA", "Hypersistence Optimizer", "Gatling"],
+  "watchIf": "You run Spring Data JPA in production and see connection pool exhaustion, N+1 queries or unexplained latency.",
+  "themes": ["Data & databases", "Spring & frameworks", "JVM performance & runtime"],
+  "demo": true
+}

@@ -1,0 +1,44 @@
+{
+  "id": 24224,
+  "source": "transcript",
+  "tldr": "Burr explains how qubits and Shor's algorithm threaten RSA, why 'harvest now, decrypt later' makes it urgent today, and how lattice-based schemes like Kyber (ML-KEM) replace it.",
+  "summary": [
+    "Burr frames quantum computers as enhancements that sit on top of classical machines, not replacements, and uses the double-slit experiment to explain superposition: qubits hold many states at once but collapse to one random value on measurement, so superposition alone gives no speed-up. The power comes from quantum algorithms that arrange states so wrong answers destructively interfere and right answers constructively interfere, making the correct result the likely measurement. He then walks through Shor's algorithm against RSA, whose security rests on factoring being slow (adding 10 digits multiplies the time roughly tenfold, making RSA-2048 take trillions of years classically).",
+    "Shor's algorithm turns a bad guess into useful factors using modular arithmetic: the hard sub-problem is finding the period p of a repeating remainder sequence, and that single step is where a quantum computer, via the quantum Fourier transform on a partially measured superposition, is fast. A good guess breaks the key 37.5% of the time, so about 10 tries give 99% success. The same threat hits discrete-log and elliptic-curve crypto. Qubit estimates to run it have fallen fast, from 20 million noisy qubits (2019) to about a million (2025) to roughly 100,000 this year, against today's largest QPU of around 1,000 physical qubits; error correction is the main bottleneck.",
+    "Because of 'harvest now, decrypt later' attacks on data that stays sensitive (state and medical secrets), NIST ran a competition with Google, IBM and Amazon to standardise quantum-resistant algorithms, most of them lattice-based. Burr builds up the lattice idea from the closest-vector problem (good vs bad basis as private vs public key), notes the 1990s GGH scheme leaked the private key and was broken, then explains Learning With Errors: public-key equations made unsolvable by linear algebra through modulo arithmetic plus small random errors, with bits encoded by optionally adding half the modulus. He closes with migration: Google and the other providers aim for quantum-safe by 2029-2030, and Kyber, standardised as ML-KEM, is in core libraries including Java since Java 24."
+  ],
+  "keyPoints": [
+    "Superposition alone does not parallelise computation; quantum algorithms work by making wrong answers interfere destructively so measurement likely yields the right answer.",
+    "Shor's algorithm reduces factoring to period-finding; only that step is quantum, done with a quantum Fourier transform, and succeeds about 37.5% per attempt (99% within ~10 tries).",
+    "Shor-style algorithms also break discrete-logarithm and elliptic-curve cryptography, not just RSA.",
+    "Estimated qubits to break RSA dropped from ~20M (2019) to ~1M (2025) to ~100k this year; today's largest QPU has about 1,000 physical qubits, with error correction the key limiter.",
+    "The urgent threat now is harvest-now-decrypt-later on data that stays sensitive over time.",
+    "Lattice-based Learning With Errors hides the private key by adding modulo arithmetic and small random errors so no efficient classical or quantum algorithm is known to solve it.",
+    "Kyber won the NIST competition and was standardised as ML-KEM; it is available in core libraries, including Java since Java 24."
+  ],
+  "takeaways": [
+    "Treat long-lived sensitive data as already at risk from harvest-now-decrypt-later and prioritise migrating it.",
+    "Prefer major providers with a published post-quantum migration plan, or switch your own encryption to standardised algorithms like ML-KEM.",
+    "On the JVM, use the ML-KEM (Kyber) support available since Java 24 rather than rolling your own."
+  ],
+  "quotes": [
+    {"text": "It's much better to think of them as enhancements.", "at": "02:52"},
+    {"text": "What if we had a magical box, and that magical box could turn our bad guesses into good guesses? That's essentially what Shor's algorithm is.", "at": "09:55"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "What this talk covers"},
+    {"at": "01:51", "title": "Qubits and superposition"},
+    {"at": "04:14", "title": "Double-slit and measurement"},
+    {"at": "08:30", "title": "Shor's algorithm and RSA"},
+    {"at": "14:18", "title": "Period finding with Fourier"},
+    {"at": "18:14", "title": "How many qubits and when"},
+    {"at": "21:13", "title": "Harvest now, decrypt later"},
+    {"at": "22:41", "title": "Lattice-based cryptography"},
+    {"at": "26:29", "title": "Learning with errors"},
+    {"at": "32:33", "title": "Migration and Kyber today"}
+  ],
+  "tech": ["RSA", "Shor's algorithm", "Quantum Fourier transform", "NIST PQC", "Kyber", "ML-KEM", "Dilithium", "Learning With Errors", "GGH", "Java 24", "Google", "AWS", "Azure"],
+  "watchIf": "You want an accessible but technically honest explanation of how quantum computers threaten RSA and what post-quantum migration looks like today.",
+  "themes": ["Security & supply chain", "Hardware, robots & fun"],
+  "demo": false
+}

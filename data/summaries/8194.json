@@ -1,0 +1,49 @@
+{
+  "id": 8194,
+  "source": "transcript",
+  "tldr": "A three-hour security session arguing that AI makes attacks cheaper but the game is unchanged: learn classic vulnerabilities, shift checks left, monitor production, and lock down your dependency supply chain.",
+  "summary": [
+    "Khodami frames the session around two trends: AI-enabled attacks and supply-chain attacks. He cites data that the time from disclosure to working exploit has collapsed, then shows, at a high level, how several small mistakes in a vibe-coded demo app (an exposed Swagger UI, an injectable endpoint, an over-privileged database user, an unauthenticated cache) chain together into a full account takeover. His point is that one team's shortcuts can expose a whole platform, and that developers who have never tried classic attacks in a training lab should do so before writing more code.",
+    "He then walks the OWASP Top 10 2025 with examples: Swagger and Spring Boot Actuator endpoints found via Shodan, publicly exposed Nexus and JFrog instances, developers mistaking JWTs for encryption, deserialization gadgets, and 'mishandling of exceptional conditions' such as recycled phone numbers or expired maintainer domains used to take over npm accounts. The DevSecOps part covers the four-eyes principle (including not letting forked PRs trigger pipelines), Gitleaks and TruffleHog as pre-commit hooks, SAST and SCA in IntelliJ, Snyk or Checkmarx, Checkov for IaC, SBOMs and reachability analysis.",
+    "A live demo of an AI agent, run inside Docker Sandboxes, produced a pen-test style report against his own lab app with little prompting, which he uses to argue that the cost of attacking has dropped. He covers package-popularity manipulation, LLM poisoning, threat modelling with STRIDE (and why UX designers belong in the room, illustrated by row-level encryption keyed on the single lookup field support staff need), and security monitoring: treating logs as a detection tool, with an Elasticsearch plus ElastAlert rule that posts brute-force alerts to Slack, and an overview of CNAPP and ASPM platforms.",
+    "Part two focuses on the software supply chain. Khodami shows that adding one tampered dependency to an empty Spring Initializr project, or installing a confused npm package, is enough to run attacker code during a normal build. He then gives tiered mitigations: critical (reserved namespaces with 2FA, version pinning, checksum checks, Maven Enforcer, committed lock files, `dependency:analyze`), medium (proxy repositories, repository filtering, Renovate with cooldown periods, immutable releases, SBOM generation, hardened base images) and advanced (dependency firewalls, artifact signing with jarsigner, continuous SBOM monitoring in Dependency-Track or Sonatype)."
+  ],
+  "keyPoints": [
+    "OWASP Top 10 2025 ranks software supply chain failures third; Khodami expects it to climb to first.",
+    "Exposed Swagger, Actuator, pgAdmin and artifact repositories are routinely indexed by attack-surface search engines like Shodan.",
+    "Gitleaks and TruffleHog as pre-commit hooks (and in CI) block committed secrets; you can also tell coding agents to run them before pushing.",
+    "Reachability analysis (e.g. IntelliJ's 'Vulnerable API usage' inspection) separates the thousands of reported CVEs from the few that matter; severity is not priority without context such as internet exposure and PII.",
+    "A plain Spring Boot starter pulls in about 49 dependencies and Express about 65, each a possible attack path; Khodami cited Maven Central data that a large share of Log4j downloads are still vulnerable to Log4Shell.",
+    "Dependency confusion mostly hits npm; Maven Central's namespace verification helps, but random group IDs on unowned domains remain a risk.",
+    "Switching to a hardened base image took one demo Dockerfile from 11 vulnerabilities to 1 with a two-line change.",
+    "A jar can be decompiled, modified and repackaged in a couple of commands; signing with jarsigner makes such tampering detectable."
+  ],
+  "takeaways": [
+    "Add Gitleaks or TruffleHog as a pre-commit hook and pipeline step.",
+    "Pin dependency versions, commit your lock files, and let Renovate or Dependabot propose upgrades with a cooldown period.",
+    "Reserve your organisation's npm scope and Maven group ID domain, enable 2FA on publishing accounts, and route all downloads through a proxy repository that blocks internal names from public registries.",
+    "Generate and store an SBOM per release (CycloneDX plugin, Syft, dep-scan) and monitor it continuously, for example in OWASP Dependency-Track.",
+    "Move to hardened base images and define log-based detection rules with your security team."
+  ],
+  "quotes": [
+    {"text": "If you haven't tried SQL injection, if you haven't tried path traversal, and you have no idea how capable these basic old stuff are, you should stop writing the code.", "at": "03:34"},
+    {"text": "If you can replace it, a hacker can also replace it.", "at": "139:31"},
+    {"text": "So the severity is not priority.", "at": "155:54"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why AI and supply chain"},
+    {"at": "03:34", "title": "Chained weaknesses warm-up demo"},
+    {"at": "16:23", "title": "OWASP Top 10 2025"},
+    {"at": "31:24", "title": "DevSecOps and shift-left tooling"},
+    {"at": "52:05", "title": "AI agent pen test"},
+    {"at": "66:50", "title": "LLM poisoning and threat modelling"},
+    {"at": "80:26", "title": "Security monitoring, CNAPP, ASPM"},
+    {"at": "105:32", "title": "Malicious dependency demos"},
+    {"at": "124:15", "title": "Supply chain mitigations"},
+    {"at": "160:15", "title": "Jar tampering and signing"}
+  ],
+  "tech": ["OWASP Top 10", "Gitleaks", "TruffleHog", "IntelliJ IDEA", "Snyk", "Checkmarx", "SonarQube", "Checkov", "CycloneDX", "SPDX", "OWASP dep-scan", "Syft", "Trivy", "Docker Sandboxes", "Shodan", "STRIDE", "Elasticsearch", "Kibana", "ElastAlert", "Maven Enforcer Plugin", "Renovate", "Dependabot", "Nexus Repository", "JFrog Artifactory", "OWASP Dependency-Track", "Sonatype", "jarsigner", "Docker Hardened Images", "Chainguard"],
+  "watchIf": "You own Java or Node services and want a broad, demo-heavy tour of how attacks chain together and which supply-chain controls to add first.",
+  "themes": ["Security & supply chain", "AI agents & agentic coding"],
+  "demo": true
+}

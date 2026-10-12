@@ -1,0 +1,47 @@
+{
+  "id": 19713,
+  "source": "transcript",
+  "tldr": "Gageot builds specialized AI agents with no code using Docker Agent and YAML, showing tools, structured output, evals, flavors, sandboxing and multi-agent protocols on a Pokemon example standing in for business workflows.",
+  "summary": [
+    "Gageot, who worked on Docker's Gordon assistant, argues for specialized agents over coding agents like Claude Code: they solve one focused task far more cheaply (Claude Code's base prompt is around 40k tokens). He introduces Docker Agent, an open-source, mostly no-code tool configured in YAML that runs as a standalone binary or docker CLI plugin on any machine and talks to any model provider (frontier, local, Ollama, Docker Model Runner). After recapping the agent loop (model, harness, tools, user), he shows the simplest config, a parrot agent costing a fraction of a cent, then swaps models (Haiku vs the pricier Fable, ~15x cost) and a polite-rewrite agent to demonstrate fast iteration and visible cost.",
+    "The same agent can be driven different ways: a terminal UI, --exec run for scripting, last-response or full JSON output, or served behind an OpenAI-compatible API, plus A2A and MCP. The business demo wires an agent to a Pokemon catalog via an OpenAPI toolset, then restricts it to one endpoint and trims the JSON response to three fields to cut tokens, like a GraphQL projection. He adds a shell tool (a random-integer command, with security caveats), read-only file-system instructions the harness enforces, a manually specified tool for an arena microservice lacking an OpenAPI spec, and structured JSON output, turning the agent into a black box service.",
+    "Because LLMs cheat or miscount, he builds evals: test-case questions plus black-and-white assertions and LLM-as-a-judge relevance checks, run five times to measure flakiness and cost outliers. His baseline passed 80% of tests at least once but only 40% every time, i.e. too random for production. He improves it with 'flavors' (small YAML patches, such as giving it a counting tool), runs evals in containers for isolation, and can hand the detailed results to another agent to loop and improve while holding back some questions to avoid overfitting. He finishes with a Python client over the OpenAI API, OpenTelemetry tracing, a Compose deployment, a 16-agent tournament via sub-agents with human-approval hooks, and connectivity options: A2A, MCP, LSP, ACP for IDEs, AI gateways and model routing."
+  ],
+  "keyPoints": [
+    "Docker Agent is open source, configured in YAML (with an optional Go SDK), runs as a standalone binary or docker plugin, and works with any model provider.",
+    "The same agent config can be exposed as a TUI, a scriptable exec command, an OpenAI-compatible HTTP API, or via A2A and MCP.",
+    "Plug in an existing OpenAPI spec as a toolset, then restrict to specific endpoints and trim response fields via hooks to control tokens.",
+    "Structured output makes the agent a black-box service returning parseable JSON.",
+    "Evals combine deterministic assertions with LLM-as-a-judge relevance checks, run multiple times to expose flakiness and cost outliers.",
+    "'Flavors' are small YAML patches for isolating one change; giving the agent a tool to count fixed unreliable team-building.",
+    "Run evals in containers (cheaper than sandboxes at thousands of tests) and gate external tool calls with human-approval hooks or permission checks.",
+    "A Docker Agent agent can coordinate many sub-agents (a 16-agent, 32-run tournament) and connect via LSP and ACP to IDEs like JetBrains or Zed."
+  ],
+  "takeaways": [
+    "Build a cheap specialized agent instead of running a full coding agent for narrow, repeated tasks.",
+    "Wrap an existing OpenAPI service as an agent toolset and trim responses to only the fields the model needs.",
+    "Write evals with LLM-as-a-judge checks and run them several times to measure flakiness before shipping.",
+    "Isolate one change at a time with a YAML flavor and compare against a baseline score.",
+    "Run agents and their evals in containers, and require approval for external side effects."
+  ],
+  "quotes": [
+    {"text": "You have to go from developer to builder.", "at": "00:32"},
+    {"text": "When I say Pokemon, you think, okay, what's my most boring workflow that I want to automate.", "at": "13:36"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Specialized vs coding agents"},
+    {"at": "04:21", "title": "Agent loop and first demo"},
+    {"at": "06:09", "title": "Models and cost"},
+    {"at": "09:43", "title": "Interfaces for one agent"},
+    {"at": "13:36", "title": "Pokemon OpenAPI toolset"},
+    {"at": "18:00", "title": "Shell, file and custom tools"},
+    {"at": "24:31", "title": "Structured output as a service"},
+    {"at": "25:36", "title": "Evals and scoring"},
+    {"at": "32:47", "title": "Flavors and optimization"},
+    {"at": "36:32", "title": "Serving, tracing, multi-agent"}
+  ],
+  "tech": ["Docker Agent", "YAML", "OpenAPI", "MCP", "A2A", "ACP", "LSP", "OpenAI API", "OpenTelemetry", "Docker Compose", "Ollama", "Docker Model Runner", "LLM as a judge"],
+  "watchIf": "You want to build cheap, specialized AI agents over your own APIs and test them systematically without writing agent code.",
+  "themes": ["AI agents & agentic coding", "Developer experience & tooling"],
+  "demo": true
+}
