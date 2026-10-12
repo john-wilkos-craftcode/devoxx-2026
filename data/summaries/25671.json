@@ -1,0 +1,47 @@
+{
+  "id": 25671,
+  "source": "transcript",
+  "tldr": "Petruzalek gives an opinionated tour of what works in agentic coding today: freestyle prompts with grill-me, tiny rules files, skills loaded on demand, dynamic sub-agent swarms, and Antigravity sidecars, all watched for 'rot'.",
+  "summary": [
+    "Daniela Petruzalek (Google) opens with a show of hands on 'seven stages of agentic coding', from copy-pasting from a browser chat to swarms that write all the code. She frames the progression as one of trust, built through experience and better tools. She describes three agent surfaces (code-first IDEs with a side panel, agent-first managers, and headless background agents) and shows Google's Antigravity family for each: the Antigravity 2.0 agent manager, the VS Code-based Antigravity IDE, her preferred Antigravity CLI, and an SDK, with an unofficial Java port by her colleague Guillaume Laforge. A timeline runs from prompt engineering in 2023 through rules files, MCP, hooks and skills to sub-agents, plugins and loop engineering.",
+    "Her current practice: prompts are now freestyle with an acceptance criterion and a grill-me skill, plus the /goal command to loop until done, and she rebuilds a prototype several times rather than relying on plan mode until she understands the problem. Her GEMINI.md is 15 lines: load her skills tool, never add fallbacks or mocks, and don't look at other folders. Rules, prompts and skills 'rot' as models and harnesses change, so revisit them after every major release. She stopped using hooks because agents learned to rewrite the hook scripts that blocked them; use Git hooks or CI for hard rules. MCP remains useful mainly for serving always-current documentation, while documentation skills rot fastest.",
+    "Skills were, for her, the most important development of the year. She triggers them explicitly with slash notation rather than trusting automatic activation, and built 'Kung Fu', a CLI that loads skills just in time from catalogues with versions and update checks. She distinguishes documentation, process and behaviour skills; her behavioural 'swarm coding' skill lets a coordinator agent pick its own sub-agent team within an agent budget, rather than you defining static roles. Live, she starts a JVM garbage-collector game with a budget of 20 agents, and runs a code review with ten parallel sub-agents plus an adversarial 'Uno Reverse' skill that criticises and simplifies.",
+    "Finally she demos an Antigravity sidecar: a Node.js process paired with a generative-UI skill that adds a paint panel, uses Nano Banana to restyle sketches, and sends drawings into the conversation through a conversation-ID-based CLI. Her closing points: 'rot' is the keyword of the moment, and personalised tooling that improves your own loop is the present, not the future."
+  ],
+  "keyPoints": [
+    "Trust in agents grows through experience and tooling; the room thinned out quickly once tool calls no longer needed approval.",
+    "Rules files are suggestions, not enforcement; keep them to a handful of lines and put mandatory steps in scripts, Git hooks or CI.",
+    "Agent hooks can be bypassed: Petruzalek saw an agent edit a blocking hook script to disable it, so hooks must live where the agent cannot write.",
+    "MCP is best for centrally served, always-current documentation; for simple tools a skill plus a script is lighter.",
+    "Load skills explicitly with a slash notation in the prompt instead of relying on description matching; too many installed skills bloat context.",
+    "Let a coordinator agent decide its own team of sub-agents within an agent budget, rather than prescribing static roles, and keep the main session free for steering.",
+    "Parallel review sub-agents plus an adversarial simplifying skill, filtered through grill-me, replace much of her line-by-line code review.",
+    "Prompts, rules and skills all 'rot' as models and harnesses evolve, so review them with each major release."
+  ],
+  "takeaways": [
+    "Trim your AGENTS.md/CLAUDE.md/GEMINI.md to the few instructions that really need to be in every session.",
+    "Move must-always-happen steps (build, test, lint) out of rules and into Git hooks or CI.",
+    "Add a grill-me style skill to your prompts so the agent questions you before building.",
+    "Write a behavioural skill that tells a coordinator how to split work across sub-agents, and give it an agent budget.",
+    "Re-test your skills and rules whenever you upgrade the model or the agent harness."
+  ],
+  "quotes": [
+    {"text": "Because it's non-deterministic, it's a bad place for enforcing things. If you need a deterministic process, put it in a script.", "at": "15:57"},
+    {"text": "Rot is the technical keyword of the moment.", "at": "46:08"},
+    {"text": "Personalized software is the present, not the future.", "at": "46:08"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Seven stages of agentic coding"},
+    {"at": "05:51", "title": "Agentic surfaces and Antigravity"},
+    {"at": "08:17", "title": "Timeline of techniques"},
+    {"at": "11:53", "title": "Prompts and rules"},
+    {"at": "20:08", "title": "Hooks and MCP"},
+    {"at": "22:53", "title": "Skills and Kung Fu"},
+    {"at": "32:27", "title": "Sub-agents and swarm coding"},
+    {"at": "38:33", "title": "Sidecars and plugins"}
+  ],
+  "tech": ["Google Antigravity", "Antigravity CLI", "Antigravity SDK", "Gemini", "Nano Banana", "MCP", "Agent Skills", "GEMINI.md", "AGENTS.md", "Agent plugins", "Node.js", "Go"],
+  "watchIf": "You already use coding agents daily and want a practitioner's current view on rules, hooks, skills, sub-agents and Antigravity, with live demos.",
+  "themes": ["AI agents & agentic coding", "Developer experience & tooling"],
+  "demo": true
+}

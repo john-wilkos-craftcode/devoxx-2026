@@ -1,0 +1,40 @@
+{
+  "id": 51951,
+  "source": "transcript",
+  "tldr": "Rentea's fast, comic keynote on retraining yourself as an agentic engineer: learn the basics, protect your brain from agent-driven burnout, shift to judgement, product and people skills, and force the habit.",
+  "summary": [
+    "Victor Rentea, who says he wrote code for 19 years and stopped six months ago, opens by showing his own setup, including a dictation tool built on a Whisper large-v3-turbo model he fine-tuned on 40 hours of his own voice (two hours on a rented H100 for about four dollars). He then lists the basics every developer should already know: context windows and the 'dumb zone', writing skills, specialised sub-agents, prompt caching and model/effort choice. He points to Anthropic's courses on Skilljar and stresses creative feedback loops, such as giving an agent two browsers to compare a legacy JSP screen with its Angular rewrite pixel by pixel. To keep up with what agents generate, he recommends memory techniques: active recall, chunking into groups of four, and dual coding. He then warns that running three or four terminals in parallel leads to rubber-stamping ('you are only able to type K'), drained agency and burnout, so you must learn your own cognitive limits and how to recover.",
+    "The rest is about what remains human. System design, the '-ilities' and a cloud certification still matter. Rentea argues that manual debugging and tuning are now 'unethical' at work: Claude found 17 memory leaks from heap dumps and 10 bottlenecks from JFR and async-profiler output in 30 minutes, and a friend's team confirmed a Keycloak bug with adversarial agents. He asks for humility, critical thinking, real listening, estimating in dollars of tokens, watching for sycophancy, and a product mindset close to users. His 'conversion' homework: generate over 95% of your code, buy a personal subscription if your employer won't, never edit files by hand, dictate prompts, run four conversations in parallel, pair with an internal AI champion, and drop the Copilot-in-IntelliJ combination for VS Code or a CLI agent."
+  ],
+  "keyPoints": [
+    "Running several agent terminals at once pushes developers into approving without reading; Rentea treats burnout and loss of agency as the main risk and urges people to learn their limits and how to recover.",
+    "To own decisions made at agent speed, use learning techniques: active recall ('explain it with the lid closed'), chunking, dual coding, and asking for ELI5 explanations.",
+    "He cites Claude tracing 17 memory leaks from heap dumps and 10 hotspots from JFR and async-profiler reports in 30 minutes, and concludes that hand debugging and tuning no longer pay at work.",
+    "The engineer's role moves left (product owner), up (architecture) or right (quality guardian), and needs humility, critical thinking, listening and sensitivity to AI sycophancy.",
+    "Concrete targets: over 95% generated code, no manual file edits, dictated prompts, four parallel sessions, and estimates expressed in dollars of tokens."
+  ],
+  "takeaways": [
+    "Build and use at least one skill, and learn how prompt caching and context limits affect cost and quality.",
+    "Design feedback loops the agent can run itself, such as browser-driven visual comparisons between a legacy UI and its rewrite.",
+    "Ask the agent to show the dollar cost of options so you start estimating work in tokens.",
+    "Spend a week editing no files by hand and dictating prompts instead of typing them."
+  ],
+  "quotes": [
+    {"text": "The nerd is dead. Long live the builder.", "at": "09:58"},
+    {"text": "Manual debugging and tuning become unethical. Let go. Unlearn. Goodbye, expertise.", "at": "12:21"},
+    {"text": "Superpowers need a quest. Doing good and helping others will keep you sane.", "at": "20:09"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Rentea's setup"},
+    {"at": "01:54", "title": "Agent basics"},
+    {"at": "04:31", "title": "Learning at agent speed"},
+    {"at": "07:20", "title": "Burnout and agency"},
+    {"at": "09:58", "title": "System design and unlearning"},
+    {"at": "12:21", "title": "Human skills that matter"},
+    {"at": "17:44", "title": "Forcing the conversion"}
+  ],
+  "tech": ["Claude Code", "Claude Opus", "Whisper", "MLX", "RunPod", "JFR", "async-profiler", "Keycloak", "Wispr Flow", "GitHub Copilot", "IntelliJ IDEA"],
+  "watchIf": "You feel stuck between agent hype and exhaustion and want one opinionated practitioner's checklist for retraining, delivered in 20 minutes.",
+  "themes": ["AI agents & agentic coding", "Teams, careers & leadership"],
+  "demo": false
+}

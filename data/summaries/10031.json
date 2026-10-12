@@ -1,0 +1,44 @@
+{
+  "id": 10031,
+  "source": "transcript",
+  "tldr": "A comic, AI-free tour of computing's oddities and pains, from HTTP 418 and leap seconds to Y2K38, CORS, Excel, Doom in TypeScript types and Jira bureaucracy, illustrated with Marsaud's own war stories.",
+  "summary": [
+    "Fabien Marsaud, a Bordeaux freelancer who attended Javapolis before it became Devoxx, invites the audience to forget AI for an hour. He starts with the debates that derail every new project (Lombok, Maven versus Gradle, ISO 8601 versus timestamps, what a 404 actually means), then moves to odd HTTP status codes: 418 from the April Fools RFC 2324, Twitter's 420 for rate limiting, and 451 for legally blocked content, named after Fahrenheit 451. On encodings he tells how a mainframe veteran at Worldline instantly explained garbage characters in file transfers: on his system, file metadata was encoded inside the file. Floating point gets a story from Belgian operator Base, where VAT calculations turned 10-euro invoices into 9.9999 euros, plus the JDK's NaN check (v != v).",
+    "Dates get special attention: leap seconds, Sweden's 30 February 1712, Fiji's yearly daylight saving decision and Samoa skipping 30 December 2011. Y2K was mostly a non-event that made consultants money, while the 32-bit time overflow in January 2038 is real. Other stops include the unending variety of email-validation regexes, randomness (Cloudflare's lava lamp wall, and Belgian bank card readers whose one-time passwords he noticed increasing linearly), UUID collision odds, CORS, CR/LF line endings, and case-insensitive file systems on Windows and macOS, with Linus Torvalds' verdict that case insensitivity is a bug.",
+    "The second half ranges further: RGB versus CMYK, printers, centring a div, CSS's new OKLCH colour model, JavaScript's quirks, TypeScript's unsound type system and the port that renders Doom inside TypeScript types (177 TB of types, 12 days per frame), C++ that even Bjarne Stroustrup says he doesn't fully understand, undefined behaviour in C, null, and Raku. He pays tribute to Margaret Hamilton, whose death he said had just been announced, and to curl and FFmpeg as unpaid infrastructure. Other topics: the master/slave terminology changes after 2020, pre-Git version control, SOA, Excel as the real enterprise backbone, chip decapping for MAME preservation and the LLM-assisted reverse engineering of the Roland JP-8000. He ends on Jira-driven organisations, timesheets and the ninety-ninety rule."
+  ],
+  "keyPoints": [
+    "HTTP 418 comes from RFC 2324, an April Fools RFC; 451 signals legally blocked content; RFC 3514 jokingly defined an 'evil bit' for malicious IPv4 packets.",
+    "Floating-point money calculations caused real 9.9999-euro invoices; use BigDecimal or integer cents (some currencies use three decimal places).",
+    "Systems that store time as a signed 32-bit integer overflow in January 2038 and wrap to December 1901, and Marsaud doubts all of them will be fixed in time.",
+    "Every partner in an order chain may validate email addresses with a different regex, which can leave orders stuck between systems.",
+    "Code developed on case-insensitive Windows file systems can pick up a misspelt file name that then fails on case-sensitive Linux in production.",
+    "Excel imports routinely strip leading zeros, swap days and months and mangle decimals, however carefully the columns are agreed with the business."
+  ],
+  "takeaways": [
+    "Ask partners for a byte order mark or an explicit encoding in exchanged files instead of probing UTF-8, ISO-8859-1 and Windows-1252 in turn.",
+    "Never use binary floating point for money; use BigDecimal or integer minor units.",
+    "Check whether any system you depend on still stores time in 32-bit signed integers before 2038.",
+    "Test file handling on the same OS and file system you deploy to."
+  ],
+  "quotes": [
+    {"text": "Some people will stop at nothing to prove something is a programming language.", "at": "32:46"},
+    {"text": "After 25 years, I consider it is a lost cause.", "at": "39:50"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Endless project debates"},
+    {"at": "03:06", "title": "HTTP codes and April Fools RFCs"},
+    {"at": "05:32", "title": "Encodings and floating point"},
+    {"at": "10:30", "title": "Dates, regex and Y2K38"},
+    {"at": "18:14", "title": "Randomness, hashes and CORS"},
+    {"at": "23:31", "title": "Line endings and file systems"},
+    {"at": "26:56", "title": "Colours, printers and CSS"},
+    {"at": "31:18", "title": "Language quirks"},
+    {"at": "37:43", "title": "Terminology, VCS, SOA and Excel"},
+    {"at": "42:36", "title": "Open source, hardware and Jira"}
+  ],
+  "tech": ["HTTP", "IEEE 754", "BigDecimal", "java.time", "Unicode", "UUID", "SHA-256", "CORS", "Spring Boot", "CSS", "OKLCH", "JavaScript", "TypeScript", "C++", "Raku", "Git", "Excel", "curl", "FFmpeg", "MAME", "Jira"],
+  "watchIf": "You want a lighthearted hour of shared developer pain and trivia, with no AI in it.",
+  "themes": ["Hardware, robots & fun", "Legacy modernization"],
+  "demo": false
+}

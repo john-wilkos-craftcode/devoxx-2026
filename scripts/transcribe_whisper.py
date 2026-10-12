@@ -21,6 +21,7 @@ import ctypes
 import glob
 import json
 import os
+import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -68,15 +69,32 @@ def download_audio(video_id):
 
 
 def prompt_for(talk):
-    names = ", ".join(s["name"] for s in talk["speakers"])
-    return (f"Devoxx Belgium 2026 talk: {talk['title']}. Speakers: {names}. "
-            f"Topics: {', '.join(talk['keywords'])}. Java, JVM, Devoxx.")
+    """A plain sentence, not 'Speakers: ... Topics: ...': Whisper sometimes loops on label words
+    from the prompt ("Topics. Topics. Topics.")."""
+    names = " and ".join(s["name"] for s in talk["speakers"])
+    return f"{talk['title']}, a talk at Devoxx Belgium by {names} about {', '.join(talk['keywords'])}."
+
+
+LOOP = re.compile(r"((?:\b[\w']+[.,!?]?\s+){1,3})\1{7,}")
+
+
+def looped_words(text):
+    """Words inside hallucination loops: the same 1-3 words repeated 8+ times in a row."""
+    return sum(len(m.group(0).split()) for m in LOOP.finditer(text + " "))
 
 
 def transcribe(pipeline, audio, talk):
-    segments, info = pipeline.transcribe(str(audio), language="en", batch_size=8,
-                                         initial_prompt=prompt_for(talk))
-    return yt.format_transcript((seg.start, seg.text.strip()) for seg in segments), info.duration
+    """Primed with names for spelling; if that produces a loop, retry unprimed and keep the better one."""
+    def run(prompt):
+        segments, info = pipeline.transcribe(str(audio), language="en", batch_size=8, initial_prompt=prompt)
+        return yt.format_transcript((seg.start, seg.text.strip()) for seg in segments), info.duration
+
+    text, duration = run(prompt_for(talk))
+    if looped_words(text) > 12:
+        retry, _ = run(None)
+        if looped_words(retry) < looped_words(text):
+            text = retry
+    return text, duration
 
 
 def save(path, data):

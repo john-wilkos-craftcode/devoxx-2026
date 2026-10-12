@@ -1,0 +1,49 @@
+{
+  "id": 4098,
+  "source": "transcript",
+  "tldr": "Martinelli walks through his AI Unified Process: use cases and entity models kept in the repo as the source of truth, a stack-specific harness, deterministic sensors, and reverse engineering for brownfield modernisation.",
+  "summary": [
+    "Simon Martinelli, a Swiss consultant who mostly modernises 20-25-year-old Java systems, started spec-driven development after a vibe-coded volunteer management app became impossible to adapt for a second client. Citing Birgitta Böckeler's three levels (spec-first, spec-anchored, spec-as-source), he argues for spec-anchored: specs live in the repo next to the code and are the lasting definition of the system. Regenerating code from specs on every change repeats model-driven development without its determinism, and AI is not a compiler. His AI Unified Process (AIUP) borrows from the Rational Unified Process: a vision leads to requirements with stable IDs and a glossary, then an entity model, use case diagrams and Jacobson/Cockburn-style system use cases with pre- and postconditions, main and alternative flows, business rules, and a status field.",
+    "The live demo builds a hotel reservation system with Claude Code (Sonnet), Spring Boot, Vaadin and jOOQ, using skills distributed as a Claude Code plugin marketplace (also via Tessl), with a technology-agnostic core plus stack plugins (Vaadin/jOOQ, Angular/JPA, Blazor, NestJS/React). He chose jOOQ over Hibernate because the SQL is visible in review, and Vaadin because its tested components and browserless UI tests mean less to review. Skills generate requirements, a glossary, a Mermaid ER model, a PlantUML use case diagram and a use case spec; a spec-review skill runs a blocking Python linter plus non-blocking AI semantic checks. A Flyway migration with check constraints is generated, then the use case is implemented in 52 seconds. The resulting UI let users pick a checkout date before check-in, because nothing in the harness said to add validation to the UI.",
+    "The second half covers the harness and sensors. Deterministic sensors (ArchUnit, SonarQube, linters, JUnit tests that read the spec files) block progress; LLM-based checks only warn, because they can loop. In his Spring PetClinic reference repo, tests check that every @UseCase annotation points to a real use case, that 'done' use cases have tests, and that business rules are traced. Claude Code hooks guard status transitions, and a coverage-check sub-agent detects drift between spec, code and tests. Generated white-box tests give about 95% coverage, but he questions their value since they change in step with the code. Black-box Playwright tests derived from BPMN business processes, written by test engineers, carry more weight. CLAUDE.md should stay short and point to architecture docs, and rules that matter should become guardrails rather than guidelines.",
+    "For brownfield work the process runs in reverse: first find modules, then reverse-engineer entity models and use cases module by module, review them with domain experts, and add new features during the modernisation. Martinelli warns that a go-live missed a rare edge case nobody remembered; parallel operation saved them. Other advice: run agents off your laptop (a Hetzner VM, Fly.io Sprites, Claude Code remote control, Docker sandboxes), version and evaluate skills (one insurer accumulated 6,000 mostly unused ones), protect prompt caching, and expect results to differ between agents even on the same model. His conclusion is that the speed-up is mainly in building, so in enterprise settings it is smaller than people expect."
+  ],
+  "keyPoints": [
+    "Spec-anchored development keeps use cases and entity models in the same repo as UI, backend and tests, and updates existing code when specs change rather than regenerating it.",
+    "Use cases describe behaviour from an actor's perspective, not code, and can be read by business owners, testers and agents; keep them small enough for a human to review (one proof-of-concept use case reached 22 pages).",
+    "A status field on each use case (draft, approved, implemented, tested, done) drives the harness: skills refuse to implement unapproved use cases, and CI can trigger implementation on approval.",
+    "Pick frameworks that reduce review effort: jOOQ shows the executed SQL, and Vaadin's server-side UI can be tested without a browser.",
+    "Deterministic sensors block, AI sensors only warn; JUnit tests that parse the spec files enforce traceability from use case to test.",
+    "Test at the use case level (testing trophy, integration tests with a real database) and derive end-to-end tests from BPMN business processes; co-generated white-box tests add little assurance.",
+    "Vertical slices, such as self-contained systems or bounded contexts spanning UI to database, fit AI better than fine-grained microservices and micro-frontends.",
+    "Brownfield: modularise first, reverse-engineer per module, review with users of the old system, and run several reverse-engineering passes because AI may miss rare edge cases."
+  ],
+  "takeaways": [
+    "Turn every rule you would check in a pull request into an ArchUnit test, linter rule or repo-reading JUnit test instead of a CLAUDE.md line.",
+    "Give requirements and use cases stable IDs and annotate tests with them so a test can fail when a spec is renamed or removed.",
+    "Write eval scenarios for your own skills and rerun them when models or agents change; delete skills nobody uses.",
+    "Run long agent sessions in a sandbox or remote VM rather than on your laptop.",
+    "Treat the first implemented use case in a greenfield project as harness training: inspect the output and fix skills before scaling up."
+  ],
+  "quotes": [
+    {"text": "The problem with software modernization is not moving from one technology to another. The problem is no one knows what the system actually does.", "at": "07:37"},
+    {"text": "AI is not a compiler, so it may generate different output anytime.", "at": "11:44"},
+    {"text": "A lot of people confuse software engineering with programming. Programming is just typing.", "at": "17:27"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why spec-driven development"},
+    {"at": "09:04", "title": "Levels of spec-driven development"},
+    {"at": "18:50", "title": "The AI Unified Process"},
+    {"at": "30:47", "title": "Stack, skills and plugins"},
+    {"at": "42:42", "title": "Requirements and entity model demo"},
+    {"at": "50:29", "title": "Writing use cases for AI"},
+    {"at": "81:21", "title": "Architecture for AI development"},
+    {"at": "88:25", "title": "Implementing and testing a use case"},
+    {"at": "110:10", "title": "Guardrails and sensors"},
+    {"at": "134:10", "title": "Brownfield reverse engineering"}
+  ],
+  "tech": ["AI Unified Process", "Claude Code", "Claude Sonnet", "GitHub Copilot", "Spring Boot", "Vaadin", "jOOQ", "Flyway", "H2", "PostgreSQL", "Testcontainers", "ArchUnit", "SonarQube", "Playwright", "Mermaid", "PlantUML", "BPMN", "Tessl", "Agent Skills", "MCP", "Spring PetClinic", "Docker Sandboxes", "Fly.io Sprites"],
+  "watchIf": "You build long-lived business applications or modernise legacy Java systems and want a stakeholder-readable spec process with concrete harness and traceability techniques.",
+  "themes": ["AI agents & agentic coding", "Legacy modernization", "Testing & quality"],
+  "demo": true
+}

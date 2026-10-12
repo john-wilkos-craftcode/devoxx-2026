@@ -1,0 +1,39 @@
+{
+  "id": 31451,
+  "source": "transcript",
+  "tldr": "Janssen opens Devoxx Belgium 2026 with a dancing humanoid robot, his view that developers are becoming builders, notes on token costs and local models, and a live demo of Alex Gavrilescu's Groma.md.",
+  "summary": [
+    "The keynote opens with a scripted humanoid robot claiming to come from 2200 and dancing on stage. Thomas, whose team brought it from Germany, explains that it was trained with reinforcement learning and NVIDIA SONIC and costs about 40,000 euros. Stephan Janssen then describes being both excited and frightened by AI: he turned his non-developer son's wine spreadsheet into a Firebase-hosted website without touching code, which is why Devoxx now speaks of 'builders'. He walks through the stages from copy-paste prompting through context, agentic, harness and loop engineering, and points to 'decision engineering', where decision APIs return probabilities over constrained JSON options; he said Spring AI and LangChain4j already support them. He adds that this year's Java track, with many Oracle engineers, is the strongest ever.",
+    "On cost, about 70% of the room uses a subscription, which Janssen calls heavily subsidised, so he pushes local models, which he places about a year behind frontier models, plus European open-weight models from Mistral. He reports that DevoxxGenie, his open-source Java plugin for local models in the IDE, has passed 100,000 downloads, although he increasingly works in CLIs and reviews in IntelliJ. Alex Gavrilescu, creator of Backlog.md, then demos Groma.md, which keeps a live architecture map of a codebase. Six agents work through DevoxxGenie GitHub issues while components appear and change on the map, followed by an architecture-level diff. Gavrilescu put the run at $60-100+ in tokens versus about five days of manual work. The keynote closes with the robot games competition, the mobile rating app and Janssen's call to embrace the change."
+  ],
+  "keyPoints": [
+    "Janssen sees natural language as the new abstraction layer and developers moving from programming to building, while still reviewing code for critical domains.",
+    "He describes 'decision APIs' as a new building block: give a constrained set of options and get probabilities back, which is useful for tool selection or judging whether a tool call is disruptive.",
+    "Subscriptions are, in Janssen's view, heavily subsidised; he urges developers to evaluate local open-weight models, which he estimates are about a year behind the frontier.",
+    "Groma.md keeps a continuously updated architecture diagram of a codebase, shows multiple agents' changes on it in real time, and offers architecture diffs alongside code diffs.",
+    "Six parallel agents implementing six backlog tasks cost roughly $60 to over $100 in tokens, against an estimated five days of manual work."
+  ],
+  "takeaways": [
+    "Try a capable local model as an agent orchestrator to understand your options if subscription prices rise.",
+    "Look at spec-driven tools like Backlog.md and architecture-level views like Groma.md for reviewing agent output above the line-diff level.",
+    "Rate talks in the Devoxx mobile app so speakers get feedback."
+  ],
+  "quotes": [
+    {"text": "We are all transitioning into builders. The new abstraction layer is not programming languages anymore. It's natural language.", "at": "06:46"},
+    {"text": "$120, it would have taken me manually probably five days to implement. I am more expensive than $120.", "at": "23:43"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Robot from the future"},
+    {"at": "04:32", "title": "How the robot was trained"},
+    {"at": "05:37", "title": "From developers to builders"},
+    {"at": "08:56", "title": "Stages of AI engineering"},
+    {"at": "12:48", "title": "Token costs and local models"},
+    {"at": "17:44", "title": "DevoxxGenie and spec-driven development"},
+    {"at": "19:11", "title": "Groma.md live demo"},
+    {"at": "24:45", "title": "Wrap-up"}
+  ],
+  "tech": ["DevoxxGenie", "Groma.md", "Backlog.md", "Claude", "Codex", "Firebase", "Ollama", "Qwen", "Mistral", "Spring AI", "LangChain4j", "Embabel", "NVIDIA SONIC", "IntelliJ IDEA"],
+  "watchIf": "You want the opening mood of Devoxx 2026 in 25 minutes, including a dancing robot and a live multi-agent architecture-map demo.",
+  "themes": ["AI agents & agentic coding", "Developer experience & tooling", "Hardware, robots & fun"],
+  "demo": true
+}

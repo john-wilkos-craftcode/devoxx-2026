@@ -1,0 +1,46 @@
+{
+  "id": 49255,
+  "source": "transcript",
+  "tldr": "Smals reports on seven AI-assisted legacy projects, from COBOL analysis to SAS-to-Python, and details how it moved a JBoss EAP 7 application to EAP 8/Jakarta EE with a phased, human-in-the-loop harness.",
+  "summary": [
+    "Koen Vanderkimpen (Smals Research) frames legacy as a spectrum, from COBOL on exotic databases through framework migrations such as Struts to merely outdated dependencies. Large codebases do not fit in context, so AI cannot simply be put in the driver's seat; it is already good at searching, analysing, documenting and small translations, but architectural change needs close human guidance. He then sums up six of the seven cases from a two-year study. They include a dependency-analysis tool for thousands of interlinked COBOL programs, a chatbot built from video transcripts recorded by a retiring expert, and COBOL-to-Java translation where the code can't leave machines that have production access. The others are a 2024 Struts/Java 8 rewrite where Claude ported features by reading the old code, SAS ETL jobs translated to Python, and a toolchain that documents VBA macros hidden in Word templates.",
+    "His lessons: iterate and throw away weak first attempts, scrub secrets and personal data before code reaches a cloud model (a GDPR issue for government), let the AI ask questions rather than guess, and watch for cheating. In the Word-macro case the AI wrote a test that simply returned the expected value. Have AI build deterministic tools that take it partly out of the loop. Test environments remain the biggest, mostly organisational, blocker.",
+    "Wim Lambrecht then covers the Jakarta EE migration of 'Odysseus', an application for the National Social Security Office running on JBoss EAP 7, Spring 5 and Hibernate 5 on OpenShift. The key input was a company knowledge base: standalone Git repositories showing how to move each concern (Dockerfile, ActiveMQ, IBM MQ, Oracle) from EAP 7 to 8. A prepare phase sets up an isolated branch, installs the assistant with guardrails, removes PII and secrets without using AI, checks test coverage and involves the product team through kickoffs and hackathons. Execution starts with /init, then one large prompt that produces a phased plan marking parallelisable steps, a dependency inventory with a hand-written Jakarta dependency mapping file, a PROGRESS.md and an audit trail, and hands control back to a human after each phase. Lambrecht advises migrating shared common libraries first.",
+    "Later approaches added structure: role-based agents that ask the human which model to use per phase, a spec-driven COBOL-to-Java pipeline with JSON output contracts and non-AI quality gates per phase, and finally a single reusable migration skill. Vanderkimpen closes by warning that teams risk becoming 'AI-locked-in' if prices rise, cites the Jevons paradox to argue developer demand will grow, and lists what works well today: documentation, small translations and tooling, with humans needed for architectural rewrites."
+  ],
+  "keyPoints": [
+    "AI works well for understanding and documenting legacy code, small translations and refactorings, and building tooling; end-to-end migration only works for small programs, and architectural rewrites need close supervision.",
+    "Turning a retiring COBOL expert's explanatory videos into transcripts and a knowledge-base chatbot gave the new team a way to answer questions about the old code.",
+    "Early SAS-to-Python translations reproduced SAS idioms literally; more context, guardrails and eventually a skill improved them.",
+    "The EAP 7 to 8 migration was grounded in a company knowledge base of small example repositories, one per migration topic, which the agent learned from.",
+    "Ask for a phased plan in markdown that humans can edit, a PROGRESS.md and an audit trail of human corrections, and give control back after every phase.",
+    "Remove secrets and PII with non-AI tools before any agent sees the code.",
+    "The approach evolved from one big prompt to role-based agents, then spec-driven phases with JSON contracts and deterministic quality gates, and finally a reusable migration skill."
+  ],
+  "takeaways": [
+    "Before an AI-assisted migration, scrub secrets and personal data and make sure test coverage can catch regressions.",
+    "Build small reference repositories showing your organisation's approved before-and-after for each migration concern, and feed them to the agent.",
+    "Migrate shared common libraries before the applications that depend on them.",
+    "Use a different model, or a human, to review AI-written tests, since agents can write tests that just return the expected value.",
+    "Package a migration that worked into a skill so other teams can reuse it."
+  ],
+  "quotes": [
+    {"text": "If context is king, harness is the kingdom.", "at": "05:25"},
+    {"text": "You can't use AI to remove your sensitive data, because that's just the point.", "at": "30:16"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Smals and the agenda"},
+    {"at": "02:59", "title": "Context and harness engineering"},
+    {"at": "07:54", "title": "The legacy spectrum"},
+    {"at": "11:49", "title": "Six modernisation cases"},
+    {"at": "17:47", "title": "Lessons learned"},
+    {"at": "23:12", "title": "Jakarta EE migration case"},
+    {"at": "28:51", "title": "Prepare and execute phases"},
+    {"at": "40:20", "title": "Agents, specs and skills"},
+    {"at": "47:47", "title": "AI lock-in and the future"}
+  ],
+  "tech": ["Jakarta EE", "Java EE", "JBoss EAP", "Spring", "Hibernate", "OpenShift", "COBOL", "SAS", "Python", "VBA", "Struts", "Claude Code", "GitHub Copilot", "Maven", "Agent Skills"],
+  "watchIf": "You own legacy Java EE, COBOL or SAS code and want a realistic, public-sector view of where AI helps with modernisation and how to structure a migration.",
+  "themes": ["Legacy modernization", "AI agents & agentic coding"],
+  "demo": false
+}

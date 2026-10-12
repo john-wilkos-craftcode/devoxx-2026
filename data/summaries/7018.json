@@ -1,0 +1,46 @@
+{
+  "id": 7018,
+  "source": "transcript",
+  "tldr": "LangChain4j's agentic module now rests on a pluggable Planner interface, so you can write and mix your own orchestration patterns; Quarkus adds fault tolerance, observability, persistence and guardrails.",
+  "summary": [
+    "Mario Fusco and Kevin Dubois pick up from their Devoxx 2025 session on LangChain4j agentic patterns. After recapping the basics (AI services, prompts, chat memory, tools and MCP, RAG, guardrails, and the newer skills feature), they explain that feedback after last year showed the four built-in workflows (sequence, parallel, conditional, loop) plus the supervisor were not enough: every team wanted its own orchestration strategy.",
+    "Fusco's answer is a Planner interface with three methods, two of them defaulted: given the current agentic scope, return the next action, which is either 'invoke these agents' or 'done'. He rewrote all existing patterns on top of it (the sequential planner is a cursor over the sub-agents) and added new ones in a separate langchain4j-agentic-patterns module, including a goal-oriented planner that treats agent inputs and outputs as pre- and post-conditions and walks the shortest path through the resulting graph, and a blackboard pattern, shown with a medical diagnosis example. Patterns compose, so a loop can be inserted inside a goal-oriented plan, which on its own cannot loop.",
+    "The live demo combines a story writer with a voting pattern: three critic agents (style, originality, engagement) score in parallel, an aggregation function averages the votes, and an editor loops until the score reaches 8.5. The Quarkus Dev UI shows both the agent topology and the execution trace, with timing, tokens, inputs and outputs per call. A new @ChatModelSupplier hook selects the model per invocation: GPT-4o mini while the score is below 7.8, GPT-5.1 for the final polishing. Dubois then shows a router that uses a newly released 'decision model', which returns probabilities rather than chat, to route a request to medical and legal agents above a 0.5 threshold; it is now available as a DecisionRouterPlanner.",
+    "The last part covers production concerns via Quarkus: MicroProfile Fault Tolerance @Retry and @Fallback on agents, OpenTelemetry metrics for the LGTM stack, a Langfuse extension that starts a local instance in dev mode, guardrails on tool calls as well as model calls, Quarkus Flow to persist workflows (for example human-in-the-loop pauses) via Kafka or a database so they survive restarts, MCP Server 2.0 supporting the new stateless spec, and A2A with multi-tenancy. They argue that Java's typing makes it a better fit for agentic systems than Python."
+  ],
+  "keyPoints": [
+    "The Planner interface returns a next action (invoke one or more agents, or done); all built-in patterns were rewritten on it, and it is passed to a generic planner builder as a supplier so each execution gets a fresh instance.",
+    "New patterns live in a separate langchain4j-agentic-patterns module: goal-oriented, blackboard, voting, decision router and others, with a slide table of pros, cons and fit for each.",
+    "The goal-oriented planner builds a dependency graph from agent inputs and outputs and follows the shortest path, so it structurally cannot loop; nesting a loop agent inside it works around that.",
+    "The Quarkus Dev UI visualises agent topology and each execution, including duration, token use, and every agent's input and output.",
+    "A @ChatModelSupplier method can pick the model per call, e.g. GPT-4o mini for rough drafts and GPT-5.1 only once the critics' score is close to the 8.5 exit threshold.",
+    "LangChain4j added support for a newly released type of decision model within days of its release; the DecisionRouterPlanner calls every agent whose relevance probability exceeds a threshold, in parallel.",
+    "Quarkus Flow persists agentic workflows so a human-in-the-loop pause survives timeouts, pod restarts and rescheduling; by default LangChain4j keeps that state in memory.",
+    "Guardrails now apply to tool invocations as well as model input and output, and MCP tools can be wrapped as non-AI agents."
+  ],
+  "takeaways": [
+    "When the built-in workflows don't fit, implement the Planner interface rather than forcing a supervisor to do deterministic routing.",
+    "Cut cost by choosing the cheapest model that is good enough per agent, and switch models at runtime based on intermediate results.",
+    "Put @Retry and @Fallback on agent calls just as you would on remote service calls.",
+    "If your agents pause for human input, persist workflow state (e.g. with Quarkus Flow) instead of relying on in-memory state.",
+    "Work through the Quarkus LangChain4j workshop on GitHub to try these patterns and the enterprise features hands-on."
+  ],
+  "quotes": [
+    {"text": "The API is stupidly simple, so you can really create and plug what you want.", "at": "16:16"},
+    {"text": "You don't want everything to be a string. You want to keep reasoning with the types of your domain.", "at": "47:16"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Recap of LangChain4j agentic"},
+    {"at": "07:45", "title": "The pluggable planner"},
+    {"at": "11:32", "title": "Goal-oriented and blackboard patterns"},
+    {"at": "20:05", "title": "Voting pattern demo"},
+    {"at": "28:06", "title": "Dynamic model selection"},
+    {"at": "30:51", "title": "Decision models as routers"},
+    {"at": "37:22", "title": "Enterprise features in Quarkus"},
+    {"at": "47:16", "title": "Why Java for agents"}
+  ],
+  "tech": ["LangChain4j", "LangChain4j Agentic", "Quarkus", "Quarkus Dev UI", "MicroProfile Fault Tolerance", "SmallRye", "OpenTelemetry", "Grafana LGTM", "Langfuse", "Quarkus Flow", "Kafka", "MCP", "A2A", "GPT-4o mini", "GPT-5.1"],
+  "watchIf": "You build multi-agent systems in Java and need more control over orchestration, cost and production resilience than fixed workflow patterns give you.",
+  "themes": ["AI agents & agentic coding", "LLMs in Java apps", "Spring & frameworks"],
+  "demo": true
+}

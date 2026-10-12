@@ -1,0 +1,46 @@
+{
+  "id": 16414,
+  "source": "transcript",
+  "tldr": "A bank mainframe-to-Kafka modernisation was vibe-coded to a demo, then made production-grade by wrapping the agents in deterministic harnesses: build enforcers, OpenRewrite, ArchUnit, scripts and token discipline.",
+  "summary": [
+    "Anyul Rivas (GFT) tells the story of a proof of concept for a bank: stream data from a COBOL mainframe's SQL Server database via change data capture (Debezium) into Kafka, consumed by Java and C# microservices with outbox, dead-letter and resilience patterns, deployed on OpenShift with Helm and Azure DevOps. The constraints were strict: dependencies only from the bank's Artifactory, no outside images, no skills, MCP servers or sub-agents, and initially no AI traces in the repo; later GitHub Copilot was allowed. Three architects vibe-coded a working demo in about a month, which Rivas puts at 25k commits, 3,500 auto-merged pull requests and 180,000 generated lines.",
+    "Vague user stories invited hallucination, so the team used Matt Pocock's 'grill me' skill to turn them into implementation-ready specs with edge cases, bank constraints and acceptance evidence. Because the client refused spec tools like OpenSpec and wanted ADRs kept in Confluence, they built their own research-plan-implement workflow that ends by syncing Azure DevOps stories and Confluence. They kept two tracks: vibe coding for the demo, then a second, engineered track for production. Rivas uses Ousterhout's tactical versus strategic programming to frame the split: agents handle tactics, humans own strategy.",
+    "Most of the talk is lessons from building that production harness. When models silently downgraded Java 25 to 17, the Maven Enforcer plugin failed the build. Positive instructions worked better than negative ones. After the bank said three people were using 30% of the company's monthly Copilot quota, the team adopted the RTK CLI proxy (which Rivas credits with 60-80% token savings), pruned AGENTS.md files and stale ADRs, and started a fresh session per task. A duplication threshold in the build stopped copy-paste across the monorepo, OpenRewrite recipes enforced coding style, and ArchUnit and ArchUnit.NET enforced the bank's layering. Role-based sub-agent teams and naive TDD failed. A provisioning script with actionable error messages stopped the agent struggling with SQL Server under Rosetta.",
+    "Rivas closes with a Matrix metaphor: developers move from Neo, fighting inside the code, to Tank, who equips and steers the operators. He presents a work-in-progress 'AI harness scorecard' script that rates a repository on five pillars. Part of the middle section is missing from the transcript because of a transcription failure."
+  ],
+  "keyPoints": [
+    "Vibe coding was used deliberately for idea-to-demo; production quality came from a separate track with engineering practices, not from continuing the prototype.",
+    "Matt Pocock's 'grill me' skill turns a vague story into a spec with edge cases, constraints and an explicit acceptance signal so the agent knows when to stop; a 300-line plan is cheaper to review than a 10,000-line PR.",
+    "Encode rules in the build rather than the prompt: Maven Enforcer for Java version and banned dependencies, a duplication threshold with a message telling the agent to refactor, OpenRewrite recipes, ArchUnit for layers.",
+    "Token discipline: the RTK output-compressing proxy, AGENTS.md files under 500 lines, one session per task, skills loaded on demand, no rescanning of unchanged code, and a cap on output tokens, which cost several times more than input tokens.",
+    "A team of role-based sub-agents (DevOps, QA and so on) passing work between them failed: most tokens were spent on agent-to-agent chatter. A single orchestrator delegating narrow, disposable tasks worked better.",
+    "Agents misapplied TDD with horizontal, layer-by-layer test writing; outside-in TDD with vertical slices and external deterministic feedback worked.",
+    "Rivas cited a study of 660 Claude Code runs in which clean code did not change pass rates but cut token use by 7-8% and file revisits by 34%."
+  ],
+  "takeaways": [
+    "Turn recurring agent mistakes into build failures with clear messages instead of adding more prompt instructions.",
+    "Phrase agent instructions positively (what to do) rather than as lists of prohibitions.",
+    "Wrap flaky environment setup in a script per environment with actionable error output so the agent stops burning tokens on it.",
+    "Have the agent grill you on a story before planning, and review the plan rather than the generated code.",
+    "Start a fresh session per task and keep AGENTS.md short."
+  ],
+  "quotes": [
+    {"text": "A plausible implementation of the wrong problem is still a wrong solution.", "at": "15:08"},
+    {"text": "You are anthropomorphizing a human process for a computational system and you will repeat the same pathologies.", "at": "27:40"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "The mainframe modernisation brief"},
+    {"at": "05:58", "title": "Vibe coding the demo"},
+    {"at": "07:25", "title": "Grilling vague specifications"},
+    {"at": "11:43", "title": "Two tracks: demo and production"},
+    {"at": "16:36", "title": "Harnesses as adapters"},
+    {"at": "19:20", "title": "Build-enforced constraints"},
+    {"at": "22:06", "title": "Cutting token consumption"},
+    {"at": "29:03", "title": "Sub-agents and TDD pitfalls"},
+    {"at": "33:34", "title": "Your role now"}
+  ],
+  "tech": ["COBOL", "SQL Server", "Debezium", "Kafka", "OpenShift", "Helm", "Azure DevOps", "GitHub Copilot", "Maven Enforcer", "OpenRewrite", "ArchUnit", "ArchUnit.NET", "Testcontainers", "Mockito", "AssertJ", "RTK", "Confluence", "Docker Compose", "Java 25"],
+  "watchIf": "You need AI-generated code to pass the standards of a regulated enterprise and want concrete harness techniques that worked under tight constraints.",
+  "themes": ["AI agents & agentic coding", "Legacy modernization", "Testing & quality"],
+  "demo": false
+}
