@@ -1,0 +1,49 @@
+{
+  "id": 23524,
+  "source": "transcript",
+  "tldr": "Parlog and Sippach pick the Java 18-28 features that matter most, from data-oriented programming and the AOT cache to structured concurrency, post-quantum TLS, gatherers and JFR, and explain when to use each.",
+  "summary": [
+    "Instead of covering only JDK 26 and 27, Nicolai Parlog and Falk Sippach take five years of releases, roughly 18 to 28. An opening poll found most of the room on 21 or 25. Sippach starts with data-oriented programming using a medication-plan model: records as product types, a sealed Dosage interface over Tablet and Infusion as a sum type, and switch expressions with type, record, nested and unnamed patterns, when guards, dominance rules and case null. He stresses exhaustiveness: avoid default so that adding a Patch subtype breaks every switch at compile time. He contrasts Brian Goetz's DOP principles with Parlog's revised ones (model data immutably and transparently, separate operations from data). Parlog adds that primitive patterns wait on planned constant patterns.",
+    "On performance, Parlog's first answer is to upgrade. Project Lilliput's compact object headers cut headers from 96 to 64 bits (opt-in on 25, default on 27, by his account). G1 is now the default in every situation. He shows Netflix's pause-time graph after the switch to generational ZGC. Project Leyden's AOT cache stores loaded and linked classes, method profiles and now compiled code from a training run, which he said gives 50-70% faster startup for Helidon, Micronaut, Quarkus and Spring Boot hello-worlds and much faster warm-up. The training run must match production in JDK, architecture, GC and classpath, and agents that rewrite bytecode at load time limit it. The on-ramp section covers compact source files, IO.println, multi-file launching, module imports, shebang scripts and a preview JSON API that is not meant to replace Jackson.",
+    "Security covers ML-KEM and ML-DSA against harvest-now-decrypt-later attacks. JDK 27 puts a hybrid TLS 1.3 key exchange first in the default list, tunable via jdk.tls.namedGroups. Also covered: a PEM encoder/decoder API, integrity by default, and Oracle's plan to move JDK security updates from quarterly to monthly. After the break Parlog explains virtual threads as a way to raise throughput, not lower latency: don't pool them, limit concurrency with semaphores, and beware native-call pinning, file I/O and inheritable thread-local copies. Scoped values give one-way, automatically cleaned context, and StructuredTaskScope with Joiners (awaitAllSuccessfulOrThrow, anySuccessfulOrThrow, allUntil), timeouts and interrupt-based cancellation keeps fan-out inside one block. He argues this replaces most reactive code for new backends.",
+    "Sippach then covers sequenced collections, including that reversed() is a live view and that addLast on a TreeSet throws. He also covers stream gatherers (windowFixed, windowSliding, scan, fold, mapConcurrent, and a custom distinctBy), lazy constants as a replacement for double-checked locking, opt-in HTTP/3 in the HttpClient with its negotiation strategies, jwebserver, and Marc Hoffmann's Java Almanac. Parlog finishes with JDK Flight Recorder: method tracing and timing filters, jfr view, experimental CPU-time sampling, about 194 built-in events and in-process redaction of sensitive properties in 27. The last topics are Markdown Javadoc with /// comments and compiled, testable snippets pulled into Javadoc from source regions."
+  ],
+  "keyPoints": [
+    "Use records, sealed interfaces and pattern-matching switches without a default branch, so that adding a subtype causes compile errors everywhere it has to be handled.",
+    "Compact object headers (JDK 25 opt-in, on by default in 27 according to Parlog) shrink headers from 96 to 64 bits. They usually reduce heap and GC pressure, but measure, because decompression can cost CPU.",
+    "The AOT cache records a training run (possibly a canary in production) and replays classes, profiles and compiled code. A mismatched cache just gives no speedup, it never gives wrong behavior. You cannot record and use a cache at the same time.",
+    "Virtual threads increase throughput when work is I/O-bound and downstream services can scale. They don't make a single task faster, and the next bottleneck often shows up quickly.",
+    "StructuredTaskScope ties forked subtasks to a try-with-resources block. Joiners decide when to cancel and what join() returns, and close() waits for every thread, so tasks must honor interrupts for early cancellation to work.",
+    "For thread-local context in libraries such as Log4j2's MDC, use scoped values in your own code, a library flag that switches to InheritableThreadLocal, or a custom ThreadFactory that copies the context.",
+    "JDK 27 prefers a hybrid ML-KEM TLS 1.3 key exchange by default. jdk.tls.namedGroups or per-socket SSLParameters change the order.",
+    "JFR can trace or time specific methods (for example HashMap.resize or all static initializers) via command-line filters and show the results with jfr view, at about 1% overhead with default settings."
+  ],
+  "takeaways": [
+    "Upgrade to the latest JDK before any manual tuning, then measure with compact object headers and generational ZGC turned on.",
+    "Try an AOT cache training run for a service with slow startup or warm-up, and move load-time bytecode weaving to build time.",
+    "Replace hand-rolled thread pools for fan-out with StructuredTaskScope on virtual threads, and use semaphores where you need to cap concurrency.",
+    "Replace custom sliding-window or distinct-by-key stream code with Gatherers, and hand-written lazy singletons with lazy constants once they are final.",
+    "Start a JFR recording on a running app with jcmd <pid> JFR.start the next time you investigate a slowdown."
+  ],
+  "quotes": [
+    {"text": "A newer JDK is a faster JDK.", "at": "46:11"},
+    {"text": "Here, waiting is free. This cup, indeed, is most useful when it's empty.", "at": "79:25"},
+    {"text": "The closest to production is production.", "at": "146:10"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Scope and version poll"},
+    {"at": "04:06", "title": "Pattern matching building blocks"},
+    {"at": "27:14", "title": "Data-oriented programming"},
+    {"at": "36:29", "title": "Performance and the AOT cache"},
+    {"at": "47:39", "title": "On-ramp and Java scripting"},
+    {"at": "62:45", "title": "Security and removals"},
+    {"at": "78:00", "title": "Virtual threads and scoped values"},
+    {"at": "91:58", "title": "Structured concurrency"},
+    {"at": "116:46", "title": "New APIs"},
+    {"at": "147:32", "title": "JFR and Javadoc"}
+  ],
+  "tech": ["Records", "Sealed classes", "Pattern matching", "Project Amber", "Compact object headers", "Project Lilliput", "Project Leyden", "AOT cache", "G1", "Generational ZGC", "FFM API", "Vector API", "Compact source files", "JSON API (preview)", "ML-KEM", "ML-DSA", "TLS 1.3", "PEM API", "Virtual threads", "Scoped values", "Structured concurrency", "Log4j2", "Resilience4j", "Sequenced collections", "Stream gatherers", "Lazy constants", "HttpClient", "HTTP/3", "jwebserver", "Java Almanac", "JDK Flight Recorder", "JDK Mission Control", "Javadoc"],
+  "watchIf": "You are moving from Java 17 or 21 to 25 or later and want a guided tour of which features change how you write, run and secure code, with enough detail to start using them.",
+  "themes": ["Java language & JDK", "JVM performance & runtime"],
+  "demo": false
+}

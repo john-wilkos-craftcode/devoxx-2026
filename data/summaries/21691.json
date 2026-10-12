@@ -1,0 +1,46 @@
+{
+  "id": 21691,
+  "source": "transcript",
+  "tldr": "Ward walks through the 2026-07-28 MCP spec: a stateless transport, elicitation via multi-round-trip requests, CIMD replacing dynamic client registration, and official extensions for MCP Apps, Tasks and Skills over MCP.",
+  "summary": [
+    "James Ward, of AWS and the Agentic AI Foundation's technical committee, covers what changed in the MCP specification released as version 2026-07-28. Deprecated: roots, sampling, logging, dynamic client registration (DCR) and the HTTP+SSE transport. The headline change is that the transport becomes stateless. The old streamable HTTP needed an initialize call, a session ID and a separate SSE GET stream, which forced sticky load balancing on that session ID. Now every request carries protocol version, client info and capabilities in metadata. Clients are encouraged to send MCP method and name headers so routers can act on them, a server/discover call replaces initialize, results carry a result type (complete, input required, task), and list responses include a TTL and cache scope.",
+    "Without server push, state moves into explicit handles, which Ward likens to REST resource IDs. Elicitation becomes a multi-round-trip request (MRTR): the server returns input-required with a JSON schema, and the client sends a second request with the answer. He demos this with his Scala ZIO HTTP MCP library in MCP Inspector, booking a flight with era auto-negotiation between legacy (2025-11-25) and modern clients, and the tool code is unchanged for both. Spring AI and the Java MCP SDK were still on the previous spec, so his advice is to run Spring AI servers in stateless mode now so the upgrade becomes a version bump.",
+    "For auth, the MCP server remains an OAuth 2.1 resource server: a 401 points to protected resource metadata, which leads to the authorization server. The spec now also requires validating the issuer. Client ID Metadata Documents (CIMD) replace DCR: the client ID is a URL that serves a JSON document with name, redirect URIs and grant types, so the server knows who the client is without unbounded registrations. On a Spring AI server the only change is to validate the audience claim, and Daniel Garnier-Moiroux's MCP security library handles the client side. The live login demo first fell back to DCR until Ward switched CIMD on in Inspector.",
+    "Extensions are now formalized, with capability negotiation and io.modelcontextprotocol/ namespaces. MCP Apps return HTML resources that the client renders, demoed in Claude.ai as a sortable EC2 instance table that can pre-fill prompts. Text fallbacks are needed for terminals. Tasks add standard tools for long-running work. Skills over MCP serves skills as resources, and Ward said Codex was an early client supporting it. His SkillsJars project packages skills as Maven Central JARs under META-INF/skills, and his server exposes them automatically. Build plugins extract them to disk when a coding agent needs the files."
+  ],
+  "keyPoints": [
+    "The stateless transport puts protocol version, client info and capabilities on every request, so MCP servers can sit behind ordinary load balancers without sticky sessions on a session ID.",
+    "server/discover replaces initialize. Servers must implement it, clients may call it, and its presence is how servers tell modern-era clients from legacy ones.",
+    "Responses carry a result type (complete, input required or task), and list and read results include TTL milliseconds and a cache scope so clients can decide how long to cache.",
+    "Elicitation now returns input-required with a JSON schema, and the client sends a follow-up request with the user's answer, instead of the server pushing over SSE.",
+    "CIMD makes the OAuth client ID a URL pointing to a metadata document. It replaces dynamic client registration, which gave every client a new ID and no real identity.",
+    "Official extensions: MCP Apps (interactive HTML UIs via resources), Tasks (standard tools for long-running work) and Skills over MCP (skills list/get, served as resources), plus an OAuth client-credentials extension for enterprise auth.",
+    "SkillsJars ships agent skills as JARs, so they can be versioned and distributed like any other dependency and served over MCP from the classpath."
+  ],
+  "takeaways": [
+    "Switch your MCP servers to stateless mode now, and model state as explicit resource handles passed in tool arguments.",
+    "Stop relying on sampling, roots and logging, which are deprecated in the new spec.",
+    "Enable audience-claim validation on authenticated MCP servers to be ready for CIMD.",
+    "Move long-running tool work to the Tasks extension, and give every MCP App a plain text or data fallback.",
+    "Use MCP Inspector, which can force legacy or modern protocol eras, to test that your server works with both."
+  ],
+  "quotes": [
+    {"text": "The MCP specification, which is really good reading material if you need to fall asleep at night.", "at": "47:03"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "MCP's evolution and deprecations"},
+    {"at": "02:57", "title": "Stateless transport"},
+    {"at": "07:55", "title": "Handles and Spring AI stateless mode"},
+    {"at": "10:08", "title": "Multi-round-trip elicitation"},
+    {"at": "13:49", "title": "Era negotiation demo"},
+    {"at": "20:06", "title": "Auth and CIMD"},
+    {"at": "26:35", "title": "CIMD demo with Spring AI"},
+    {"at": "31:29", "title": "Extensions and MCP Apps"},
+    {"at": "37:23", "title": "Tasks, skills and SkillsJars"},
+    {"at": "43:05", "title": "Migration checklist and Q&A"}
+  ],
+  "tech": ["Model Context Protocol (MCP)", "MCP Inspector", "Spring AI", "Java MCP SDK", "ZIO HTTP", "Scala", "OAuth 2.1", "CIMD", "Dynamic Client Registration", "JSON Schema", "MCP Apps", "Agent skills", "SkillsJars", "Maven Central", "Claude.ai", "Codex", "Amazon EC2"],
+  "watchIf": "You maintain or are about to build an MCP server or client and need to know what the 2026-07-28 spec breaks and how to prepare for it.",
+  "themes": ["AI agents & agentic coding", "LLMs in Java apps", "Security & supply chain"],
+  "demo": true
+}

@@ -1,0 +1,39 @@
+{
+  "id": 5051,
+  "source": "transcript",
+  "tldr": "Philippart shows how Dev Containers let Docker be the only thing installed on a laptop, building a Java toolchain up from a devcontainer.json to shared features, templates and prebuilt images.",
+  "summary": [
+    "Stéphane Philippart starts from familiar pain: reinstalling tools on a new machine, onboarding onto a project, giving up on an open source fix because of the setup, or wanting to try an AI assistant without letting it run rm -rf on your laptop. His answer is Dev Containers: local VS Code connects to a VS Code server inside a container, with the source mounted as a volume. In a live demo on a Mac with no Java installed, he adds a configuration from the Java template (Java 25 on Debian Trixie), reopens in the container and runs Java there. He then switches to a generic base image and uses features to install Java 26 from Temurin, Maven and JBang via SDKMAN, with customizations that pre-install the JBang and Red Hat Java extensions.",
+    "Each following step adds one more level of reuse. postCreateCommand runs a script, here installing the OVHcloud CLI and a JBang-installed httpd command, remoteEnv sets the PATH, and port forwarding opens the app in the host browser. He turns the script into a local feature (a folder with devcontainer-feature.json and install.sh), then into a remote feature published to the GitHub registry using Microsoft's feature starter repo and its GitHub Action. He also covers custom Dockerfiles pushed to a private registry, Docker Compose with a PostgreSQL service, custom templates from the template starter repo, and `devcontainer build --push`, which bakes everything into an image so the config shrinks to two lines. The downsides he lists: heavy images, rebuilds that need a network connection, and weak IntelliJ support (Ultimate only, plugins installed locally)."
+  ],
+  "keyPoints": [
+    "Features install tools such as Java 26 (Temurin), Maven and JBang into a generic image without writing a Dockerfile.",
+    "postCreateCommand covers tools that have no feature, and remoteEnv sets container environment variables such as PATH.",
+    "Local features live in .devcontainer/<name>/ with devcontainer-feature.json (options) and install.sh. The official feature-starter repo plus a GitHub Action publishes them to the GitHub registry so other projects can share them.",
+    "Templates (devcontainer-template.json with options) and the devcontainer CLI's build command can bake the whole setup into one image, so a project's config is just a name and an image.",
+    "Downsides: images can be heavy, every config change triggers a rebuild that needs internet, and the IntelliJ integration needs Ultimate and installs plugins locally, which Philippart says goes against the spirit of Dev Containers."
+  ],
+  "takeaways": [
+    "Add a .devcontainer/devcontainer.json to one project, starting from an official template, and see whether new contributors need anything besides Docker.",
+    "Move repeated postCreateCommand scripts into a feature published from the devcontainers feature-starter repo, so a change only has to be made once.",
+    "Use Docker Compose in devcontainer.json to bring up the database next to the dev container instead of installing it locally."
+  ],
+  "quotes": [
+    {"text": "If I succeed to create my Dockerfile, I think you can too.", "at": "20:53"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why environment setup hurts"},
+    {"at": "01:52", "title": "Dev Containers architecture"},
+    {"at": "03:13", "title": "Java from a template"},
+    {"at": "05:42", "title": "Features and customizations"},
+    {"at": "08:14", "title": "Post-create commands and ports"},
+    {"at": "10:48", "title": "Local and remote features"},
+    {"at": "13:58", "title": "Dockerfiles and Docker Compose"},
+    {"at": "17:01", "title": "Custom templates and prebuilt images"},
+    {"at": "20:53", "title": "Limitations and IntelliJ"}
+  ],
+  "tech": ["Dev Containers", "VS Code", "Docker", "Docker Compose", "Docker Desktop", "devcontainer CLI", "JBang", "SDKMAN", "Maven", "Eclipse Temurin", "PostgreSQL", "GitHub Actions", "IntelliJ IDEA", "OVHcloud"],
+  "watchIf": "You onboard people onto projects with long setup instructions, or want a disposable, reproducible Java environment, and haven't used Dev Containers beyond the basics.",
+  "themes": ["Developer experience & tooling"],
+  "demo": true
+}

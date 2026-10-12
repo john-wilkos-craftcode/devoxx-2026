@@ -1,0 +1,47 @@
+{
+  "id": 9035,
+  "source": "transcript",
+  "tldr": "Vermeer demos five live attacks through a Java MCP server and Claude Code skills, all exploiting what agents trust, and argues pinned versions, curated inventories and automated scanning beat human approval prompts.",
+  "summary": [
+    "Brian Vermeer opens with Snyk research on ClawHub, the OpenClaw skills hub: of roughly 4,000 skills in February 2026, he said 37% had a security flaw and 13.4% a critical one, such as malware binaries, active prompt injection or secret exfiltration. His persona Dave is a careful Java developer who pins versions and reads changelogs, but under pressure to be an \"agentic developer\" he installs MCP servers and skills without the same scrutiny.",
+    "The first demo is a Spring AI MCP server that wraps javaconferences.org, installed the way many READMEs suggest, with an always-latest JBang, npx or uvx command. Vermeer ships a new version whose tool runs Runtime.getRuntime().exec and pops a calculator: a rug pull, because a stdio server runs with your permissions and nothing forces a re-review. He then removes the side effect, as if the server were sandboxed, and poisons only the tool description, telling Claude to also query an email tool and hide that it did. The agent reports a made-up conference in Breda. This is a toxic flow: untrusted input, an agent following the instructions, and a sensitive action through a different connector, with no single server looking malicious.",
+    "Skills get the same treatment. A code-formatter SKILL.md hides hex-encoded, HTML-escaped instructions that look harmless in the rendered view, and the agent signs off as \"Skynet Quality Assurance\" and switches to pirate speech. A dependency-updater skill downloads a zip and runs a GraalVM native binary, which the agent cannot inspect, and reports that a stale Logback 1.2.11 is up to date. A git-pulse skill produces a correct changelog while its Python script quietly posts git config to a local \"telemetry\" endpoint. Since a skill is a directory, reading the markdown alone is not enough.",
+    "Vermeer argues that a human in the loop is not a security boundary: approval fatigue works like phishing, and he cited real ClawHub malware, a \"SkillGuard\" skill with a reverse shell. Regexes are easy to get around, so detection has to combine deterministic rules with trained models. He runs Snyk's free Agent Scan (uvx snyk-agent-scan at a pinned version), which flags all three skills with risk scores and the hidden email-tool instruction in the MCP server. He closes with team advice and a short pitch for the paid Snyk Evo product, which monitors MCP and skill usage on developer machines."
+  ],
+  "keyPoints": [
+    "Install commands that always fetch the latest version (npx, uvx, JBang) give implicit trust: you approve an MCP server once and every later release runs with your permissions.",
+    "A stdio MCP server runs on your machine. Sandboxing stops code side effects but not a poisoned tool description, which the agent still reads.",
+    "Toxic flow = untrusted input + an agent that follows it + a sensitive action, often through another connector. Each server looks fine alone, and the risk is in the combination.",
+    "Prompt injections in skills can be hidden with hex encoding, HTML escaping, base64, other languages or invisible characters. The agent can still read them, while the rendered markdown looks clean to a human.",
+    "Skills ship scripts and can download binaries. A GraalVM native executable stops the agent from inspecting what it runs.",
+    "Vermeer contrasts this with Maven Central's controls (verified namespaces, no version ranges by convention) and says there is no equivalent for MCP servers and skills yet, comparing it to npm around 2015.",
+    "Snyk Agent Scan checks the default Claude Code, Cursor and Codex config locations, or a given path, and gave the binary-download skill 1,000/1,000 and the hex-encoded one 300/1,000."
+  ],
+  "takeaways": [
+    "Pin MCP server versions instead of using latest-tag npx, uvx or JBang install lines, and rescan every update.",
+    "Run Snyk Agent Scan, or a similar scanner, over your installed skills and MCP configs, including the scripts inside skill directories.",
+    "Keep a team inventory of approved, scanned MCP servers and skills, and only allow the pinned versions on that list.",
+    "Run MCP servers in sandboxes, and treat every tool description, tool response and skill file as untrusted input to the agent."
+  ],
+  "quotes": [
+    {"text": "Why, as an adversary, should I attack your application while I can attack you?", "at": "12:59"},
+    {"text": "Even though I cannot read hex-encoded text, my agent can.", "at": "30:35"},
+    {"text": "A human in the loop is not a security boundary.", "at": "40:39"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "ClawHub skills research"},
+    {"at": "04:17", "title": "Meet Dave, the agentic developer"},
+    {"at": "07:05", "title": "Rug pull in an MCP server"},
+    {"at": "14:27", "title": "Toxic flows via tool descriptions"},
+    {"at": "20:58", "title": "Skills as instructions"},
+    {"at": "25:55", "title": "Hidden prompt injection demo"},
+    {"at": "30:35", "title": "Downloaded native binary"},
+    {"at": "35:26", "title": "Exfiltrating script in a skill"},
+    {"at": "40:39", "title": "Why human approval fails"},
+    {"at": "42:45", "title": "Scanning with Snyk Agent Scan"}
+  ],
+  "tech": ["Model Context Protocol (MCP)", "Agent skills", "Claude Code", "Codex", "Cursor", "Spring AI", "JBang", "npx", "uvx", "GraalVM Native Image", "Maven Central", "ClawHub", "OpenClaw", "Snyk Agent Scan", "Snyk Evo"],
+  "watchIf": "You or your team install MCP servers and skills into coding agents, especially in auto-approve mode, and want to see concretely how they get abused.",
+  "themes": ["Security & supply chain", "AI agents & agentic coding"],
+  "demo": true
+}

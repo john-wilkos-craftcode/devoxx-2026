@@ -1,0 +1,47 @@
+{
+  "id": 4086,
+  "source": "transcript",
+  "tldr": "Rosa and Sammut argue that AI speeds up building but exposes how poorly organizations understand themselves, and show, through an insurance case, how AI-assisted discovery lenses and small reversible hypotheses lead to better decisions.",
+  "summary": [
+    "João Rosa and Dave Sammut present a method from a white paper they say was peer-reviewed by banks and telcos. You look at the organization through several lenses, make observations, turn them into hypotheses, and then validate and scale them or learn from being wrong. Sammut compares it to the Mikado Method for refactoring: look at the consequences before jumping in, because the documented org chart differs from the ground truth of invisible work and interruptions. He also stresses reversibility: sticking with a bad decision, as on one client's four-year migration, is not discipline. Their running example is a 200-year-old insurer built from mergers and acquisitions, which has \"modernized\" but is still slow.",
+    "Rosa covers sales and distribution. Using interview recordings, workshop photos, Event Storming output and Git history as a \"brain\" for AI analysis, a slow platform team found it should rely on central compliance (including DORA work) instead of building its own. To tackle invisible tech debt, the team built a pipeline: SonarQube and CodeScene scores feed backlog items, LLMs prioritize and refactor using open source agents and skills, and humans re-review. When 249 teams wanted the same pipeline, it moved into the developer experience platform. Token costs then exploded, and an AI platform team emerged that applied FinOps attribution and helped teams pick the right models.",
+    "Sammut takes claims management, where his advice is \"start where it hurts\". Short guided conversations, synthesized by an LLM and pushed into Miro, give Event Storming-style maps of pain points such as a three-day claim-approval lead time, then an imagine/model/make/move/maintain view of the delivery lifecycle. A lens on architects' work, first used at a Dutch bank, split it into firefighting, operational and strategic. Automating operational toil backfired in part, because architects said some of it was how they learned. Domain-understanding and Team Topologies views showed subject matter experts cut off from delivery. That led to an AI-archaeology enabling team, story-style outputs for the business, and migration choices across the four Rs instead of a feature-parity migration.",
+    "They finish with three asks: spread knowledge through the communities of practice and informal channels you already have, keep organizational learning alive (citing organizations caught out by Broadcom's VMware licensing change), and stay committed to investing without falling for sunk costs. Culture matters too: they reference Westrum's pathological, bureaucratic and generative types and say AI programs struggle where mistakes lead to witch hunts. The abstract promised live demonstrations, but the session was slides and field stories only."
+  ],
+  "keyPoints": [
+    "The method: look through several lenses, make observations, form hypotheses, then validate and scale or pivot. It favors many small reversible decisions over large reorganizations.",
+    "Feeding interview recordings, workshop artifacts and Git history to an LLM lets consultants build a shared picture of an organization much faster than with traditional workshops alone.",
+    "One team's tech-debt pipeline combined deterministic tools (SonarQube, CodeScene), LLM prioritization and refactoring with open source agents and skills, and human review before closing each backlog item.",
+    "Successful AI practices that move into a platform drive token costs up. In the insurer's case an AI platform team applied FinOps cost attribution and model-selection guidance.",
+    "Guided 15-20 minute conversations synthesized by an LLM into Miro boards help avoid blank-page paralysis and surface pain points such as a three-day claim-approval lead time.",
+    "Automating architects' toil can remove learning opportunities. Sammut's architects pushed back on handing some work to AI that looked like toil.",
+    "AI-driven code archaeology of a legacy estate, presented as stories, let business experts choose among replace, re-platform, remove and re-architect instead of a parity migration."
+  ],
+  "takeaways": [
+    "Before rolling out AI, spend a short, bounded period mapping where work actually hurts, using recorded conversations and an LLM to synthesize them.",
+    "Frame each AI initiative as a hypothesis with a way to measure it, and decide explicitly whether to scale, pivot or reverse.",
+    "Put cost attribution in place for LLM usage before a successful internal AI tool spreads to hundreds of teams.",
+    "In legacy migrations, use AI to explain what the old system does to domain experts and challenge whether each feature is still needed, instead of aiming for parity.",
+    "Share what works with AI through existing communities of practice, meetups and lunches rather than new structures."
+  ],
+  "quotes": [
+    {"text": "Just because you took a bad decision, it's not discipline by sticking by that decision.", "at": "06:43"},
+    {"text": "If you give that to the AI to do, I'm missing out on a learning opportunity.", "at": "29:48"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "AI forces organizational reflection"},
+    {"at": "04:15", "title": "Lenses, observations, hypotheses"},
+    {"at": "06:43", "title": "Insurance company case"},
+    {"at": "09:15", "title": "Sales and distribution platform"},
+    {"at": "13:15", "title": "AI tech-debt pipeline"},
+    {"at": "17:25", "title": "Scaling via platforms and FinOps"},
+    {"at": "21:49", "title": "Claims: start where it hurts"},
+    {"at": "28:25", "title": "Why architects are a bottleneck"},
+    {"at": "32:05", "title": "Domains, teams and AI archaeology"},
+    {"at": "36:36", "title": "Culture, knowledge and commitment"}
+  ],
+  "tech": ["Event Storming", "Team Topologies", "Domain-driven design", "Mikado Method", "SonarQube", "CodeScene", "Miro", "FinOps", "DORA (Digital Operational Resilience Act)", "Westrum organizational culture model"],
+  "watchIf": "You are an architect or engineering leader in a large enterprise whose AI rollout is producing agents nobody uses, rising token bills or a stalled migration.",
+  "themes": ["Teams, careers & leadership", "Architecture & design", "Legacy modernization"],
+  "demo": false
+}

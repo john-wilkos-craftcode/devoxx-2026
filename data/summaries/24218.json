@@ -1,0 +1,45 @@
+{
+  "id": 24218,
+  "source": "transcript",
+  "tldr": "Chatzizacharias plays a real-time strategy game whose map is a Git repository, and uses it to explain snapshots, staging, three-way merges, custom merge drivers, the .git folder, rebasing and how history can be destroyed.",
+  "summary": [
+    "Alexander Chatzizacharias says he was motivated by Claude Code asking permission to run an obscure octopus-merge command he could not read. If Git is his last line of defense against agents, he wants to understand it. He recaps the history: the BitKeeper licence was revoked after someone on the kernel side reverse-engineered it, and Linus Torvalds started Git on 3 April 2005 with goals of merges in under three seconds, full distribution and protection against corruption. The first commit came on 7 April, Linux shipped with Git in June, and Junio Hamano, still the maintainer, took over in July. Chatzizacharias notes that the famous \"10 days\" of coding followed months of thinking.",
+    "After versioning his Elden Ring and Baldur's Gate 3 Honour Mode save files, he built an RTS on top of Git. The map is a text grid where each building is a run of characters. The game client is written in Unity/C#, a Quarkus sidecar watches the repository through JGit and the Git CLI and pushes changes over WebSockets, and custom merge drivers are compiled with GraalVM native image. The game shows Git states directly: a building in the working tree is just a reserved outline, staging it (an object with no commit, which gc could discard) gives half capacity, and committing makes it fully active. Switching branches makes buildings appear and disappear.",
+    "Merging two diverged branches shows a three-way merge against the common ancestor. Because Git merges line by line, two buildings on the same row of the map conflict, so he wrote a merge driver that compares each character and returns exit code 0 or 1. He explains the Merkle DAG of content-addressed blobs, trees and commits, and why git status is fast. A tagged wonder building represents the .git folder: HEAD, index, the logs behind reflog, refs for branches, tags and remotes, and objects that are packed into deltas on gc. A rebase is replayed visibly as a series of cherry-picks followed by a fast-forward merge.",
+    "Hidden buildings on another branch crush enemy units when merged in. He closes with a \"don't do this\" recipe for wiping history: write-tree and commit-tree onto an orphan branch, delete every other ref, expire the reflog, garbage-collect, then mirror-push so colleagues pull the damaged repository. His final message is that coding is a superpower and developers should build fun, odd things, not another LLM-wrapping notes app."
+  ],
+  "keyPoints": [
+    "Git stores a full snapshot per commit, not diffs. It saves space through content addressing, and gc packs objects into deltas with the newest version stored whole.",
+    "Staged but uncommitted content already lives in .git/objects. Objects that no commit references are orphans and can be removed on the next garbage collection.",
+    "A three-way merge compares both sides with their common ancestor. Git's default works per line, and custom merge drivers can replace it, signalling a conflict through their exit code.",
+    "Blobs, trees, commits and tags form a Merkle DAG. A change anywhere changes the root hash, so git status only has to descend into folders whose hashes changed.",
+    "Branches, tags and remotes are just small files in refs that point to hashes. The logs folder records every HEAD movement and is what makes git reflog able to recover work.",
+    "A rebase is a series of cherry-picks onto the target branch, which then allows a fast-forward merge and a linear history.",
+    "History is only safe while something references it: deleting refs, expiring the reflog, running gc and mirror-pushing can wipe it for everyone."
+  ],
+  "takeaways": [
+    "Open your repository's .git folder and look at HEAD, refs, logs and objects to see what your daily commands actually change.",
+    "Use git reflog to recover a lost branch or detached-HEAD work before assuming it is gone.",
+    "Write a custom merge driver for structured files where line-based merging produces false conflicts.",
+    "Read any unfamiliar Git command an agent proposes before approving it, especially ones that touch refs, the reflog or gc."
+  ],
+  "quotes": [
+    {"text": "Git is my last line of defense against you agents. If you screw something up, I'm going to use Git to fix it, so I might as well understand what it does.", "at": "05:35"},
+    {"text": "The world doesn't need another LLM-wrapping notebook app. Make fun things.", "at": "44:48"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why talk about Git now"},
+    {"at": "05:35", "title": "Git's origin story"},
+    {"at": "10:09", "title": "From save files to RTS"},
+    {"at": "13:44", "title": "Snapshots and game architecture"},
+    {"at": "19:06", "title": "Working tree, staging, commits"},
+    {"at": "24:00", "title": "Merges and custom drivers"},
+    {"at": "30:19", "title": "Inside the .git folder"},
+    {"at": "38:14", "title": "Rebase and fast-forward"},
+    {"at": "42:00", "title": "Destroying history"}
+  ],
+  "tech": ["Git", "JGit", "Quarkus", "WebSockets", "Unity", "C#", "GraalVM Native Image", "BitKeeper", "Claude Code"],
+  "watchIf": "You use Git every day but couldn't explain what a rebase, the reflog or a merge driver really does, and you'd like to learn it from a game with buildings exploding.",
+  "themes": ["Developer experience & tooling", "Hardware, robots & fun"],
+  "demo": true
+}
