@@ -1,0 +1,41 @@
+{
+  "id": 10016,
+  "source": "transcript",
+  "tldr": "Using a client-facing insurance RAG chatbot as the example, Pacquetet lays out a three-step evaluation pipeline built on a written evaluation dataset, narrow pass/fail metrics and LLM judges calibrated against human reviewers.",
+  "summary": [
+    "Pacquetet, a senior AI scientist at SCIAM, argues that the gap between an AI demo and production is trust, and that trust comes from turning ad hoc 'try a question and eyeball it' checks into a pipeline that produces a score at the click of a button. That score is used to compare versions before each release and to guide every prompt or architecture change. The pipeline has three steps: simulate inputs across ideal, realistic (typos, keywords, vague 'am I covered?') and adversarial (prompt injection, jailbreaks) scenarios; run them through the system; then evaluate the outputs. Operational quality such as latency, cost and stability is monitored as for any other service. Her running example is an insurance chatbot with a triage agent that outputs only true or false, scored by string matching, followed by a RAG agent that writes the answer.",
+    "The hard part is the free-text answer. Working through 'Is renter's insurance mandatory for a tenant in France?', she shows how correctness, relevance, completeness and safety pull against business rules such as a warm tone and short answers for a small chat window, and that several different answers can all be good. Writing the expected answers in the evaluation dataset is slow, but it turns vague specs ('short') into a concrete contract with the business team. She ranks metrics from deterministic (regex, string matching, F1) through similarity metrics (ROUGE, BLEU, BERTScore; 'similarity is not quality') to LLM-as-a-judge and human review. A judge works when it gets one narrow task, for example 'return true if the new answer contradicts the expected one', never 'is this answer good?'. Each question combines several pass/fail checks, with secondary metrics tracked but not gating, and the judges are calibrated against business reviewers until their verdicts agree."
+  ],
+  "keyPoints": [
+    "Test inputs should cover three scenarios: ideal, realistic and adversarial; teams often skip the realistic one.",
+    "The evaluation dataset of inputs and expected outputs works as the executable spec and exposes contradictory or implicit business rules.",
+    "Prefer deterministic metrics whenever possible; semantic similarity cannot detect a wrong fact or a bad tone.",
+    "An LLM judge is reliable only with a narrow binary task, such as detecting contradictions with the reference answer.",
+    "Combine per-question pass/fail checks (a contradiction judge plus string matching for a required phone number), keep secondary metrics like a follow-up question non-blocking, and calibrate everything against human reviewers."
+  ],
+  "takeaways": [
+    "Write expected answers for a set of ideal, realistic and adversarial questions together with your business team before tuning prompts.",
+    "Use string matching or regex for anything constrained, and keep LLM judges for the parts that need comprehension.",
+    "Rewrite any 'is this answer good?' judge prompt into single-purpose true/false checks.",
+    "Have business reviewers score a sample of outputs and adjust your judges until their verdicts match."
+  ],
+  "quotes": [
+    {"text": "If you want to find balance, you have to give up control.", "at": "05:20"},
+    {"text": "Similarity is not quality.", "at": "26:53"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "From demo to production"},
+    {"at": "04:17", "title": "Why LLM products resist evaluation"},
+    {"at": "07:49", "title": "The three-step pipeline"},
+    {"at": "11:42", "title": "Evaluating the triage agent"},
+    {"at": "15:45", "title": "What is a good answer"},
+    {"at": "23:04", "title": "The evaluation dataset as spec"},
+    {"at": "25:42", "title": "Four families of metrics"},
+    {"at": "33:09", "title": "Combining pass/fail metrics"},
+    {"at": "35:45", "title": "Roadmap for your team"}
+  ],
+  "tech": ["RAG", "LLM-as-a-judge", "ROUGE", "BLEU", "BERTScore", "Constrained output"],
+  "watchIf": "You have an LLM or RAG prototype that works in demos and need a defensible way to show it is good enough for real users.",
+  "themes": ["Testing & quality", "LLMs in Java apps"],
+  "demo": false
+}

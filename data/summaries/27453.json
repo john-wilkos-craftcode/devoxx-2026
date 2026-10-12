@@ -1,0 +1,105 @@
+{
+  "id": 27453,
+  "source": "transcript",
+  "tldr": "Davies shares his field notes on running open-weight Qwen models on a four-box NVIDIA DGX Spark cluster for 50-200 person offices that cannot send data to frontier clouds, including serving numbers, operational pitfalls and KV-cache loading instead of RAG.",
+  "summary": [
+    "Davies builds private AI systems for banks, accountants, law firms and medical clients that will not send client data to US clouds. Privacy is the main driver, but he also cites long-term reproducibility of decisions, the lack of SLAs from hosted providers, and model quality that shifts after releases. After Mac Studios became hard to buy, he moved to NVIDIA DGX Sparks (GB10, 128 GB unified memory) running vLLM. vLLM is slower than llama.cpp or MLX for a single user but serves many users concurrently. He measured about 300 tokens/s aggregate on one box, around 12 tokens/s each with 32 users, or about 34 tokens/s each when spread over four boxes.",
+    "His main hardware advice is to pick a model that fits on one box and add boxes for throughput and availability, rather than splitting a big model across machines. He wired four Sparks into a ring over the high-speed interconnect, then left it unused: it added about 20 W per box (idle rose from 60 to 80 W), and Wi-Fi 7 is enough for SSH and copying model files. On top of the boxes his team built layers: a plain URL endpoint, with a proxy so Claude Code can use it, box reservations so code reviews do not slow down client demos, encrypted per-user chat history kept for debugging, and a browser and iPhone dashboard with remote shutdown.",
+    "For models he runs two Qwen variants on two boxes each. Qwen 3.6 35B at Q4 serves eight users at the full 256k context, or 30-50 agents at 64k, at 60-100 tokens/s with 0.1-0.2 s to the first token. A larger Qwen model, which he rates near the frontier coding models of mid-2026, fits only two full-context instances per Spark. Its 'extra high' effort setting reasoned until it ran out of tokens and scored worse than 'medium'. Other lessons: set vLLM GPU memory utilization to about 0.7 to avoid out-of-memory crashes, hard-reboot to clear memory fragmentation that shrinks the usable context, and watch clock-governor tweaks that silently ruined a night of benchmarks. The spare memory runs Whisper or Parakeet for speech-to-text and Chatterbox for speech output, which he uses for live Spanish-English meeting translation.",
+    "On data, he pins model hashes, seeds and inputs so a KYC decision can be reproduced years later, which public models cannot guarantee. In place of RAG he prefills a document once, writes its KV cache to disk (2-5 GB for a book-sized document) and reloads it in about 250 ms. He said this gives sub-second answers on a Mac and around one second on a Spark for documents such as the 270-page SpaceX S-1, and that layered summary caches let him search 58 million tokens of SWIFT ISO 20022 documentation in under five seconds. In the Q&A he said the setup is for document work and code review, not code generation, and he recommended Hermes Agent for home use."
+  ],
+  "keyPoints": [
+    "One DGX Spark with vLLM produced about 300 tokens/s aggregate; 32 concurrent users got about 12 tokens/s each, and spreading them over four boxes raised that to about 34.",
+    "Choose a model that fits one box and scale by adding boxes; splitting a model across Sparks works but never doubles speed, and the interconnect cost about 20 W per box.",
+    "Qwen 3.6 35B at Q4 handled eight concurrent 256k-context sessions, or 30-50 at 64k, with 0.1-0.2 s time to first token.",
+    "On the larger Qwen model, the default 'extra high' effort performed worse than 'medium' because it exhausted its token budget while reasoning.",
+    "Operational settings: vLLM memory utilization around 0.7, hard reboots to undo memory fragmentation, and caution with CPU clock governors during benchmarks.",
+    "Saving a prefilled document's KV cache to disk and reloading it (about 250 ms for 2-5 GB) replaces chunking and embedding for stable documents.",
+    "Pinning model hash, seed and inputs makes regulated decisions such as KYC checks reproducible years later.",
+    "Davies said Spark prices were about to rise sharply and recommended buying soon."
+  ],
+  "takeaways": [
+    "Benchmark candidate open-weight models on your own workload, not published leaderboards, before standardizing on one.",
+    "Pick a quantized model that fits a single machine and add identical machines for concurrency and failover.",
+    "Experiment with caching prefilled KV state to disk for large, rarely changing documents before building a RAG pipeline.",
+    "Record model hash, seed and inputs for any LLM-assisted decision you may need to justify later.",
+    "Give each user encrypted chat history and a reservation mechanism when sharing local inference boxes across an office."
+  ],
+  "quotes": [
+    {
+      "text": "You should really be finding the model that fits on these boxes. And if it doesn't fit on one box, it's questionable whether it's worth putting it on two boxes.",
+      "at": "09:44"
+    },
+    {
+      "text": "We use it for code reading, not for code writing.",
+      "at": "41:36"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why clients need private AI"
+    },
+    {
+      "at": "03:00",
+      "title": "Choosing the hardware"
+    },
+    {
+      "at": "07:00",
+      "title": "Serving with vLLM"
+    },
+    {
+      "at": "11:05",
+      "title": "Networking the cluster"
+    },
+    {
+      "at": "13:42",
+      "title": "Gateway, reservations and encryption"
+    },
+    {
+      "at": "20:20",
+      "title": "Monitoring and model choice"
+    },
+    {
+      "at": "27:04",
+      "title": "Memory tuning and speech models"
+    },
+    {
+      "at": "29:48",
+      "title": "Model pinning for compliance"
+    },
+    {
+      "at": "30:55",
+      "title": "KV cache instead of RAG"
+    },
+    {
+      "at": "41:36",
+      "title": "Q&A"
+    }
+  ],
+  "tech": [
+    "NVIDIA DGX Spark",
+    "Mac Studio",
+    "Mac Mini",
+    "vLLM",
+    "llama.cpp",
+    "MLX",
+    "Qwen",
+    "Gemma",
+    "KV cache",
+    "Multi-token prediction",
+    "Whisper",
+    "Parakeet",
+    "Chatterbox",
+    "Hermes Agent",
+    "Claude Code",
+    "Tenstorrent",
+    "Humanity's Last Exam"
+  ],
+  "watchIf": "You need LLMs for a regulated or privacy-sensitive organization and want concrete numbers and pitfalls from running open-weight models on a small on-premises cluster.",
+  "themes": [
+    "Hardware, robots & fun",
+    "Security & supply chain"
+  ],
+  "demo": false
+}

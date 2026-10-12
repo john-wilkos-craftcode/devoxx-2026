@@ -63,9 +63,9 @@ const CSS = `
 .kx-who { color: #c9c3e6; font-size: 30px; margin-top: 18px; }
 .kx-tldr { font-size: 34px; line-height: 1.38; margin-top: 26px; border-left: 8px solid #FFC93C; padding-left: 26px; max-width: 30em; }
 .kx-actions { display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap; }
-.kx-btn { border: 2px solid #3a3f70; background: transparent; border-radius: 999px; padding: 12px 28px; font-size: 28px; cursor: pointer; text-decoration: none; }
-.kx-btn:hover { border-color: #FFC93C; }
-.kx-btn.is-play { background: #FFC93C; color: #17122B; border-color: #FFC93C; font-weight: 600; }
+.kx-panel .kx-btn { border: 2px solid #3a3f70; background: transparent; border-radius: 999px; padding: 12px 28px; font-size: 28px; cursor: pointer; text-decoration: none; }
+.kx-panel .kx-btn:hover { border-color: #FFC93C; }
+.kx-panel .kx-btn.is-play { background: #FFC93C; color: #17122B; border-color: #FFC93C; font-weight: 600; }
 .kx-side { display: grid; grid-template-rows: auto 1fr; gap: 18px; min-height: 0; }
 .kx-tabs { display: flex; gap: 10px; }
 .kx-tabs button { background: #10132a; border: 2px solid #252b55; border-radius: 999px; padding: 8px 22px; font-size: 26px; cursor: pointer; color: #c9cdea; }
