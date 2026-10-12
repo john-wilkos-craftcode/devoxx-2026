@@ -9,8 +9,10 @@ const fTime = fmt({ hour: "2-digit", minute: "2-digit" });
 const fDay = fmt({ weekday: "long" });
 const fShort = fmt({ weekday: "short", day: "numeric" });
 const dayKey = (iso) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date(iso));
-const roomNo = (t) => Number(String(t.room || "").replace(/\D/g, "")) || null;
-const EMBED = window.self === window.top;   // the claude.ai artifact sandbox can't embed YouTube
+// Only "Room N" is on the cinema floor; "BOF 2" is a meeting room downstairs, not cinema Room 2.
+const roomNo = (t) => { const m = /^Room (\d+)$/.exec(t.room || ""); return m ? Number(m[1]) : null; };
+const EMBED = window.self === window.top;
+const ytLink = (t, sec = 0) => `https://www.youtube.com/watch?v=${t.videoId}${sec ? `&t=${sec}s` : ""}`;   // the claude.ai artifact sandbox can't embed YouTube
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 // Phones: a 16:9 wall would be ~200 px tall, so the panels become a sheet over the live venue.
 const SHEET = matchMedia("(max-width: 760px), (max-height: 520px)").matches;
@@ -120,6 +122,13 @@ const CSS = `
 .kx-sheet .kx-chapter { grid-template-columns: 56px 1fr; padding: 8px 0; }
 .kx-sheet .kx-chapter time { font-size: 17px; }
 .kx-sheet .kx-note { font-size: 14px; }
+.kx-detail h2 { margin: 12px 0 0; font: 900 64px/0.95 "Big Shoulders Display", sans-serif; }
+.kx-detail .kx-who { font-size: 26px; margin-top: 12px; color: #c9c3e6; }
+.kx-detail .kx-tldr { font-size: 28px; margin-top: 18px; }
+.kx-points { font-size: 24px; line-height: 1.4; display: grid; gap: 10px; margin: 18px 0 0; padding-left: 1.1em; max-width: 52em; }
+.kx-points li::marker { color: #FFC93C; }
+.kx-sheet .kx-detail h2 { font-size: 28px; }
+.kx-sheet .kx-points, .kx-sheet .kx-detail .kx-tldr { font-size: 15px; }
 .kx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 `;
 
@@ -145,7 +154,7 @@ export function startExperience(k) {
 
   // ---------- the programme wall: the big LED screen at the north end of the exhibition hall ----------
   // Centred between the hall's column lines at x 2.65 and 9.13, so the walk-up view has no column in it.
-  const WALL = { x: 5.9, y: 18.0, z: 3.15, w: 8, h: 4.5 };
+  const WALL = { x: 5.9, y: 18.0, z: 4.05, w: 7.2, h: 4.05 };
   {
     const frame = new THREE.Mesh(new THREE.BoxGeometry(WALL.w + 0.3, WALL.h + 0.3, 0.2), k.mat(0x0b0c12, { roughness: 0.6 }));
     frame.position.copy(v3(WALL.x, WALL.y + 0.05, WALL.z));
@@ -162,8 +171,67 @@ export function startExperience(k) {
     const glow = new THREE.Mesh(new THREE.PlaneGeometry(WALL.w, WALL.h), new THREE.MeshBasicMaterial({ map: ledTex, toneMapped: false, color: 0xcfcfcf }));
     glow.position.copy(v3(WALL.x, WALL.y - 0.06, WALL.z));
     scene.add(frame, glow);
-    point(0x6a8cff, 140, 16, WALL.x, WALL.y - 4, WALL.z);
-    point(0x6a8cff, 60, 22, WALL.x, WALL.y - 12, 4.5);
+    point(0x6a8cff, 90, 16, WALL.x, WALL.y - 4, WALL.z);
+    point(0xb8c4ff, 50, 22, WALL.x, WALL.y - 12, 4.2);
+
+    // The hall as in the evening photo: two dark square columns flanking the screen, a red tensile
+    // funnel under it, blue glass doors at floor level, rows of track spots on LED-lined beams,
+    // red box portals on the side walls and stacked chairs.
+    const dark = k.mat(0x17181e, { roughness: 0.85 });
+    for (const sx of [-1, 1]) {
+      const col = new THREE.Mesh(new THREE.BoxGeometry(1.1, 6.2, 1.1), dark);
+      col.position.copy(v3(WALL.x + sx * (WALL.w / 2 + 1.0), WALL.y - 0.6, 3.1));
+      scene.add(col);
+    }
+    const pts = [];
+    for (let i = 0; i <= 16; i++) { const t = i / 16; pts.push(new THREE.Vector2(0.25 + 3.3 * Math.pow(t, 2.2), t * 1.9)); }
+    const funnel = new THREE.Mesh(new THREE.LatheGeometry(pts, 40, -Math.PI / 2, Math.PI),
+      k.mat(0x8f1026, { emissive: 0xb0132f, emissiveIntensity: 0.3, side: THREE.DoubleSide, roughness: 0.7 }));
+    funnel.position.copy(v3(WALL.x, WALL.y - 0.2, WALL.z - WALL.h / 2 - 1.9));
+    funnel.scale.set(1, 1, 0.22);   // a shallow tent against the wall, as in the photo
+    scene.add(funnel);
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.5), new THREE.MeshBasicMaterial({ color: 0x2c58ff }));
+    glass.position.copy(v3(WALL.x, WALL.y - 0.1, 0.8));
+    scene.add(glass);
+    const ledLine = new THREE.MeshBasicMaterial({ color: 0xdfe7ff });
+    const spotBody = k.mat(0x0d0d10, { roughness: 0.4, metalness: 0.6 });
+    const spotLens = new THREE.MeshBasicMaterial({ color: 0xfff3dc });
+    for (const sx of [-1, 1]) {
+      const bx = WALL.x + sx * 7.2;
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 18), ledLine);
+      beam.position.copy(v3(bx + sx * 0.4, WALL.y - 9, 5.75));
+      scene.add(beam);
+      for (let y = WALL.y - 2; y > WALL.y - 17; y -= 1.6) {
+        const can = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.32, 14), spotBody);
+        can.position.copy(v3(bx, y, 5.55)); can.rotation.z = -sx * 0.5;
+        const lens = new THREE.Mesh(new THREE.CircleGeometry(0.1, 14), spotLens);
+        lens.position.copy(v3(bx - sx * 0.08, y, 5.38)); lens.rotation.x = Math.PI / 2; lens.rotation.y = -sx * 0.5;
+        scene.add(can, lens);
+      }
+    }
+    const portal = k.mat(0xc61d3b, { emissive: 0xc61d3b, emissiveIntensity: 0.25, roughness: 0.6 });
+    for (const sx of [-1, 1]) {
+      const g = new THREE.Group();
+      const top = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.5, 0.6), portal); top.position.y = 3.0;
+      const l = new THREE.Mesh(new THREE.BoxGeometry(0.4, 3.2, 0.6), portal); l.position.set(-1.4, 1.6, 0);
+      const r = l.clone(); r.position.x = 1.4;
+      const door = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.75), new THREE.MeshBasicMaterial({ color: 0x0a0b10 }));
+      door.position.set(0, 1.375, -0.25);
+      g.add(top, l, r, door);
+      g.position.copy(v3(WALL.x + sx * 10.5, WALL.y - 5, 0));
+      g.rotation.y = sx > 0 ? -Math.PI / 2 : Math.PI / 2;
+      scene.add(g);
+      point(0xff3355, 18, 6, WALL.x + sx * 9.8, WALL.y - 5, 2.2);
+    }
+    const chair = new THREE.BoxGeometry(0.5, 0.9, 0.5);
+    const chairs = new THREE.InstancedMesh(chair, k.mat(0x22242c, { roughness: 0.8 }), 48);
+    const m4 = new THREE.Matrix4();
+    let ci = 0;
+    for (const sx of [-1, 1]) for (let row = 0; row < 4; row++) for (let i = 0; i < 6; i++) {
+      m4.makeTranslation(...v3(WALL.x + sx * (8.6 - row * 0.65), WALL.y - 9 + i * 0.62, 0.45).toArray());
+      chairs.setMatrixAt(ci++, m4);
+    }
+    scene.add(chairs);
   }
   const days = [...new Set(talks.filter((t) => t.start).map((t) => dayKey(t.start)))].sort();
   let day = days.includes("2026-10-07") ? "2026-10-07" : days[0];
@@ -182,6 +250,22 @@ export function startExperience(k) {
     el("div", { class: "kx-wall-head" }, dayBox, search),
     slotsBox);
   const blob = (t) => [t.title, ...t.speakers.map((s) => s.name), t.s && t.s.tldr, ...((t.s && t.s.tech) || [])].join(" ").toLowerCase();
+  // A session in a room off the cinema floor (BOFs, labs downstairs): its summary on the wall itself.
+  function showOnWall(t) {
+    const s = t.s || {};
+    slotsBox.textContent = "";
+    slotsBox.append(el("div", { class: "kx-detail" },
+      el("div", { class: "kx-meta", text: [t.type, t.start ? `${fDay.format(new Date(t.start))} ${fTime.format(new Date(t.start))}` : null, t.room].filter(Boolean).join(", ") }),
+      el("h2", { text: t.title }),
+      el("div", { class: "kx-who", text: t.speakers.map((sp) => sp.name).join(", ") }),
+      s.tldr ? el("p", { class: "kx-tldr", text: s.tldr }) : null,
+      s.keyPoints && s.keyPoints.length ? el("ul", { class: "kx-points" }, s.keyPoints.map((x) => el("li", { text: x }))) : null,
+      el("div", { class: "kx-actions" },
+        t.videoId ? el("a", { class: "kx-btn is-play", href: ytLink(t), target: "_blank", rel: "noopener", text: "Watch on YouTube" }) : null,
+        el("button", { class: "kx-btn", type: "button", text: "Back to the programme", onclick: () => { history.replaceState(null, "", location.pathname + location.search); renderWall(); } })),
+      el("p", { class: "kx-note", text: `${t.room || "This room"} is off the cinema floor, so there is no seat to walk you to.` })));
+    slotsBox.scrollTop = 0;
+  }
   function renderWall() {
     for (const b of dayBox.children) b.setAttribute("aria-pressed", String(b.dataset.day === day));
     slotsBox.textContent = "";
@@ -204,11 +288,12 @@ export function startExperience(k) {
     }
   }
   renderWall();
+  let wallObj = null;
   if (SHEET) {
     wall.classList.add("kx-sheet");
     document.body.append(wall);
   } else {
-    const wallObj = new CSS3DObject(wall);
+    wallObj = new CSS3DObject(wall);
     wallObj.position.copy(v3(WALL.x, WALL.y - 0.08, WALL.z));
     wallObj.scale.setScalar(WALL.w / 1600);
     cssScene.add(wallObj);
@@ -225,7 +310,7 @@ export function startExperience(k) {
   const LOBBY_FOV = 50, SEAT_FOV = 52;
   const lobbyPose = () => {
     if (SHEET) { const d = fitDistance(WALL.w, WALL.h, 62, 0.9); return { pos: new THREE.Vector3(WALL.x, WALL.y - d, WALL.z), look: new THREE.Vector3(WALL.x, WALL.y, WALL.z), fov: 62 }; }
-    const d = fitDistance(WALL.w, WALL.h, LOBBY_FOV, 0.8);
+    const d = fitDistance(WALL.w, WALL.h, LOBBY_FOV, 0.66);
     return { pos: new THREE.Vector3(WALL.x, WALL.y - d, WALL.z), look: new THREE.Vector3(WALL.x, WALL.y, WALL.z), fov: LOBBY_FOV };
   };
   const toThree = (p) => v3(p.x, p.y, p.z);
@@ -255,7 +340,17 @@ export function startExperience(k) {
       if (sc < score) { score = sc; best = s; }
     }
     const seat = { x: best.bounds.x + best.bounds.w / 2, y: best.bounds.y + best.bounds.h / 2, z: FH + best.height + 0.8 };
-    const info = { n, door, room: r, screen, seat };
+    // the walk in: along the side aisle on the door's side, following the treads of the rake
+    const rake = venue.links.find((l) => l.id === `rake-${n}`);
+    const ys = seats.map((d) => d.bounds.y), y0 = Math.min(...ys), y1 = Math.max(...seats.map((d) => d.bounds.y + d.bounds.h));
+    const aisleY = door.room.doorSide === "low" ? (b.y + y0) / 2 : (y1 + b.y + b.h) / 2;
+    const steps = Math.round(rake.rise / rake.riser), going = rake.bounds.w / steps;
+    const tread = (x) => {
+      const i = THREE.MathUtils.clamp(Math.floor((x - rake.bounds.x) / going), 0, steps - 1);
+      return FH + rake.base + (rake.ascending ? i + 1 : steps - i) * rake.riser;
+    };
+    const highX = west ? rake.bounds.x + rake.bounds.w : rake.bounds.x;   // the top of the rake, by the corridor
+    const info = { n, door, room: r, screen, seat, aisleY, tread, highX };
     roomInfo.set(n, info);
     return info;
   }
@@ -330,6 +425,18 @@ export function startExperience(k) {
     cssScene.add(screenObj);
   }
 
+  // ---------- doors: the room you walk to opens its leaves ----------
+  const doorTargets = new Map();   // n -> 0 (closed) .. 1 (open)
+  function setDoor(n, open) { doorTargets.set(n, open ? 1 : 0); }
+  function tickDoors(dt) {
+    for (const d of doors) {
+      const target = doorTargets.get(d.n) || 0;
+      if (Math.abs(d.open - target) < 0.001) continue;
+      d.open += Math.sign(target - d.open) * Math.min(Math.abs(target - d.open), dt * 1.8);
+      for (const { hinge, side } of d.leaves) hinge.rotation.y = side * d.open * 1.45;
+    }
+  }
+
   // ---------- walking: lobby -> side stair -> corridor -> door -> seat ----------
   let anim = null;
   const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
@@ -345,13 +452,16 @@ export function startExperience(k) {
       { x: sx, y: stair.y + 0.6, z: FH + 1.65 },
       { x: (sx + corridor.x + corridor.w / 2) / 2, y: stair.y - 2.5, z: FH + 1.7 },
       { x: d.wallX + face * 3.2, y: d.yc, z: FH + 1.7 },
-      { x: d.wallX - face * 1.4, y: d.yc, z: FH + 1.65 },
-      { x: info.seat.x + (west ? 1.2 : -1.2), y: (info.seat.y + d.yc) / 2, z: info.seat.z + 0.5 },
+      { x: d.wallX - face * 1.2, y: d.yc, z: FH + 1.65 },
+      { x: (info.highX + d.wallX) / 2, y: info.aisleY, z: FH + 1.65 },
+      { x: (info.highX + info.seat.x) / 2, y: info.aisleY, z: info.tread((info.highX + info.seat.x) / 2) + 1.65 },
+      { x: info.seat.x, y: info.aisleY, z: info.tread(info.seat.x) + 1.6 },
+      { x: info.seat.x, y: (info.aisleY + info.seat.y) / 2, z: info.seat.z + 0.15 },
       info.seat,
     ];
     return new THREE.CatmullRomCurve3(pts.map(toThree), false, "centripetal", 0.3);
   }
-  function animate(curve, finalLook, fovTo, ms, done) {
+  function animate(curve, finalLook, fovTo, ms, done, onProgress) {
     const from = { fov: camera.fov };
     const start = performance.now();
     skipNote.hidden = false;
@@ -363,6 +473,7 @@ export function startExperience(k) {
       const blend = THREE.MathUtils.smoothstep(t, 0.72, 1);
       camera.lookAt(ahead.lerp(finalLook, blend));
       camera.fov = THREE.MathUtils.lerp(from.fov, fovTo, u); camera.updateProjectionMatrix();
+      if (onProgress) onProgress(t);
       if (t >= 1) finish();
     } };
   }
@@ -379,32 +490,41 @@ export function startExperience(k) {
     current = t;
     history.replaceState(null, "", `#talk-${t.id}`);
     if (!info) {   // BOFs and labs are in rooms we don't model: show the talk on the wall instead
+      if (state !== "lobby") goLobby({ instant: true });
+      showOnWall(t);
+      if (SHEET) wall.hidden = false;
       live.textContent = `${t.title} is in ${t.room}, which is not part of the cinema floor.`;
       return;
     }
     buildScreen(info, t);
+    if (screenObj && !screenObj.sheet) screenObj.visible = false;   // HTML draws over walls, so only show it on arrival
     lightRoom(info.room);
     for (const [n2, plane] of k.screenPlanes) plane.visible = SHEET || n2 !== n;
     const plane = k.screenPlanes.get(n);   // the screen shows the talk you chose, not whatever was on at 14:00
     if (plane) { plane.material.map.dispose(); plane.material.map = k.titleCard(t); plane.material.needsUpdate = true; }
     if (SHEET) wall.hidden = true;
-    const arrive = () => { state = "seated"; setPose(seatPose(info)); exitBtn.hidden = false; live.textContent = `Seated in Room ${n} for ${t.title}.`; };
-    if (instant || reduceMotion) { arrive(); return; }
+    const arrive = () => { state = "seated"; if (screenObj && !screenObj.sheet) screenObj.visible = true; if (wallObj) wallObj.visible = false; setPose(seatPose(info)); exitBtn.hidden = false; live.textContent = `Seated in Room ${n} for ${t.title}.`; };
+    if (instant || reduceMotion) { for (const d of doors) { d.open = d.n === n ? 1 : 0; for (const { hinge, side } of d.leaves) hinge.rotation.y = side * d.open * 1.45; } doorTargets.set(n, 1); arrive(); return; }
     state = "walking";
     if (SHEET) wall.hidden = true;
     const curve = pathTo(info);
     const ms = Math.min(4300, 2300 + curve.getLength() * 22);
-    animate(curve, toThree({ x: info.screen.x, y: info.seat.y, z: info.screen.z }), SEAT_FOV, ms, arrive);
+    setDoor(n, true);
+    animate(curve, toThree({ x: info.screen.x, y: info.seat.y, z: info.screen.z }), SEAT_FOV, ms, arrive,
+      (p) => { if (wallObj) wallObj.visible = p < 0.22; if (screenObj && !screenObj.sheet) screenObj.visible = p > 0.97; });
   }
   function goLobby({ instant = false } = {}) {
     history.replaceState(null, "", location.pathname + location.search);
     exitBtn.hidden = true;
     if (SHEET && screenObj) { screenObj.element.remove(); screenObj = null; }
-    const back = () => { state = "lobby"; if (SHEET) wall.hidden = false; setPose(lobbyPose()); for (const l of roomLights) l.intensity = 0; live.textContent = "Back in the exhibition hall."; };
+    if (screenObj && !screenObj.sheet) screenObj.visible = false;
+    const leaving = current && roomNo(current);
+    const back = () => { if (leaving) setDoor(leaving, false); state = "lobby"; if (wallObj) wallObj.visible = true; if (SHEET) wall.hidden = false; setPose(lobbyPose()); for (const l of roomLights) l.intensity = 0; live.textContent = "Back in the exhibition hall."; };
     if (state !== "seated" || instant || reduceMotion || !current || !infoFor(roomNo(current))) { back(); return; }
     state = "walking";
     const pts = pathTo(infoFor(roomNo(current))).getPoints(60).reverse();
-    animate(new THREE.CatmullRomCurve3(pts), toThree(lobbyPose().look), LOBBY_FOV, 2400, back);
+    animate(new THREE.CatmullRomCurve3(pts), toThree(lobbyPose().look), LOBBY_FOV, 2400, back,
+      (p) => { if (wallObj) wallObj.visible = p > 0.8; });
   }
   // With a sheet over the bottom of the screen, shift the projection so the scene sits in the space above it.
   const sheetOffset = () => { if (SHEET) camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * 0.3, innerWidth, innerHeight); };
@@ -427,9 +547,16 @@ export function startExperience(k) {
   // test hooks for headless checks
   window.__kino = {
     walkFrame: (id, u) => { const t = talks.find((x) => x.id === id), info = infoFor(roomNo(t)), c = pathTo(info);
+      info.door.open = 1; for (const { hinge, side } of info.door.leaves) hinge.rotation.y = side * 1.45;
       lightRoom(info.room); camera.fov = SEAT_FOV; camera.updateProjectionMatrix();
       camera.position.copy(c.getPointAt(u)); camera.lookAt(c.getPointAt(Math.min(1, u + 0.06))); }, goTalk: (id) => goTalk(talks.find((t) => t.id === id), { instant: true }), goLobby: () => goLobby({ instant: true }) };
 
   // performance.now(), not the rAF timestamp: that one can be earlier than an animation's start.
-  return () => { if (anim) anim.tick(performance.now()); };
+  let last = performance.now();
+  return () => {
+    const now = performance.now();
+    if (anim) anim.tick(now);
+    tickDoors(Math.min(0.1, (now - last) / 1000));
+    last = now;
+  };
 }

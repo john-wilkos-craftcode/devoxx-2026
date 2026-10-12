@@ -1,0 +1,108 @@
+{
+  "id": 24247,
+  "source": "transcript",
+  "tldr": "Saikali builds a dinner-planning agent step by step in Spring AI, showing that an agent is structured output, tool calling, constraint checks and advisors wired together in plain code.",
+  "summary": [
+    "Saikali (Broadcom) opens with an 'application capability continuum' built around a restaurant booking app: CRUD app, then a machine-learning recommender, then a generative AI Q&A service, and finally an agent that plans the whole dinner. He then argues that ChatGPT and Claude are agents, not models. The ChatGPT app answered a question past its training cutoff by searching the web, where the raw API said it didn't know, and Claude ran `ps aux` in what it said was its own Ubuntu container with Java 21. A model just predicts the next token; tools and a loop make the agent.",
+    "With Spring AI's ChatClient he shows system prompts (a 'fruit-only' assistant refusing carrot questions) and structured output. Asking for a Java record makes Spring AI add a JSON schema and formatting instructions to the prompt, which he calls 'prompt begging'. The alternative is the provider's native structured output (opt-in, Spring AI lead Christian Tzolov noted, since not every provider supports it). The first agent module, Jarvis, uses this for intent alignment: each user message is merged into a `UserRequirements` POJO, a plain if-statement lists missing fields, and an enum tracks gathering, confirming and confirmed. When the extracted object `equals()` the previous one, the user has confirmed.",
+    "After explaining tool calling with a weather example, he adds a `findAvailableRestaurants` tool over 15 Toronto restaurants. The first search proposes a steakhouse for a vegetarian guest. That leads to his 'iron law': the acceptance rate, meaning the share of tasks users accept without correcting or retrying. The fix is constraint checkers: deterministic ones for budget and noise level returning pass, fail or maybe, an LLM judge for meal suitability, and a hybrid dietary check that sends only main courses to the model. The planner then calls search, detail and check tools and lists only restaurants that pass.",
+    "The last modules add decision support, so the agent can compare shortlisted restaurants through a details tool, and Spring AI advisors, which work like servlet filters or AOP around each model call. Tool calling and the model call itself are advisors. A custom advisor plus remember/forget-favourite tools gives the agent user memory. He closes with the two loops: the model decides when to leave the tool-calling loop, while your code decides whether the result meets the constraints. Running the workshop cost about $1.50 on a mini model, and he sees multi-agent orchestration as ordinary service orchestration."
+  ],
+  "keyPoints": [
+    "Consumer chat apps are agents with tools (web search, a sandbox VM, memory); the bare API is the closest you get to the raw model, and you bring your own tools.",
+    "You can build an agent by writing a SKILL.md, scripting a coding agent such as `claude -p`, or calling the model API directly; the last gives the most control at the highest upfront cost.",
+    "Structured output turns free text into Java records: Spring AI either injects a JSON schema into the prompt or uses the provider's native response format, which is opt-in.",
+    "Intent alignment keeps requirements in a typed object; missing-field checks are plain if-statements, and an unchanged object after a user message is read as confirmation.",
+    "Tool calling is the model answering with a request to call a method; Spring AI invokes `@Tool`-annotated methods, sends back the result and repeats, and the model decides how many calls to make, for example one weather call per city.",
+    "MCP is presented as tool calling run out of process, so tools can be written in any language and shared across host applications.",
+    "Constraint checkers come in three kinds: deterministic (budget range, noise level), LLM judge (meal suitability, returning a record with verdict and reason), and hybrid (filter the menu to main courses, then ask the model about dietary fit).",
+    "Spring AI advisors form a filter chain around each model call; tool calling, observability and the model call itself are advisors, and a custom advisor can add memory such as favourite restaurants."
+  ],
+  "takeaways": [
+    "Measure your agent by acceptance rate, meaning tasks users accept without correction, and collect token, latency and cost metrics from day one.",
+    "Capture user intent in a typed object with structured output before letting the agent act, and check for missing fields in plain code.",
+    "Write verifiable checks for every hard constraint, deterministic where possible and narrowly scoped LLM judges where not, and only show results that pass.",
+    "Give each model call its own focused system prompt, and use a cheap model for extraction and a stronger one for planning.",
+    "Use an advisor (or your framework's interceptor) for cross-cutting concerns such as memory, tracing and guardrails instead of repeating them at every call site."
+  ],
+  "quotes": [
+    {
+      "text": "The consumer apps are agents. They're not models.",
+      "at": "17:52"
+    },
+    {
+      "text": "Acceptance is a system property. It's not the model's fault. It's not your agent's fault. It's both.",
+      "at": "104:57"
+    },
+    {
+      "text": "Who decides to exit the tool calling loop? The model does, not your code.",
+      "at": "144:32"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Goals and capability continuum"
+    },
+    {
+      "at": "16:52",
+      "title": "Chat apps are agents"
+    },
+    {
+      "at": "27:31",
+      "title": "System prompts and structured output"
+    },
+    {
+      "at": "44:13",
+      "title": "Intent alignment"
+    },
+    {
+      "at": "66:13",
+      "title": "Tool calling"
+    },
+    {
+      "at": "80:21",
+      "title": "Agentic loop and restaurant search"
+    },
+    {
+      "at": "101:19",
+      "title": "Acceptance rate"
+    },
+    {
+      "at": "106:00",
+      "title": "Constraint checkers and planning"
+    },
+    {
+      "at": "130:15",
+      "title": "Advisors and user memory"
+    },
+    {
+      "at": "144:32",
+      "title": "Two loops and Q&A"
+    }
+  ],
+  "tech": [
+    "Spring AI",
+    "Spring Boot",
+    "ChatClient",
+    "Structured output",
+    "Tool calling",
+    "Spring AI Advisors",
+    "MCP",
+    "LLM-as-a-judge",
+    "Jackson",
+    "Vue.js",
+    "OpenAI API",
+    "Claude",
+    "ChatGPT",
+    "Codex",
+    "Claude Code"
+  ],
+  "watchIf": "You are a Java developer who uses chat assistants but has never built an agent, and want a clear mental model of what happens on the wire.",
+  "themes": [
+    "AI agents & agentic coding",
+    "LLMs in Java apps",
+    "Spring & frameworks"
+  ],
+  "demo": true
+}

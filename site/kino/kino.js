@@ -7,6 +7,8 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 const FH = 6.2;          // floor 1 above floor 0
 const CLEAR = 5.4;       // floor to ceiling
@@ -17,7 +19,7 @@ const params = new URLSearchParams(location.search);
 // ---------- palette: photo-checked notes (charcoal walls, navy carpet, blue light) ----------
 const C = {
   wall: 0x3a3d46, column: 0x2c2e35, carpetNavy: 0x161c2e, carpetHall: 0x3a3c42, stairCarpet: 0x2f3f86,
-  nosing: 0x5b6aa0, concrete: 0x34363d, auditoriumFloor: 0x121318, seat: 0x6e1420, seatBack: 0x5e111b,
+  nosing: 0x5b6aa0, concrete: 0x34363d, auditoriumFloor: 0x121318, seat: 0x2c3650, seatBack: 0x262f46,
   vault: 0xcdc8bf, ceiling: 0x14151a, portal: 0xc61d3b, numeralPanel: 0xf0641e, led: 0x3f74ff,
   funnel: 0xf3f4f8, steel: 0xb8bcc4, signWhite: 0xf4f4f4, signOrange: 0xff6a1a, glass: 0x8fb4d8,
 };
@@ -128,7 +130,7 @@ for (const d of venue.decor) {
   const bottom = under + (d.base || 0);
   const top = under + d.height;
   let key = d.material || (d.linkId ? (STAIRS.has(d.linkId) ? "stair" : "rake") : "concrete");
-  if (d.material === "floorBelow") continue;
+  if (d.material === "floorBelow" || d.material === "seat" || d.material === "seatBack") continue;
   if (d.material === "structure") key = "rake";
   const m = M[key] || M.concrete;
   addBox(key, m, d.bounds, bottom, top);
@@ -221,7 +223,7 @@ const cx = corridor.x + corridor.w / 2;
   for (const fx of [g.x + 2, g.x + g.w / 2, g.x + g.w - 2]) point(0xffe2c4, 60, 14, fx, g.y - 4, 1.2 + 4.2);
 }
 // cool downlights down the middle, blue washes on the coves, as in the evening photos
-for (let y = -44; y <= 62; y += 12) point(0xdfe3f5, 110, 18, cx, y, FH + CLEAR - 0.5);
+for (let y = -44; y <= 62; y += 12) point(0xdfe3f5, 70, 16, cx, y, FH + 3.1);
 for (let y = -40; y <= 60; y += 20) for (const x of [corridor.x + 1.5, corridor.x + corridor.w - 1.5]) point(0x3358ff, 70, 9, x, y, FH + CLEAR - 0.9);
 scene.add(new THREE.HemisphereLight(0x4656a0, 0x0c0c14, params.has("bright") ? 6 : 0.6));
 
@@ -374,16 +376,29 @@ for (const r of venue.rooms.filter((x) => x.kind === "auditorium")) {
   g.position.copy(v3(wallX + face * 0.16, yc, FH));
   g.rotation.y = face > 0 ? Math.PI / 2 : -Math.PI / 2; // local +z points into the corridor
   // portal frame: a red box around the doors, standing proud of the wall
-  const frame = new THREE.Mesh(new THREE.BoxGeometry(3.1, 3.5, 0.55), portalMat);
-  frame.position.set(0, 1.75, 0.27);
-  const recess = new THREE.Mesh(new THREE.BoxGeometry(2.3, 2.7, 0.1), doorMat);
-  recess.position.set(0, 1.35, 0.56);
-  g.add(frame, recess);
-  for (const dx of [-0.42, 0.42]) {
-    const ring = new THREE.Mesh(ringGeo, M.steel);
-    ring.position.set(dx, 1.25, 0.63);
-    g.add(ring);
+  // portal: a red frame around the doorway (top and two jambs), not a solid block you'd walk into
+  const frame = new THREE.Group();
+  const head = new THREE.Mesh(new THREE.BoxGeometry(3.1, 0.8, 0.55), portalMat); head.position.set(0, 3.1, 0.27);
+  for (const sx of [-1, 1]) {
+    const jamb = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.7, 0.55), portalMat);
+    jamb.position.set(sx * 1.35, 1.35, 0.27);
+    frame.add(jamb);
   }
+  frame.add(head);
+  // double doors: two leaves hinged at the frame, each with its ring handle; they swing open for you
+  const leaves = [];
+  for (const side of [-1, 1]) {
+    const hinge = new THREE.Group();
+    hinge.position.set(side * 1.15, 0, 0.56);
+    const leaf = new THREE.Mesh(new THREE.BoxGeometry(1.15, 2.7, 0.08), doorMat);
+    leaf.position.set(-side * 0.575, 1.35, 0);
+    const ring = new THREE.Mesh(ringGeo, M.steel);
+    ring.position.set(-side * 0.73, 1.25, 0.07);
+    hinge.add(leaf, ring);
+    g.add(hinge);
+    leaves.push({ hinge, side });
+  }
+  g.add(frame);
   // big numeral panel beside the portal
   const panel = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 3.05),
     new THREE.MeshStandardMaterial({ map: numeralTexture(n), emissive: 0xffffff, emissiveMap: numeralTexture(n), emissiveIntensity: 0.12, roughness: 0.8 }));
@@ -410,7 +425,7 @@ for (const r of venue.rooms.filter((x) => x.kind === "auditorium")) {
   stand.rotation.y = side * 0.35;
   g.add(stand);
   scene.add(g);
-  doors.push({ n, room: r, group: g, wallX, yc, face });
+  doors.push({ n, room: r, group: g, wallX, yc, face, leaves, open: 0 });
 }
 
 // ---------- cinema screens: the session on now, as a title card ----------
@@ -453,29 +468,82 @@ for (const d of venue.decor.filter((x) => x.material === "screen" && x.room)) {
 }
 
 // ---------- close every auditorium floor to ceiling (Ghost Light's walls stop at 3.2 m), door left open ----------
+const audWall = mat(0x121318, { roughness: 0.95 });
 for (const d of doors) {
   const b = d.room.bounds, t = 0.3, lo = FH - RAKE_DEPTH, hi = FH + CLEAR;
   const corridorX = d.face > 0 ? b.x + b.w - t : b.x, farX = d.face > 0 ? b.x : b.x + b.w - t;
-  addBox("wall", M.wall, { x: b.x, y: b.y - t / 2, w: b.w, h: t }, lo, hi);
-  addBox("wall", M.wall, { x: b.x, y: b.y + b.h - t / 2, w: b.w, h: t }, lo, hi);
-  addBox("wall", M.wall, { x: farX, y: b.y, w: t, h: b.h }, lo, hi);
+  addBox("audWall", audWall, { x: b.x, y: b.y - t / 2, w: b.w, h: t }, lo, hi);
+  addBox("audWall", audWall, { x: b.x, y: b.y + b.h - t / 2, w: b.w, h: t }, lo, hi);
+  addBox("audWall", audWall, { x: farX, y: b.y, w: t, h: b.h }, lo, hi);
   const gap0 = d.yc - 1.15, gap1 = d.yc + 1.15;
   addBox("wall", M.wall, { x: corridorX, y: b.y, w: t, h: gap0 - b.y }, lo, hi);
   addBox("wall", M.wall, { x: corridorX, y: gap1, w: t, h: b.y + b.h - gap1 }, lo, hi);
   addBox("wall", M.wall, { x: corridorX, y: gap0, w: t, h: gap1 - gap0 }, FH + 2.7, hi);   // over the door
 }
 
+// ---------- cinema seats: one modelled seat, instanced on every seat pan in the venue ----------
+{
+  const part = (w, h, d, x, y, z, rz = 0) => {
+    const g = new THREE.BoxGeometry(w, h, d);
+    if (rz) g.rotateZ(rz);
+    g.translate(x, y, z);
+    return g;
+  };
+  // local frame: +x faces the screen, y up from the top of the pan, z across the row
+  const upholstery = mergeGeometries([
+    part(0.46, 0.09, 0.5, 0, -0.045, 0),              // pan
+    part(0.09, 0.72, 0.5, -0.25, 0.3, 0, 0.12),       // back, leaning back
+  ]);
+  const frame = mergeGeometries([
+    part(0.46, 0.05, 0.06, 0.0, 0.2, 0.27),           // armrest (shared with the neighbour)
+    part(0.06, 0.62, 0.06, -0.05, -0.12, 0.27),       // standard under it
+    part(0.2, 0.06, 0.4, -0.08, -0.3, 0),             // seat bracket
+  ]);
+  const fabric = mat(C.seat, { roughness: 0.92 });
+  const metal = mat(0x15161b, { roughness: 0.5, metalness: 0.4 });
+  const pans = venue.decor.filter((d) => d.material === "seat");
+  const up = new THREE.InstancedMesh(upholstery, fabric, pans.length);
+  const fr = new THREE.InstancedMesh(frame, metal, pans.length);
+  const q = new THREE.Quaternion(), one = new THREE.Vector3(1, 1, 1), m4 = new THREE.Matrix4();
+  pans.forEach((d, i) => {
+    const room = auditoriums.find((r) => d.bounds.x >= r.bounds.x && d.bounds.x <= r.bounds.x + r.bounds.w && d.bounds.y >= r.bounds.y && d.bounds.y <= r.bounds.y + r.bounds.h);
+    const facesWest = room ? room.bounds.x < corridor.x : true;   // west rooms have the screen at the west end
+    q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), facesWest ? Math.PI : 0);
+    m4.compose(v3(d.bounds.x + d.bounds.w / 2, d.bounds.y + d.bounds.h / 2, d.floor * FH + plateUnder(d) + d.height), q, one);
+    up.setMatrixAt(i, m4); fr.setMatrixAt(i, m4);
+  });
+  scene.add(up, fr);
+}
+
+// the side stairwells, so the walk up them is not a dark tube
+for (const id of ["stair-west", "stair-east"]) {
+  const b = venue.links.find((l) => l.id === id).bounds;
+  point(0xcdd6ff, 40, 10, b.x + b.w / 2, b.y + b.h * 0.7, 2.6);
+  point(0xcdd6ff, 40, 10, b.x + b.w / 2, b.y + b.h * 0.25, FH - 0.6);
+}
+
 flushBoxes();
 
+// soft fill from a neutral room environment, and dithering so dark gradients do not band
+{
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+  scene.traverse((o) => {
+    for (const m of [].concat(o.material || [])) {
+      if (m.isMeshStandardMaterial) { m.envMapIntensity = 0.18; m.dithering = true; m.needsUpdate = true; }
+    }
+  });
+}
+
 // ---------- the room you are in: a small pool of lights moved there, so the shader cost stays flat ----------
-const roomLights = [point(0xffe0c0, 0, 30, 0, 0, 0), point(0xffe0c0, 0, 30, 0, 0, 0), point(0x8fa8ff, 0, 26, 0, 0, 0)];
+const roomLights = [point(0xdfe2f0, 0, 26, 0, 0, 0), point(0xdfe2f0, 0, 26, 0, 0, 0), point(0x9fb4ff, 0, 24, 0, 0, 0)];
 function lightRoom(room) {
   const b = room.bounds, west = b.x < corridor.x;
   const screenX = west ? b.x + 1 : b.x + b.w - 1, backX = west ? b.x + b.w - 3 : b.x + 3;
   const [a, c, s] = roomLights;
-  a.position.copy(v3((screenX + backX) / 2, b.y + b.h * 0.3, FH + CLEAR - 0.6)); a.intensity = 140;
-  c.position.copy(v3((screenX + backX) / 2, b.y + b.h * 0.7, FH + CLEAR - 0.6)); c.intensity = 140;
-  s.position.copy(v3(screenX + (west ? 3 : -3), b.y + b.h / 2, FH + 1)); s.intensity = 160; // spill from the screen
+  a.position.copy(v3((screenX + backX) / 2, b.y + b.h * 0.25, FH + 2.2)); a.intensity = 45;
+  c.position.copy(v3((screenX + backX) / 2, b.y + b.h * 0.75, FH + 2.2)); c.intensity = 45;
+  s.position.copy(v3(screenX + (west ? 4 : -4), b.y + b.h / 2, FH - 0.5)); s.intensity = 120; // spill from the screen
 }
 
 // ---------- post-processing: bloom for the LEDs, screens and signs ----------

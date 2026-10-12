@@ -1,0 +1,74 @@
+{
+  "id": 24212,
+  "source": "transcript",
+  "tldr": "Yurenko and GraalVM founder Thomas Wuerthinger demo three projects that loosen Native Image's limits: shared base layers, runtime class loading with Crema, and compiling Spring apps to WebAssembly.",
+  "summary": [
+    "Yurenko, joined on stage by GraalVM project lead Thomas Wuerthinger, opens with a recap: Native Image, the Graal JIT, Truffle languages, and GraalVM inside Oracle Database. GraalVM now ships monthly feature releases; compiling the Micronaut PetClinic with Community Edition 25.4 instead of 25.0 gave about 33% smaller images and 22% less memory with default settings, no GC tuning or PGO. To deal with configuration pain they point to GraalVM AI skills (installed with npx) and the reachability metadata repository, where an AI agent fleet generates tests and configuration for about 2,000 libraries across 30,000 versions. Requesting a missing library just takes an issue with its Maven coordinates.",
+    "Looking for a 10x rather than a 10% gain, the team found that only about 3% of the classes loaded by a Micronaut app are user code. Native Image Layers compile the JDK, framework and dependencies once into a shared base and the app into a thin layer on top. In the demo ten Micronaut greeting apps were 2 MB each on a 20 MB base; one instance had a proportional set size (PSS) of about 100 MB, and with ten running each one's PSS dropped to about 30 MB. Layers are now released as experimental.",
+    "User code also accounted for only 1.72% of CPU time, which led to Project Crema: a Java bytecode interpreter plus JIT inside a native image, built on the open-world compilation that layers needed. A Micronaut app generated new classes at run time with Byte Buddy and still ran in about 10 ms. A natively compiled Java source launcher ran single-file programs in about 35 ms, about 7x faster than the regular launcher. A custom Micronaut runtime started a controller from source in 150 ms and from a JAR in 64 ms, so teams can ship only a JAR on top of a precompiled base.",
+    "Web Image compiles JVM apps to WebAssembly for browsers and Wasm-only edge platforms; a Spring Boot music player ran in the browser from an 18 MB Wasm file. They close with the release model (a stable 25.0 baseline with security updates alongside 25.x feature releases), a Micronaut-based runtime scripted in Python or JavaScript, and Amazon's work on Shenandoah GC for Native Image. The project accepts AI-assisted pull requests if the contributor owns the code."
+  ],
+  "keyPoints": [
+    "Moving from GraalVM CE 25.0 to 25.4 reduced Micronaut PetClinic image size by about 33% and memory by about 22% with default settings.",
+    "GraalVM uses 32-bit object headers by default and keeps reflection and class metadata off-heap costs low, which the speakers say makes it the most memory-efficient way to run JVM apps.",
+    "The reachability metadata repository covers about 2,000 libraries (30,000 versions), with AI-generated tests used to derive and then verify the native configuration; native build tools pick it up automatically.",
+    "In a Micronaut app only about 3% of loaded classes and 1.72% of CPU time are user code, which motivates both layers and Crema.",
+    "With Native Image Layers, ten apps of 2 MB each shared a 20 MB base, and each app's private memory (PSS) fell from about 100 MB to about 30 MB.",
+    "Crema adds a bytecode interpreter with JIT to native images, so classes generated at run time, for example by Byte Buddy, can now execute; the closed-world assumption no longer has to hold.",
+    "A Crema-based Java source launcher runs in about 35 ms (about 7x faster wall clock, about 30x less CPU than the standard launcher); a precompiled Micronaut runtime serves a controller from source in 150 ms.",
+    "Web Image turned a Spring Boot app into an 18 MB WebAssembly module running in the browser; Amazon is integrating Shenandoah GC into Native Image."
+  ],
+  "takeaways": [
+    "Upgrade to the latest GraalVM release before tuning anything; the image size and memory gains come without configuration.",
+    "Use the native build tools Maven or Gradle plugin so reachability metadata is applied automatically, and open an issue with Maven coordinates for libraries that are missing.",
+    "Measure native app memory with system-level RSS and PSS rather than Java heap size.",
+    "If many services share one framework stack, test Native Image Layers or a Crema-based custom runtime so a platform team can build the shared base once."
+  ],
+  "quotes": [
+    {
+      "text": "The question really is not how can we get the next 10%, but where can we get the next 10x?",
+      "at": "10:51"
+    },
+    {
+      "text": "Yes, this is Spring Boot running in your browser.",
+      "at": "39:01"
+    }
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "GraalVM recap"},
+    {"at": "04:16", "title": "Monthly releases and gains"},
+    {"at": "06:50", "title": "AI skills and reachability metadata"},
+    {"at": "10:51", "title": "Why native image layers"},
+    {"at": "14:40", "title": "Layers demo: shared memory"},
+    {"at": "19:25", "title": "Project Crema and Byte Buddy"},
+    {"at": "25:37", "title": "Native Java source launcher"},
+    {"at": "29:42", "title": "Custom Micronaut runtimes"},
+    {"at": "34:58", "title": "Web Image and WebAssembly"},
+    {"at": "39:01", "title": "Roadmap and contributions"}
+  ],
+  "tech": [
+    "GraalVM",
+    "Native Image",
+    "Native Image Layers",
+    "Project Crema",
+    "Web Image",
+    "WebAssembly",
+    "Micronaut",
+    "Spring Boot",
+    "Byte Buddy",
+    "Truffle",
+    "GraalJS",
+    "Oracle Database",
+    "GraalVM Reachability Metadata",
+    "Native Build Tools",
+    "Java source launcher",
+    "Shenandoah GC",
+    "Hyperfine"
+  ],
+  "watchIf": "You run Java microservices as native images, or gave up on Native Image because of build times, dynamic class generation or the closed world.",
+  "themes": [
+    "JVM performance & runtime",
+    "Cloud native & Kubernetes"
+  ],
+  "demo": true
+}
