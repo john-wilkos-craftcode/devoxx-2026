@@ -625,7 +625,7 @@ if (devMode) {
   tick = () => controls.update();
 } else {
   document.getElementById("dev").remove();
-  const { startExperience } = await import("./experience.js");
+  const { startExperience } = await import("./experience.js?v=bb0c0192b5");
   tick = startExperience({ THREE, scene, camera, renderer, v3, venue, talks, doors, corridor, auditoriums,
     FH, CLEAR, lightRoom, roomLights, point, ledMat, mat, M, params, plateUnder, screenPlanes, titleCard, canvasTexture });
 }

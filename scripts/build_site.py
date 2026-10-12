@@ -5,6 +5,7 @@ With --artifact, also writes build/artifact/ for publishing as a claude.ai artif
 without its document wrapper (the artifact adds its own), plus the CSS, JS and data files.
 Usage: python3 scripts/build_site.py [--artifact]
 """
+import hashlib
 import html
 import shutil
 import sys
@@ -59,10 +60,23 @@ def main():
     (ROOT / "site").mkdir(exist_ok=True)
     (ROOT / "site" / "data.js").write_text(
         "window.DEVOXX = " + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
+    stamp_assets(ROOT / "site" / "index.html", ("styles.css", "app.js", "data.js"))
+    stamp_assets(ROOT / "site" / "kino" / "kino.js", ("./experience.js",))   # before kino.js is hashed
+    stamp_assets(ROOT / "site" / "kino" / "index.html", ("kino.js", "../data.js"))
     print(f"site/data.js: {len(talks)} talks, {len(talks) - len(missing)} with summaries, "
           f"recap: {'yes' if recap else 'no'}")
     if missing:
         print(f"missing summaries: {' '.join(map(str, missing))}")
+
+
+def stamp_assets(page, names):
+    """Add ?v=<content hash> to each asset reference, so browsers fetch a changed file at once
+    instead of serving a cached copy (GitHub Pages sends max-age=600)."""
+    text = page.read_text()
+    for name in names:
+        digest = hashlib.sha1((page.parent / name).read_bytes()).hexdigest()[:10]
+        text = re.sub(rf'(["\'])({re.escape(name)})(\?v=[0-9a-f]+)?\1', rf"\1\2?v={digest}\1", text)
+    page.write_text(text)
 
 
 def build_artifact():
@@ -81,7 +95,7 @@ def build_artifact():
     # The 3D prototype, as its own artifact: same unwrapping, data.js next to the page.
     kino, kout = site / "kino", ROOT / "build" / "kino"
     kout.mkdir(parents=True, exist_ok=True)
-    page = (kino / "index.html").read_text().replace('src="../data.js"', 'src="data.js"')
+    page = re.sub(r'src="\.\./data\.js', 'src="data.js', (kino / "index.html").read_text())
     head = page[page.index("<head>") + 6:page.index("</head>")]
     body = page[page.index("<body>") + 6:page.index("</body>")]
     head = "\n".join(l for l in head.splitlines() if "<meta charset" not in l and 'name="viewport"' not in l)
