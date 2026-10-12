@@ -98,10 +98,38 @@ def material(name, color, rough=0.85, metal=0.0, emission=None, strength=0.0, sh
         dark = nt.nodes.new("ShaderNodeMapRange")
         dark.inputs["To Min"].default_value, dark.inputs["To Max"].default_value = 1 - grime, 1.0
         nt.links.new(ao.outputs["AO"], dark.inputs["Value"])
+        # scuffs low down: within 40 cm of the floor, patchy
+        coord = nt.nodes.new("ShaderNodeTexCoord")
+        sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+        nt.links.new(coord.outputs["Object"], sep.inputs[0])
+        low = nt.nodes.new("ShaderNodeMapRange")
+        low.inputs["From Min"].default_value, low.inputs["From Max"].default_value = 0.0, 0.4
+        low.inputs["To Min"].default_value, low.inputs["To Max"].default_value = 1 - grime * 0.6, 1.0
+        nt.links.new(sep.outputs["Z"], low.inputs["Value"])
+        patch = nt.nodes.new("ShaderNodeTexNoise")
+        patch.inputs["Scale"].default_value, patch.inputs["Detail"].default_value = 4.0, 6.0
+        nt.links.new(coord.outputs["Object"], patch.inputs["Vector"])
+        lift = nt.nodes.new("ShaderNodeMath")
+        lift.operation, lift.use_clamp = "ADD", True
+        nt.links.new(low.outputs["Result"], lift.inputs[0])
+        lift_s = nt.nodes.new("ShaderNodeMath")
+        lift_s.operation = "MULTIPLY_ADD"
+        lift_s.inputs[1].default_value, lift_s.inputs[2].default_value = 0.5, -0.25
+        nt.links.new(patch.outputs["Fac"], lift_s.inputs[0])
+        nt.links.new(lift_s.outputs["Value"], lift.inputs[1])
+        both = nt.nodes.new("ShaderNodeMath")
+        both.operation = "MULTIPLY"
+        nt.links.new(dark.outputs["Result"], both.inputs[0])
+        nt.links.new(lift.outputs["Value"], both.inputs[1])
         _, a, b, out = mix_multiply(nt)
         a.default_value = srgb(color)
-        nt.links.new(dark.outputs["Result"], b)
+        nt.links.new(both.outputs["Value"], b)
         nt.links.new(out, bsdf.inputs["Base Color"])
+        # paint never has an even sheen
+        rv = nt.nodes.new("ShaderNodeMapRange")
+        rv.inputs["To Min"].default_value, rv.inputs["To Max"].default_value = max(0.05, rough - 0.15), min(1.0, rough + 0.15)
+        nt.links.new(patch.outputs["Fac"], rv.inputs["Value"])
+        nt.links.new(rv.outputs["Result"], bsdf.inputs["Roughness"])
     if bevel:
         # no razor edges: shade every box edge as rounded over a few millimetres
         bev = nt.nodes.new("ShaderNodeBevel")
@@ -297,14 +325,17 @@ M = {
     "column": material("column", 0x24262c, 0.9),
     "concrete": material("concrete", 0x34363d, 0.9),
     "rake": material("rake", 0x1a1c25, 0.98, noise_bump=0.15),
-    "stair": material("stair", 0x2f3f86, 1.0, noise_bump=0.25),
-    "nosing": material("nosing", 0x5d6694, 0.8),
+    "stair": material("stair", 0x67696e, 0.85, noise_bump=0.25, speckle=0.35, bevel=0.006),   # speckled grey treads
+    "nosing": material("nosing", 0xb4b8be, 0.35, 0.9),                                       # aluminium edge
+    "stairWall": material("stairWall", 0x1f2742, 0.7, bevel=0.01, grime=0.2),
+    "stringer": material("stringer", 0x2a2d35, 0.6, bevel=0.008),
     "carpet": material("carpet", 0x161c2e, 1.0, noise_bump=0.3),
     "hallFloor": material("hallFloor", 0x2a2c33, 1.0, noise_bump=0.3),
-    "hollywoodFloor": textured("hollywoodFloor", "carpet", 0.6, tint=0xa29b93, normal=1.0, tiles=0.5),
-    "hallColumn": material("hallColumn", 0xebeae6, 0.6, bevel=0.012, grime=0.3),
+    "hollywoodFloor": textured("hollywoodFloor", "carpet", 0.6, tint=0x9b9a98, normal=1.0, tiles=0.5),
+    "hallColumn": material("hallColumn", 0xdedcd7, 0.6, bevel=0.012, grime=0.35),
     "hallWall": material("hallWall", 0xe4e2dd, 0.85, bevel=0.01, grime=0.25),
     "raft": material("raft", 0xf1f1ee, 0.9, bevel=0.01),
+    "plenum": material("plenum", 0x7d8086, 0.95, noise_bump=0.4),
     "acoustic": material("acoustic", 0x10131c, 1.0, noise_bump=1.0),
     "curtain": textured("curtain", "curtain", 1.4, tint=0x8f8574, normal=0.7, sheen=0.5, uv=True),
     "frostedGlass": material("frostedGlass", 0xdfeee8, 0.2),
@@ -336,7 +367,7 @@ M = {
     "paving": material("paving", 0x2c2d31, 0.95),
     "funnel": material("funnel", 0xf3f4f8, 0.7),
     "led": emissive("led", 0x3f74ff, 12.0),
-    "cove": emissive("cove", 0x3d6bff, 10.0),
+    "cove": emissive("cove", 0x8c9cff, 6.0),
     "panelLight": emissive("panelLight", 0xfff3e6, 8.0),       # the look of the panels; area lights below do the lighting      # about 4000 K, like the photos
     "screen": emissive("screen", 0x2a3350, 4.0),       # the HTML is pinned over this in the browser
     "programme": emissive("programme", 0x16224f, 4.0),  # the hall screen: the programme is pinned over it
@@ -460,6 +491,8 @@ for o in venue["obstacles"]:
         continue
     if o.get("linkId") and o["floor"] == 1 and o["height"] <= 0:
         continue   # floor-1 colliders hanging down a stairwell (one is a 6 m sheet across each side stair's foot)
+    if o.get("linkId") in ("stair-west", "stair-east"):
+        continue   # the side stairs' walking colliders; their treads are built from the links below
     datum = o["floor"] * FH
     tall = o["height"] >= 3 and not o.get("linkId")
     b = o["bounds"]
@@ -492,6 +525,8 @@ for d in venue["decor"]:
         continue
     if d.get("wordmark") and d["wordmark"] != "devoxx":
         continue   # Ghost Light stores DEVOXX and JAVAPOLIS in the same spot; draw only DEVOXX
+    if d.get("linkId") in ("stair-west", "stair-east"):
+        continue   # stepped balustrade blocks; the side stairs get sloped stringers and a handrail below
     under = d["floor"] * FH + plate_under(d)
     key = mat or ("stair" if d.get("linkId") in STAIRS else "rake" if d.get("linkId") else "concrete")
     if mat == "structure":
@@ -734,9 +769,9 @@ for wb in ({"x": inner["x"], "y": inner["y"] - 0.17, "w": inner["w"], "h": 0.04}
            {"x": inner["x"] + inner["w"] + 0.13, "y": inner["y"], "w": 0.04, "h": inner["h"]}):
     B.box("cove", wb, STEP_Z + 0.1, STEP_Z + 0.12)
 # entrance end: higher ceiling, the bulkhead down to the drop ceiling, black acoustic panels at the sides
-B.box("raft", {k: entrance[k] for k in "xywh"}, NEAR_Z, NEAR_Z + 0.1)
+B.box("plenum", {k: entrance[k] for k in "xywh"}, NEAR_Z, NEAR_Z + 0.1)
 B.box("raft", {"x": hall["x"], "y": entrance["y"] + entrance["h"] - 0.05, "w": hall["w"], "h": 0.05}, HALL_CEIL + 0.25, NEAR_Z)
-for (x0, x1) in ((hall["x"], coffer["x"] - 0.6), (coffer["x"] + coffer["w"] + 0.6, hall["x"] + hall["w"])):
+for (x0, x1) in ((hall["x"], coffer["x"] - 2.2), (coffer["x"] + coffer["w"] + 2.2, hall["x"] + hall["w"])):
     B.box("acoustic", {"x": x0, "y": entrance["y"], "w": x1 - x0, "h": entrance["h"] - 0.3}, NEAR_Z - 0.35, NEAR_Z)
 spots = []
 for sy in (entrance["y"] + 2.5, entrance["y"] + 5.0):
@@ -797,6 +832,7 @@ for (sx_, sy_) in ((hall["x"] + 0.05, -10.0), (hall["x"] + 0.05, 8.0), (hall["x"
 for (gx, gy, _) in lights[::3]:
     cylinder("speaker", gx + 0.9, gy + 1.1, HALL_CEIL - 0.04, HALL_CEIL, 0.06)
 
+stair_lamps = []
 # the stairwells' glass: white mullions every 1.25 m, and glass across the stair's high (south) end
 for l in stair_links:
     b = l["bounds"]
@@ -809,6 +845,45 @@ for l in stair_links:
         B.box("plinth", {"x": fx - 0.01, "y": b["y"] - 0.3, "w": 0.05, "h": 13.2}, 0, 0.12)
     for fx in [b["x"] - 0.3 + 1.25 * k for k in range(4)]:
         B.box("hexFrame", {"x": fx, "y": b["y"] - 0.33, "w": 0.05, "h": 0.03}, 0, HALL_CEIL)
+
+# the side stairs: navy walls lit blue from an LED strip that follows the flight, a sloped stringer
+# along each side, one grey handrail, warm downlights in the stairwell ceiling
+for l in stair_links:
+    b, rise = l["bounds"], l["rise"]
+    def nose(y):                                              # a line through the tread tops' outer corners
+        f = (b["y"] + b["h"] - y) / b["h"] if not l["ascending"] else (y - b["y"]) / b["h"]
+        return rise * min(1.0, max(0.0, f)) + l["riser"]
+    ys = [b["y"] - 0.02, b["y"] + b["h"] + 0.02]
+    for side, wx in ((-1, b["x"]), (1, b["x"] + b["w"])):
+        # navy liner on the wall above the glass, all the way up the flight
+        B.box("stairWall", {"x": wx if side < 0 else wx - 0.04, "y": b["y"] - 0.3, "w": 0.04, "h": b["h"] + 0.3},
+              HALL_CEIL, FH + CLEAR)
+        # sloped stringer: a band 0.3 m deep following the nosings
+        sx = wx - side * 0.05
+        v = [(sx, ys[0], nose(ys[0]) - 0.25), (sx, ys[1], nose(ys[1]) - 0.25), (sx, ys[1], nose(ys[1]) + 0.08), (sx, ys[0], nose(ys[0]) + 0.08)]
+        B.mesh("stringer", v + [(x - side * 0.05, y, z) for x, y, z in v],
+               [(0, 1, 2, 3), (4, 7, 6, 5), (3, 2, 6, 7), (0, 4, 5, 1)])
+        # LED strip just above the stringer: the wall glows blue along the flight
+        lx = wx - side * 0.012
+        B.mesh("led", [(lx, ys[0], nose(ys[0]) + 0.12), (lx, ys[1], nose(ys[1]) + 0.12), (lx, ys[1], nose(ys[1]) + 0.15), (lx, ys[0], nose(ys[0]) + 0.15)],
+               [(0, 1, 2, 3)])
+    # handrail on the west side: a round tube 0.9 m above the nosings on brackets every 1.2 m
+    hx, steps = b["x"] + 0.09, 24
+    ring = 10
+    pts = [(b["y"] + b["h"] + 0.3 - (b["h"] + 0.6) * k / steps) for k in range(steps + 1)]
+    verts = []
+    for y in pts:
+        zc = nose(y) + 0.9
+        verts += [(hx + 0.022 * math.cos(2 * math.pi * j / ring), y, zc + 0.022 * math.sin(2 * math.pi * j / ring)) for j in range(ring)]
+    faces = [(k * ring + j, k * ring + (j + 1) % ring, (k + 1) * ring + (j + 1) % ring, (k + 1) * ring + j) for k in range(steps) for j in range(ring)]
+    B.mesh("steel", verts, faces)
+    y = b["y"] + 0.6
+    while y < b["y"] + b["h"]:
+        B.box("steel", {"x": hx - 0.09, "y": y - 0.01, "w": 0.09, "h": 0.02}, nose(y) + 0.84, nose(y) + 0.87)
+        y += 1.2
+    for y in (b["y"] + b["h"] * 0.25, b["y"] + b["h"] * 0.65):
+        cylinder("downlight", b["x"] + b["w"] / 2, y, FH + CLEAR - 0.01, FH + CLEAR, 0.08)
+        stair_lamps.append((b["x"] + b["w"] / 2, y, FH + CLEAR - 0.02, nose(y)))
 
 # trusses along the side walls, a box truss with its chords and a zigzag of diagonals
 for tx in (hall["x"] + 0.9, hall["x"] + hall["w"] - 0.9):
@@ -982,17 +1057,21 @@ for fx in (grand["x"] + grand["w"] * 0.17, grand["x"] + grand["w"] * 0.5, grand[
     point(f"funnel-{fx:.1f}", (fx, grand["y"] + grand["h"] + 1.8, FH + 0.6), 1500, (0.35, 0.5, 1.0), 0.4)
 for sid in ("stair-west", "stair-east"):
     sb = next(l for l in venue["links"] if l["id"] == sid)["bounds"]
-    point(f"{sid}-foot", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] + 2.0, 3.0), 300, (0.85, 0.88, 1.0))
-    point(f"{sid}-low", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] * 0.7, 2.6), 500, (0.8, 0.85, 1.0))
-    point(f"{sid}-high", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] * 0.25, FH - 0.6), 500, (0.8, 0.85, 1.0))
+    point(f"{sid}-foot", (sb["x"] + sb["w"] / 2, sb["y"] + sb["h"] + 2.0, 2.9), 120, (1.0, 0.9, 0.8))
+for (lx, ly, lz, _) in stair_lamps:
+    spot = bpy.data.lights.new(f"stair-{lx:.1f}-{ly:.1f}", "SPOT")
+    spot.energy, spot.spot_size, spot.spot_blend, spot.color = 1800, math.radians(80), 0.5, (1.0, 0.88, 0.74)
+    so = bpy.data.objects.new(spot.name, spot)
+    so.location = (lx, ly, lz)
+    scene.collection.objects.link(so)
 # the Hollywood room: an area light under each hexagon panel, a narrow spot in each downlight (they throw the
 # pools of light on the carpet), warm track spots at the entrance end
 for (lx, ly, lz) in lights:
-    ob = area(f"panel-{lx:.1f}-{ly:.1f}", (lx, ly, lz - 0.06), 0.3, 55, (1.0, 0.94, 0.86))
+    ob = area(f"panel-{lx:.1f}-{ly:.1f}", (lx, ly, lz - 0.06), 0.3, 32, (1.0, 0.94, 0.86))
     ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", 0.8, 0.3
 for (lx, ly) in downlights:
     spot = bpy.data.lights.new(f"down-{lx:.1f}-{ly:.1f}", "SPOT")
-    spot.energy, spot.spot_size, spot.spot_blend, spot.color = 45, math.radians(38), 0.35, (1.0, 0.9, 0.78)
+    spot.energy, spot.spot_size, spot.spot_blend, spot.color = 110, math.radians(34), 0.25, (1.0, 0.9, 0.78)
     spot.shadow_soft_size = 0.04
     so = bpy.data.objects.new(spot.name, spot)
     so.location = (lx, ly, HALL_CEIL - 0.01)
@@ -1089,6 +1168,11 @@ def catmull_rom(pts, samples):
     return out, cum[-1]
 
 
+def stair_rise(b, frac):
+    """Tread height a fraction of the way up a side stair (they all climb towards -y, 6.2 m)."""
+    return FH * frac + 0.18
+
+
 def walk(n):
     """Keyframe the camera from the hall to its seat in room n, and swing that room's doors open."""
     door, scr = doors[n], screens[n]
@@ -1114,6 +1198,7 @@ def walk(n):
     # into the stairwell through the side opening at its foot (between the wall end and the stub)
     gap_y, in_x = stair["y"] + stair["h"] + 2.55, stair["x"] - 0.3 if sx > lp[0] else stair["x"] + stair["w"] + 0.3
     pts = [lp, (in_x + (-1.6 if sx > lp[0] else 1.6), gap_y, 1.7), (sx, gap_y - 0.25, 1.7), (sx, stair["y"] + stair["h"] - 0.4, 1.75),
+           (sx, stair["y"] + stair["h"] / 2, stair_rise(stair, 0.5) + 1.65),
            (sx, stair["y"] + 0.6, FH + 1.65), ((sx + cx) / 2, stair["y"] - 2.5, FH + 1.7),
            (wx + face * 3.2, yc, FH + 1.7), (wx - face * 1.2, yc, FH + 1.65), ((high_x + wx) / 2, aisle_y, FH + 1.65),
            ((high_x + seat[0]) / 2, aisle_y, tread((high_x + seat[0]) / 2) + 1.65), (seat[0], aisle_y, tread(seat[0]) + 1.6),
@@ -1205,7 +1290,7 @@ else:
     scene.render.motion_blur_shutter = 0.4
 scene.view_settings.view_transform = "AgX" if "AgX" in [v.name for v in bpy.types.ColorManagedViewSettings.bl_rna.properties["view_transform"].enum_items] else "Filmic"
 scene.view_settings.look = "None"
-scene.view_settings.exposure = -0.9
+scene.view_settings.exposure = -0.55
 try:
     scene.view_settings.look = "Medium High Contrast"
 except TypeError as e:
