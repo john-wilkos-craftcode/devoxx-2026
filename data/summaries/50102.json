@@ -1,0 +1,38 @@
+{
+  "id": 50102,
+  "source": "transcript",
+  "tldr": "Van Wassenhove shows AURA, a laptop-hosted brain for a 300-euro Reachy Mini robot that recognises family members, separates facts from memories, codes in VS Code, and needs approval for anything sensitive.",
+  "summary": [
+    "Jan Van Wassenhove assembled a Reachy Mini, the open-source desktop robot from Hugging Face and Pollen Robotics, on his kitchen table in an evening with one screwdriver. It arrives without a mind, so he wrote AURA, a brain that runs on his laptop: the robot only streams camera and microphone events, and all state is kept encrypted on the laptop, so the robot itself holds no secrets. Using a stand-in persona called Mila, he replays a day. AURA recognises Mila and greets her using facts he entered plus memories it derived from past conversations. Her son Luca is tagged as a minor, so nothing about him is remembered beyond the facts given. In 'home mode' it refuses to reveal his work agenda, and in 'presenting mode' it has extra guardrails so it doesn't keep interrupting.",
+    "The robot then goes 'outside the box': asked to fix AURA's own skills screen, which made one API call per skill, it opens VS Code, has a coding agent rewrite the code to a single call, runs the tests, and then asks permission before committing, which Van Wassenhove refuses on stage. AURA also notices that across 15 morning briefings he always skipped the weather and news, and proposes a shorter procedure that only takes effect once he approves. Its 'hands' are tools such as VS Code, Spotify or speaker control. His broader point is that the floor is moving as well as the ceiling: compared with the 40,000-euro humanoid from the opening, this robot cost about 300 euros and was built by someone with a day job and no robotics background. The architecture is covered in his separate talk later the same day."
+  ],
+  "keyPoints": [
+    "Everything runs on the laptop, not the robot; captured events are interpreted by multiple AI models and stored encrypted, so stealing the robot yields only motors and servos.",
+    "AURA keeps facts the family gave it separate from memories it derived itself, and stores no memories for people tagged as minors.",
+    "Modes (home, presenting) gate which data and tools are available; for example, the work agenda is unavailable in home mode.",
+    "Self-improvement is proposal-only: AURA can rewrite procedures such as the morning briefing or modify its own code, but nothing changes or gets committed without explicit human approval.",
+    "Van Wassenhove's argument: hardware has become cheap enough (about 300 euros) that a hobbyist can build an agentic robot, which changes who gets to build things."
+  ],
+  "takeaways": [
+    "Put a human approval gate in front of every action that leaves the sandbox, such as commits or procedure changes, because agents will find reasons to do what you didn't intend.",
+    "Separate user-provided facts from model-derived memories and apply different retention rules, especially for minors.",
+    "Use explicit operating modes to limit which data and tools an assistant can reach in a given context."
+  ],
+  "quotes": [
+    {"text": "If you just let your agents go, they will come up with a good excuse to still execute the thing you don't want to do. So those gates are quite important.", "at": "09:40"},
+    {"text": "It's not about the ceiling which is moving. At the same pace, we've got the floor which is moving.", "at": "13:25"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "A robot in a box"},
+    {"at": "03:21", "title": "AURA, the laptop brain"},
+    {"at": "04:21", "title": "Recognising the family"},
+    {"at": "07:10", "title": "Modes and guardrails"},
+    {"at": "08:37", "title": "Coding with approval gates"},
+    {"at": "11:00", "title": "Self-improving procedures"},
+    {"at": "13:25", "title": "The floor is moving"}
+  ],
+  "tech": ["Reachy Mini", "Hugging Face", "Pollen Robotics", "VS Code", "Claude Code", "Spotify"],
+  "watchIf": "You want a 15-minute live look at a hobbyist-built agentic robot with sensible privacy and approval guardrails.",
+  "themes": ["Hardware, robots & fun", "AI agents & agentic coding"],
+  "demo": true
+}

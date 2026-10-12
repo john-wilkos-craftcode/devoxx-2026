@@ -1,0 +1,45 @@
+{
+  "id": 8153,
+  "source": "transcript",
+  "tldr": "Klaver explains how the Port of Rotterdam, with five teams running 90+ microservices, used event storming and DDD to find business boundaries and is consolidating capability by capability into Spring Modulith services.",
+  "summary": [
+    "Mario Klaver traces the Port of Rotterdam's system from a 2010 Java Swing client and single backend, through a 2015-era monolith with side effects, release bottlenecks and whole-app scaling, to a microservices drive in which new features meant new services. By the end of 2024 five teams owned more than 90 microservices, about 20 each, multiplied across Rotterdam and Amsterdam deployments and DTAP environments. Microservices did deliver independent deployment, scaling and ownership, but also slower cross-service features, repeated dependency upgrades even with Renovate and OpenRewrite, harder debugging and higher cost. He cites Uber and Spotify reporting the same pain. Like Uber, the team responded with platform engineering (in their case one person building in-house Spring-style starters for JMS, security and inbox/outbox) and a hard look at boundaries.",
+    "The real problem turned out to be boundaries rather than service count. Three services for port entry, berth safety and berth planning looked cleanly separated on paper but called each other constantly, changed together, and decided things for each other. To find real business boundaries the team ran a big-picture event storming: chaotic exploration, enforcing the timeline with pivotal events and milestones, adding actors, a walkthrough, then clustering. Pivotal events marked subdomains such as port clearance, which covers health, dangerous goods, waste and security assessments leading to operational clearance.",
+    "Each subdomain becomes one deployable service, deliberately, because the boundaries may be wrong and moving code inside one service is cheap. Inside, Spring Modulith defines modules with an explicit API package (IntelliJ shows locks for exposed and internal packages), verifies allowed dependencies and cycles, and tests modules in isolation. Modules talk through business events such as 'health assessment completed', which can later move to Kafka or AMQ. Modules are extracted only for scaling, ownership, deployment frequency or tech reasons. Migration goes capability by capability across four patterns of increasing difficulty and should take four to five years. Klaver admits the benefits are still unmeasured hypotheses: shorter lead time and less maintenance."
+  ],
+  "keyPoints": [
+    "Klaver's microservice-to-engineer ratio rule of thumb: 0.2-0.5 is healthy, above 1.0 is proliferation; theirs exceeded 4.5.",
+    "Services with clean names can still be one tightly coupled unit; the test is whether a business process change touches several of them at once and who actually makes the decision.",
+    "Big-picture event storming in five steps (chaotic exploration, enforce timeline, actors, walkthrough, clustering), with pivotal events marking candidate subdomain boundaries.",
+    "One deployable per subdomain, with internal Spring Modulith modules exposing an explicit API package; Modulith's verification turns allowed module dependencies into executable architecture rules.",
+    "Modules communicate through business events from the event storming instead of direct bean calls, so extracting a module later needs no switch to REST.",
+    "@ApplicationModuleTest in standalone mode boots only one module's Spring context for faster, focused tests.",
+    "Migration strategies: add new capabilities as modules listening to legacy events, move code from several services into one service as packages, carve one process out of a shared service, and split capabilities that are smeared across several services."
+  ],
+  "takeaways": [
+    "Before splitting or merging services, run a big-picture event storming with as many perspectives in the room as possible.",
+    "Start with modules inside one deployable and extract a microservice only when scaling, ownership, deployment cadence or technology demands it.",
+    "Add Spring Modulith verification to your build so module boundaries can't erode through public classes.",
+    "Migrate business capabilities one at a time while the old system keeps running, and define metrics such as lead time up front."
+  ],
+  "quotes": [
+    {"text": "If you hadn't created a new microservice that day, you went home disappointed.", "at": "03:51"},
+    {"text": "Microservices aren't the goal, good boundaries are.", "at": "45:28"},
+    {"text": "Microservices distribute complexity, but good boundaries control it.", "at": "47:52"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "From Swing to 90 microservices"},
+    {"at": "06:59", "title": "The cost of microservices"},
+    {"at": "09:38", "title": "Platform engineering and starters"},
+    {"at": "12:37", "title": "The real problem: boundaries"},
+    {"at": "17:18", "title": "DDD and event storming"},
+    {"at": "26:58", "title": "One service per subdomain"},
+    {"at": "30:28", "title": "Spring Modulith modules"},
+    {"at": "37:23", "title": "Incremental migration strategies"},
+    {"at": "44:06", "title": "Lessons and hypotheses"}
+  ],
+  "tech": ["Spring Modulith", "Spring Boot", "IntelliJ IDEA", "Renovate", "OpenRewrite", "Apache Kafka", "ActiveMQ", "JMS", "Java Swing"],
+  "watchIf": "Your team owns far more microservices than people and you want a candid, in-progress account of consolidating with DDD and Spring Modulith.",
+  "themes": ["Architecture & design", "Legacy modernization", "Spring & frameworks"],
+  "demo": false
+}

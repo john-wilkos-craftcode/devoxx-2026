@@ -1,0 +1,111 @@
+{
+  "id": 22912,
+  "source": "transcript",
+  "tldr": "Laforge and Venema define loop engineering as designing triggers, goals, checkers, state and stop conditions around coding agents, and demo maker-checker, goal, scheduled and Ralph Wiggum loops built with Antigravity.",
+  "summary": [
+    "Guillaume Laforge's first loop came from frustration: Google codelabs took him two days to write. He had Antigravity turn the formatting guide into a skill, generate a codelab, compile and run every sample, then walk through the result in a fresh context and report problems, cutting the work to about two hours. Citing Boris Cherny and Peter Steinberger ('design loops that prompt your agents'), the speakers stack the vocabulary: prompt, context, harness, loop and graph engineering. A loop has a trigger, a contract (goal or standard operating procedure), a maker, a separate checker, persisted state and a stopping gate with caps.",
+    "They list six primitives: triggers (manual, schedule, events), Git worktrees, skills and rules, connectors such as MCP and A2A, sub-agents, and state files. Loops are placed on a quadrant of manual or autonomous triggers and exits: turn-based, goal-based, time-based and proactive. Laforge demos /goal to lift JaCoCo coverage above 80% one class at a time, a daily scheduled task that redeploys his Devoxx schedule app when the agenda changes, and a GitHub Action that runs a JBang script using his Antigravity Java SDK with a PR-review skill and locked-down tool policies.",
+    "Wietse Venema builds loops in Python on the Antigravity SDK, which drives the same Go harness binary as the IDE. His demos add token and tool-call budgets, output truncation and compaction (every 15,000 tokens in one run), a maker-checker where the read-only checker must find something on its first pass, a planner in front, a model-based shell command classifier as a guardrail, a 'maker-user' loop that writes friction logs from the README alone, a docs maker allowed to write only in docs/, a forced red-green-refactor TDD loop, and a 'dreaming' node that turns the maker's trajectory into a Markdown memory.",
+    "After the break, Laforge runs Geoffrey Huntley's Ralph Wiggum loop: fresh context per iteration, specs written with Matt Pocock's grill-me skill, and todo and progress files, commit only on success, building a Connect 4 game. He then walks through Andrej Karpathy's autoresearch loop, which ran 83 five-minute nanoGPT training experiments overnight and kept only improvements. Six failure modes follow: runaway token burn, unverified autonomy, uncheckable goals, impossible goals, complexity and context saturation, and away-from-keyboard comprehension rot, illustrated by a 2.0 SDK release full of Object-typed signatures. They close on graph engineering and software factories, citing Zach Lloyd of Warp, while admitting it may be 'engineers looking for engineering things'."
+  ],
+  "keyPoints": [
+    "A loop's anatomy: trigger, contract (target state or SOP), maker, checker, state carried across iterations, and a stopping gate with caps on tokens, iterations or tool calls.",
+    "Never let the maker grade itself in the same conversation; use a fresh context or a different (possibly smaller) model, adversarial review prompts, and deterministic gates such as tests and linters where possible.",
+    "Goals must be checkable and reachable: asked for 100% coverage, agents have deleted hard-to-test files temporarily or added coverage ignore lists; 'make this code cleaner' has no exit condition.",
+    "Budgets matter in the harness: Venema caps tool calls per turn with a hook that warns at six of eight, truncates noisy tool output, and compacts history at a token threshold, trading lost detail against cost.",
+    "Restrict loops with policies, not just prompts: read-only checkers, docs makers that may only write to docs/, and a classifier hook on every shell command to block reads outside the workspace or calls to the cloud metadata server.",
+    "The Ralph Wiggum loop avoids context rot by restarting each iteration from scratch and keeping memory in todo/progress files and Git commits.",
+    "Karpathy's autoresearch is a roughly 600-line Python loop: hypothesise a change, train for a fixed five minutes, commit if the metric improves, otherwise reset, and log failed experiments so they are not retried.",
+    "Venema says a Google experiment found agents are often distracted by TODO comments, more so at higher thinking levels, so clear them out of codebases agents work in."
+  ],
+  "takeaways": [
+    "Pick one repetitive task (release notes, doc sync, dependency updates) and turn it into a scheduled or goal-based loop with an explicit, verifiable exit condition.",
+    "Add a separate checker in a fresh context that must find at least one issue on its first pass.",
+    "Set token, iteration and tool-call caps on every autonomous loop before you walk away from it.",
+    "Persist loop state in files or Git so each iteration can start with a clean context.",
+    "Keep asking your agent to explain the code, architecture and its findings so you still understand what it built."
+  ],
+  "quotes": [
+    {
+      "text": "Each time you ask a model to grade itself what it has done, in the same conversation, it will always say it's good. Always.",
+      "at": "36:16"
+    },
+    {
+      "text": "99% of the time, it's perfectly fine. And then at one time, it does something completely unhinged.",
+      "at": "131:14"
+    },
+    {
+      "text": "I can't shake the feeling that this might be engineers looking for engineering things.",
+      "at": "145:37"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why loops: the codelab story"
+    },
+    {
+      "at": "18:28",
+      "title": "From prompt to graph engineering"
+    },
+    {
+      "at": "28:27",
+      "title": "Anatomy and primitives of loops"
+    },
+    {
+      "at": "43:56",
+      "title": "Four kinds of loops"
+    },
+    {
+      "at": "47:54",
+      "title": "Goal and scheduled loop demos"
+    },
+    {
+      "at": "60:34",
+      "title": "Skills and a PR review action"
+    },
+    {
+      "at": "68:17",
+      "title": "SDK loops: budgets to dreaming"
+    },
+    {
+      "at": "95:08",
+      "title": "Ralph Wiggum and autoresearch"
+    },
+    {
+      "at": "122:19",
+      "title": "Failure modes and dangers"
+    },
+    {
+      "at": "139:14",
+      "title": "Graphs and software factories"
+    }
+  ],
+  "tech": [
+    "Google Antigravity",
+    "Antigravity SDK",
+    "Gemini",
+    "Claude Code",
+    "Codex",
+    "LangChain4j",
+    "Micronaut",
+    "JaCoCo",
+    "JBang",
+    "GitHub Actions",
+    "Git worktrees",
+    "MCP",
+    "A2A",
+    "claat",
+    "Python",
+    "TypeScript",
+    "Vite",
+    "Google Cloud Run",
+    "nanoGPT"
+  ],
+  "watchIf": "You already use a coding agent interactively and want concrete patterns, guardrails and failure modes for letting it run unattended on goals, schedules or events.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}

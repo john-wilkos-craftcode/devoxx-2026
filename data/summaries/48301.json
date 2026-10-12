@@ -1,0 +1,71 @@
+{
+  "id": 48301,
+  "source": "transcript",
+  "tldr": "De Morlhon presents Docker's sandbox platform for coding agents (microVMs with filesystem and network control, shareable Kits, cloud sandboxes) and the internal 'AI factory' Docker built on it.",
+  "summary": [
+    "Jean-Laurent de Morlhon frames the talk around four questions: can you trust an agent, repeat its setup, run it without you, and build on it? Each agent runs in its own microVM with its own kernel and a Docker daemon, isolated by hardware virtualisation (Intel VT-x, AMD-V). A filesystem manager mounts only chosen directories, and a network proxy enforces policies and injects credentials on outbound calls, so the agent only sees a dummy value. A demo shows the sbx CLI blocking a disallowed site. Docker Kits package a Dockerfile with a kit.yaml of sandbox policies in one OCI image; Docker plans to donate the new spec to the CNCF.",
+    "The same sandboxes run in Docker's cloud (sbx move hands a local session over), behind an MCP gateway that can allow individual tools of a server, with a web UI, an OpenAPI API and a TypeScript SDK. Since February Docker has run an internal 'AI factory' on top: agents co-write a design document with humans, a PM agent splits it into Jira tickets, an orchestrator runs four or five implementer agents in parallel, review agents check each PR, and a human is pinged in Slack to approve. Most human time goes into commenting on design documents; reviewing 10,000-line PRs remains a problem."
+  ],
+  "keyPoints": [
+    "Credentials never enter the sandbox: the network proxy swaps a placeholder for the real API key or SSH credential on outbound calls, limiting the damage from info-stealing packages.",
+    "MicroVM isolation is hardware-enforced and boots fast enough to run 6-20 agents side by side on a laptop.",
+    "Docker Kits bundle the sandbox image and its policy (allowed hosts, injected secrets, capabilities) under one OCI digest so a team can share the exact agent setup.",
+    "The MCP gateway can allow specific tools within an MCP server, for example read but not destructive write operations.",
+    "In Docker's internal factory the human effort shifts to design review; implementation is parallelised across sandboxed agents and the output is tracked as artifacts rather than sessions."
+  ],
+  "takeaways": [
+    "Stop giving agents broad GitHub tokens or raw API keys; run them in a sandbox that injects scoped credentials at the network layer.",
+    "Write down network and filesystem policies for your agents and share them as a versioned image, not as personal setup steps.",
+    "Try the free sbx CLI to run a coding agent in a microVM on your laptop."
+  ],
+  "quotes": [
+    {
+      "text": "I think the real power of sandboxes is that it's more like a seatbelt in your car.",
+      "at": "03:17"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Who gives agents their tokens?"
+    },
+    {
+      "at": "03:17",
+      "title": "Trust: microVM sandboxes"
+    },
+    {
+      "at": "08:37",
+      "title": "Repeat: Docker Kits"
+    },
+    {
+      "at": "11:14",
+      "title": "Run without you: cloud sandboxes"
+    },
+    {
+      "at": "13:58",
+      "title": "Docker's internal AI factory"
+    }
+  ],
+  "tech": [
+    "Docker Sandboxes",
+    "sbx CLI",
+    "MicroVM",
+    "Docker Kits",
+    "OCI images",
+    "MCP",
+    "MCP Gateway",
+    "Claude Code",
+    "Codex",
+    "OpenCode",
+    "Jira",
+    "Slack",
+    "TypeScript SDK",
+    "CNCF"
+  ],
+  "watchIf": "You let coding agents run with real credentials on your machine and want a quick look at how Docker isolates them and orchestrates many in parallel.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Security & supply chain"
+  ],
+  "demo": false
+}

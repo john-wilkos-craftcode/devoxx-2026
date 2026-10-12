@@ -1,0 +1,48 @@
+{
+  "id": 19733,
+  "source": "transcript",
+  "tldr": "Josh Long live-codes a dog-and-cat Spring Boot 4.1 app on Java 27 to tour API versioning, HTTP interface clients, resilience, SSRF filtering, OpenTelemetry, Spring gRPC, BeanRegistrar, JobRunr and Leyden AOT.",
+  "summary": [
+    "Josh Long opens with his usual selfie, plugs a free Spring Security book and the next day's security session with Daniel Garnier-Moiroux, and mentions Spring Tools now offers MCP support for Claude Code. His case for still writing code by hand: AI models make mistakes, so developers need to know what good looks like to validate what comes out. He then urges teams to upgrade much faster. The Spring portfolio, like other open source projects, has seen a flood of CVE reports, fixes ship before the CVEs are disclosed, and small issues can be chained into critical exploits.",
+    "The demo starts on start.spring.io with Java 27 (Long credits compact object headers with 10-20% less RAM) and Spring Boot 4.1, which is modularised so the web server and REST client are separate starters. Against Postgres with Spring Data JDBC and virtual threads, he shows the new lazy connection-fetch setting that delays taking a pooled connection until real I/O inside a @Transactional method. A dogs endpoint gets two versions via API versioning, chosen by an X-Dogs-Version header. A cat-facts client goes from a hand-written RestClient to a declarative HTTP interface registered with @ImportHttpServices.",
+    "For robustness he adds @EnableResilientMethods with @Retryable (and mentions @ConcurrencyLimit) from Spring Framework 7, citing last year's AWS us-east-1 and Cloudflare outages. An InetAddressFilter bean in Boot 4.1 blocks outbound requests by host, subnet or category to counter server-side request forgery, across all supported HTTP clients. The new OpenTelemetry starter sends metrics to a local Grafana stack from Docker Compose. Spring gRPC, now managed by Boot, serves a dogs.proto service, called with grpcurl.",
+    "He explains @Component stereotypes versus @Bean methods, then introduces BeanRegistrar for programmatic, loop-friendly bean registration. He uses it to wire JobRunr (from Belgian developer Ronald Dehuysser): a recurring job persisted in Postgres so missed runs survive restarts, with carbon-aware scheduling that shifts runs based on local grid data. To finish, a Project Leyden AOT cache script, which works on any standard JDK, cuts startup from about 1.7 to 0.47 seconds."
+  ],
+  "keyPoints": [
+    "Long says Spring now sees many CVE reports per month, against an average of about 1.5 per month across the portfolio before; fixes ship in releases before disclosure, so teams need a fast upgrade path.",
+    "Spring Boot 4 splits auto-configuration into smaller modules: spring-boot-starter-webmvc and the REST client starter are separate, so a CLI or batch app can call HTTP services without a web server.",
+    "Spring Boot 4.1 adds a lazy connection-fetch data source option so a @Transactional method holds a pooled connection only while it does SQL, which matters when virtual threads let the web tier flood the pool.",
+    "API versioning is built in: annotate handlers with version 1.0 and 2.0, set a default version and resolve it from a custom header.",
+    "Declarative HTTP interface clients (@GetExchange, activated with @ImportHttpServices) replace hand-written RestClient code.",
+    "Spring Framework 7 brings resilience without extra libraries: @EnableResilientMethods, @Retryable with included exceptions, and @ConcurrencyLimit as a semaphore.",
+    "An InetAddressFilter bean in Boot 4.1 restricts outbound HTTP calls by host, IP, subnet or category (for example external-only) to block SSRF-style exfiltration.",
+    "BeanRegistrar lets you register beans in code with loops and conditionals, choosing constructor inference or a custom supplier; Long uses it to wire a JobRunr launcher and handler."
+  ],
+  "takeaways": [
+    "Set up a fast path to production so you can take Spring patch releases as soon as they ship.",
+    "Turn on lazy connection fetching if you use virtual threads with long @Transactional methods.",
+    "Replace hand-written HTTP client code with HTTP interfaces, and add @Retryable for flaky downstream services.",
+    "Register an InetAddressFilter to limit where your services may make outbound requests.",
+    "Try the Leyden AOT cache workflow on your Spring Boot app to measure the startup gain on a stock JDK."
+  ],
+  "quotes": [
+    {"text": "That is the world's first good JavaScript.", "at": "08:11"},
+    {"text": "Every time a CVE is published, that's a dinner bell for hackers.", "at": "11:46"},
+    {"text": "Don't debug DSLs on stage. That's rule number five of public speaking.", "at": "41:08"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Intro and why know good code"},
+    {"at": "08:11", "title": "Java 27 and the CVE wave"},
+    {"at": "12:50", "title": "Data, virtual threads, lazy connections"},
+    {"at": "18:05", "title": "API versioning and HTTP interfaces"},
+    {"at": "23:01", "title": "Retries and SSRF filtering"},
+    {"at": "26:52", "title": "OpenTelemetry and Grafana"},
+    {"at": "28:06", "title": "Spring gRPC"},
+    {"at": "35:42", "title": "BeanRegistrar and JobRunr"},
+    {"at": "47:06", "title": "Leyden AOT startup"}
+  ],
+  "tech": ["Spring Boot 4.1", "Spring Framework 7", "Java 27", "Java 25", "Spring Data JDBC", "PostgreSQL", "Virtual threads", "RestClient", "HTTP interface clients", "OpenTelemetry", "Grafana", "Docker Compose", "Spring gRPC", "gRPC", "Protocol Buffers", "grpcurl", "JobRunr", "Project Leyden", "Compact object headers", "Spring Tools", "Claude Code", "MCP"],
+  "watchIf": "You maintain Spring Boot 3 apps and want a fast, demo-driven tour of what Boot 4.x and Framework 7 add before you upgrade.",
+  "themes": ["Spring & frameworks", "Java language & JDK", "JVM performance & runtime"],
+  "demo": true
+}

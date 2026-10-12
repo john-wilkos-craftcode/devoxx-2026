@@ -1,25 +1,25 @@
 {
   "id": 31451,
   "source": "transcript",
-  "tldr": "Janssen opens Devoxx Belgium 2026 with a dancing humanoid robot, his view that developers are becoming builders, notes on token costs and local models, and a live demo of Alex Gavrilescu's Groma.md.",
+  "tldr": "Janssen opens Devoxx Belgium 2026 with a dancing humanoid robot, argues developers are becoming builders, weighs token costs against local models, and hosts a live Groma.md multi-agent demo.",
   "summary": [
-    "The keynote opens with a scripted humanoid robot claiming to come from 2200 and dancing on stage. Thomas, whose team brought it from Germany, explains that it was trained with reinforcement learning and NVIDIA SONIC and costs about 40,000 euros. Stephan Janssen then describes being both excited and frightened by AI: he turned his non-developer son's wine spreadsheet into a Firebase-hosted website without touching code, which is why Devoxx now speaks of 'builders'. He walks through the stages from copy-paste prompting through context, agentic, harness and loop engineering, and points to 'decision engineering', where decision APIs return probabilities over constrained JSON options; he said Spring AI and LangChain4j already support them. He adds that this year's Java track, with many Oracle engineers, is the strongest ever.",
-    "On cost, about 70% of the room uses a subscription, which Janssen calls heavily subsidised, so he pushes local models, which he places about a year behind frontier models, plus European open-weight models from Mistral. He reports that DevoxxGenie, his open-source Java plugin for local models in the IDE, has passed 100,000 downloads, although he increasingly works in CLIs and reviews in IntelliJ. Alex Gavrilescu, creator of Backlog.md, then demos Groma.md, which keeps a live architecture map of a codebase. Six agents work through DevoxxGenie GitHub issues while components appear and change on the map, followed by an architecture-level diff. Gavrilescu put the run at $60-100+ in tokens versus about five days of manual work. The keynote closes with the robot games competition, the mobile rating app and Janssen's call to embrace the change."
+    "A scripted humanoid robot 'from the year 2200' opens the keynote and dances; Thomas, whose team brought it from Germany, says it was trained with reinforcement learning and NVIDIA SONIC, costs about 40,000 euros, and is the subject of their lunch talk. Stephan Janssen describes AI as both exciting and frightening: overnight he turned his non-developer son's wine spreadsheet into a Firebase-hosted website without touching code, which is why Devoxx now speaks of 'builders'. He lists the stages from copy-paste prompting through context, agentic, harness and loop engineering to 'decision engineering', where decision APIs return probabilities over constrained JSON options, useful for picking tools or flagging risky tool calls. He said OpenAI and Ollama recently shipped such APIs and that Spring AI and LangChain4j support them. He also says he has not written code himself since July 2025, and calls this year's Java track, staffed by many Oracle engineers, the best ever.",
+    "On economics, about 70% of the room uses a Claude or Codex subscription, which Janssen calls heavily subsidised, so he urges trying local models, which he puts roughly a year behind the frontier, naming Qwen and Mistral's new open-weight release. DevoxxGenie, his open-source Java IDE plugin for local models, has passed 100,000 downloads, though he now mostly works in CLIs and reviews in IntelliJ. Alex Gavrilescu, creator of Backlog.md, then demos Groma.md, which keeps a live architecture map of a codebase: six agents implement six DevoxxGenie GitHub issues as components appear on the map, followed by an architecture-level diff. A run costs $60 to over $100 in tokens versus an estimated five days of manual work. Janssen closes with the robot games competition, a reminder to rate talks, and a call to embrace the change."
   ],
   "keyPoints": [
-    "Janssen sees natural language as the new abstraction layer and developers moving from programming to building, while still reviewing code for critical domains.",
-    "He describes 'decision APIs' as a new building block: give a constrained set of options and get probabilities back, which is useful for tool selection or judging whether a tool call is disruptive.",
-    "Subscriptions are, in Janssen's view, heavily subsidised; he urges developers to evaluate local open-weight models, which he estimates are about a year behind the frontier.",
-    "Groma.md keeps a continuously updated architecture diagram of a codebase, shows multiple agents' changes on it in real time, and offers architecture diffs alongside code diffs.",
-    "Six parallel agents implementing six backlog tasks cost roughly $60 to over $100 in tokens, against an estimated five days of manual work."
+    "Janssen sees natural language as the new abstraction layer and calls himself language-agnostic now, while still insisting on human code review in domains like hospitals or nuclear plants.",
+    "'Decision engineering': decision APIs take a constrained JSON set of options and return probabilities, which Janssen suggests for tool selection and judging whether a tool call is disruptive.",
+    "In Janssen's view, $100 subscriptions yield thousands of dollars of tokens a month, so prices may rise; local open-weight models are the hedge, and he says Qwen already works well as an orchestrator.",
+    "Groma.md (open source, MIT) maintains a continuously updated architecture diagram, shows parallel agents' changes on it live, and offers architecture diffs (added, modified, removed components) next to code diffs, using language-specific scanners that run offline.",
+    "Six parallel agents on a fast OpenAI model cost about $60 per rehearsal run and over $100 for the full run, against Gavrilescu's estimate of five days of manual work."
   ],
   "takeaways": [
-    "Try a capable local model as an agent orchestrator to understand your options if subscription prices rise.",
-    "Look at spec-driven tools like Backlog.md and architecture-level views like Groma.md for reviewing agent output above the line-diff level.",
+    "Install a capable local model and try it as an agent orchestrator so you have an option if subscription prices rise.",
+    "Look at spec-driven tooling such as Backlog.md and architecture-level views such as Groma.md to review agent output above the line-diff level.",
     "Rate talks in the Devoxx mobile app so speakers get feedback."
   ],
   "quotes": [
-    {"text": "We are all transitioning into builders. The new abstraction layer is not programming languages anymore. It's natural language.", "at": "06:46"},
+    {"text": "We are all transitioning into builders. The new abstraction layer is not programming anymore or programming languages. It's the natural language.", "at": "06:46"},
     {"text": "$120, it would have taken me manually probably five days to implement. I am more expensive than $120.", "at": "23:43"}
   ],
   "chapters": [

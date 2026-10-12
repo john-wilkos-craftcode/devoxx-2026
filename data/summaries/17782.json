@@ -1,0 +1,74 @@
+{
+  "id": 17782,
+  "source": "transcript",
+  "tldr": "Lippert argues the IDE is not dying but splitting into three tools: review tools for high-volume agent changes, managers for fleets of agents, and headless language smartness serving agents.",
+  "summary": [
+    "Martin Lippert, who builds the Spring Tools extensions, traces the IDE back to the Smalltalk-80 system browser and names its core principles: language and framework smartness, fast feedback without running a compiler, keeping the developer in flow through completion, hovers and refactoring, source-level debugging, and integration of tests, Git and builds in one place. Agentic coding has pushed many developers back to the terminal with tools like Claude Code, which itself is gaining IDE-like diff panels. Developers now juggle parallel agent sessions and spend their effort on harnesses and guardrails. Lippert puts himself about two-thirds of the way from IDE to agent.",
+    "He predicts the IDE will split three ways. First, review tools: reading diffs of thousands of agent-written lines makes the human the bottleneck, so reviewers need framework-aware validation, navigation and higher-level views. He demos a Spring Tools logical structure view in VS Code that shows only changes, such as new request mappings, query methods or entities, while an agent works. Second, tools to manage fleets of agents, such as JetBrains Air and the VS Code agents view. Third, IDE language smartness exposed to agents through the Language Server Protocol and debugger integrations, so the agent becomes the toolsmith's new user."
+  ],
+  "keyPoints": [
+    "The IDE was built on fast feedback and keeping the developer in flow; those principles now need to apply to agents and to reviewers rather than to people typing code.",
+    "Reviewing agent output line by line through diffs does not scale; Lippert wants review tools that show changes at the level of framework concepts and architecture.",
+    "Spring Tools is experimenting with a 'changes only' logical structure view that surfaces new or modified Spring stereotypes (controllers, repositories, entities) as an agent edits files.",
+    "Language servers built for VS Code are being plugged into Claude Code and other agents so they get compile errors and references in milliseconds, use fewer tokens, and get version-correct Spring guidance; Lippert calls this still a research area.",
+    "Agents increasingly drive source-level debuggers directly and even write and run their own throwaway tools, a kind of personal software for the agent."
+  ],
+  "takeaways": [
+    "Connect a language server plugin for your stack to your coding agent so it gets fast compile and navigation feedback instead of guessing.",
+    "Look for or build review views that summarise agent changes at the framework or architecture level before you read the diff.",
+    "Decide per project how much human review the risk warrants rather than applying one policy everywhere."
+  ],
+  "quotes": [
+    {
+      "text": "It's not you anymore. I'm sorry. It's the agent to help the agent.",
+      "at": "30:09"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Who still uses an IDE"
+    },
+    {
+      "at": "02:55",
+      "title": "From Smalltalk to modern IDEs"
+    },
+    {
+      "at": "09:54",
+      "title": "Back to the terminal"
+    },
+    {
+      "at": "13:49",
+      "title": "The IDE splits in three"
+    },
+    {
+      "at": "15:12",
+      "title": "Tools for reviewing agent code"
+    },
+    {
+      "at": "25:08",
+      "title": "Managing fleets of agents"
+    },
+    {
+      "at": "26:13",
+      "title": "Language smartness for agents"
+    }
+  ],
+  "tech": [
+    "Spring Tools",
+    "VS Code",
+    "Eclipse",
+    "IntelliJ IDEA",
+    "Claude Code",
+    "Language Server Protocol",
+    "JetBrains Air",
+    "GitHub Copilot",
+    "Smalltalk-80"
+  ],
+  "watchIf": "You wonder where your IDE fits once agents write most of the code, or you build developer tooling and want a toolsmith's view of the shift.",
+  "themes": [
+    "Developer experience & tooling",
+    "AI agents & agentic coding"
+  ],
+  "demo": false
+}

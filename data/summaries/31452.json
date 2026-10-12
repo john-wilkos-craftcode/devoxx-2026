@@ -1,0 +1,109 @@
+{
+  "id": 31452,
+  "source": "transcript",
+  "tldr": "Rentea takes a vague ticket to a PR with grilling, OpenSpec and adversarial AI review, arguing human review can be dimmed only gradually, after guardrails and months of good output.",
+  "summary": [
+    "Victor Rentea says he typed code for 19 years and stopped six months ago; his slides run on an app he vibe-coded that morning. After recalling StrongDM's 'dark factory' that no longer reviews code, he works through a Spring Pet Clinic with an Angular front end. An agent fixes a validation bug filed by QA and shows the Playwright trace. A vague human ticket, adding sorting and pagination to the owners grid, then gets the full treatment. First warm up your own brain, then run Matt Pocock's grill-me skill against a top model, treating it like an experienced architect you must not approach unprepared.",
+    "His grilling rules: when offered A or B, push back with context the agent cannot know, such as 100,000 expected owners, and save it to AGENTS.md; when it asks something odd, give it your tools, like a database or browser CLI, instead of dictating. He then uses OpenSpec propose and tailors its skills: the proposal is rewritten for a product owner, technical detail moves to design.md for engineers, and specs go to QA, so business, QA and developer form the 'three amigos'. Implementation runs unattended with a hook that waits for green CI. Rentea puts the feature plus live UI polish at about $17.",
+    "The core rule for review: no human reviews AI code before a second AI does. A fresh-context, adversarial reviewer (or several, like Claude's /simplify) avoids the maker's sunk-cost bias; findings are auto-fixed or rejected as nitpicks. Static analysis, Git hooks, stop hooks and CODEOWNERS-protected workflows sit in front. Ask the agent to list the assumptions it made with confidence scores, review in sessions of about 45 minutes, and use stacked PRs. When bad code slips through, upgrade the skills, reviewers or guardrails. After months of consistently good PRs on low-risk code, review intensity can be halved, then halved again: a grey factory, not a dark one.",
+    "The last hour covers testing and legacy. Acceptance-level and sociable tests matter most; mock-heavy solitary tests are low value. He proposes counting coverage only for tests a human has read and, following StrongDM, keeping a holdout set of acceptance tests the agent never sees. He also recommends characterization tests from recorded production traffic, shadow deployments, cleaning up unfinished migrations so agents don't copy bad patterns, showing a hand-refactored example instead of describing it, and OpenRewrite recipes for syntax-safe transformations. He insists everyone should build their own workflow rather than adopt a central 'software factory'."
+  ],
+  "keyPoints": [
+    "Warm up your own brain with questions before asking a frontier model to grill you; offered A or B, answer with context the agent couldn't know and record it in AGENTS.md.",
+    "Treat a bad agent question as missing tools or knowledge: hand it a database CLI or a Playwright/browser CLI rather than dictating the answer.",
+    "Tailor community workflows (OpenSpec, Matt Pocock's skills, superpowers) to your team: a non-technical proposal for the business, design.md for engineers, specs reviewed by QA; reserve this ceremony for the roughly 20% of tickets that deserve it.",
+    "Humans should not review AI-generated code before a second, fresh-context, adversarial AI has; then have the agent list its own assumptions with confidence scores so humans review the risky parts first.",
+    "Put deterministic guardrails before review (Sonar or similar, Git hooks, stop hooks, CODEOWNERS-protected CI files) and keep human review sessions to about 45 minutes, using stacked PRs for large changes.",
+    "When defects slip through, upgrade the grill skill, review.md, custom reviewer agents and guardrails; only after months of consistently good PRs on low-risk code should review intensity be reduced step by step.",
+    "Count acceptance-test coverage only for tests a human has read, and consider a holdout set of acceptance tests the agent never sees, as Rentea says StrongDM did.",
+    "For legacy work: finish half-done migrations, show a hand-polished refactoring as the example, use OpenRewrite recipes, and constrain big refactors (for example, generated SQL must stay byte-identical)."
+  ],
+  "takeaways": [
+    "Run an adversarial AI review in a fresh context on every agent-written change before a human looks at it.",
+    "Ask your agent at the end of each task which decisions it took on its own, and review those first.",
+    "Fork a spec-driven workflow like OpenSpec and edit its skills to fit your team instead of using it as-is.",
+    "Turn every escaped defect into an upgrade of a skill, reviewer prompt or guardrail rather than a one-off fix.",
+    "Prefer sociable or acceptance tests you have actually read over large numbers of mock-based unit tests."
+  ],
+  "quotes": [
+    {
+      "text": "Humans should not review AI-generated code before a second AI does it.",
+      "at": "95:08"
+    },
+    {
+      "text": "I vibe, you vibe, we don't vibe in production.",
+      "at": "64:38"
+    },
+    {
+      "text": "Every time AI asks stupid questions, does a mistake, your first reaction is: what did your prodigy child not know?",
+      "at": "34:57"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "From Copilot to dark factories"
+    },
+    {
+      "at": "05:52",
+      "title": "Fixing a bug from Jira"
+    },
+    {
+      "at": "12:45",
+      "title": "Warming up and grill-me"
+    },
+    {
+      "at": "40:03",
+      "title": "Spec-driven with OpenSpec"
+    },
+    {
+      "at": "61:10",
+      "title": "Three amigos and teach-me mode"
+    },
+    {
+      "at": "72:06",
+      "title": "Agent context and business PRs"
+    },
+    {
+      "at": "93:40",
+      "title": "Adversarial review and guardrails"
+    },
+    {
+      "at": "117:17",
+      "title": "Review practices and dimming"
+    },
+    {
+      "at": "132:57",
+      "title": "Testing in the AI era"
+    },
+    {
+      "at": "144:48",
+      "title": "Legacy refactoring and recap"
+    }
+  ],
+  "tech": [
+    "Claude Code",
+    "Codex",
+    "GitHub Copilot",
+    "OpenSpec",
+    "Playwright",
+    "Spring Pet Clinic",
+    "Angular",
+    "Spring Data",
+    "PostgreSQL",
+    "Flyway",
+    "SonarQube",
+    "Git hooks",
+    "OpenRewrite",
+    "CodeGraphContext",
+    "Language Server Protocol",
+    "Jira"
+  ],
+  "watchIf": "Your team ships agent-written code and is debating how much human review it still needs, and you want a concrete, step-by-step workflow rather than a slogan.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Testing & quality",
+    "Teams, careers & leadership"
+  ],
+  "demo": true
+}

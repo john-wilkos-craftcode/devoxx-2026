@@ -1,46 +1,113 @@
 {
   "id": 16414,
   "source": "transcript",
-  "tldr": "A bank mainframe-to-Kafka modernisation was vibe-coded to a demo, then made production-grade by wrapping the agents in deterministic harnesses: build enforcers, OpenRewrite, ArchUnit, scripts and token discipline.",
+  "tldr": "A bank mainframe-to-Kafka proof of concept was vibe-coded to a demo, then made production-grade by surrounding the agents with deterministic harnesses: build enforcers, OpenRewrite, ArchUnit, scripts and token discipline.",
   "summary": [
-    "Anyul Rivas (GFT) tells the story of a proof of concept for a bank: stream data from a COBOL mainframe's SQL Server database via change data capture (Debezium) into Kafka, consumed by Java and C# microservices with outbox, dead-letter and resilience patterns, deployed on OpenShift with Helm and Azure DevOps. The constraints were strict: dependencies only from the bank's Artifactory, no outside images, no skills, MCP servers or sub-agents, and initially no AI traces in the repo; later GitHub Copilot was allowed. Three architects vibe-coded a working demo in about a month, which Rivas puts at 25k commits, 3,500 auto-merged pull requests and 180,000 generated lines.",
-    "Vague user stories invited hallucination, so the team used Matt Pocock's 'grill me' skill to turn them into implementation-ready specs with edge cases, bank constraints and acceptance evidence. Because the client refused spec tools like OpenSpec and wanted ADRs kept in Confluence, they built their own research-plan-implement workflow that ends by syncing Azure DevOps stories and Confluence. They kept two tracks: vibe coding for the demo, then a second, engineered track for production. Rivas uses Ousterhout's tactical versus strategic programming to frame the split: agents handle tactics, humans own strategy.",
-    "Most of the talk is lessons from building that production harness. When models silently downgraded Java 25 to 17, the Maven Enforcer plugin failed the build. Positive instructions worked better than negative ones. After the bank said three people were using 30% of the company's monthly Copilot quota, the team adopted the RTK CLI proxy (which Rivas credits with 60-80% token savings), pruned AGENTS.md files and stale ADRs, and started a fresh session per task. A duplication threshold in the build stopped copy-paste across the monorepo, OpenRewrite recipes enforced coding style, and ArchUnit and ArchUnit.NET enforced the bank's layering. Role-based sub-agent teams and naive TDD failed. A provisioning script with actionable error messages stopped the agent struggling with SQL Server under Rosetta.",
-    "Rivas closes with a Matrix metaphor: developers move from Neo, fighting inside the code, to Tank, who equips and steers the operators. He presents a work-in-progress 'AI harness scorecard' script that rates a repository on five pillars. Part of the middle section is missing from the transcript because of a transcription failure."
+    "Anyul Rivas (GFT) tells the story in three film-themed chapters. In 'Limitless', three architects had to show a bank how to stream a COBOL mainframe's transactions from SQL Server through Debezium change data capture into Kafka, consumed by Java and C# microservices using the outbox pattern and dead-letter queues, on OpenShift with Helm and Azure DevOps. The bank allowed only Artifactory dependencies, no outside images, no skills, MCP servers or sub-agents, and at first no AI traces in the repo; GitHub Copilot came later. With roughly a month left after onboarding, they vibe-coded a working demo: by Rivas's count 25k commits, 3,500 auto-merged pull requests and 180,000 generated lines.",
+    "Vague user stories invite hallucination, so the team ran Matt Pocock's 'grill me' skill to turn each story into an implementation-ready spec with edge cases, bank constraints and acceptance evidence that tells the agent when to stop. The client rejected OpenSpec-style tools and wanted ADRs kept in Confluence, so the team built its own research-plan-implement workflow ending in a mandatory sync of Azure DevOps stories and Confluence pages. They ran two tracks: vibe coding to reach and validate the demo, then a separate engineered track for production. Rivas frames this with John Ousterhout's tactical versus strategic programming.",
+    "The 'Apollo 13' chapter treats the harness as the adapter that makes a stochastic model fit deterministic production rules. Lessons included: Maven Enforcer to stop models silently downgrading Java 25 to 17; positive (cataphatic) rather than negative (apophatic) instructions; context engineering after the bank said three people were using 30% of the company's monthly Copilot quota; a duplication threshold in the build; OpenRewrite recipes for style; ArchUnit and ArchUnit.NET for the bank's layering; CLI calls instead of forbidden MCP servers for Confluence; and a per-environment provisioning script for SQL Server under Rosetta. Role-based sub-agent teams and naive TDD both failed.",
+    "In the 'Matrix' chapter Rivas argues the developer moves from Neo, fighting inside the code, to Tank on the Nebuchadnezzar: providing judgement, constraints, tools, environments and clear stop conditions while agents handle the tactical work. He cites a study of 660 Claude Code runs in which clean code did not change pass rates but cut tokens and file revisits. He closes with a work-in-progress 'AI harness scorecard' script that rates a repository on five pillars. In Q&A he said the production phase grew to more than 100 bank developers consuming the SDK."
   ],
   "keyPoints": [
-    "Vibe coding was used deliberately for idea-to-demo; production quality came from a separate track with engineering practices, not from continuing the prototype.",
-    "Matt Pocock's 'grill me' skill turns a vague story into a spec with edge cases, constraints and an explicit acceptance signal so the agent knows when to stop; a 300-line plan is cheaper to review than a 10,000-line PR.",
-    "Encode rules in the build rather than the prompt: Maven Enforcer for Java version and banned dependencies, a duplication threshold with a message telling the agent to refactor, OpenRewrite recipes, ArchUnit for layers.",
-    "Token discipline: the RTK output-compressing proxy, AGENTS.md files under 500 lines, one session per task, skills loaded on demand, no rescanning of unchanged code, and a cap on output tokens, which cost several times more than input tokens.",
-    "A team of role-based sub-agents (DevOps, QA and so on) passing work between them failed: most tokens were spent on agent-to-agent chatter. A single orchestrator delegating narrow, disposable tasks worked better.",
-    "Agents misapplied TDD with horizontal, layer-by-layer test writing; outside-in TDD with vertical slices and external deterministic feedback worked.",
-    "Rivas cited a study of 660 Claude Code runs in which clean code did not change pass rates but cut token use by 7-8% and file revisits by 34%."
+    "Vibe coding was used deliberately from idea to demo; production quality came from a second track with engineering practices, not from continuing to prompt the prototype.",
+    "A 300-line implementation plan is cheaper to review than a 5,000-10,000-line pull request, so the human review effort goes into the grilled spec and plan.",
+    "Recurring agent mistakes became build failures: Maven Enforcer for the Java version, banned dependencies and groupId/artifactId patterns; a duplication threshold with a message telling the agent to refactor; OpenRewrite recipes (Mockito, AssertJ, Testcontainers, idiomatic Java); ArchUnit tests for architecture layers.",
+    "Token discipline: the RTK CLI proxy (Rivas credits it with 60-80% savings), AGENTS.md files under 500 lines, archived stale ADRs, a new session per task kept around 70% context use, skills loaded on demand, an LSP or CodeGraph map instead of rescanning code, and capped output tokens, which cost three to eight times more than input.",
+    "A 'virtual IT department' of front-end, back-end, DevOps and QA sub-agents failed, with most tokens spent on agent-to-agent chatter; one orchestrator delegating narrow, disposable tasks worked.",
+    "Agents misapplied TDD by writing tests layer by layer (horizontal slices); outside-in TDD with vertical slices, bounded execution and fast external feedback worked better.",
+    "Rivas cited a study of 660 Claude Code runs: clean code left pass rates unchanged but reduced token use by 7-8% and file revisits by 34%.",
+    "The proposed AI harness scorecard checks five pillars: architectural documentation, mechanical constraints, testing and stability, review and risk prevention, and AI-specific safeguards."
   ],
   "takeaways": [
-    "Turn recurring agent mistakes into build failures with clear messages instead of adding more prompt instructions.",
-    "Phrase agent instructions positively (what to do) rather than as lists of prohibitions.",
-    "Wrap flaky environment setup in a script per environment with actionable error output so the agent stops burning tokens on it.",
-    "Have the agent grill you on a story before planning, and review the plan rather than the generated code.",
-    "Start a fresh session per task and keep AGENTS.md short."
+    "Turn each recurring agent mistake into a build failure with an actionable message instead of adding another prompt instruction.",
+    "Write agent instructions as what to do, not lists of prohibitions.",
+    "Have the agent grill you on a story and review the plan before any code is generated.",
+    "Wrap flaky environment setup in a script per environment with clear error output so the agent stops burning tokens on it.",
+    "Use one orchestrating agent with narrow, disposable sub-agent tasks rather than a team of role-playing agents."
   ],
   "quotes": [
-    {"text": "A plausible implementation of the wrong problem is still a wrong solution.", "at": "15:08"},
-    {"text": "You are anthropomorphizing a human process for a computational system and you will repeat the same pathologies.", "at": "27:40"}
+    {
+      "text": "A plausible implementation of the wrong problem is still a wrong solution.",
+      "at": "15:08"
+    },
+    {
+      "text": "You are anthropomorphizing a human process for a computational system and you will repeat the same pathologies.",
+      "at": "27:40"
+    },
+    {
+      "text": "We need to let go of the syntax, because now it's the cheapest part of the system that can be built.",
+      "at": "37:11"
+    }
   ],
   "chapters": [
-    {"at": "00:00", "title": "The mainframe modernisation brief"},
-    {"at": "05:58", "title": "Vibe coding the demo"},
-    {"at": "07:25", "title": "Grilling vague specifications"},
-    {"at": "11:43", "title": "Two tracks: demo and production"},
-    {"at": "16:36", "title": "Harnesses as adapters"},
-    {"at": "19:20", "title": "Build-enforced constraints"},
-    {"at": "22:06", "title": "Cutting token consumption"},
-    {"at": "29:03", "title": "Sub-agents and TDD pitfalls"},
-    {"at": "33:34", "title": "Your role now"}
+    {
+      "at": "00:00",
+      "title": "The mainframe modernisation brief"
+    },
+    {
+      "at": "04:45",
+      "title": "Vibe coding the demo"
+    },
+    {
+      "at": "07:25",
+      "title": "Grilling vague specifications"
+    },
+    {
+      "at": "10:14",
+      "title": "Two tracks: demo and production"
+    },
+    {
+      "at": "16:36",
+      "title": "Harnesses as adapters"
+    },
+    {
+      "at": "19:20",
+      "title": "Build-enforced constraints"
+    },
+    {
+      "at": "22:06",
+      "title": "Cutting token consumption"
+    },
+    {
+      "at": "26:39",
+      "title": "Sub-agents and TDD pitfalls"
+    },
+    {
+      "at": "30:30",
+      "title": "Docs, environments, clean code"
+    },
+    {
+      "at": "33:34",
+      "title": "From Neo to Tank"
+    }
   ],
-  "tech": ["COBOL", "SQL Server", "Debezium", "Kafka", "OpenShift", "Helm", "Azure DevOps", "GitHub Copilot", "Maven Enforcer", "OpenRewrite", "ArchUnit", "ArchUnit.NET", "Testcontainers", "Mockito", "AssertJ", "RTK", "Confluence", "Docker Compose", "Java 25"],
-  "watchIf": "You need AI-generated code to pass the standards of a regulated enterprise and want concrete harness techniques that worked under tight constraints.",
-  "themes": ["AI agents & agentic coding", "Legacy modernization", "Testing & quality"],
+  "tech": [
+    "COBOL",
+    "SQL Server",
+    "Debezium",
+    "Kafka",
+    "OpenShift",
+    "Helm",
+    "Azure DevOps",
+    "GitHub Copilot",
+    "Confluence",
+    "Maven Enforcer",
+    "OpenRewrite",
+    "ArchUnit",
+    "ArchUnit.NET",
+    "Testcontainers",
+    "Mockito",
+    "AssertJ",
+    "RTK",
+    "Docker Compose",
+    "Java 25",
+    ".NET"
+  ],
+  "watchIf": "You need AI-generated code to meet a regulated enterprise's standards and want concrete harness techniques that worked under tight tooling restrictions.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Legacy modernization",
+    "Testing & quality"
+  ],
   "demo": false
 }

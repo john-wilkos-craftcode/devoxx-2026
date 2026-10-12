@@ -1,0 +1,39 @@
+{
+  "id": 4100,
+  "source": "transcript",
+  "tldr": "Custers, a developer turned enterprise architect, argues that the role's value is translating business needs into IT decisions, changing things in small experiments, and staying hands-on enough to stay credible.",
+  "summary": [
+    "Robin Custers opens with a midlife-crisis tractor stuck in the mud, then describes starting as enterprise architect at a newly formed government organisation in 2022. The CIO's consultant-written IT strategy had principles everyone agrees with (reuse over buy over build, security by design) and a roadmap of 'more secure, more efficient'. Seeing that the prison, family-violence and law-enforcement departments all stored client data, sent notifications, handled documents and integrated systems, she asked for one central system, and the consultants proposed Salesforce, mapping each need to a module and ticking every principle. Custers used the operating-model quadrants from Enterprise Architecture as Strategy (standardisation versus integration; McDonald's, airlines, Sony) to show the organisation was a 'coordination' type: different processes, shared data. That meant separate systems per department, sharing only non-core capabilities. Explained in the CIO's own terms, as James Watt sold steam engines in horsepower, the argument killed the Salesforce plan.",
+    "For governance he borrows from Facilitating Software Architecture: architecture principles, recurring architecture advisory forums with team leads, and public architecture decision records. Standardising on Java and Angular broke when a supplier wanted Python for a two-week AI proof of concept, so standards became defaults that can be overridden with an ADR. His platform strategy, inspired by Team Topologies, was rejected after five minutes as too much change, which led him to Larman's laws. He restarted with a one-person platform team, one capability and one application, framed as an experiment. On staying technical, he tells how his father ran a steel-cutting optimiser Custers wrote in Java 1.3 in 2000 for 25 years until the PC died, and how he rebuilt it with AI agents in a weekend using Java and React."
+  ],
+  "keyPoints": [
+    "Vendor fit-to-requirements checklists and generic IT principles can justify almost anything; a consultant mapped every need, and every principle, onto Salesforce modules.",
+    "The operating-model grid (process standardisation versus integration) helps decide whether a central shared system makes sense; for a 'coordination' organisation it does not, beyond non-core capabilities like security and infrastructure.",
+    "Lightweight governance: principles for direction, a recurring architecture advisory forum, and ADRs visible to everyone, which carry strategy down and decisions back up.",
+    "Treat technology standards as defaults with documented exceptions rather than hard rules.",
+    "Following Larman's laws, big change initiatives tend to revert to the status quo; a one-person platform team proving one capability on one application got buy-in where a full platform plan did not."
+  ],
+  "takeaways": [
+    "Pitch architecture decisions in the business's own units and language, not in product features.",
+    "Record decisions, including justified deviations from standards, as ADRs that everyone can read.",
+    "Frame organisational change as a small, time-boxed experiment to limit the blast radius and the fear.",
+    "Keep a hands-on pet project going so your technical judgement stays credible, and lean on peers for what you don't know."
+  ],
+  "quotes": [
+    {"text": "I'm not sure whether prisoners in prison are really looking for a better relationship with our organization.", "at": "07:48"},
+    {"text": "A lot of the technical decisions that we take, in reality, are often business decisions in disguise.", "at": "34:30"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Stuck in the mud"},
+    {"at": "03:26", "title": "The Salesforce proposal"},
+    {"at": "12:21", "title": "Operating model quadrants"},
+    {"at": "18:23", "title": "Architect as translator"},
+    {"at": "19:24", "title": "Governance without blocking"},
+    {"at": "25:41", "title": "Starting change small"},
+    {"at": "29:26", "title": "Should architects code?"}
+  ],
+  "tech": ["Salesforce", "Architecture decision records", "Java", "Angular", "React", "Python", "Team Topologies"],
+  "watchIf": "You're moving from developer into an architecture role, or keep losing arguments with enterprise architects, and want practical tactics on governance and influence.",
+  "themes": ["Teams, careers & leadership", "Architecture & design"],
+  "demo": false
+}
