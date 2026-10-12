@@ -465,13 +465,19 @@ export function startExperience(k) {
     const from = { fov: camera.fov };
     const start = performance.now();
     skipNote.hidden = false;
+    const look = new THREE.Vector3();
+    camera.getWorldDirection(look).multiplyScalar(8).add(camera.position);
+    let lastNow = start;
     anim = { done, tick(now) {
       const t = THREE.MathUtils.clamp((now - start) / ms, 0, 1), u = ease(t);
       camera.position.copy(curve.getPointAt(u));
-      const ahead = curve.getPointAt(Math.min(1, u + 0.06)).clone();
-      ahead.y = THREE.MathUtils.lerp(ahead.y, camera.position.y, 0.6);
-      const blend = THREE.MathUtils.smoothstep(t, 0.72, 1);
-      camera.lookAt(ahead.lerp(finalLook, blend));
+      const ahead = curve.getPointAt(Math.min(1, u + 0.12)).clone();
+      ahead.y = THREE.MathUtils.lerp(ahead.y, camera.position.y, 0.75);   // keep the horizon level
+      const target = ahead.lerp(finalLook, THREE.MathUtils.smoothstep(t, 0.55, 1));
+      const k = 1 - Math.exp(-(now - lastNow) / 220);                   // ~0.2 s to catch up: no whip pans
+      lastNow = now;
+      look.lerp(target, t >= 1 ? 1 : k);
+      camera.lookAt(look);
       camera.fov = THREE.MathUtils.lerp(from.fov, fovTo, u); camera.updateProjectionMatrix();
       if (onProgress) onProgress(t);
       if (t >= 1) finish();
@@ -539,10 +545,12 @@ export function startExperience(k) {
   if (linked) goTalk(linked, { instant: true });
   else if (k.params.has("still") || reduceMotion) setPose(lobbyPose());
   else {
-    const end = lobbyPose();
-    const curve = new THREE.CatmullRomCurve3([toThree({ x: end.pos.x - 3, y: end.pos.y - 16, z: 2.4 }), toThree({ x: end.pos.x - 1, y: end.pos.y - 7, z: 2.6 }), end.pos.clone()]);
-    camera.fov = LOBBY_FOV;
-    animate(curve, toThree(end.look), LOBBY_FOV, 2600, () => { state = "lobby"; setPose(lobbyPose()); });
+    // fade up from black on the wall (a fly-in through the booths and columns was disorienting)
+    setPose(lobbyPose());
+    const fade = el("div", { style: "position:fixed;inset:0;background:#000;z-index:6;pointer-events:none;transition:opacity 1.4s ease" });
+    document.body.append(fade);
+    requestAnimationFrame(() => requestAnimationFrame(() => { fade.style.opacity = "0"; }));
+    setTimeout(() => fade.remove(), 1600);
   }
   // test hooks for headless checks
   window.__kino = {
