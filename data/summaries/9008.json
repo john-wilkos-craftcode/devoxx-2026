@@ -1,0 +1,47 @@
+{
+  "id": 9008,
+  "source": "transcript",
+  "tldr": "Dessaigne explains how each HotSpot garbage collector works, from Java 1's mark-and-sweep to generational ZGC and Shenandoah, and gives a simple guide for which GC fits which workload.",
+  "summary": [
+    "Dessaigne, from Axway, starts with how a simple Conference object is really three objects (header and fields, a String, a byte array), and how the heap set by -Xms/-Xmx is only part of a JVM's memory next to thread stacks and off-heap memory. That is why a pod's memory limit must be higher than -Xmx. Java 1, built for 1990s set-top boxes with megabytes of RAM, marked everything reachable from GC roots (locals and statics) and swept the rest. That left fragmentation, and scan times grew with the heap. The generational hypothesis led to SerialGC in 1998, with Eden, two survivor spaces, an age counter for promotion to old, copy-then-wipe collection, and card tables kept by a write barrier to track old-to-young references.",
+    "SerialGC is single-threaded and stops the world but has the lowest overhead. ParallelGC adds threads for maximum throughput but can pause for seconds on large heaps. CMS was concurrent but couldn't compact. G1, the default since Java 9, splits the heap into thousands of regions, uses humongous regions for objects larger than half a region, and does mixed collections that pick the regions with the most garbage first. It aims for a 200 ms pause target. Dessaigne said almost every G1 performance gain since Java 7 has come from its remembered sets, and that a full GC on G1 means something is wrong. Because pauses add up across chained microservices, he says to measure percentiles end to end, not averages for one service.",
+    "ZGC and Shenandoah keep pauses under a millisecond by moving objects concurrently behind a load barrier, at a cost of up to about 20% more CPU and memory. ZGC stores colour bits in the pointer. Generational ZGC, the only mode since Java 24, fixed the old triple-counted memory that Kubernetes saw, still checks a pointer in two instructions, and can't use compressed pointers. Shenandoah stores a forwarding pointer in the object header and has many tuning knobs. Epsilon never collects. GraalVM native images get Serial or Epsilon, with G1 only in Oracle GraalVM. He covered JDK 26's 5-15% G1 throughput gain and G1 becoming the default everywhere in JDK 27."
+  ],
+  "keyPoints": [
+    "Set the container memory limit well above -Xmx: thread stacks and off-heap memory (Netty, for instance) sit outside the GC-managed heap.",
+    "Young collections copy live objects to a survivor space and wipe Eden in one go; the age counter lives in 4 header bits, which is why the tenuring threshold can't exceed 15.",
+    "G1 picks regions with the most garbage first, targets 200 ms pauses, and should essentially never run a full GC; seeing one signals a problem.",
+    "ZGC and Shenandoah give sub-millisecond pauses but cost up to roughly 20% extra CPU/memory and can hit allocation stalls if GC threads fall behind, which is worth monitoring.",
+    "Generational ZGC (opt-in in Java 21, sole mode from Java 24) reports memory correctly to Kubernetes, unlike the old multi-mapped colored pointers.",
+    "GraalVM Community Edition and Mandrel native images ship only SerialGC and Epsilon, so the GC is single-threaded; Oracle GraalVM adds G1. Dessaigne mentioned an open pull request bringing Shenandoah to Community Edition.",
+    "According to Dessaigne, JDK 26 improved G1 throughput by 5-15%, and JDK 27 makes G1 the default even on small machines where SerialGC used to be chosen.",
+    "His rule of thumb: SerialGC for small microservices under 2 GB, Epsilon for short-lived CLIs and serverless, ParallelGC for batch jobs and Kafka Streams, ZGC or Shenandoah when latency is critical, and G1 for everything else."
+  ],
+  "takeaways": [
+    "Pick the collector by workload (overhead, throughput or latency) rather than defaulting to the newest one.",
+    "Measure GC impact with end-to-end percentiles and GC logs, not averages on a single service.",
+    "Run on the latest JDK even if you compile for an older release; collector improvements come for free.",
+    "Set -Xms equal to -Xmx, and consider large pages and AlwaysPreTouch, then stop adding tuning flags.",
+    "Audit and remove inherited GC flags nobody can justify for your current JDK and load."
+  ],
+  "quotes": [
+    {"text": "Epsilon never collects anything, it just allocates until it crashes, and the application dies.", "at": "39:06"},
+    {"text": "There's nothing worse than having a flag set by some architect four years ago, who's left the company, and everybody is too afraid to remove it.", "at": "46:51"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why so many GCs"},
+    {"at": "02:03", "title": "Objects and JVM memory"},
+    {"at": "05:06", "title": "Java 1 mark and sweep"},
+    {"at": "09:50", "title": "Generations and SerialGC"},
+    {"at": "19:09", "title": "ParallelGC and CMS"},
+    {"at": "22:15", "title": "How G1 works"},
+    {"at": "28:36", "title": "ZGC and colored pointers"},
+    {"at": "34:51", "title": "Shenandoah and Epsilon"},
+    {"at": "39:06", "title": "Choosing a GC and native"},
+    {"at": "41:40", "title": "Future GCs and tuning flags"}
+  ],
+  "tech": ["G1", "ZGC", "Shenandoah", "SerialGC", "ParallelGC", "CMS", "Epsilon GC", "GraalVM", "Mandrel", "Kubernetes", "Netty", "Kafka Streams", "compact object headers"],
+  "watchIf": "You run Java services and want a clear mental model of how each GC works and a practical rule for picking one.",
+  "themes": ["JVM performance & runtime"],
+  "demo": false
+}

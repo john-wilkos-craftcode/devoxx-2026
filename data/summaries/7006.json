@@ -1,0 +1,112 @@
+{
+  "id": 7006,
+  "source": "transcript",
+  "tldr": "Riecks argues that with AI writing tests, verification is the bottleneck: know unit, slice and integration tests, keep the suite fast, and encode testing standards in agent skills.",
+  "summary": [
+    "Riecks opens with a north star instead of a coverage target: a Renovate pull request bumping Spring Boot to a new major version arrives on Friday afternoon, CI is green, and the team is confident enough to merge and deploy. Since code is now cheap to generate, the bottleneck is verification, and a fast, comprehensive test suite is what makes AI output safe to accept. He cites the DORA finding that AI amplifies a team's existing practices, good or bad, and warns that tests often written last and chased for coverage numbers will not improve just because an agent writes them.",
+    "The first block reviews the fundamentals a reviewer needs to judge AI-written tests. His rule: a test without a Spring context is a unit test (suffix Test, run by Surefire), anything with a context is an integration test (suffix IT, run by Failsafe), so they can be parallelised differently. He shows how a unit test of a REST controller stays green while missing the request mapping, Bean Validation, Jackson serialization and Spring Security. @WebMvcTest fixes that with a sliced context and MockMvc. He explains the 'shopping list' of beans in WebMvcTypeExcludeFilter, plus @DataJpaTest, @JsonTest, @RestClientTest and Spring Cloud AWS's @SqsTest.",
+    "For full @SpringBootTest he contrasts the default MOCK web environment (MockMvc, same thread, so @WithMockUser tricks work) with RANDOM_PORT (real Tomcat, real HTTP, real tokens required), and uses Testcontainers with pinned image versions for infrastructure. Context caching gets the most time: Spring Test keeps contexts in a LinkedHashMap of size 32 keyed by MergedContextConfiguration, so any difference in profiles, properties or @MockitoBean usage forces a new context. Optimising this alone cut one client's Maven build from 26 to 12 minutes. He shows his open-source Spring Test Profiler for reporting reuse, warns against @DirtiesContext, and introduces mutation testing with PIT.",
+    "The second block covers agentic practice. Riecks encodes his testing standards as Claude Code skills (the same idea works in Copilot, Junie, Codex and Cursor): a SKILL.md with front matter, a references file of numbered standards with severities, and an examples.md of good and bad assertions, adapted per project through an onboarding prompt. CI fails when the profiler's JSON reports too many contexts, and Docker events count container starts. On TDD with agents he quotes Kent Beck, Simon Willison and Birgitta Böckeler without taking a firm side. His MCP servers are Context7, GitHub and Playwright. He closes with feature flags, runbooks linked from alerts and fast rollback."
+  ],
+  "keyPoints": [
+    "A unit test calling a controller method directly cannot catch broken request mappings, missing Bean Validation, changed JSON serialization or missing Spring Security rules; @WebMvcTest with MockMvc can.",
+    "Sliced contexts load only the beans on a fixed list (for the web layer, defined in WebMvcTypeExcludeFilter); anything else, such as the service a controller injects, must be supplied, usually as a @MockitoBean.",
+    "@SpringBootTest defaults to a mock servlet environment with MockMvc; only webEnvironment RANDOM_PORT starts Tomcat, and then security context overrides no longer work because test and app run on different threads.",
+    "Spring Test caches up to 32 application contexts keyed by MergedContextConfiguration; differing profiles, properties or mocked beans each create a new context. Riecks reported cutting a client build from 26 to 12 minutes this way.",
+    "Testcontainers tips: singleton containers instead of @Testcontainers lifecycle, pinned image tags, the same database as production instead of H2, withReuse(true) locally, and optionally a nightly prebuilt Postgres image with schema and sample data.",
+    "Parallelise unit tests first with JUnit Jupiter's thread pool, which shares the context cache, unlike forked JVMs; for integration tests randomise business keys, scope WireMock stubs narrowly and opt individual classes out of parallel runs.",
+    "Testing standards live in checked-in skills: SKILL.md front matter controls lazy loading, a references file lists rules with IDs and severities (e.g. a failure message on every assertion), and examples.md shows good versus bad code.",
+    "Introduce PIT mutation testing incrementally on changed code using its history file, cached between CI runs, rather than over a whole legacy codebase."
+  ],
+  "takeaways": [
+    "Inspect your test suite's context reuse with Spring's cache logging or Spring Test Profiler, consolidate on one abstract integration test base class, and remove @DirtiesContext where it is not needed.",
+    "Add a CI step that fails when the number of Spring contexts or started Docker containers exceeds a threshold, so agents cannot silently add new ones.",
+    "Write your team's unit, slice and integration testing rules into a checked-in agent skill with numbered rules and good/bad examples.",
+    "Cover each REST endpoint with a @WebMvcTest that asserts every response field, validation errors and blocked anonymous access.",
+    "Inject a Clock instead of calling Instant.now() so AI-generated tests stay deterministic."
+  ],
+  "quotes": [
+    {
+      "text": "We can generate code on scale, but trust and confidence we can't prompt.",
+      "at": "84:10"
+    },
+    {
+      "text": "If the road is bumpy, a faster car just means you hit the wall sooner than before.",
+      "at": "89:26"
+    },
+    {
+      "text": "With the AI you can delegate the typing. What you can't delegate is the ownership.",
+      "at": "149:53"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why test in the AI era"
+    },
+    {
+      "at": "16:27",
+      "title": "Toolbox and test types"
+    },
+    {
+      "at": "28:37",
+      "title": "Limits of unit tests"
+    },
+    {
+      "at": "34:33",
+      "title": "Slice testing with MockMvc"
+    },
+    {
+      "at": "48:46",
+      "title": "Integration tests and Testcontainers"
+    },
+    {
+      "at": "61:04",
+      "title": "Context caching"
+    },
+    {
+      "at": "73:57",
+      "title": "Mutation testing and Q&A"
+    },
+    {
+      "at": "84:10",
+      "title": "Verification is the bottleneck"
+    },
+    {
+      "at": "99:52",
+      "title": "Testing standards as skills"
+    },
+    {
+      "at": "117:10",
+      "title": "Parallelization, containers, MCP servers"
+    }
+  ],
+  "tech": [
+    "Spring Boot",
+    "spring-boot-starter-test",
+    "JUnit 5",
+    "Mockito",
+    "AssertJ",
+    "Awaitility",
+    "MockMvc",
+    "@WebMvcTest",
+    "@DataJpaTest",
+    "@SpringBootTest",
+    "Testcontainers",
+    "WireMock",
+    "PIT",
+    "Spring Test Profiler",
+    "Claude Code skills",
+    "Context7",
+    "GitHub MCP",
+    "Playwright MCP",
+    "Maven Surefire/Failsafe"
+  ],
+  "watchIf": "You let an AI agent write Spring Boot tests and want to judge whether they prove anything, or your CI build is slow because of Spring context restarts.",
+  "themes": [
+    "Testing & quality",
+    "Spring & frameworks",
+    "AI agents & agentic coding"
+  ],
+  "demo": false
+}

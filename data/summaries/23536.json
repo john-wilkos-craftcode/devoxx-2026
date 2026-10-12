@@ -1,0 +1,88 @@
+{
+  "id": 23536,
+  "source": "transcript",
+  "tldr": "An Oracle Java architects panel answers audience questions on virtual thread schedulers, deprecation policy, AI code generation, string internals, Valhalla, modules, string templates and ZGC automatic heap sizing.",
+  "summary": [
+    "Moderated by Nicolai Parlog, the panel included Alan Bateman, Gavin Bierman, Maurizio Cimadamore, Viktor Klang, Per-Ake Minborg, Georges Saab, David Simms and Ron Pressler. First up: custom schedulers for virtual threads. Bateman said there are prototypes in the Loom repository but no plan to expose an API, since locking, timers and socket code calling into user schedulers is risky; carrier pool size is the only knob. Klang argued per-library pools end up costing more in handovers than they gain in priority. Francesco Nigro of Red Hat, a Netty committer, described a year of experimenting with the scheduler API and asked for real use cases on loom-dev.",
+    "On deprecation, Bateman said removals are rare and data-driven, using static analysis of artifacts from Maven Central; examples were the Java EE modules, Nashorn and Thread.stop, which was re-specified to throw. On AI, panelists said frontier labs complain they train on old Java because modern code is scarce, and urged developers to send feedback through tools such as Codex's /feedback. One panelist said a Java 25 rewrite of generated programs used about 20% fewer tokens than Java 8 style, and several argued that features which express intent, like records, guard agents as well as humans. Javadoc's upcoming @note tag and code snippets were mentioned as useful to agents.",
+    "Minborg and Cimadamore warned against zero-copy string views, which could let native code modify immutable strings, but noted JDK 27 copies string bytes straight into memory segments. Simms said JEP 401 does not specify flattening, so no layout is guaranteed, though VM debug flags such as PrintInlineLayout show it; there is no timeline for specialized or reified generics. Cimadamore said string templates were withdrawn because nested templates forced eager double processing, and a better design is in progress. Module usability and builder-style record construction are being explored but not yet public. Neighbour-aware automatic heap sizing is coming to ZGC, then G1, but ZGC will not become the default soon."
+  ],
+  "keyPoints": [
+    "No public custom scheduler API for virtual threads is planned; only the carrier thread count and range are configurable, and the experimental API lives in the Loom repository.",
+    "Deprecation decisions use corpus analysis of open-source artifacts; the JDK collects no runtime telemetry, only opt-in telemetry from the Oracle VS Code extension.",
+    "Panelists said model vendors know they train on outdated Java and want developer feedback on generated code; one cited about 20% fewer tokens for Java 25-style code than Java 8-style.",
+    "JDK 27 removed intermediate buffers when copying strings into FFM memory segments, but a direct memory-segment view of a string's bytes is considered unsafe.",
+    "JEP 401 value classes deliberately leave flattening and scalarization out of the spec; VM diagnostic flags can print the actual layouts.",
+    "String templates were withdrawn because nested templates were processed eagerly, which prevents a link-once validation pass; a reworked proposal is in progress.",
+    "Automatic heap sizing for ZGC sizes the heap dynamically based on allocation rate, CPU use and other processes on the machine; G1 support is planned."
+  ],
+  "takeaways": [
+    "Report concrete virtual thread scheduling problems, especially Netty or event-loop interop, to the loom-dev mailing list instead of reaching into internals reflectively.",
+    "Use your AI tool's feedback channel when it generates outdated Java idioms.",
+    "Try ZGC for your services; the panel recommended it for most Java programs.",
+    "Bring specific string or memory performance problems to the relevant OpenJDK mailing list with the use case, rather than asking for a particular API."
+  ],
+  "quotes": [
+    {
+      "text": "After one year, I just understood why the ForkJoinPool does what it does.",
+      "at": "06:51"
+    },
+    {
+      "text": "Our goal is not to have you use the features. Our goal is to have the features work for you.",
+      "at": "38:53"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Panel introductions"
+    },
+    {
+      "at": "01:47",
+      "title": "Custom virtual thread schedulers"
+    },
+    {
+      "at": "08:17",
+      "title": "Deprecation and removal"
+    },
+    {
+      "at": "17:17",
+      "title": "Java for AI agents"
+    },
+    {
+      "at": "28:45",
+      "title": "Zero-copy strings"
+    },
+    {
+      "at": "36:43",
+      "title": "Valhalla and modules"
+    },
+    {
+      "at": "43:07",
+      "title": "String templates and records"
+    },
+    {
+      "at": "47:07",
+      "title": "ZGC heap sizing"
+    }
+  ],
+  "tech": [
+    "Virtual threads",
+    "Project Loom",
+    "Netty",
+    "Project Valhalla",
+    "JEP 401",
+    "Foreign Function & Memory API",
+    "Java Platform Module System",
+    "String templates",
+    "Javadoc",
+    "ZGC",
+    "G1"
+  ],
+  "watchIf": "You want the JDK architects' current thinking on virtual thread schedulers, Valhalla, string templates and ZGC, straight from the people building them.",
+  "themes": [
+    "Java language & JDK",
+    "JVM performance & runtime"
+  ],
+  "demo": false
+}

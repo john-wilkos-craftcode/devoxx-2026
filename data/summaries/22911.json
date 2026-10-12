@@ -1,0 +1,39 @@
+{
+  "id": 22911,
+  "source": "transcript",
+  "tldr": "Charrière builds a coding agent live in Go with Genkit and a small local model on Docker Model Runner, showing that one bash tool can replace a catalogue of dedicated tools.",
+  "summary": [
+    "Charrière, a solution architect at Docker, runs everything on a 32 GB MacBook Air with a JetBrains Mellum model that he said has 12B parameters, about 2.5B active per token, served by Docker Model Runner (a wrapper around llama.cpp or vLLM, with a request inspector in Docker Desktop that helps with debugging). He explains function calling: the model only emits a tool name and arguments, and the agent executes the tool. The first demo uses Genkit for Go with four calculator and price-lookup tools for a computer store. The second wraps curl, grep and similar commands as separate tools to fetch example.com and create a Go module. Every extra tool description eats context, which hurts small models, so the third version keeps a single bash tool with a longer description. The model already knows Unix CLIs, and when it doesn't it can run --help.",
+    "The final step puts the loop behind a chat prompt, configured from a YAML file, as an agent called Bob, run inside Docker's sbx sandbox (a micro VM with its own Docker engine and a proxy that hides API keys). Bob writes, builds and runs a small Go program. After being told to run gopls help, it uses gopls workspace symbol, references and rename -w to find and rename a method. Next steps he lists: ripgrep or ast-grep, an edit tool, a skills tool, detection of hallucinations and silent endless loops, RAG, context compression by summarising history, and MCP. His side project grew out of this, with guardrails for local models. In Q&A he recommended small Qwen models and Menlo's Lucy and Jan-nano for tool calling."
+  ],
+  "keyPoints": [
+    "The model never executes a tool; it returns a tool name and parameters, the agent runs it and appends the result to the message history.",
+    "Each extra tool description fills the context window, which hurts small local models far more than hosted ones.",
+    "A single bash tool lets the model use curl, grep, find, go mod and go version from its training knowledge, and --help covers CLIs it doesn't know.",
+    "With gopls available through bash, the agent finds symbols, references and renames code more precisely than with grep.",
+    "Small agents need guards against hallucinated tool calls and silent endless loops, or the program never terminates."
+  ],
+  "takeaways": [
+    "Try replacing a pile of narrow tools or MCP servers with one well-described bash tool when context is tight.",
+    "Run any agent that has shell access inside a sandbox such as a micro VM, not directly on your laptop.",
+    "Add loop detection and context compression before relying on a small local model for agent work.",
+    "Point the agent at language-server CLIs like gopls for code navigation and refactoring."
+  ],
+  "quotes": [
+    {"text": "Very important, the model cannot execute any tool. The model can only generate text or data.", "at": "04:31"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Local models and Model Runner"},
+    {"at": "03:28", "title": "How function calling works"},
+    {"at": "07:15", "title": "Genkit tool demo"},
+    {"at": "08:44", "title": "Real-world command tools"},
+    {"at": "11:38", "title": "One bash tool"},
+    {"at": "14:11", "title": "Agent loop in a sandbox"},
+    {"at": "20:49", "title": "Using gopls from bash"},
+    {"at": "23:15", "title": "Going further and Q&A"}
+  ],
+  "tech": ["Docker Model Runner", "Docker Desktop", "llama.cpp", "vLLM", "Genkit", "Go", "Mellum", "bash", "curl", "gopls", "ripgrep", "ast-grep", "Docker Sandboxes", "MCP", "Qwen"],
+  "watchIf": "You use coding agents and want to see how small the core loop is, or want to run one on a local model.",
+  "themes": ["AI agents & agentic coding", "Developer experience & tooling"],
+  "demo": true
+}

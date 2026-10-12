@@ -1,0 +1,47 @@
+{
+  "id": 19748,
+  "source": "transcript",
+  "tldr": "De Wit live-codes a playable Snake in Kotlin, using only the JDK, in 10 lines of at most 130 characters, arguing that constraints force better solutions and that concise code brings understanding.",
+  "summary": [
+    "De Wit takes the six-word story (Margaret Atwood's \"Longed for him, got him, shit\") as inspiration and reduces Snake to \"snake moves, steers, eats, grows, dies\". He describes Pong, Tetris and the Chrome dino game the same way, and suggests describing your next feature in six words. The rules: 10 functional lines inside main, at most 130 characters each, no libraries beyond the JDK, written in Kotlin. Readability, few bugs and extra features such as a score are nice-to-haves. His first version prints frames to the terminal like his old Game of Life, but the terminal cannot read arrow keys in real time without external libraries, so he turns to Swing's KeyAdapter, a JFrame and a JTextArea. That costs more than 40 lines until he strips defaults and joins lines with IntelliJ's Ctrl+Shift+J.",
+    "Movement is the key insight. Moving every body part, or storing only the corners as memory-constrained old games did, takes too much code. Instead, each frame adds a new head and drops the tail, and eating just puts the tail back. Self-collision is checked by comparing the distinct cells to the whole body. That gives a 114-line game, still too large because of the 2D Cell class. So the board becomes a 1D list rendered with JTextArea line wrap, and directions become plus or minus 1 and plus or minus the width. Wrapping across lines is a side effect he keeps as a feature.",
+    "Condensing to 10 lines uses inlining of single-use variables and methods, shorter names, removed whitespace, a static import of nextInt, Kotlin's generateSequence to replace a retry loop for random food, an anonymous object for the key adapter, and apply on the JFrame instead of a variable. He then hides features in the constraints. The process exit code shows the score. The snake starts one cell shorter with food in front of its face, so the first frame randomises the food. A newDirection variable blocks reversing into yourself. Filling the board triggers a kill screen, because no empty cell is left for food. The same 10-line skeleton, with different logic, gives a Pong-like game and a Tetris-like game. A Java version, \"Jake\", also fits."
+  ],
+  "keyPoints": [
+    "Real-time keyboard input in a terminal isn't possible with the plain JDK; Swing's KeyAdapter, JFrame and JTextArea are the shortest route, after stripping defaults.",
+    "Snake movement is just adding a new head and removing the tail each frame; eating means putting the removed tail back.",
+    "Storing the board as a 1D list with line wrap turns coordinates and directions into single integers (plus or minus 1, plus or minus width), which removed enough code to fit 10 lines.",
+    "Self-collision check: the game ends when the number of distinct cells in the body is smaller than the body size.",
+    "Kotlin's generateSequence with first { it !in snake } replaces a while-loop retry for placing food, and is more readable.",
+    "Abusing the process exit code as the score display and placing the first food directly in front of the snake add features without adding lines.",
+    "About half of the 10 lines (window, frame loop, sleep, exit) are generic game scaffolding; swapping the other half gives Pong- and Tetris-like games."
+  ],
+  "takeaways": [
+    "Try a constrained side project (line, time or token budget) to learn APIs and shortcuts you would not touch otherwise.",
+    "When a solution doesn't fit a constraint, rethink the data representation instead of squeezing the code.",
+    "Describe your next feature in six words to pin down what actually matters.",
+    "Use IntelliJ's Join Lines (Ctrl+Shift+J) and inline refactorings to tidy parameter lists and single-use variables.",
+    "Replace initialise-then-retry while loops with generateSequence in Kotlin or Stream.generate in Java."
+  ],
+  "quotes": [
+    {"text": "Snake moves, steers, eats, grows, and dies.", "at": "03:39"},
+    {"text": "I did promise you snake in 10 lines. I never said 2D snake in 10 lines.", "at": "22:17"},
+    {"text": "I don't have any unit tests. I have a human test. I can play the game.", "at": "29:38"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Six-word stories"},
+    {"at": "01:37", "title": "Rules of the challenge"},
+    {"at": "06:36", "title": "Terminal Snake and its limits"},
+    {"at": "09:28", "title": "Keyboard input with Swing"},
+    {"at": "14:09", "title": "Moving, eating and dying"},
+    {"at": "22:17", "title": "Going one-dimensional"},
+    {"at": "26:41", "title": "Condensing to 10 lines"},
+    {"at": "35:04", "title": "Bugs, scores and kill screen"},
+    {"at": "42:12", "title": "Other games in 10 lines"},
+    {"at": "46:12", "title": "Takeaways and Java version"}
+  ],
+  "tech": ["Kotlin", "Java", "Swing", "JFrame", "JTextArea", "KeyAdapter", "IntelliJ IDEA", "generateSequence"],
+  "watchIf": "You enjoy code golf and live coding, or want a light talk on how constraints push you to rethink a design.",
+  "themes": ["Hardware, robots & fun", "Java language & JDK"],
+  "demo": true
+}

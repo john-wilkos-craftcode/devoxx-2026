@@ -1,0 +1,82 @@
+{
+  "id": 23519,
+  "source": "transcript",
+  "tldr": "Lauwers argues that APIs are becoming a primary interface and shows, with a postage-pricing example, how explicit data, meaning, machine-readable errors and next actions let agents act safely.",
+  "summary": [
+    "Lauwers, a long-time Devoxx steering committee member speaking for the first time, starts from a claim by Cloudflare CEO Matthew Prince that bot traffic now exceeds human HTTP requests. Workflow knowledge has long been trapped in UIs: which button is enabled, what an error means, what comes next. An agent calling the API gets none of that. His example is a bpost chatbot reported in April that could not say what a stamp costs, then declared it was glad to have helped. Putting a chatbot in front of a system does not make it AI-ready; the agent needs a trusted capability such as 'calculate the price of a shipment'.",
+    "He then evolves one endpoint. A bad version takes cryptic parameters (type, w, d) and returns a bare string; a good one returns product code, amount, currency and validity date; an AI-first one adds meaning (why the shipment qualifies) and available actions such as buying postage. Errors carry a stable code, the missing inputs and the action they unlock, close to HATEOAS, he admits. Valid values come inline when few, or via a schema or reference-data endpoint when many. 'MCP around a bad API is still a bad API.' Agents get only the user's delegated permissions, purchases need explicit confirmation, and the domain, never the model, sets the price."
+  ],
+  "keyPoints": [
+    "An AI-first API response has three layers: data, meaning (why this result and which rules applied) and the next valid actions.",
+    "Errors should carry a stable code, the missing fields, why they are needed and the action that becomes possible, so the agent can ask the user a precise follow-up question instead of guessing.",
+    "Return allowed values directly only for small, stable sets; for large or changing ones such as country codes, reference a schema or a reference-data endpoint in the API description.",
+    "Wrapping a poorly designed API in an MCP server does not fix hidden workflows, vague errors or unsafe write operations.",
+    "Agents act with the user's delegated permissions, not as super users; state-changing actions should be marked as requiring confirmation and every tool call logged with inputs, outcome and a correlation ID."
+  ],
+  "takeaways": [
+    "Audit one endpoint: replace cryptic parameter names and string responses with explicit fields, units and currency.",
+    "Make error responses machine-readable with stable codes and a list of missing or invalid inputs.",
+    "Expose the next allowed actions, and whether they need user confirmation, in the response instead of only in UI logic or documentation.",
+    "Log agent tool calls with correlation IDs so you can audit what an agent did in your system."
+  ],
+  "quotes": [
+    {
+      "text": "MCP around a bad API is still a bad API.",
+      "at": "24:28"
+    },
+    {
+      "text": "AI does not get permissions because it's intelligent, it gets exactly the permissions delegated by the user.",
+      "at": "25:52"
+    },
+    {
+      "text": "An AI-first API does not let AI make your business decisions. It makes your business capabilities explicit enough for AI to use them safely.",
+      "at": "36:54"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Machines as API consumers"
+    },
+    {
+      "at": "05:34",
+      "title": "Stop building applications"
+    },
+    {
+      "at": "11:01",
+      "title": "The stamp price chatbot"
+    },
+    {
+      "at": "14:38",
+      "title": "From bad to AI-first responses"
+    },
+    {
+      "at": "16:58",
+      "title": "Machine-readable errors"
+    },
+    {
+      "at": "23:25",
+      "title": "MCP, observability and security"
+    },
+    {
+      "at": "25:52",
+      "title": "End-to-end agent flow"
+    },
+    {
+      "at": "31:21",
+      "title": "Adoption waves and closing"
+    }
+  ],
+  "tech": [
+    "REST APIs",
+    "HATEOAS",
+    "Model Context Protocol",
+    "JSON Schema"
+  ],
+  "watchIf": "You own a business API and want a concrete checklist for making its responses and errors usable by AI agents without letting the model make business decisions.",
+  "themes": [
+    "Architecture & design",
+    "AI agents & agentic coding"
+  ],
+  "demo": false
+}

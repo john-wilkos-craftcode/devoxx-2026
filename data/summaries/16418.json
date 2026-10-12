@@ -1,0 +1,71 @@
+{
+  "id": 16418,
+  "source": "transcript",
+  "tldr": "Sulyz live-debugs a Temporal Saga for a synchronous payment hold, fixing compensation ordering, cancellation scopes and activity cancellation races, and ends with reconciliation as the final safety net.",
+  "summary": [
+    "Sulyz leads the processing team at Skyro, a fintech whose credit platform orchestrates services with Temporal's Java SDK. His case is a payment hold: money is frozen in credit and debit systems while a customer waits at a terminal, so it must be fast and cancellable. Starting from Temporal's original Saga sample, still copied in articles, he fixes problems one by one. Registering a compensation only after an activity succeeds misses holds whose response was lost, so compensations go first. Cancelling then fails with parallel compensation (an unexpected CompensationException) or silently skips compensation in sequential mode (CanceledFailure). The fix is running saga.compensate() in a detached CancellationScope.",
+    "With Toxiproxy adding eight seconds of latency, he shows the next race: under the default TRY_CANCEL type, compensation runs while the hold request is still in flight. WAIT_CANCELLATION_COMPLETED waits for the activity, but plain HTTP activities that never heartbeat ignore cancellation, so the workflow ends without compensating; checking the scope's cancel request and throwing CanceledFailure closes that gap. Since cancellation can still race completion, Skyro runs a reconciliation service a few times a day. Callers start the workflow with a stable per-operation ID so client retries attach to the running execution, wait with getResult and a timeout, and cancel on timeout."
+  ],
+  "keyPoints": [
+    "Register the compensation before calling the activity: a request can succeed remotely while its response is lost, leaving a hold that would never be released.",
+    "Run Saga compensation inside Workflow.newDetachedCancellationScope, otherwise activities cannot run once the workflow is cancelled; parallel compensation surfaces this as an error, sequential mode silently skips it.",
+    "The default TRY_CANCEL activity cancellation type triggers compensation immediately, racing in-flight requests; WAIT_CANCELLATION_COMPLETED waits, but only works if activities heartbeat or the workflow checks for a cancel request and throws CanceledFailure.",
+    "Even with these fixes, cancellation can race completion, so a reconciliation service remains necessary in financial systems.",
+    "For synchronous callers, use a deterministic workflow ID so retries reuse the running workflow, block on the result with a timeout, and cancel on timeout."
+  ],
+  "takeaways": [
+    "Review Saga code copied from older Temporal examples for compensation ordering and a detached cancellation scope.",
+    "Pick an explicit ActivityCancellationType per activity and make long HTTP activities heartbeat or check for cancellation.",
+    "Test cancellation paths with injected latency, for example with Toxiproxy, rather than only the happy path.",
+    "Keep a reconciliation job for distributed money movements even when the workflow engine handles retries."
+  ],
+  "quotes": [
+    {
+      "text": "A reconciliation service, not only in our system, but in all fintech systems, is the last guardian for our consistency.",
+      "at": "22:36"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "The synchronous hold operation"
+    },
+    {
+      "at": "03:15",
+      "title": "Temporal basics and Saga sample"
+    },
+    {
+      "at": "06:02",
+      "title": "Compensation ordering"
+    },
+    {
+      "at": "08:54",
+      "title": "Detached cancellation scopes"
+    },
+    {
+      "at": "13:43",
+      "title": "Activity cancellation races"
+    },
+    {
+      "at": "22:36",
+      "title": "Reconciliation and calling workflows"
+    },
+    {
+      "at": "25:25",
+      "title": "Takeaways"
+    }
+  ],
+  "tech": [
+    "Temporal",
+    "Temporal Java SDK",
+    "Saga pattern",
+    "Toxiproxy",
+    "gRPC",
+    "Camunda"
+  ],
+  "watchIf": "You implement Sagas on Temporal, especially for synchronous, cancellable operations where a missed compensation leaves customer money frozen.",
+  "themes": [
+    "Architecture & design"
+  ],
+  "demo": true
+}

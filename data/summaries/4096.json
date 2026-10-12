@@ -1,23 +1,47 @@
 {
   "id": 4096,
-  "source": "abstract",
-  "tldr": "Shows how to use Apache Maven features to produce identical artifacts from identical inputs and how to diagnose sources of non-determinism with built-in verification.",
+  "source": "transcript",
+  "tldr": "Mulders shows why bit-for-bit reproducible Maven builds matter for supply-chain security and EU compliance, and how to diagnose, fix and independently verify them with the Maven Artifact plugin, Diffoscope and Reproducible Central.",
   "summary": [
-    "Maarten Mulders starts from the pressure on delivery pipelines from auditors, regulators and governance teams, and the fact that many builds are not reproducible, which creates blind spots in compliance and traceability.",
-    "The session demonstrates how developers can use Maven features to reliably produce identical artifacts from identical inputs, diagnose where reproducibility breaks down, and use Maven's built-in verification tools to highlight sources of non-determinism."
+    "Mulders opens by building a near-empty POM twice and getting different SHA-256 sums seconds apart. Reproducibility means that the same source produces the same artifact, bit for bit. The usual causes are file timestamps, entry ordering, floating dependencies, environment leaking into the build, and stale files (he once shipped an empty stray directory to Maven Central). He argues it is no longer an engineering puzzle. On quality, it lets you check a published library against its source amid rising CI/CD attacks, makes build caches useful, and lets you rebuild an old release plus a single hotfix. On compliance, he reads the Cyber Resilience Act, DORA, NIS2 and the Medical Device Regulation as requiring proof of what runs in production and how it got there, with the caveat that this is his interpretation, not legal advice.",
+    "The demos use the maven-artifact-plugin. artifact:compare checks a fresh build against a reference and writes a buildcompare file with Diffoscope instructions. Diffoscope then shows a config.properties where an API key from the build machine leaked into the reference jar. artifact:check-buildplan reports a missing project.build.outputTimestamp, a plugin too old to be reproducible, and an SLF4J version range that, combined with shading, pulled 2.0.20 instead of 2.0.19. The fixes: pin dependency and plugin versions and keep them current with Dependabot or Renovate (Maven 4 warns about unpinned default plugins), set project.build.outputTimestamp once and let the Release plugin update it, and use maven-jar-plugin 3.2.0 or later for stable entry order. Some demo steps didn't behave as rehearsed: the timestamp diffs and the leaked key didn't show up again.",
+    "For outside proof, Mulders uses Reproducible Central (jvm-repo-rebuild/reproducible-central on GitHub). A buildspec file lists the coordinates, source repository, Maven and JDK versions and build command. A script rebuilds the artifact in a Docker container and compares the POM, jar and sources jar (not Javadoc). Once a project is listed, new releases are checked automatically, which is how his stray-directory mistake was caught, and projects can show a badge. Building from a fresh checkout, which release:perform does, prevents stray files. Signatures only show the key holder meant to upload those bits. The pgpverify-maven-plugin lets consumers pin which keys they expect for each dependency."
   ],
   "keyPoints": [
-    "Non-reproducible builds weaken compliance and traceability.",
-    "Maven features can produce identical artifacts from identical inputs.",
-    "Built-in verification tools highlight sources of non-determinism."
+    "Even an almost-empty POM gives a different jar on each build, because zip entries carry the build time as timestamp unless project.build.outputTimestamp is set.",
+    "mvn artifact:check-buildplan flags a missing output timestamp, plugins too old for reproducible output (with the minimum version needed), and dependency version ranges.",
+    "mvn artifact:compare rebuilds and compares against a reference artifact, producing a buildcompare file and Diffoscope commands for drilling into differences in jars.",
+    "Version ranges plus shading make output depend on the day you build: a new SLF4J patch release changed the shaded jar.",
+    "Unpinned plugin versions depend on the Maven version each developer runs; Maven 4 logs a warning for default lifecycle plugins without a pinned version.",
+    "Reproducible Central rebuilds Maven Central artifacts from a buildspec in Docker and keeps checking each new release once a project is listed.",
+    "Mulders reads CRA, DORA, NIS2 and MDR traceability requirements as strong pointers towards reproducible builds, while advising teams to confirm with compliance officers.",
+    "PGP signatures only prove intent by the key holder; pgpverify-maven-plugin lets you specify which keys you expect to have signed each dependency."
   ],
   "takeaways": [
-    "Check whether two builds of your project produce identical artifacts and investigate any differences."
+    "Add project.build.outputTimestamp to your POM and run mvn artifact:check-buildplan to find the remaining blockers.",
+    "Replace dependency version ranges with exact versions and pin every plugin, using Dependabot or Renovate to keep them current.",
+    "Build releases from a fresh checkout of the tag (as release:perform does) so stray local files can't leak in.",
+    "Add your open-source library to Reproducible Central so that someone else independently verifies every release.",
+    "Check config files packaged in your jars for values injected from the build environment, such as API keys."
   ],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Apache Maven", "Reproducible builds"],
-  "watchIf": "You build with Maven and need reproducible, auditable artifacts.",
+  "quotes": [
+    {"text": "When it comes to trust, I would say I prefer an established proof rather than assumptions that will probably be good.", "at": "15:24"},
+    {"text": "It's still a little bit of me checking my own work rather than somebody else checking my own work. That would be the actual proof.", "at": "33:58"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Can you rebuild it?"},
+    {"at": "02:35", "title": "Defining reproducibility"},
+    {"at": "05:02", "title": "A failing empty POM"},
+    {"at": "07:50", "title": "Quality reasons"},
+    {"at": "11:25", "title": "Compliance: CRA, DORA, NIS2"},
+    {"at": "16:25", "title": "artifact:compare and Diffoscope"},
+    {"at": "21:13", "title": "Diagnosing with check-buildplan"},
+    {"at": "23:19", "title": "Pinning versions and timestamps"},
+    {"at": "33:58", "title": "Reproducible Central"},
+    {"at": "41:54", "title": "Wrap-up and signatures"}
+  ],
+  "tech": ["Apache Maven", "Maven 4", "maven-artifact-plugin", "maven-jar-plugin", "Maven Release Plugin", "Maven Build Cache", "Diffoscope", "Reproducible Central", "SLF4J", "Dependabot", "Renovate", "Docker", "pgpverify-maven-plugin", "Cyber Resilience Act", "DORA", "NIS2"],
+  "watchIf": "You publish Maven artifacts or work under audit or EU regulation and need to prove your binaries match your source.",
   "themes": ["Security & supply chain", "Developer experience & tooling"],
-  "demo": false
+  "demo": true
 }

@@ -563,10 +563,16 @@ window.__renderOnce = () => { composer.render(); if (window.__css) window.__css(
 // ?still renders a couple of frames and stops: for headless screenshots on software WebGL.
 const still = params.has("still");
 let frames = 0;
+// Three.js stops the loop if this callback throws, so a bad frame must not freeze the page.
+let lastError = null;
 renderer.setAnimationLoop((t) => {
-  tick(t);
-  composer.render();
-  if (window.__css) window.__css();
+  try {
+    tick(t);
+    composer.render();
+    if (window.__css) window.__css();
+  } catch (e) {
+    if (String(e) !== lastError) { console.error(e); lastError = String(e); }
+  }
   if (++frames === 2) {
     window.__ready = true;
     if (still) renderer.setAnimationLoop(null);

@@ -1,0 +1,46 @@
+{
+  "id": 9023,
+  "source": "transcript",
+  "tldr": "Two ING Belgium engineers describe how the bank rolled out AI coding tools under regulation, show internal agents for vulnerabilities, framework migration and front-end scaffolding, and demo the AI-built Devoxx4Kids labs they run.",
+  "summary": [
+    "Hammou Ahabchane, a Java tech lead in ING's CRM area who moved from ops to development in 2019, and Zaraoui present this as a testimonial. Regulation, customer trust, a legacy landscape with mainframes and COBOL, and the risk of hallucinated answers kept ING out of the 2022 AI wave. The timeline they give: three engineers trained for a week in the Netherlands in March 2025, 180 licensed users by May, a community in November, a dedicated AI department and a group-wide Agentic Hub of reviewed agents and skills early 2026, and adoption dashboards splitting users into active, engaged and dedicated so licence costs are justified. They report more than 8,500 GitHub Copilot licences group-wide, with Belgium's count doubled in a year, and two days of AI training per employee.",
+    "Three internal agents show the approach. A vulnerability agent runs the Prisma and Checkmarx scanners, pins or replaces vulnerable dependencies, and checks whether an unfixable CVE is actually reachable. A migration agent reads the release notes and per-major-version migration guides of ING's API SDK, a Spring Boot-based framework (now at version 33) behind roughly 2,000 to 2,200 APIs, and reports what affects your service. A front-end toolkit agent asks grill-me style questions (UX design, unit tests, Storybook, layout, country, team purpose code), then scaffolds a three-screen complaint form that follows ING branding into an empty repo. Agents are split into validated global ones and experimental ones, with more than 100 in total.",
+    "The second half covers ING's volunteer Devoxx4Kids workshops for 7 to 14 year olds. Hammou Ahabchane's CodeKids Lab, started in Lovable, explains programming, variables and loops, then unlocks games: Mastermind, a Caesar cipher, an animated bubble sort, a toy AI trainer that learns y = 2x + 5, and a hidden Space Invaders. He shows that the AI scattered translations across every component, an example of the product vision AI lacks. Zaraoui built CyberQuest with Claude Code in two to three weeks: terms nobody reads, password strength, deepfakes, privacy, and a captive-portal demo on why open Wi-Fi is risky. They close with the engineer as the one who specifies, supplies context and rules, and verifies, accountable for code they didn't type."
+  ],
+  "keyPoints": [
+    "ING delayed adoption until regulatory, confidentiality and hallucination concerns were addressed, then scaled from three trained engineers in March 2025 to more than 8,500 Copilot licences group-wide.",
+    "Usage is tracked in three tiers (active, engaged, dedicated) so that paid licences are actually used and training gaps surface.",
+    "A shared Agentic Hub holds reviewed agents and skills, split into globally validated ones adopted by all ING entities and experimental ones.",
+    "The vulnerability agent combines Prisma image scanning and Checkmarx static analysis, proposes version pins or alternatives, and assesses whether an unfixable CVE is exploitable in your API.",
+    "A migration agent summarises which deprecated or removed features of the internal Spring Boot-based API SDK your service uses, from release notes and migration guides.",
+    "The front-end agent asks which steps to automate (UX, unit tests, Storybook) and layout questions before generating a branded wizard.",
+    "AI lets a back-end developer build a responsive, translated kids' learning site, but without guidance it duplicated translations in every class instead of one central file."
+  ],
+  "takeaways": [
+    "Track AI licence usage by engagement level, not just headcount, and use it to find where people need training.",
+    "Collect reviewed agents and skills in one shared catalogue so teams reuse them instead of rebuilding.",
+    "Give an agent the release notes and migration guides of your internal frameworks and let it produce a first-pass impact report before upgrades.",
+    "Start prompts with context, rules about your tech stack and standards, and acceptance criteria, then verify against those criteria yourself.",
+    "Use AI to build the side project or volunteer tool you have been putting off."
+  ],
+  "quotes": [
+    {"text": "AI is not owning your code and is not having the product vision that you have. So you are still the brain.", "at": "37:24"},
+    {"text": "You will not blame the AI when something will get wrong in production, right? You will be blamed.", "at": "46:05"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Speakers and agenda"},
+    {"at": "09:48", "title": "AI in a regulated bank"},
+    {"at": "15:14", "title": "ING adoption timeline"},
+    {"at": "21:39", "title": "Vulnerability management agent"},
+    {"at": "23:02", "title": "Framework migration agent"},
+    {"at": "25:31", "title": "Front-end toolkit agent"},
+    {"at": "28:23", "title": "Devoxx4Kids at ING"},
+    {"at": "32:11", "title": "CodeKids Lab demo"},
+    {"at": "38:49", "title": "CyberQuest demo"},
+    {"at": "44:38", "title": "Engineers in the driver's seat"}
+  ],
+  "tech": ["GitHub Copilot", "Microsoft 365 Copilot", "Spring Boot", "Checkmarx", "Prisma Cloud", "Storybook", "Liquibase", "Lovable", "Claude Code"],
+  "watchIf": "You work in a regulated enterprise and want a practical account of rolling out AI coding tools, or you volunteer teaching kids to code.",
+  "themes": ["AI agents & agentic coding", "Teams, careers & leadership"],
+  "demo": false
+}

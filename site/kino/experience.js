@@ -302,7 +302,7 @@ export function startExperience(k) {
     const start = performance.now();
     skipNote.hidden = false;
     anim = { done, tick(now) {
-      const t = Math.min(1, (now - start) / ms), u = ease(t);
+      const t = THREE.MathUtils.clamp((now - start) / ms, 0, 1), u = ease(t);
       camera.position.copy(curve.getPointAt(u));
       const ahead = curve.getPointAt(Math.min(1, u + 0.06)).clone();
       ahead.y = THREE.MathUtils.lerp(ahead.y, camera.position.y, 0.6);
@@ -367,5 +367,6 @@ export function startExperience(k) {
       lightRoom(info.room); camera.fov = SEAT_FOV; camera.updateProjectionMatrix();
       camera.position.copy(c.getPointAt(u)); camera.lookAt(c.getPointAt(Math.min(1, u + 0.06))); }, goTalk: (id) => goTalk(talks.find((t) => t.id === id), { instant: true }), goLobby: () => goLobby({ instant: true }) };
 
-  return (now) => { if (anim) anim.tick(now ?? performance.now()); };
+  // performance.now(), not the rAF timestamp: that one can be earlier than an animation's start.
+  return () => { if (anim) anim.tick(performance.now()); };
 }

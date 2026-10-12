@@ -1,0 +1,89 @@
+{
+  "id": 21666,
+  "source": "transcript",
+  "tldr": "Cimadamore and Klang explain method handles as 'link once, execute many' and trace that idea through reflection, string concatenation, FFM downcalls and a planned marshalling API.",
+  "summary": [
+    "Cimadamore starts from core reflection. Calling Point.translate via Method.invoke boxes arguments into an Object array, checks access through @CallerSensitive, unboxes and only then calls, on every invocation; his benchmark put it at about a third of a direct call's throughput. The JVM splits a call into linkage (resolution, access check, vtable index) and execution, and method handles, added in Java 7 with invokedynamic, expose that split. A Lookup checks access once at creation; invokeExact is signature-polymorphic, so javac burns the static argument and cast types into the call site, leaving a cheap type check. Since Java 18, java.lang.reflect.Method wraps a method handle, closing most of the gap.",
+    "The same pattern repeats. Pre-Java 9 string concatenation compiled to StringBuilder chains whose default capacity of 16 always resized for his 21-character example. Since Java 9, javac emits an invokedynamic call to StringConcatFactory.makeConcatWithConstants with a recipe; the generated code precomputes the constant length and coder, then sizes one byte array exactly, which he said made concatenation about twice as fast. In the Foreign Function & Memory API, a downcall handle points not at bytecode but at an assembly trampoline generated once from a FunctionDescriptor of memory layouts, following the platform ABI. jextract can generate the wrappers so users never touch the handles.",
+    "Klang then shows his exploratory work on marshalling as a successor to serialization: a class declares explicit structural versions as records (PointV1) that map to and from the real type. A naive reflective marshaller redoes type inspection and access checks for every object; instead, a schema with marshal and unmarshal method handles is generated once per type and cached, and his rough benchmark favoured handles by a wide margin. With Project Leyden, that linkage could move to a training run. In Q&A they named string templates as the next likely user, said combinator-heavy handles generate bloat so the JDK often spins classes with the class-file API, and mentioned Project Babylon."
+  ],
+  "keyPoints": [
+    "Method.invoke boxes arguments, checks access via @CallerSensitive and unboxes on every call; a method handle does the access check once through MethodHandles.Lookup.",
+    "invokeExact is signature-polymorphic: javac encodes the static argument types and the cast return type into the call site descriptor, so no boxing or varargs array is needed.",
+    "A static final method handle is a JIT constant, so the remaining type check is effectively a pointer comparison.",
+    "Since Java 18, core reflection is reimplemented on top of method handles, so reflective calls reuse the same C2 optimisations.",
+    "Indy string concatenation (Java 9) uses makeConcatWithConstants with a recipe string, precomputing constant length and encoding (coder), then filling one exactly sized byte array.",
+    "FFM downcall handles are built from a symbol address and a FunctionDescriptor; the ABI classification and assembly trampoline are generated once at creation.",
+    "Klang's marshalling prototype caches a per-type schema with marshal and unmarshal method handles; with Project Leyden this linking could happen at training time.",
+    "Combinator-heavy method handle trees generate a lot of hidden bytecode; JDK code such as string concatenation moved to spinning one class with the class-file API instead."
+  ],
+  "takeaways": [
+    "Store method handles in static final fields and call them with invokeExact using exact static types and a cast on the result.",
+    "In your own framework code, separate one-time setup (lookup, type analysis, access checks) from the per-call path and cache the result.",
+    "Use jextract to generate FFM bindings instead of writing downcall handles by hand.",
+    "Prefer generating a single class with the class-file API over deep method handle combinator chains when the shape is complex."
+  ],
+  "quotes": [
+    {
+      "text": "It was really the one move that made the next thousand possible.",
+      "at": "01:46"
+    },
+    {
+      "text": "Once you see this shape of the problem, it's really hard to unsee that. So you don't have to use the method handles. We'll use them for you.",
+      "at": "39:53"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Link once, execute many"
+    },
+    {
+      "at": "03:08",
+      "title": "Cost of core reflection"
+    },
+    {
+      "at": "07:26",
+      "title": "Method handles and invokeExact"
+    },
+    {
+      "at": "15:12",
+      "title": "String concatenation"
+    },
+    {
+      "at": "21:32",
+      "title": "FFM downcall handles"
+    },
+    {
+      "at": "28:09",
+      "title": "Marshalling with method handles"
+    },
+    {
+      "at": "39:53",
+      "title": "Stewardship lesson"
+    },
+    {
+      "at": "41:19",
+      "title": "Q&A"
+    }
+  ],
+  "tech": [
+    "Method handles",
+    "VarHandles",
+    "Core reflection",
+    "invokedynamic",
+    "StringConcatFactory",
+    "Foreign Function & Memory API",
+    "jextract",
+    "Class-File API",
+    "Project Leyden",
+    "Project Babylon",
+    "String templates"
+  ],
+  "watchIf": "You write frameworks, serializers or native interop code and want to understand why the JDK keeps reaching for method handles and how to get their performance.",
+  "themes": [
+    "Java language & JDK",
+    "JVM performance & runtime"
+  ],
+  "demo": false
+}
