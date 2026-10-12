@@ -320,7 +320,7 @@ def textured(name, tex, scale, tint=None, rough=None, normal=1.0, sheen=0.0, til
 # vaults, blue-grey seats, red portals, orange numeral panels, blue LED light. Downstairs, the Hollywood
 # room is the opposite: white columns and ceilings, grey carpet, beige curtains, black acoustic ceiling.
 M = {
-    "wall": material("wall", 0x34373f, 0.92),
+    "wall": material("wall", 0x1a2036, 0.85, bevel=0.01, grime=0.15),        # navy, as in the corridor photos
     "audWall": material("audWall", 0x0f1014, 0.95),
     "column": material("column", 0x24262c, 0.9),
     "concrete": material("concrete", 0x34363d, 0.9),
@@ -329,7 +329,7 @@ M = {
     "nosing": material("nosing", 0xb4b8be, 0.35, 0.9),                                       # aluminium edge
     "stairWall": material("stairWall", 0x1f2742, 0.7, bevel=0.01, grime=0.2),
     "stringer": material("stringer", 0x2a2d35, 0.6, bevel=0.008),
-    "carpet": material("carpet", 0x161c2e, 1.0, noise_bump=0.3),
+    "carpet": textured("carpet", "carpet", 0.6, tint=0x3e3741, normal=1.0),   # dark purple-grey, speckled
     "hallFloor": material("hallFloor", 0x2a2c33, 1.0, noise_bump=0.3),
     "hollywoodFloor": textured("hollywoodFloor", "carpet", 0.6, tint=0x9b9a98, normal=1.0, tiles=0.5),
     "hallColumn": material("hallColumn", 0xdedcd7, 0.6, bevel=0.012, grime=0.35),
@@ -350,8 +350,15 @@ M = {
     "tableFrame": material("tableFrame", 0x111114, 0.4, 0.6),
     "audFloor": material("audFloor", 0x111218, 1.0, noise_bump=0.2),
     "ceiling": material("ceiling", 0x121318, 1.0),
-    "vault": material("vault", 0xcdc8bf, 0.9),
-    "seat": material("seat", 0x2c3650, 0.95, sheen=0.6, noise_bump=0.2),
+    "vault": material("vault", 0xe6e6e8, 0.85),
+    "starDot": emissive("starDot", 0xfff4e8, 60.0),
+    "wordX": material("wordX", 0xff9a2a, 0.5, emission=0xff8a1e, strength=0.4),
+    "trussLamp": emissive("trussLamp", 0xf2f4ff, 400.0),
+    "aisleLed": emissive("aisleLed", 0xff2030, 30.0),
+    "posterA": emissive("posterA", 0x3a5cff, 3.0),
+    "posterB": emissive("posterB", 0xff6a2a, 3.0),
+    "posterC": emissive("posterC", 0xc9d6ff, 3.0),
+    "seat": material("seat", 0x222a42, 0.9, sheen=0.6, noise_bump=0.2),
     "seatFrame": material("seatFrame", 0x15161b, 0.5, 0.4),
     "steel": material("steel", 0xb8bcc4, 0.3, 0.9),
     "portal": material("portal", 0xc61d3b, 0.55, emission=0xc61d3b, strength=0.15),
@@ -523,8 +530,8 @@ for d in venue["decor"]:
     mat = d.get("material")
     if mat in ("floorBelow", "seat", "seatBack"):
         continue
-    if d.get("wordmark") and d["wordmark"] != "devoxx":
-        continue   # Ghost Light stores DEVOXX and JAVAPOLIS in the same spot; draw only DEVOXX
+    if d.get("wordmark"):
+        continue   # Ghost Light's box letters (DEVOXX and JAVAPOLIS in the same spot); real type is set below
     if d.get("linkId") in ("stair-west", "stair-east"):
         continue   # stepped balustrade blocks; the side stairs get sloped stringers and a handrail below
     under = d["floor"] * FH + plate_under(d)
@@ -569,34 +576,41 @@ for r in rooms:
 for e in venue["extents"]:
     B.box("ceiling", e, FH + CLEAR, FH + CLEAR + 0.2)
 
-# ---------------------------------------------------------------------------------- corridor dressing
-cx, cy = corridor["x"] + corridor["w"] / 2, corridor["y"] + corridor["h"] / 2
-
-
-def cove(side, R=1.3, segs=16):
-    """A quarter-cylinder vault springing from the corridor wall head up to the ceiling."""
-    wall_x = corridor["x"] if side < 0 else corridor["x"] + corridor["w"]
-    cxx, cz = wall_x - side * R, FH + CLEAR - R
-    y0, y1 = corridor["y"], corridor["y"] + corridor["h"]
-    verts, faces = [], []
-    for k in range(segs + 1):
-        a = k / segs * math.pi / 2
-        x, z = cxx + side * R * math.cos(a), cz + R * math.sin(a)
-        verts += [(x, y0, z), (x, y1, z)]
-    for k in range(segs):
-        faces.append((2 * k, 2 * k + 1, 2 * k + 3, 2 * k + 2))
-    B.mesh("vault", verts, faces)
-    B.box("led", {"x": wall_x - side * (R + 0.05) - 0.03, "y": y0, "w": 0.06, "h": y1 - y0}, FH + CLEAR - 0.07, FH + CLEAR - 0.01)
-
-
-cove(-1)
-cove(1)
-
-
 def cylinder(key, cx, cy, z0, z1, r, segs=16):
     ring = [(cx + r * math.cos(2 * math.pi * k / segs), cy + r * math.sin(2 * math.pi * k / segs)) for k in range(segs)]
     B.mesh(key, [(x, y, z) for z in (z0, z1) for x, y in ring],
            [tuple(reversed(range(segs))), tuple(range(segs, 2 * segs)), *[(k, (k + 1) % segs, segs + (k + 1) % segs, segs + k) for k in range(segs)]])
+
+
+# ---------------------------------------------------------------------------------- corridor dressing
+cx, cy = corridor["x"] + corridor["w"] / 2, corridor["y"] + corridor["h"] / 2
+
+
+def bulkhead(side):
+    """The upstairs corridor (the 2026 "foyer" photos): along each wall a white ceiling plane slopes up from just
+    above the cinema portals towards the middle, with a short fascia at its inner edge. Blue LED lines run along
+    the wall head and under the fascia, and track spots hang from the plane. The middle is open to the black roof."""
+    wall_x = corridor["x"] if side < 0 else corridor["x"] + corridor["w"]
+    inner_x = wall_x - side * 4.6
+    z_wall, z_in = FH + 3.75, FH + CLEAR - 0.35
+    y0, y1 = corridor["y"], corridor["y"] + corridor["h"]
+    B.mesh("vault", [(wall_x, y0, z_wall), (wall_x, y1, z_wall), (inner_x, y1, z_in), (inner_x, y0, z_in)], [(0, 1, 2, 3)] if side > 0 else [(0, 3, 2, 1)])
+    B.box("vault", {"x": min(inner_x, inner_x - side * 0.08), "y": y0, "w": 0.08, "h": y1 - y0}, z_in - 0.45, z_in + 0.02)   # fascia
+    B.box("led", {"x": inner_x + side * 0.02 - 0.02, "y": y0, "w": 0.04, "h": y1 - y0}, z_in - 0.47, z_in - 0.44)
+    B.box("led", {"x": wall_x - side * 0.03 - 0.02, "y": y0, "w": 0.04, "h": y1 - y0}, z_wall - 0.05, z_wall - 0.01)
+    # track spots two thirds of the way up the slope, every 3 m
+    t = 0.62
+    tx, tz = wall_x + (inner_x - wall_x) * t, z_wall + (z_in - z_wall) * t
+    y = y0 + 1.5
+    while y < y1:
+        cylinder("tableFrame", tx, y, tz - 0.3, tz, 0.06)
+        corridor_spots.append((tx, y, tz - 0.32, side))
+        y += 3.0
+
+
+corridor_spots = []
+bulkhead(-1)
+bulkhead(1)
 
 
 def lathe(key, profile, center, segs=48, phi0=0.0, phi=2 * math.pi, scale=(1, 1, 1)):
@@ -740,6 +754,114 @@ for name, bm_, mat in (("seats", seats_bm, M["seat"]), ("seat-frames", frames_bm
     ob = bpy.data.objects.new(name, me)
     ob.data.materials.append(mat)
     scene.collection.objects.link(ob)
+
+# ---------------------------------------------------------------------------------- auditorium and corridor dressing
+# From the 2026 auditorium photos: a black room under a star field of small ceiling spots, a box-truss light
+# tower at each front corner of the stage, red LED dots on the aisle steps, "#DEVOXX" standing on the stage in
+# heavy type with an orange last X. In the corridor, backlit poster boxes between the cinema portals.
+WORD_FONT = bpy.data.fonts.load(str(ROOT / "scripts" / "blender" / "fonts" / "ArchivoBlack.ttf"))
+wordmark_blocks = [d for d in venue["decor"] if d.get("wordmark") == "devoxx" and d["floor"] == 1]
+truss_lamps, house_spots, word_lights = [], [], []
+
+
+def aisle_y_for(n):
+    """The aisle by the door (the walk climbs it): halfway between the side wall and the first seats."""
+    b = doors[n]["room"]["bounds"]
+    ys = [d["bounds"]["y"] for d in pans if inside(b, d["bounds"]["x"], d["bounds"]["y"])]
+    ye = [d["bounds"]["y"] + d["bounds"]["h"] for d in pans if inside(b, d["bounds"]["x"], d["bounds"]["y"])]
+    return (b["y"] + min(ys)) / 2 if doors[n]["room"].get("doorSide") == "low" else (max(ye) + b["y"] + b["h"]) / 2
+
+
+for n, door in doors.items():
+    r, b = door["room"], door["room"]["bounds"]
+    west, scr = door["west"], screens.get(n)
+    if not scr:
+        continue
+    toward = 1 if west else -1                   # +x points away from the screen in a west room (screen on the far west wall)
+    # star field: rows of small spots across the ceiling
+    gx = b["x"] + 1.2
+    while gx < b["x"] + b["w"] - 1.0:
+        gy = b["y"] + 1.0 + (0.9 if int((gx - b["x"]) / 2.2) % 2 else 0)
+        while gy < b["y"] + b["h"] - 0.8:
+            cylinder("starDot", gx, gy, FH + CLEAR - 0.03, FH + CLEAR - 0.005, 0.045, segs=8)
+            gy += 1.8
+        gx += 2.2
+    # truss towers at the front corners of the stage, a lamp head on top aimed at the audience
+    tx = scr["x"] + toward * 3.6
+    for ty in (b["y"] + 1.3, b["y"] + b["h"] - 1.3):
+        for (dx, dy) in ((-0.15, -0.15), (0.15, -0.15), (-0.15, 0.15), (0.15, 0.15)):
+            B.box("steel", {"x": tx + dx - 0.02, "y": ty + dy - 0.02, "w": 0.04, "h": 0.04}, FH, FH + 4.6)
+        z = FH + 0.4
+        while z < FH + 4.6:
+            B.box("steel", {"x": tx - 0.17, "y": ty - 0.17, "w": 0.34, "h": 0.34}, z, z + 0.025)
+            z += 0.5
+        cylinder("tableFrame", tx, ty, FH + 4.6, FH + 4.95, 0.18)
+        lamp_x = tx + toward * 0.19
+        B.mesh("trussLamp", [(lamp_x, ty + 0.15 * math.cos(a), FH + 4.78 + 0.15 * math.sin(a)) for a in [2 * math.pi * k / 16 for k in range(16)]],
+               [tuple(range(16)) if toward > 0 else tuple(reversed(range(16)))])
+        truss_lamps.append((lamp_x, ty, FH + 4.78, toward, n))
+    # house spots over the seating, used only in the room we walk to
+    hx = b["x"] + 3.0
+    while hx < b["x"] + b["w"] - 2:
+        for hy in (b["y"] + b["h"] * 0.3, b["y"] + b["h"] * 0.7):
+            house_spots.append((hx, hy, FH + CLEAR - 0.05, n))
+        hx += 4.5
+    # red LED dots on each step of the door-side aisle
+    rake = next((l for l in venue["links"] if l["id"] == f"rake-{n}"), None)
+    if rake and any(inside(b, d["bounds"]["x"], d["bounds"]["y"]) for d in pans):
+        ay = aisle_y_for(n)
+        steps = round(rake["rise"] / rake["riser"])
+        going = rake["bounds"]["w"] / steps
+        for i in range(steps):
+            top = FH + rake["base"] + ((i + 1) if rake["ascending"] else (steps - i)) * rake["riser"]
+            edge_x = rake["bounds"]["x"] + (i * going if rake["ascending"] else (i + 1) * going)
+            for dy in (-0.45, 0.45):
+                B.box("aisleLed", {"x": edge_x - 0.02, "y": ay + dy - 0.03, "w": 0.04, "h": 0.06}, top - 0.04, top - 0.01)
+    # "#DEVOXX" on the stage, sized to the box letters Ghost Light placed there
+    blocks = [d for d in wordmark_blocks if inside(b, d["bounds"]["x"], d["bounds"]["y"])]
+    if blocks:
+        y0w = min(d["bounds"]["y"] for d in blocks)
+        y1w = max(d["bounds"]["y"] + d["bounds"]["h"] for d in blocks)
+        xw = sum(d["bounds"]["x"] + d["bounds"]["w"] / 2 for d in blocks) / len(blocks)
+        floor_z = FH + plate_under(blocks[0])
+        rot = (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2)
+        parts = []
+        for body, mat in (("#DEVOX", M["white"]), ("X", M["wordX"])):
+            cu = bpy.data.curves.new(f"word-{n}-{body}", "FONT")
+            cu.body, cu.font, cu.size, cu.extrude = body, WORD_FONT, 1.0, 0.09
+            cu.align_x, cu.align_y = "LEFT", "BOTTOM"
+            ob = bpy.data.objects.new(f"word-{n}-{body}", cu)
+            ob.data.materials.append(mat)
+            scene.collection.objects.link(ob)
+            parts.append(ob)
+        bpy.context.view_layer.update()
+        w0, w1 = parts[0].dimensions.x, parts[1].dimensions.x
+        scale = min((y1w - y0w) / (w0 + w1 + 0.08), 1.5 / parts[0].dimensions.y)
+        total = (w0 + w1 + 0.08) * scale
+        along = 1 if west else -1                # reading direction in world y, seen from the seats
+        start = (y0w + y1w) / 2 - along * total / 2
+        for ob, off in ((parts[0], 0.0), (parts[1], (w0 + 0.08) * scale)):
+            ob.scale = (scale,) * 3
+            ob.rotation_euler = rot
+            ob.location = (xw, start + along * off, floor_z)
+        word_lights.append(((xw - toward * 0.0, (y0w + y1w) / 2, floor_z + 0.6), toward, n))
+
+# corridor: backlit poster boxes on both walls, clear of the portals, the schedule screens and the stairwells
+door_ys = [(d["wall_x"], d["yc"]) for d in doors.values()]
+for side, wall_x in ((-1, corridor["x"]), (1, corridor["x"] + corridor["w"])):
+    y = corridor["y"] + 3
+    k = 0
+    while y < corridor["y"] + corridor["h"] - 3:
+        clear = all(abs(y - yc) > 4.2 for wx, yc in door_ys if abs(wx - wall_x) < 1) and not (-3 < y < 12)
+        if clear:
+            x0 = wall_x - side * 0.12
+            B.box("bezel", {"x": min(wall_x, x0), "y": y - 0.7, "w": 0.12, "h": 1.4}, FH + 0.6, FH + 2.75)
+            key = ("posterA", "posterB", "posterC")[k % 3]
+            xf = wall_x - side * 0.125
+            B.mesh(key, [(xf, y - 0.62, FH + 0.68), (xf, y + 0.62, FH + 0.68), (xf, y + 0.62, FH + 2.67), (xf, y - 0.62, FH + 2.67)],
+                   [(0, 1, 2, 3)] if side > 0 else [(0, 3, 2, 1)])
+            k += 1
+        y += 3.4
 
 # ---------------------------------------------------------------------------------- the Hollywood room
 # The exhibition floor downstairs, after the photos in data/references/ (area "hollywood"). A white drop
@@ -1022,7 +1144,7 @@ haze.use_nodes = True
 hnt = haze.node_tree
 hnt.nodes.remove(hnt.nodes["Principled BSDF"])
 vol = hnt.nodes.new("ShaderNodeVolumeScatter")
-vol.inputs["Density"].default_value = 0.012
+vol.inputs["Density"].default_value = 0.004
 vol.inputs["Anisotropy"].default_value = 0.55
 hnt.links.new(vol.outputs["Volume"], hnt.nodes["Material Output"].inputs["Volume"])
 hz = Batch()
@@ -1050,10 +1172,26 @@ def point(name, loc, power, color=(1, 1, 1), radius=0.2):
     scene.collection.objects.link(ob)
 
 
-y = -44
-while y <= 62:
-    area(f"corridor-{y}", (cx, y, FH + CLEAR - 0.05), 1.2, 900, (0.9, 0.92, 1.0))
-    y += 12
+for (sx_, sy_, sz_, side) in corridor_spots:              # track spots aimed down and out across the corridor
+    li = bpy.data.lights.new(f"cspot-{sx_:.1f}-{sy_:.1f}", "SPOT")
+    li.energy, li.spot_size, li.spot_blend, li.color = 220, math.radians(70), 0.8, (1.0, 0.9, 0.78)
+    so = bpy.data.objects.new(li.name, li)
+    so.location, so.rotation_euler = (sx_, sy_, sz_), (0, side * 0.35, 0)
+    scene.collection.objects.link(so)
+for side in (-1, 1):                                       # uplights at the wall head wash the sloped planes white
+    wall_x = corridor["x"] if side < 0 else corridor["x"] + corridor["w"]
+    y = corridor["y"] + 6
+    while y < corridor["y"] + corridor["h"]:
+        ob = area(f"wash-{side}-{y:.0f}", (wall_x - side * 0.4, y, FH + 3.6), 1.0, 300, (0.92, 0.94, 1.0), rot=(math.pi, 0, 0))
+        ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", 0.3, 11.5
+        y += 12
+for sid in ("corridor-blue-w", "corridor-blue-e"):          # the blue LED lines wash the bulkheads
+    side = -1 if sid.endswith("w") else 1
+    wall_x = corridor["x"] if side < 0 else corridor["x"] + corridor["w"]
+    y = corridor["y"] + 6
+    while y < corridor["y"] + corridor["h"]:
+        area(f"{sid}-{y:.0f}", (wall_x - side * 4.5, y, FH + CLEAR - 0.85), 0.5, 120, (0.25, 0.35, 1.0))
+        y += 12
 for fx in (grand["x"] + grand["w"] * 0.17, grand["x"] + grand["w"] * 0.5, grand["x"] + grand["w"] * 0.83):
     point(f"funnel-{fx:.1f}", (fx, grand["y"] + grand["h"] + 1.8, FH + 0.6), 1500, (0.35, 0.5, 1.0), 0.4)
 for sid in ("stair-west", "stair-east"):
@@ -1088,8 +1226,29 @@ _room = doors[args.room]["room"]["bounds"] if args.room in doors else None
 if _room:
     _west = _room["x"] < corridor["x"]
     _mx = _room["x"] + _room["w"] * 0.55
-    area("house-1", (_mx, _room["y"] + _room["h"] * 0.3, FH + CLEAR - 0.1), 2.0, 700, (0.85, 0.88, 1.0))
-    area("house-2", (_mx, _room["y"] + _room["h"] * 0.7, FH + CLEAR - 0.1), 2.0, 700, (0.85, 0.88, 1.0))
+    for (hx, hy, hz, rn) in house_spots:
+        if rn == args.room:
+            li = bpy.data.lights.new(f"house-{hx:.1f}-{hy:.1f}", "SPOT")
+            li.energy, li.spot_size, li.spot_blend, li.color = 350, math.radians(40), 0.4, (1.0, 0.93, 0.85)
+            so = bpy.data.objects.new(li.name, li)
+            so.location = (hx, hy, hz)
+            scene.collection.objects.link(so)
+    for ((wx_, wy_, wz_), tw, rn) in word_lights:             # a front light on the wordmark, from the ceiling
+        if rn == args.room:
+            li = bpy.data.lights.new("word-light", "SPOT")
+            li.energy, li.spot_size, li.spot_blend, li.color = 2500, math.radians(30), 0.4, (1.0, 0.95, 0.88)
+            so = bpy.data.objects.new(li.name, li)
+            so.location = (wx_ + tw * 7.0, wy_, FH + CLEAR - 0.3)
+            so.rotation_euler = (Vector((wx_, wy_, wz_)) - Vector(so.location)).to_track_quat("-Z", "Y").to_euler()
+            scene.collection.objects.link(so)
+    for (lx, ly, lz, tw, rn) in truss_lamps:                 # the truss lamps glare out over the seats
+        if rn == args.room:
+            li = bpy.data.lights.new(f"truss-{ly:.1f}", "SPOT")
+            li.energy, li.spot_size, li.spot_blend, li.color = 3000, math.radians(50), 0.3, (0.95, 0.96, 1.0)
+            so = bpy.data.objects.new(li.name, li)
+            so.location = (lx + tw * 0.05, ly, lz)
+            so.rotation_euler = Vector((tw, _room["y"] + _room["h"] / 2 - ly, -0.45)).to_track_quat("-Z", "Y").to_euler()
+            scene.collection.objects.link(so)
 
 # ---------------------------------------------------------------------------------- shots
 cam_data = bpy.data.cameras.new("cam")
