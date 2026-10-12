@@ -2,7 +2,9 @@
 
 Input per talk:
 - Metadata: `python3 scripts/talk_info.py <id>` prints title, speakers, type, track, abstract.
-- Transcript: `data/raw/transcripts/<id>.txt` (YouTube auto-captions, `[mm:ss]` marker about every minute).
+- Transcript: `data/raw/transcripts/<id>.txt`, with a `[mm:ss]` marker about every minute. Most are
+  Whisper transcriptions (punctuated, mostly correct names); some are YouTube auto-captions (no
+  punctuation, more garbled). `talk_info.py` shows which.
   Absent for talks that were not recorded or not yet uploaded: summarise from the abstract instead.
 
 Output: `data/summaries/<id>.json`, then run `python3 scripts/validate_summaries.py <id> ...`.
@@ -11,7 +13,7 @@ Output: `data/summaries/<id>.json`, then run `python3 scripts/validate_summaries
 
 - Summarise what was actually **said** in the transcript, not what the abstract promised. Where they
   differ (talk changed direction, demo failed, extra announcement), go with the transcript.
-- Auto-captions garble names: speaker names, products, projects ("Devox" = Devoxx, "Gibster" = JHipster,
+- Transcripts garble names, auto-captions much more than Whisper: speaker names, products, projects ("Devox" = Devoxx, "Gibster" = JHipster,
   "Quarkis" = Quarkus, "Lang chain for J" = LangChain4j, "Jacarta" = Jakarta EE...). Always use the
   correct spelling, using the metadata's speaker names and your own knowledge.
 - Be concrete. Name the tools, numbers, APIs, JEPs, patterns and examples the speaker used. "The speaker

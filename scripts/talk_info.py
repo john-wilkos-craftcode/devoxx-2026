@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sources_file = ROOT / "data" / "raw" / "transcript_sources.json"
+sources = json.loads(sources_file.read_text()) if sources_file.exists() else {}
 talks = {t["id"]: t for t in json.loads((ROOT / "data" / "talks_base.json").read_text())}
 
 for arg in sys.argv[1:]:
@@ -15,5 +17,6 @@ for arg in sys.argv[1:]:
         print(f"Speaker: {s['name']} ({s['company'] or 'n/a'})")
     print(f"Keywords: {', '.join(t['keywords'])}")
     print(f"Transcript: {tr if tr.exists() else 'none'}"
-          + (f" ({len(tr.read_text().split())} words)" if tr.exists() else ""))
+          + (f" ({len(tr.read_text().split())} words, from {sources.get(str(t['id']), 'unknown')})"
+             if tr.exists() else ""))
     print(f"\nAbstract:\n{t['abstract']}\n")

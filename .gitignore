@@ -3,3 +3,5 @@ data/raw/transcripts/
 __pycache__/
 *.pyc
 data/raw/audio/
+data/raw/captions/
+data/raw/caption_batch.txt

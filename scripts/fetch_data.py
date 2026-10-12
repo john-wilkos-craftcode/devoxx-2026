@@ -1,28 +1,26 @@
-"""Fetch Devoxx Belgium 2026 talks, schedule, YouTube matches and transcripts.
+"""Fetch Devoxx Belgium 2026 talks and schedule, and match them to their YouTube recordings.
 
 Outputs:
   data/raw/talks.json            CFP talks
   data/raw/schedule.json         all schedule slots (Mon-Fri)
-  data/raw/videos.json           Devoxx channel videos (id, title)
+  data/raw/videos.json           Devoxx channel videos (id, title), newest first
   data/talks_base.json           joined talk records (no summaries yet)
-  data/raw/transcripts/<id>.txt  plain-text transcript per talk (gitignored)
 
-Usage: python scripts/fetch_data.py [--skip-videos] [--skip-transcripts]
+Transcripts are a separate, slow step: scripts/fetch_captions.py.
+Usage: python scripts/fetch_data.py [--skip-videos]
 """
 import argparse
 import difflib
 import json
 import re
-import subprocess
-import sys
-import time
 import unicodedata
 import urllib.request
 from pathlib import Path
 
+import yt
+
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw"
-TRANSCRIPTS = RAW / "transcripts"
 CFP = "https://dvbe26.cfp.dev/api/public"
 CHANNEL = "https://www.youtube.com/@DevoxxForever/videos"
 BOUNDARY = re.compile(r"Devoxx Belgium is Next Week|Speaking next week at Devoxx Belgium", re.I)
@@ -51,11 +49,9 @@ def fetch_cfp():
 
 
 def fetch_videos(limit):
-    out = subprocess.run(
-        ["yt-dlp", "--flat-playlist", "--playlist-end", str(limit),
-         "--print", "%(id)s\t%(title)s", CHANNEL],
-        capture_output=True, text=True, check=True,
-    ).stdout
+    """One flat listing of the channel: a handful of requests, no per-video calls."""
+    _, out = yt.run(["--flat-playlist", "--playlist-end", str(limit), "--no-warnings",
+                     "--print", "%(id)s\t%(title)s", CHANNEL])
     videos = [dict(zip(("id", "title"), line.split("\t", 1)))
               for line in out.splitlines() if "\t" in line]
     (RAW / "videos.json").write_text(json.dumps(videos, indent=1))
@@ -111,64 +107,12 @@ def assign_videos(talks, videos):
     return out
 
 
-def fetch_transcript(api, video_id, dest):
-    if dest.exists() and dest.stat().st_size > 0:
-        return True
-    for attempt in range(3):
-        try:
-            t = api.fetch(video_id, languages=["en", "en-US", "en-GB", "nl", "fr"])
-            # Plain text with a [mm:ss] marker roughly every minute, so summaries can cite chapters.
-            parts, next_mark = [], 0.0
-            for seg in t:
-                if seg.start >= next_mark:
-                    parts.append(f"\n[{int(seg.start // 60):02d}:{int(seg.start % 60):02d}]")
-                    next_mark = seg.start + 60
-                parts.append(seg.text.replace("\n", " "))
-            text = re.sub(r"\[(music|applause|laughter)\]", "", " ".join(parts), flags=re.I)
-            dest.write_text(re.sub(r"[ \t]+", " ", text).strip())
-            return True
-        except Exception as e:  # noqa: BLE001 - network/YouTube errors vary
-            if type(e).__name__ in ("IpBlocked", "RequestBlocked") or "429" in str(e):
-                raise  # caller cools down; retrying straight away only extends the block
-            last = e
-            time.sleep(2 + attempt * 3)
-    print(f"  transcript failed {video_id}: {type(last).__name__}", file=sys.stderr)
-    return False
-
-
-def fetch_all_transcripts(records, pace, cooldown, max_hours):
-    """YouTube IP-blocks bursts after a few dozen requests, so go slowly and
-    back off for `cooldown` seconds whenever blocked."""
-    from youtube_transcript_api import YouTubeTranscriptApi
-    api = YouTubeTranscriptApi()
-    deadline = time.time() + max_hours * 3600
-    todo = [r for r in records if r["videoId"] and not (TRANSCRIPTS / f"{r['id']}.txt").exists()]
-    print(f"{len(todo)} transcripts to fetch", flush=True)
-    i = 0
-    while i < len(todo) and time.time() < deadline:
-        r = todo[i]
-        try:
-            fetch_transcript(api, r["videoId"], TRANSCRIPTS / f"{r['id']}.txt")
-            i += 1
-            if i % 10 == 0:
-                print(f"  transcripts {i}/{len(todo)}", flush=True)
-            time.sleep(pace)
-        except Exception as e:  # noqa: BLE001
-            print(f"  blocked ({type(e).__name__}) at {i}/{len(todo)}, cooling down {cooldown}s", flush=True)
-            time.sleep(cooldown)
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-videos", action="store_true")
-    ap.add_argument("--skip-transcripts", action="store_true")
-    ap.add_argument("--pace", type=float, default=20, help="seconds between transcript requests")
-    ap.add_argument("--cooldown", type=float, default=900, help="seconds to wait when YouTube blocks")
-    ap.add_argument("--max-hours", type=float, default=4)
     ap.add_argument("--video-limit", type=int, default=600)
     args = ap.parse_args()
     RAW.mkdir(parents=True, exist_ok=True)
-    TRANSCRIPTS.mkdir(parents=True, exist_ok=True)
 
     talks, slots = fetch_cfp()
     print(f"{len(talks)} talks, {len(slots)} slots")
@@ -221,15 +165,8 @@ def main():
             "matchScore": round(score, 3),
         })
 
-    if not args.skip_transcripts:
-        fetch_all_transcripts(records, args.pace, args.cooldown, args.max_hours)
-    for r in records:
-        p = TRANSCRIPTS / f"{r['id']}.txt"
-        r["hasTranscript"] = p.exists() and p.stat().st_size > 500
-
     (ROOT / "data" / "talks_base.json").write_text(json.dumps(records, indent=1, ensure_ascii=False))
-    print(f"matched videos: {sum(1 for r in records if r['videoId'])}/{len(records)}, "
-          f"transcripts: {sum(r['hasTranscript'] for r in records)}")
+    print(f"matched videos: {sum(1 for r in records if r['videoId'])}/{len(records)}")
 
 
 if __name__ == "__main__":

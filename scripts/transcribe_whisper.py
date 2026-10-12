@@ -1,27 +1,38 @@
-"""Transcribe talks locally with faster-whisper, for when YouTube captions are missing,
-in the wrong language, or too garbled. Writes the same format as fetch_data.py.
+"""Transcribe talks locally with faster-whisper. This is the main transcript source: it is more
+accurate than YouTube's auto-captions (punctuation, names) and it avoids YouTube's caption endpoint,
+which is the most aggressively rate-limited one. scripts/fetch_captions.py is the fallback for
+machines without a GPU.
 
-Downloads audio with yt-dlp into data/raw/audio/ (gitignored), then transcribes on the GPU,
-priming Whisper with the title, speaker names and keywords so names come out right.
+Per talk: download the audio with yt-dlp (see yt.py for the request etiquette) into
+data/raw/audio/, transcribe it on the GPU with Whisper primed with the title, speaker names and
+keywords, write data/raw/transcripts/<id>.txt, and delete the audio. The next talk's audio
+downloads while the current one is transcribed, which also spaces requests about a minute apart.
+On a rate limit it waits (45 min, doubling up to 4 h) instead of retrying.
 
-Usage: python scripts/transcribe_whisper.py <id> [<id> ...] [--model large-v3-turbo] [--force]
-Needs: pip install faster-whisper nvidia-cublas-cu12 "nvidia-cudnn-cu12==9.*", plus yt-dlp and ffmpeg.
+Usage:
+  python scripts/transcribe_whisper.py              # every recorded talk without a transcript,
+                                                    # plus talks queued in data/raw/whisper_queue.json
+  python scripts/transcribe_whisper.py <id> ...     # specific talks (--force to replace transcripts)
+Needs: pip install -r requirements-whisper.txt, ffmpeg and an NVIDIA GPU (4 GB is enough).
 """
 import argparse
 import ctypes
 import glob
 import json
 import os
-import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+import yt
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw"
 AUDIO = RAW / "audio"
 TRANSCRIPTS = RAW / "transcripts"
 SOURCES = RAW / "transcript_sources.json"
+QUEUE = RAW / "whisper_queue.json"
 
 
 def preload_cuda_libs():
@@ -37,13 +48,14 @@ def preload_cuda_libs():
 
 
 def download_audio(video_id):
+    """Returns the audio path, None if the download failed, or raises yt.Blocked."""
     AUDIO.mkdir(parents=True, exist_ok=True)
-    existing = list(AUDIO.glob(f"{video_id}.*"))
+    existing = [p for p in AUDIO.glob(f"{video_id}.*") if not p.name.endswith(".part")]
     if existing:
         return existing[0]
-    subprocess.run(["yt-dlp", "-q", "-f", "bestaudio[ext=m4a]/bestaudio", "-o", str(AUDIO / "%(id)s.%(ext)s"),
-                    f"https://www.youtube.com/watch?v={video_id}"], check=True)
-    return next(AUDIO.glob(f"{video_id}.*"))
+    yt.run(["-f", "bestaudio[ext=m4a]/bestaudio", "-o", str(AUDIO / "%(id)s.%(ext)s"),
+            f"https://www.youtube.com/watch?v={video_id}"])
+    return next((p for p in AUDIO.glob(f"{video_id}.*") if not p.name.endswith(".part")), None)
 
 
 def prompt_for(talk):
@@ -52,52 +64,94 @@ def prompt_for(talk):
             f"Topics: {', '.join(talk['keywords'])}. Java, JVM, Devoxx.")
 
 
-def transcribe(model, audio, talk):
-    segments, info = model.transcribe(str(audio), language="en", vad_filter=True, beam_size=5,
-                                      initial_prompt=prompt_for(talk))
-    parts, next_mark = [], 0.0
-    for seg in segments:
-        if seg.start >= next_mark:
-            parts.append(f"\n[{int(seg.start // 60):02d}:{int(seg.start % 60):02d}]")
-            next_mark = seg.start + 60
-        parts.append(seg.text.strip())
-    return " ".join(parts).replace(" \n", "\n").strip(), info.duration
+def transcribe(pipeline, audio, talk):
+    segments, info = pipeline.transcribe(str(audio), language="en", batch_size=8,
+                                         initial_prompt=prompt_for(talk))
+    return yt.format_transcript((seg.start, seg.text.strip()) for seg in segments), info.duration
+
+
+def save(path, data):
+    path.write_text(json.dumps(data, indent=1, sort_keys=True))
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("ids", nargs="+", type=int)
+    ap.add_argument("ids", nargs="*", type=int)
     ap.add_argument("--model", default="large-v3-turbo")
-    ap.add_argument("--force", action="store_true", help="overwrite existing caption transcripts")
+    ap.add_argument("--force", action="store_true", help="replace existing transcripts")
+    ap.add_argument("--keep-audio", action="store_true")
+    ap.add_argument("--backoff-minutes", type=float, default=45)
+    ap.add_argument("--max-hours", type=float, default=10)
     args = ap.parse_args()
 
     talks = {t["id"]: t for t in json.loads((ROOT / "data" / "talks_base.json").read_text())}
     sources = json.loads(SOURCES.read_text()) if SOURCES.exists() else {}
-    preload_cuda_libs()
-    from faster_whisper import WhisperModel
-    model = WhisperModel(args.model, device="cuda", compute_type="int8_float16")
+    queue = json.loads(QUEUE.read_text()) if QUEUE.exists() else {}
+    TRANSCRIPTS.mkdir(parents=True, exist_ok=True)
+    if args.ids:
+        todo = [i for i in args.ids if args.force or not (TRANSCRIPTS / f"{i}.txt").exists()]
+    else:
+        # Queued talks first (their caption transcripts are unusable), then most-bookmarked first.
+        todo = [int(i) for i in queue] + sorted(
+            (i for i, t in talks.items() if not (TRANSCRIPTS / f"{i}.txt").exists() and str(i) not in queue),
+            key=lambda i: -talks[i]["favourites"])
+    todo = [i for i in todo if talks[i]["videoId"]]
+    # Talks given twice share a recording: transcribe it once.
+    seen, unique = set(), []
+    for i in todo:
+        if talks[i]["videoId"] not in seen:
+            seen.add(talks[i]["videoId"])
+            unique.append(i)
+    print(f"whisper: {len(unique)} recordings to transcribe", flush=True)
+    if not unique:
+        return
 
-    for tid in args.ids:
-        talk = talks[tid]
-        dest = TRANSCRIPTS / f"{tid}.txt"
-        if not talk["videoId"]:
-            print(f"{tid}: no video, skipping")
-            continue
-        if dest.exists() and not args.force:
-            print(f"{tid}: transcript exists, use --force to replace")
-            continue
-        t0 = time.time()
+    preload_cuda_libs()
+    from faster_whisper import BatchedInferencePipeline, WhisperModel
+    pipeline = BatchedInferencePipeline(WhisperModel(args.model, device="cuda", compute_type="int8_float16"))
+    deadline = time.time() + args.max_hours * 3600
+    backoff = args.backoff_minutes * 60
+    pool = ThreadPoolExecutor(max_workers=1)
+    pending = pool.submit(download_audio, talks[unique[0]]["videoId"])
+    done = 0
+
+    i = 0
+    while i < len(unique) and time.time() < deadline:
+        talk = talks[unique[i]]
         try:
-            audio = download_audio(talk["videoId"])
-        except subprocess.CalledProcessError as e:
-            print(f"{tid}: audio download failed ({e})", file=sys.stderr)
+            audio = pending.result()
+        except yt.Blocked as e:
+            wait = min(backoff, max(0, deadline - time.time()))
+            print(f"whisper: blocked ({e}); waiting {wait / 60:.0f} min", flush=True)
+            time.sleep(wait)
+            backoff = min(backoff * 2, 4 * 3600)
+            pending = pool.submit(download_audio, talk["videoId"])
             continue
-        text, duration = transcribe(model, audio, talk)
-        dest.write_text(text)
-        sources[str(tid)] = f"whisper:{args.model}"
-        SOURCES.write_text(json.dumps(sources, indent=1, sort_keys=True))
-        print(f"{tid}: {duration / 60:.0f} min of audio in {time.time() - t0:.0f}s, {len(text.split())} words")
+        backoff = args.backoff_minutes * 60
+        if i + 1 < len(unique):  # prefetch the next one while the GPU works
+            pending = pool.submit(download_audio, talks[unique[i + 1]]["videoId"])
+        i += 1
+        if audio is None:
+            print(f"whisper: {talk['id']} audio download failed, skipping", flush=True)
+            continue
+
+        t0 = time.time()
+        text, duration = transcribe(pipeline, audio, talk)
+        for twin in (t for t in talks.values() if t["videoId"] == talk["videoId"]):
+            (TRANSCRIPTS / f"{twin['id']}.txt").write_text(text)
+            sources[str(twin["id"])] = f"whisper:{args.model}"
+            queue.pop(str(twin["id"]), None)
+        save(SOURCES, sources)
+        save(QUEUE, queue)
+        if not args.keep_audio:
+            audio.unlink()
+        done += 1
+        print(f"whisper: {talk['id']} done ({duration / 60:.0f} min audio in {time.time() - t0:.0f}s), "
+              f"{done}/{len(unique)}", flush=True)
+
+    pool.shutdown(wait=False, cancel_futures=True)
+    print(f"whisper: finished, {done}/{len(unique)} transcribed", flush=True)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

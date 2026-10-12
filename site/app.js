@@ -354,7 +354,7 @@
           el("b", { text: sp.name }), sp.company ? el("span", { text: sp.company }) : null,
           sp.bio ? el("details", {}, el("summary", { text: "Bio" }), el("p", { text: sp.bio })) : null))))),
       el("p", { class: "source-note", text: s.source === "transcript"
-        ? "Summarised from the recording's auto-captions. Check the video before quoting it."
+        ? "Summarised from a machine transcript of the recording. Check the video before quoting it."
         : "Summarised from the official abstract, so it describes what the session set out to cover." }),
       t.videoId ? el("p", {}, el("a", { href: `https://www.youtube.com/watch?v=${t.videoId}`, target: "_blank", rel: "noopener", text: "Open on YouTube" })) : null,
     );
