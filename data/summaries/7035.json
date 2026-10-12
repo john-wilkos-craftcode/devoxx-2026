@@ -1,0 +1,47 @@
+{
+  "id": 7035,
+  "source": "transcript",
+  "tldr": "Drawing on a product with about 40 third-party integrations, Panker shows how a slow external API exhausts your workers, and which containment measures stop that: error classification, rate-limit caching, checkpointed pagination, timeouts, circuit breakers, load shedding and bulkheads.",
+  "summary": [
+    "Ines Panker, a backend developer from Slovenia, worked on a product that integrated about 40 external APIs into the same features. She defines resilience as how much of your app breaks when someone else's API does, and argues for a \"cynical\" system. A naive try/catch either misses 4xx/5xx responses or catches too much: it swallows developer bugs and returns a misleading zero. Errors need sorting into code faults, user faults and remote faults, and remote faults split into ones you can't do anything about and ones that ask you to change behaviour. Expired tokens, which often break when whoever set up the integration leaves the company, deserve UX work: tell the user it's broken, which feature is affected, and link to exactly where to fix it. Otherwise you keep making failing calls for days.",
+    "For rate limits she moves API calls into background jobs that are rescheduled with the Retry-After delay (with a sensible default when providers make up their own headers). Paginated syncs retry from a checkpoint, the last page that succeeded, instead of page one. To stop every call to a provider at once, she used a hook in Python's requests library: when one worker gets a 429, the serialised response is cached in Redis for the rate-limit window, keyed per provider, tenant and token, and every other call gets the cached response back. She sees this as good manners and self-defence, since GitHub can ban integrations that keep hammering it.",
+    "A slow API is worse than a dead one. HTTP and most client libraries have no default timeouts. TCP may take about 2 minutes on a lost SYN, 15 minutes of retransmits, or wait forever, and keep-alive defaults to 2 hours. With 20 workers, a 200 ms call degrading to 8 s cuts capacity from 100 to 2.5 calls per second, and at 20 requests per second the backlog reaches about 63,000 within an hour. Timeouts plus automatic retries just keep workers busy with zero throughput, until health checks fail and the failure cascades. The fixes: set read and connect timeouts, use a circuit breaker (always half-built for third-party APIs), shed load with task expiry, use bulkhead queues per work type, provider or tenant, and cap a backfill's share of the quota. Observability is the base: request IDs in logs, useful error messages, custom metrics and a circuit-breaker dashboard."
+  ],
+  "keyPoints": [
+    "Catch-all error handling both swallows developer bugs and returns plausible but false data, such as zero open PRs. Classify errors as code, user, remote-transient or remote asking you to change behaviour.",
+    "Bad or expired credentials cause endless failed calls unless the UI tells the user what broke and links straight to the fix. Disable the feature once there is enough evidence.",
+    "Global rate-limit handling: cache the 429 response in Redis with a TTL equal to Retry-After, scoped per provider, tenant and token, and serve it to all callers from the HTTP client hook.",
+    "Paginated syncs should retry from the last successful page. Without that, repeated rate limits can mean hours of work with no progress.",
+    "Neither HTTP nor most client libraries set timeouts, and OS-level TCP behaviour can mean waiting minutes, hours or forever. Set read and connect timeouts explicitly.",
+    "A 40x slowdown in a dependency means 40x fewer calls per worker. Timeouts and retries alone keep workers busy with zero throughput.",
+    "Load shedding through task expiry: skip nightly syncs not started within 6 hours, expire daily reports after 23 hours, drop 2-minute metric jobs after 4 hours. Log and measure what was dropped.",
+    "Bulkheads mean separate queues per work type, provider or tenant, plus a quota cap (for example 60%) for backfill jobs so user-triggered calls are not rate-limited."
+  ],
+  "takeaways": [
+    "Set explicit connect and read timeouts on every outbound HTTP client.",
+    "Move third-party API calls into background workers on dedicated queues so a degraded provider only affects those workers.",
+    "Implement a shared rate-limit block, for example by caching 429 responses in Redis for the Retry-After window.",
+    "Give recurring tasks an expiry time based on whether they lose value over time and whether a later run covers them.",
+    "Add a request ID to every log line and build a small dashboard for circuit-breaker and rate-limit state."
+  ],
+  "quotes": [
+    {"text": "So the best way to counteract is to design your system to be cynical. A cynical system expects bad things to happen and it is not surprised when they do happen.", "at": "06:06"},
+    {"text": "Sometimes it's not about being perfect but about being operational.", "at": "38:46"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Integrations are painful"},
+    {"at": "03:05", "title": "What API resilience means"},
+    {"at": "07:06", "title": "Classifying errors"},
+    {"at": "09:09", "title": "Broken authentication tokens"},
+    {"at": "13:13", "title": "Rate limits and checkpoints"},
+    {"at": "19:23", "title": "Global rate-limit block in Redis"},
+    {"at": "24:27", "title": "Why slow APIs kill apps"},
+    {"at": "34:41", "title": "Circuit breakers and load shedding"},
+    {"at": "39:48", "title": "Bulkheads"},
+    {"at": "41:51", "title": "Observability basics"}
+  ],
+  "tech": ["Redis", "Python requests", "GitHub API", "HTTP 429 / Retry-After", "TCP keepalive", "Circuit breaker", "Bulkhead pattern", "Load shedding", "Background job queues"],
+  "watchIf": "Your product calls several third-party APIs from shared workers and you want proven containment patterns, with real numbers, rather than a generic resilience library tour.",
+  "themes": ["Architecture & design"],
+  "demo": false
+}

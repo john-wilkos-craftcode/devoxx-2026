@@ -132,8 +132,40 @@
         el("span", { class: "fav-title", text: t.title }),
         el("span", { class: "fav-meta", text: `${speakerNames(t)}, ${t.favourites} bookmarks` }))))));
 
+  // ---------- not on YouTube yet ----------
+  const NOT_FILMED = new Set(["Hands-on Lab", "BOF"]);
+  const missing = talks.filter((t) => !t.videoId)
+    .sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+  const missingRecorded = missing.filter((t) => !NOT_FILMED.has(t.type));
+  const missingUnfilmed = missing.filter((t) => NOT_FILMED.has(t.type));
+  const checked = DATA.videosCheckedAt ? fLongDate.format(new Date(`${DATA.videosCheckedAt}T12:00:00Z`)) : null;
+  $("#missing-intro").textContent = `${missing.length} of ${talks.length} sessions have no recording on the Devoxx YouTube channel`
+    + (checked ? ` as of ${checked}.` : ".")
+    + " Their summaries come from the abstract instead.";
+  function missingByDay(list) {
+    const filmedTotal = (d) => talks.filter((t) => !NOT_FILMED.has(t.type) && t.start && dayKey(t.start) === d).length;
+    const counts = new Map();
+    for (const t of list) counts.set(dayKey(t.start), (counts.get(dayKey(t.start)) || 0) + 1);
+    const parts = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([d, c]) => {
+      const iso = list.find((t) => dayKey(t.start) === d).start;
+      return `${c} of ${filmedTotal(d)} on ${fWeekday.format(new Date(iso))}`;
+    });
+    return parts.length ? `Sessions that are normally filmed: ${parts.join(", ")}. The channel uploads day by day, so most of these are probably still in the queue.` : "";
+  }
+  const missingRow = (t) => el("li", {}, el("a", { href: `#/talk/${t.id}` },
+    el("span", { class: "m-title", text: t.title }),
+    el("span", { class: "m-who", text: `${speakerNames(t)}, ${t.type}` }),
+    el("span", { class: "m-when", text: t.start ? `${fShortDay.format(new Date(t.start))}, ${time(t.start)}` : "" })));
+  $("#missing-cols").append(
+    el("div", {}, el("h3", { text: `Recordings still missing (${missingRecorded.length})` }),
+      el("p", { class: "missing-note", text: missingByDay(missingRecorded) }),
+      el("ol", { class: "missing-list" }, missingRecorded.map(missingRow))),
+    el("div", {}, el("h3", { text: `Labs and BOFs (${missingUnfilmed.length})` }),
+      el("p", { class: "missing-note", text: "Hands-on labs and birds-of-a-feather sessions usually aren't filmed." }),
+      el("ol", { class: "missing-list" }, missingUnfilmed.map(missingRow))));
+
   // ---------- filters ----------
-  const state = { q: "", day: "all", theme: "", format: "", video: false, sort: "time" };
+  const state = { q: "", day: "all", theme: "", format: "", recording: "", sort: "time" };
   const daysBox = $("#days");
   const dayButtons = [["all", "All days"], ...days.map((d) => {
     const iso = talks.find((t) => t.start && dayKey(t.start) === d).start;
@@ -166,7 +198,7 @@
   themeSel.addEventListener("change", (e) => { state.theme = e.target.value; render(); });
   formatSel.addEventListener("change", (e) => { state.format = e.target.value; render(); });
   $("#sort").addEventListener("change", (e) => { state.sort = e.target.value; render(); });
-  $("#video-only").addEventListener("change", (e) => { state.video = e.target.checked; render(); });
+  $("#recording").addEventListener("change", (e) => { state.recording = e.target.value; render(); });
 
   function filtered() {
     const terms = state.q.split(/\s+/).filter(Boolean);
@@ -174,7 +206,7 @@
       (state.day === "all" || (t.start && dayKey(t.start) === state.day)) &&
       (!state.theme || themesOf(t).includes(state.theme)) &&
       (!state.format || t.type === state.format) &&
-      (!state.video || t.videoId) &&
+      (!state.recording || (state.recording === "yes") === Boolean(t.videoId)) &&
       terms.every((w) => t.blob.includes(w)));
     const roomNo = (t) => parseInt((t.room || "").replace(/\D/g, ""), 10) || 99;
     return state.sort === "fav"
@@ -244,8 +276,8 @@
     }
   }
   function resetFilters() {
-    Object.assign(state, { q: "", day: "all", theme: "", format: "", video: false });
-    $("#q").value = ""; themeSel.value = ""; formatSel.value = ""; $("#video-only").checked = false;
+    Object.assign(state, { q: "", day: "all", theme: "", format: "", recording: "" });
+    $("#q").value = ""; themeSel.value = ""; formatSel.value = ""; $("#recording").value = "";
     render();
   }
 

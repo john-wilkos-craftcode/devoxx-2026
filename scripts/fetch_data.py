@@ -7,7 +7,7 @@ Outputs:
   data/talks_base.json           joined talk records (no summaries yet)
   data/raw/transcripts/<id>.txt  plain-text transcript per talk (gitignored)
 
-Usage: python scripts/fetch_data.py [--skip-videos] [--skip-search] [--skip-transcripts]
+Usage: python scripts/fetch_data.py [--skip-videos] [--skip-transcripts]
 """
 import argparse
 import difflib
@@ -25,6 +25,7 @@ RAW = ROOT / "data" / "raw"
 TRANSCRIPTS = RAW / "transcripts"
 CFP = "https://dvbe26.cfp.dev/api/public"
 CHANNEL = "https://www.youtube.com/@DevoxxForever/videos"
+BOUNDARY = re.compile(r"Devoxx Belgium is Next Week|Speaking next week at Devoxx Belgium", re.I)
 DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"]
 
 
@@ -61,45 +62,53 @@ def fetch_videos(limit):
     return videos
 
 
-def match_video(talk, videos):
-    """Video titles look like '<talk title>  by <speakers>'. Score on the title part,
-    require a speaker surname in the video title to accept weaker title matches."""
-    t = norm(talk["title"])
+def be26_uploads(videos):
+    """The channel hosts every Devoxx event, newest first. Belgium 2026 recordings are
+    everything uploaded after the pre-conference promo, so cut the list there; older
+    editions often have talks with the same title and speakers."""
+    for i, v in enumerate(videos):
+        if BOUNDARY.search(v["title"]):
+            return videos[:i]
+    return videos
+
+
+def video_talk_title(title):
+    """'<talk title>  by <speakers>': split on the last ' by ' (titles can contain 'by')."""
+    parts = re.split(r"\s+by\s+", title, flags=re.I)
+    if len(parts) == 1:
+        parts = re.split(r"\s+[–-]\s+", title)  # some use '<title> – <speakers>'
+    return " by ".join(parts[:-1]) if len(parts) > 1 else title
+
+
+def score_match(talk, video):
+    t, vt = norm(talk["title"]), norm(video_talk_title(video["title"]))
+    score = difflib.SequenceMatcher(None, t, vt).ratio()
+    if len(vt) > 15 and (t.startswith(vt) or vt.startswith(t)):
+        score = max(score, 0.95)  # truncated or extended titles
     surnames = [norm(s.get("lastName") or "") for s in talk["speakers"]]
-    best, best_score = None, 0.0
-    for v in videos:
-        vt = norm(re.split(r"\s+(?:by|By|BY)\s+|\s+[–-]\s+", v["title"])[0])
-        score = difflib.SequenceMatcher(None, t, vt).ratio()
-        if vt and (t.startswith(vt) or vt.startswith(t)) and len(vt) > 15:
-            score = max(score, 0.95)
-        has_speaker = any(sn and sn in norm(v["title"]) for sn in surnames)
-        if has_speaker:
-            score += 0.1
-        elif score < 0.9:
-            continue  # loose title match with other speakers = different talk
-        if score > best_score:
-            best, best_score = v, score
-    return (best, best_score) if best_score >= 0.8 else (None, best_score)
+    if any(sn and sn in norm(video["title"]) for sn in surnames):
+        return score + 0.1
+    return score if score >= 0.9 else 0.0  # loose title match with other speakers = different talk
 
 
-def search_video(talk):
-    """Fallback for talks not in the channel's recent uploads: YouTube search,
-    accepting only Devoxx uploads whose title matches and names a speaker."""
-    names = ", ".join(s["fullName"] for s in talk["speakers"][:2]) if talk["speakers"] else ""
-    q = f"ytsearch5:{talk['title']} {names} Devoxx"
-    try:
-        out = subprocess.run(["yt-dlp", "--flat-playlist", "--print",
-                              "%(id)s\t%(channel)s\t%(title)s", q],
-                             capture_output=True, text=True, timeout=90).stdout
-    except subprocess.TimeoutExpired:
-        return None
-    cands = []
-    for line in out.splitlines():
-        parts = line.split("\t", 2)
-        if len(parts) == 3 and "devoxx" in parts[1].lower():
-            cands.append({"id": parts[0], "title": parts[2]})
-    video, score = match_video(talk, cands)
-    return video if video and score >= 0.85 else None
+def assign_videos(talks, videos):
+    """Greedy one-to-one assignment, best-scoring pairs first."""
+    pairs = sorted(((score_match(t, v), t["id"], v["id"]) for t in talks for v in videos), reverse=True)
+    by_vid = {v["id"]: v for v in videos}
+    out, used = {}, set()
+    for score, tid, vid in pairs:
+        if score < 0.8:
+            break
+        if tid not in out and vid not in used:
+            out[tid] = (by_vid[vid], score)
+            used.add(vid)
+    # A talk given twice (e.g. Tools-in-Action and Conference) has one recording: share it.
+    key = lambda t: (norm(t["title"]), tuple(sorted(s["id"] for s in t["speakers"])))
+    by_key = {key(t): out[t["id"]] for t in talks if t["id"] in out}
+    for t in talks:
+        if t["id"] not in out and key(t) in by_key:
+            out[t["id"]] = by_key[key(t)]
+    return out
 
 
 def fetch_transcript(api, video_id, dest):
@@ -153,7 +162,6 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-videos", action="store_true")
     ap.add_argument("--skip-transcripts", action="store_true")
-    ap.add_argument("--skip-search", action="store_true")
     ap.add_argument("--pace", type=float, default=20, help="seconds between transcript requests")
     ap.add_argument("--cooldown", type=float, default=900, help="seconds to wait when YouTube blocks")
     ap.add_argument("--max-hours", type=float, default=4)
@@ -173,16 +181,16 @@ def main():
               else fetch_videos(args.video_limit))
     print(f"{len(videos)} channel videos")
 
+    videos = be26_uploads(videos)
+    matches = assign_videos(talks, videos)
+    unmatched = [v["title"] for v in videos if v["id"] not in {m[0]["id"] for m in matches.values()}]
+    print(f"{len(videos)} Belgium 2026 uploads; not matched to a talk: {unmatched}")
+
     records = []
     for t in talks:
         sl = sorted(by_proposal.get(t["id"], []), key=lambda s: (s.get("overflow", False), s["fromDate"]))
         main_slot = sl[0] if sl else None
-        video, score = match_video(t, videos)
-        if not video and not args.skip_search and (t.get("sessionType") or {}).get("name") not in ("Hands-on Lab", "BOF", "Keynote Overflow"):
-            video = search_video(t)
-            if video:
-                score = 0.85
-                print(f"  search matched: {t['title'][:50]} -> {video['title'][:60]}")
+        video, score = matches.get(t["id"], (None, 0.0))
         records.append({
             "id": t["id"],
             "title": t["title"].strip(),

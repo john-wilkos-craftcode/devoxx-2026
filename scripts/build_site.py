@@ -6,6 +6,7 @@ Usage: python3 scripts/build_site.py
 import html
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -47,7 +48,9 @@ def main():
         })
     recap_path = DATA / "recap.json"
     recap = json.loads(recap_path.read_text()) if recap_path.exists() else None
-    out = {"event": "Devoxx Belgium 2026", "talks": talks, "recap": recap}
+    checked = datetime.fromtimestamp((DATA / "raw" / "videos.json").stat().st_mtime, timezone.utc)
+    out = {"event": "Devoxx Belgium 2026", "videosCheckedAt": checked.date().isoformat(),
+           "talks": talks, "recap": recap}
     (ROOT / "site").mkdir(exist_ok=True)
     (ROOT / "site" / "data.js").write_text(
         "window.DEVOXX = " + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")

@@ -34,7 +34,7 @@
   "videoId": "5W4o_aYOaIY",
   "videoTitle": "java raspberry Pi and the art of by Matti Tahvonen",
   "matchScore": 1.05,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 8156,
@@ -71,7 +71,7 @@
   "videoId": "P14Fy05Gs38",
   "videoTitle": "I Hired a Real Robot as My Junior Dev — and Now My Kids Don't Want to Learn Java Anymore  by Jan Van",
   "matchScore": 1.0,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 7011,
@@ -108,7 +108,7 @@
   "videoId": "GLJGhkxMdgU",
   "videoTitle": "Secure Your Coding Agent Like It’s Malware by Richard Gross",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 7012,
@@ -145,7 +145,7 @@
   "videoId": "wcghmWdu-HY",
   "videoTitle": "Destructoring is the future of Javas Encapsulation  by  Richard Gross",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 5507,
@@ -182,7 +182,7 @@
   "videoId": "K3kD89Y1YCk",
   "videoTitle": "Stopping AI Generated Architectural Drift: Deterministic Guardrails for Agentic Coding by Sasha Podl",
   "matchScore": 1.0,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 23527,
@@ -219,7 +219,7 @@
   "videoId": "JWFZY0aJTjg",
   "videoTitle": "Project Detroit: From Foreign Libraries to Foreign Language Runtimes  by Maurizio Cimadamore",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 25042,
@@ -256,7 +256,7 @@
   "videoId": "SQUrHzMie3o",
   "videoTitle": "Owning the Code You Didn't Type by Renato Guerra Cavalcanti",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 11556,
@@ -293,7 +293,7 @@
   "videoId": "0A2jqCqSIjg",
   "videoTitle": "223 Pull Requests in 11 Days: The Recipe for Building Real Software with AI Agents  by Julien Dubois",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 4090,
@@ -330,7 +330,7 @@
   "videoId": "sWP9osLV45I",
   "videoTitle": "Help! I hate my team mate! by Jessica Siewert",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 52105,
@@ -366,7 +366,7 @@
   "room": "Room 5",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.519,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -404,7 +404,7 @@
   "videoId": "j3aEB0i3Up8",
   "videoTitle": "Your AI Agent Trusts Strangers  Let Me Show You   by  Elder Moraes",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 31455,
@@ -441,7 +441,7 @@
   "videoId": "qFTuteOEtsE",
   "videoTitle": "Half of a billion Idle GPUs: The Case for On Device AI  by Prince Canuma",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 16426,
@@ -478,7 +478,7 @@
   "videoId": "a5cQAl0g2AM",
   "videoTitle": "No Country For Old APIs  Wrapping legacy Java services as MCP tools without rewriting them   by Žel",
   "matchScore": 1.0,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 8194,
@@ -552,7 +552,7 @@
   "videoId": "DseVLPC4Qjs",
   "videoTitle": "Run Frontier Open Models on consumer hardware  by Prince Canuma",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 9752,
@@ -599,7 +599,7 @@
   "videoId": "QBQ11aL2aZc",
   "videoTitle": "Learning modern Java the playful way  by Marit van Dijk, Piotr Przybyl",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 8186,
@@ -636,7 +636,7 @@
   "videoId": "m9viRAIRAUQ",
   "videoTitle": "The Hexagonal Hangover  by Ties van de Ven",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 14463,
@@ -683,7 +683,7 @@
   "videoId": "yePre1hOvHE",
   "videoTitle": "When benchmarks go bad   what we learned from measuring performance wrong  by Francesco Nigro, Holly",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 17791,
@@ -720,7 +720,7 @@
   "videoId": "8JuQaWFKk4w",
   "videoTitle": "Consistency Patterns in Event Driven Architecture  by Emanuel Trandafir",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 7035,
@@ -757,7 +757,7 @@
   "videoId": "PGpKfdXZrpc",
   "videoTitle": "Their API Went Down  So Why Is My App on Fire?  by Ines Panker",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 14459,
@@ -804,7 +804,7 @@
   "videoId": "W-OKVLMtPAw",
   "videoTitle": "Bootiful Security  by Daniel Garnier Moiroux, Josh Long",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 10046,
@@ -840,7 +840,7 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.378,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -888,7 +888,7 @@
   "videoId": "aow56RgptLA",
   "videoTitle": "Structured Concurrency Looms  by Alan Bateman, Viktor Klang",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 22946,
@@ -925,7 +925,7 @@
   "videoId": "CuvV3Aud3Q0",
   "videoTitle": "Decoding the Cosmos: Voyager's 1970s Algorithms Meet Today's Cutting Edge Tech  by Pieter van der Me",
   "matchScore": 1.0,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 4079,
@@ -971,7 +971,7 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.414,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -1009,7 +1009,7 @@
   "videoId": "AxhLQZqZdIg",
   "videoTitle": "Kubernetes for Developers  by Alain Regnier",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 24206,
@@ -1065,7 +1065,7 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.578,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -1150,7 +1150,7 @@
   "videoId": "4hXQoN8co80",
   "videoTitle": "Hey Belfius! Meet our new bank AI assistant—and discover how we’re building and securing AI across B",
   "matchScore": 0.97,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 49252,
@@ -1187,7 +1187,7 @@
   "videoId": "vhDwy1eCXbs",
   "videoTitle": "Big Runtimes Make Efficient Programs  by Ron Pressler",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 22933,
@@ -1224,7 +1224,7 @@
   "videoId": "U9pOWsERF6o",
   "videoTitle": "30 minutes to build your first Vidocq app, the 100% European Sovereign Java stack with zero external",
   "matchScore": 0.95,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 22909,
@@ -1261,7 +1261,7 @@
   "videoId": "yB6FIQPgsWE",
   "videoTitle": "What rules the virtual? How our systems obey physical laws   by Marianne Hoornenborg",
   "matchScore": 1.1,
-  "hasTranscript": false
+  "hasTranscript": true
  },
  {
   "id": 21687,
@@ -1640,7 +1640,7 @@
   "room": "Room 8",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.312,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -1734,7 +1734,7 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.648,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -1890,9 +1890,9 @@
   "start": "2026-10-07T13:10:00Z",
   "end": "2026-10-07T14:00:00Z",
   "room": "Room 5",
-  "videoId": "Ru_Ay9C4weA",
-  "videoTitle": "How to survive and thrive as a dev (team) in the exponential age of AI by Sander Hoogendoorn",
-  "matchScore": 1.05,
+  "videoId": "BLBwQpczk7M",
+  "videoTitle": "How to survive and thrive as a dev team in the exponential age of AI  Real world AI adoption, smarte",
+  "matchScore": 0.95,
   "hasTranscript": false
  },
  {
@@ -2319,7 +2319,7 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.454,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -2618,7 +2618,7 @@
   "room": "Room 8",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.237,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -2663,9 +2663,9 @@
   "start": "2026-10-08T07:30:00Z",
   "end": "2026-10-08T08:20:00Z",
   "room": "Room 9",
-  "videoId": "6Md_6KX0kOk",
-  "videoTitle": "AI without spaghetti: Clean architecture in the age of AI by Lutske de Leeuw and Maarten Vandeperre",
-  "matchScore": 1.1,
+  "videoId": "E--oDq3X74E",
+  "videoTitle": "AI without spaghetti: Clean architecture in these of AI  by Maarten Vandeperre en Lutske van der Mee",
+  "matchScore": 1.064,
   "hasTranscript": false
  },
  {
@@ -3119,7 +3119,7 @@
   "room": "Room 4",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.457,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -3345,9 +3345,9 @@
   "start": "2026-10-07T11:05:00Z",
   "end": "2026-10-07T11:45:00Z",
   "room": "Room 10",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.564,
+  "videoId": "gPtWq_LHL8o",
+  "videoTitle": "Let's dance! – Teaching your robot some moves with reinforcement learning  by Thomas Endres, Martin",
+  "matchScore": 1.1,
   "hasTranscript": false
  },
  {
@@ -3989,7 +3989,7 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.553,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -4416,7 +4416,7 @@
   "room": "Room 5",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.473,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -4638,7 +4638,7 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.444,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -4759,7 +4759,7 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.542,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -4937,7 +4937,7 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.548,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -5085,7 +5085,7 @@
   "room": "Room 6",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.413,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -5727,7 +5727,7 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.375,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -5794,7 +5794,7 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.465,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -5952,7 +5952,7 @@
   "room": "Room 7",
   "videoId": "LD2tKMpToYg",
   "videoTitle": "Snake in 10 Lines: Learning More by Coding Less  by Guus de Wit",
-  "matchScore": 1.05,
+  "matchScore": 1.1,
   "hasTranscript": false
  },
  {
@@ -6100,7 +6100,7 @@
   "room": "Room 9",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.317,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -6359,7 +6359,7 @@
   "room": "Room 6",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.408,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -6416,7 +6416,7 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.582,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -6752,7 +6752,7 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.419,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -6994,7 +6994,7 @@
   "room": "BOF 1",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.287,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -7552,7 +7552,7 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.433,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -7646,7 +7646,7 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.439,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -7683,7 +7683,7 @@
   "room": "BOF 2",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.364,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -7720,7 +7720,7 @@
   "room": "Room 9",
   "videoId": null,
   "videoTitle": null,
-  "matchScore": 0.169,
+  "matchScore": 0.0,
   "hasTranscript": false
  },
  {
@@ -7903,9 +7903,9 @@
   "start": "2026-10-07T12:00:00Z",
   "end": "2026-10-07T12:50:00Z",
   "room": "Room 4",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.441,
+  "videoId": "9vtYvAI2Dtk",
+  "videoTitle": "Deterministic by Design   Achieving Reproducible Builds with Maven  by Maarten Mulders",
+  "matchScore": 1.1,
   "hasTranscript": false
  },
  {

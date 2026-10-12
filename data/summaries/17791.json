@@ -1,0 +1,43 @@
+{
+  "id": 17791,
+  "source": "transcript",
+  "tldr": "Trandafir starts from a placeOrder method with too many side effects and works through the dual-write problem, sagas (orchestration versus choreography), the transactional outbox and the inbox pattern for idempotent consumers.",
+  "summary": [
+    "Emanuel Trandafir, a Java developer from Bucharest who writes for Baeldung, argues that time saved by AI-generated code should go into observability and architecture. His running example is a placeOrder method that writes orders and products to the database, publishes an OrderCreated event to Kafka, writes a file, POSTs to a loyalty service and emails the customer. A test with a long list of mocks is the warning sign. That is the dual-write problem: several systems can't be changed atomically, and rolling back the database can't recall a Kafka message or an HTTP call.",
+    "The saga pattern (Chris Richardson's definition: local transactions plus compensating actions) handles failures across services. With choreography, services react to each other's events, such as StockUnavailable leading to an idempotent order cancellation. This evolves easily and scales, but services end up knowing each other's domains and error handling gets complex. Orchestration puts a coordinator in charge that sends commands and undoes earlier steps. The workflow lives in one place and the services are independent of each other, but all the coupling moves into the orchestrator, which must be changed and redeployed for every new step. He suggests mixing the two, with the choreographed part talking to the orchestrated part only through the orchestrator, or staying with a modular monolith using Spring Modulith.",
+    "Wrapping the save and the publish in one @Transactional is the naive fix. A short demo shows the cost: once the loyalty service is slowed to one second, the POST endpoint exhausts the connection pool and even database-only GET requests slow down. The broker can also already hold the event when the commit fails. Exactly-once delivery doesn't exist, so for financial systems he aims for at-least-once with a transactional outbox. A poller or CDC publishes from the outbox and marks rows as sent, with an idempotency-key header and an observed-at header. On the consumer side an inbox table with a unique constraint on the key removes duplicates, allows reordering within a time window and separates retriable from non-retriable failures. Kafka transactions or two-phase commit, raised in Q&A, still commit in two steps."
+  ],
+  "keyPoints": [
+    "A test full of mocks for one method is a design smell that points to too many side effects in one place, which is the dual-write problem.",
+    "Choreographed sagas evolve and scale easily but make compensation logic spread out and complex. Orchestrated sagas centralise the workflow and error handling but concentrate coupling in the orchestrator.",
+    "Commands (CreateOrder) differ from domain events (OrderCreated). Orchestrators send commands, choreographed services publish events.",
+    "Doing I/O inside a database transaction holds connections. A one-second downstream delay exhausted the pool and slowed unrelated read endpoints in the demo.",
+    "Publishing inside a transaction can still leak events for orders that roll back at commit time.",
+    "The outbox (same database, same transaction, then polling or CDC) gives at-least-once delivery, extra latency and possible duplicates, and loses strict ordering.",
+    "The inbox pattern uses a unique constraint on the idempotency key to deduplicate. Catch the violation and acknowledge, rather than retrying forever.",
+    "Skip the inbox if the consumer is naturally idempotent through a business key. Otherwise consider retry topics and dead-letter queues."
+  ],
+  "takeaways": [
+    "Move HTTP calls and broker publishes out of @Transactional methods.",
+    "Write events to an outbox table in the same transaction as the business change and publish them asynchronously, for example with Spring Modulith's event publication support.",
+    "Add an idempotency key header to every event and enforce uniqueness on the consumer side.",
+    "Make compensating actions such as order cancellation idempotent so they can be retried safely.",
+    "Choose orchestration for complex workflows that need reliable rollback and choreography where teams need to add consumers independently."
+  ],
+  "quotes": [],
+  "chapters": [
+    {"at": "00:00", "title": "Why architecture now"},
+    {"at": "03:16", "title": "The do-everything placeOrder method"},
+    {"at": "06:24", "title": "Dual write problem"},
+    {"at": "07:24", "title": "Sagas and compensation"},
+    {"at": "11:37", "title": "Orchestration versus choreography"},
+    {"at": "17:43", "title": "Transactions and connection pools"},
+    {"at": "24:59", "title": "Delivery guarantees and outbox"},
+    {"at": "33:14", "title": "Inbox and idempotent consumers"},
+    {"at": "38:31", "title": "Recap and Q&A"}
+  ],
+  "tech": ["Kafka", "Spring Modulith", "Spring", "Transactional outbox", "Inbox pattern", "Saga pattern", "Change data capture", "Dead letter queue", "Two-phase commit"],
+  "watchIf": "You publish events from Java services alongside database writes and want a clear explanation of when to use outbox, inbox and sagas and what each costs.",
+  "themes": ["Architecture & design", "Data & databases"],
+  "demo": false
+}

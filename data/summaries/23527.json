@@ -1,0 +1,106 @@
+{
+  "id": 23527,
+  "source": "transcript",
+  "tldr": "Cimadamore explains why Nashorn failed and how Project Detroit instead embeds V8 and CPython behind the javax.script API, and what that costs in upcall performance, lifetimes and virtual-thread pinning.",
+  "summary": [
+    "Cimadamore starts with why Java still needs foreign language runtimes: many applications use JavaScript through javax.script as a DSL (even Ant has a script task), and AI workloads depend on Python libraries such as PyTorch. Nashorn, led by Jim Laskey and built on invokedynamic, shipped in Java 8 with ECMAScript 5.1 and strong Java interop. Then came ES2015 and a new standard every year, while npm grew from 6,000 to 50,000 packages in two years, and running Node.js on Nashorn would have needed bug-for-bug V8 compatibility. Nashorn was deprecated in JDK 11 and removed in JDK 15. The lesson: a runtime written in Java is a permanent, industrial-scale commitment.",
+    "The alternative came from FFM and jextract: a jextract sample already ran a Python script with a few lines of generated bindings. Project Detroit, proposed by Laskey in 2017 with JNI and restarted this year, wraps the real V8 and CPython behind javax.script, so Nashorn code mostly carries over. The JavaScript engine uses JNI for now and has a bidirectional flavour and a restricted one exposing only what the developer chooses; the Python engine uses jextract and FFM. The demo ran a Python REPL on Detroit in a Python 3.14 virtual environment, then a Gradio image classifier using Hugging Face Transformers and PyTorch installed with plain pip.",
+    "Then the seams. On Octane 2.0, Detroit JS is far faster than Nashorn and GraalJS, but sorting a JavaScript array with a Java comparator, which needs many native-to-Java upcalls, was many times slower than both. Two collectors (or Python's reference counting) can each see only half of a cross-runtime cycle, so Detroit Python offers explicit decref and FFM-style arenas. A virtual thread that blocks inside a Java callback called from V8 gets pinned because of the native frame; wrapping the call in a promise and using async/await in JavaScript avoids it.",
+    "Finally, maintainability: Detroit Python is about 6,000 lines of maintained code with no native code, while the JNI-based JS bridge was twice that, half of it C++. A flat C API over V8, run through jextract, cut native code from about 7,000 to under 2,000 lines and total maintained code from 13-14,000 to 5,500. It also sped up the comparator case, since FFM upcalls are cheaper than JNI ones and C2 can speculate on marshalling switches written in Java. In Q&A he mentioned that confined arenas in JDK 28 will pool memory per thread, with speed-ups around 20x reported for allocate-call-free patterns."
+  ],
+  "keyPoints": [
+    "Nashorn fell behind because JavaScript moved to yearly standards and Node.js compatibility would have required bug-for-bug V8 emulation; it was removed in JDK 15 by JEP 372.",
+    "Project Detroit embeds V8 and CPython rather than reimplementing them, so standards compatibility and the npm/pip ecosystems come for free.",
+    "Both engines are exposed through javax.script, so ScriptEngineManager code written for Nashorn mostly carries over; a restricted JS flavour exposes only chosen Java objects.",
+    "Pure JavaScript execution is much faster than Nashorn and GraalJS on Octane 2.0, but callback-heavy code that crosses back into Java is many times slower.",
+    "Cross-runtime reference cycles cannot be collected by either side; Detroit Python provides explicit decref and arena-based lifetimes modelled on FFM.",
+    "Blocking in Java code called from V8 pins a virtual thread; returning a promise and awaiting it in JavaScript avoids the pinning.",
+    "A flat C wrapper over V8's C++ API plus jextract cut native code roughly fourfold and improved upcall performance thanks to FFM upcalls and C2 speculation."
+  ],
+  "takeaways": [
+    "If you still depend on Nashorn or javax.script, try the experimental Detroit engines and report compatibility and performance issues to the project.",
+    "Keep interop between Java and a scripting runtime shallow: call into Python or JavaScript for a result instead of fine-grained back-and-forth callbacks.",
+    "When scripts call blocking Java code on virtual threads, make the callback asynchronous (a promise plus await) to avoid pinning.",
+    "For your own native integrations, consider a flat C API extracted with jextract instead of hand-written JNI glue."
+  ],
+  "quotes": [
+    {
+      "text": "Maintaining and implementing a foreign language runtime requires permanent industrial-scale commitment.",
+      "at": "10:20"
+    },
+    {
+      "text": "Why would you want to rewrite those things in Java and not just access them from Java?",
+      "at": "11:22"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why reach foreign runtimes"
+    },
+    {
+      "at": "05:12",
+      "title": "The rise and fall of Nashorn"
+    },
+    {
+      "at": "11:22",
+      "title": "FFM and jextract approach"
+    },
+    {
+      "at": "14:24",
+      "title": "Project Detroit architecture"
+    },
+    {
+      "at": "17:28",
+      "title": "Demo: Python and Gradio"
+    },
+    {
+      "at": "23:33",
+      "title": "Performance of the bridge"
+    },
+    {
+      "at": "27:39",
+      "title": "Lifetimes across two runtimes"
+    },
+    {
+      "at": "31:44",
+      "title": "Virtual thread pinning"
+    },
+    {
+      "at": "34:47",
+      "title": "JNI versus FFM maintainability"
+    },
+    {
+      "at": "43:58",
+      "title": "Q&A and arena pooling"
+    }
+  ],
+  "tech": [
+    "Project Detroit",
+    "FFM API",
+    "jextract",
+    "JNI",
+    "V8",
+    "CPython",
+    "javax.script",
+    "Nashorn",
+    "Rhino",
+    "GraalJS",
+    "Node.js",
+    "npm",
+    "Octane 2.0",
+    "Gradio",
+    "Hugging Face Transformers",
+    "PyTorch",
+    "Virtual threads",
+    "invokedynamic",
+    "JEP 372",
+    "Project Babylon"
+  ],
+  "watchIf": "You run JavaScript or Python from Java, or are interested in what bridging two language runtimes involves in garbage collection, threading and native interop.",
+  "themes": [
+    "Java language & JDK",
+    "JVM performance & runtime"
+  ],
+  "demo": true
+}

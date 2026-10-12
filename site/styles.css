@@ -183,7 +183,7 @@ button, input, select { font: inherit; color: inherit; }
   font: 800 clamp(34px, 5vw, 60px)/1 var(--display); margin: 0 0 12px; letter-spacing: .005em;
 }
 .section-intro { color: var(--muted); margin: 0 0 32px; max-width: 40em; }
-.recap, .favourites { padding: clamp(40px, 6vw, 72px) 0; border-top: 1px solid var(--line); }
+.recap, .favourites, .missing { padding: clamp(40px, 6vw, 72px) 0; border-top: 1px solid var(--line); }
 
 /* Trends: the recap */
 .trends { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 40px 48px; }
@@ -203,6 +203,18 @@ button, input, select { font: inherit; color: inherit; }
 .fav-list a:hover .fav-title { text-decoration: underline; text-decoration-color: var(--accent); }
 .fav-title { font: 700 21px/1.15 var(--display); display: block; letter-spacing: .01em; }
 .fav-meta { color: var(--muted); font-size: 14px; display: block; margin-top: 4px; }
+
+/* Missing recordings */
+.missing-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 40px 56px; }
+.missing h3 { font: 700 clamp(24px, 2.6vw, 30px)/1.1 var(--display); margin: 0 0 4px; }
+.missing-note { color: var(--muted); font-size: 15px; margin: 0 0 14px; }
+.missing-list { list-style: none; padding: 0; margin: 0; }
+.missing-list li { border-top: 1px solid var(--line); }
+.missing-list a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 10px 0; text-decoration: none; }
+.missing-list a:hover .m-title { text-decoration: underline; text-decoration-color: var(--accent); }
+.m-title { font-weight: 600; line-height: 1.35; }
+.m-who { grid-column: 1; color: var(--muted); font-size: 14px; }
+.m-when { grid-column: 2; grid-row: 1 / span 2; color: var(--muted); font-size: 14px; text-align: right; white-space: nowrap; }
 
 /* ---------- Programme ---------- */
 .programme { padding: clamp(40px, 6vw, 72px) 0 80px; border-top: 1px solid var(--line); }

@@ -1,0 +1,46 @@
+{
+  "id": 14463,
+  "source": "transcript",
+  "tldr": "Cummins and Nigro go through the mistakes they made rebuilding Quarkus's public benchmark against Spring, and how to get reproducibility, realism and relevance right, including coordinated omission and active benchmarking.",
+  "summary": [
+    "Holly Cummins and Francesco Nigro of the Quarkus team spent about a year refreshing the performance numbers on the Quarkus website and open-sourcing the benchmark, now naming Spring as the competitor. The live demo died on conference Wi-Fi after Cummins pruned her container cache because two numbers had come out suspiciously identical. That set up the theme: \"measure, don't guess\" is only the start, because you are often not measuring what you think you are. Setups vary in reproducibility by around 40%. Running the load generator and the app on the same laptop, with thermal throttling, explains most of the bad benchmarks they see on Reddit.",
+    "For reproducibility, Nigro's recipe makes the machine slower on purpose: disable Turbo Boost and Intel Speed Shift, set the scaling governor to performance, avoid deep idle states, drop caches and pin processes to isolated cores. Effects are asymmetric. Fixing a core-isolation mistake improved Quarkus more than Spring, from a 1.8x throughput ratio upwards, and a stale container image left their database under-filled. Realism pulls the other way: warm up first, use a populated database, and be careful with microbenchmarks. A Spring team member measured only 1.4x where they had 2-3x. The difference came down to Ubuntu's newer kernel scheduler versus CFS on their old RHEL lab machines, and both results were right.",
+    "Relevance means choosing which \"faster\" matters: throughput, response time, memory footprint or startup, each tied to business outcomes (hardware cost, user experience, elasticity). Response times suffer from coordinated omission. JMeter and wrk hide stalls, while wrk2 (from Gil Tene), Gatling and Hyperfoil handle it correctly, and Hyperfoil also reports when the load generator itself is unhealthy. Measure startup as time to first request with a polling script, not the framework's log line. Measure RSS from the OS, not heap, at startup, and never together with throughput, because the JVM trades memory for throughput. Suspiciously similar results (Quarkus versus Rust, or a disk-bound third-party benchmark) mean you are measuring a bottleneck. Their remedy is Brendan Gregg's active benchmarking and USE method, starting with errors, such as Spring's keep-alive limit silently dropping connections."
+  ],
+  "keyPoints": [
+    "Environmental noise alone caused around 40% variation in their measurements, enough to reverse a comparison between two frameworks.",
+    "For reproducibility, disable Turbo Boost and Speed Shift, use the performance governor, drop caches and isolate processes on dedicated cores. All of these make the system slower.",
+    "Noise is asymmetric: shared cores hurt Quarkus more than Spring, and the Linux scheduler (CFS versus the newer Ubuntu scheduler) shifted the ratio by about 40%.",
+    "Coordinated omission makes JMeter and wrk under-report latency during stalls. wrk2, Gatling and Hyperfoil avoid it, and Hyperfoil also flags load-generator problems such as GC pauses.",
+    "Measure startup as time to first successful request, and memory as OS-reported RSS at startup, not heap, and not during a throughput run.",
+    "Results that are suspiciously similar, such as Quarkus matching Rust or two frameworks tying on a slow disk, indicate an external bottleneck.",
+    "Distributed load tests at modern framework speeds mostly measure the network. Podman without host networking adds a single-threaded user-space bottleneck.",
+    "Use active benchmarking and the USE method (utilisation, saturation, errors) and check errors first: Spring's keep-alive limit closing connections silently reduced the load applied."
+  ],
+  "takeaways": [
+    "Never run the load generator and the system under test on the same unisolated machine, and avoid laptops for numbers you'll publish.",
+    "Replace JMeter or wrk with wrk2, Gatling or Hyperfoil when you care about latency percentiles.",
+    "Decide which metric matters to the business (throughput, latency, RSS, startup) before benchmarking, and measure one thing at a time.",
+    "Check the load generator's error and connection counts before trusting any throughput number.",
+    "When two very different systems score the same, look for the bottleneck (disk, network, scheduler) before drawing conclusions."
+  ],
+  "quotes": [
+    {"text": "Quite often when you do a measurement, you are not measuring what you think you're measuring. And if you are not measuring what you think you're measuring, then there is no point at all in doing the measurement.", "at": "07:11"},
+    {"text": "If you were thinking of changing from Java to Rust for performance reasons, you will not get anything for that if your bottleneck is somewhere else.", "at": "47:06"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Refreshing the Quarkus benchmark"},
+    {"at": "05:09", "title": "Not measuring what you think"},
+    {"at": "09:13", "title": "Reproducibility and noise"},
+    {"at": "18:23", "title": "Realism and the scheduler surprise"},
+    {"at": "24:30", "title": "Relevance and business metrics"},
+    {"at": "31:43", "title": "Coordinated omission and load generators"},
+    {"at": "39:56", "title": "Startup time and RSS"},
+    {"at": "45:04", "title": "Bottlenecks and suspicious similarity"},
+    {"at": "48:07", "title": "Active benchmarking and USE"}
+  ],
+  "tech": ["Quarkus", "Spring Boot", "GraalVM Native Image", "Hyperfoil", "wrk", "wrk2", "JMeter", "Gatling", "Podman", "Linux CFS", "USE method", "RSS"],
+  "watchIf": "You are about to compare frameworks, JVM settings or code changes by benchmarking them and want to avoid publishing numbers that only measure your laptop, network or load generator.",
+  "themes": ["JVM performance & runtime", "Testing & quality"],
+  "demo": false
+}

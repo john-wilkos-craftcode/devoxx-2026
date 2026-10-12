@@ -1,0 +1,42 @@
+{
+  "id": 22909,
+  "source": "transcript",
+  "tldr": "Hoornenborg goes down from 'virtual' cloud abstractions through hardware, transistors and Landauer's principle to quantum superposition and qubits, arguing that everything digital is physical and that abstractions deserve credit.",
+  "summary": [
+    "Marianne Hoornenborg (KVK, NLJUG) retrained into IT at 40 and drives her slides through a Makey Makey circuit to show that 'virtual' things like the cloud, serverless and wireless have a physical existence. She explains current with a theatre-row analogy in which people shift one seat toward a vacancy, then tours her brother's disassembled laptop: motherboard, daughterboard, fans and heatsinks. Data carriers come next. A punch card gets lighter as data is added, a hard disk is a mechanical arm reading magnetized platters that still fragment, and a bit is simply the ability to tell two physical states apart.",
+    "On erasure she cites Landauer's principle: losing information does not make it vanish but dissipates entropy as heat, which is part of why machines need cooling. She follows a single keystroke to the projector, through decoding, HDMI's 19 pins and excited atoms emitting photons, and notes that 'wireless' still uses a medium. She then covers silicon from sand: n-type (phosphorus) and p-type (boron) doping, transistors as switches, and NAND gates as the practical building block of logic and cache memory.",
+    "The quantum part covers the double-slit experiment, wave-particle duality, decoherence as the way the classical world emerges, the Bloch sphere and entanglement as one shared system rather than faster-than-light signalling. Her 'Jamie Oliver recipe' for quantum computing: build qubits (superconducting circuits or trapped ions held by optical tweezers), cool them to millikelvin, manipulate them with lasers or microwaves to shape interference, then measure many times. IBM offers free access, but Java tooling lags behind Python. She closes by celebrating abstractions, which let developers work at human scale."
+  ],
+  "keyPoints": [
+    "Every 'virtual' concept (cloud, wireless, serverless) depends on physical carriers, currents and media.",
+    "A bit is the physical ability to distinguish two states; a punch card loses mass as data is written to it.",
+    "Landauer's principle: erasing information dissipates entropy into the environment as heat.",
+    "Doped silicon (phosphorus n-type, boron p-type) makes transistors; NAND is the practical base gate for logic and cache memory.",
+    "Measurement or any environmental interaction causes decoherence, which is how stable classical states emerge from quantum systems.",
+    "Quantum computing needs qubits, millikelvin cooling, laser or microwave control of interference, and repeated measurement; IBM offers a free tier."
+  ],
+  "takeaways": [
+    "Take apart an old laptop to see the hardware your abstractions sit on.",
+    "Run a hello-world circuit on IBM's free quantum computing plan to get a feel for qubits and measurement.",
+    "Remember that heat and energy costs come from computation and data handling themselves, not just from inefficient code."
+  ],
+  "quotes": [
+    {"text": "Data erasure actually means that we are losing the ability to discern between one state and another.", "at": "15:26"},
+    {"text": "We can actually just be here, feet on the ground at Devoxx, and celebrate abstractions.", "at": "46:12"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "The physical side of virtual"},
+    {"at": "07:13", "title": "Current and the motherboard"},
+    {"at": "11:19", "title": "Data carriers and bits"},
+    {"at": "15:26", "title": "Erasure and Landauer heat"},
+    {"at": "18:31", "title": "From keystroke to photons"},
+    {"at": "22:36", "title": "Silicon and transistors"},
+    {"at": "29:46", "title": "Quantum superposition and decoherence"},
+    {"at": "37:00", "title": "Building a quantum computer"},
+    {"at": "45:10", "title": "Celebrating abstractions"}
+  ],
+  "tech": ["Makey Makey", "HDMI", "Transistors", "NAND gate", "Qubits", "Bloch sphere", "IBM Quantum", "Landauer's principle"],
+  "watchIf": "You want a relaxed, non-specialist tour of the physics under your code, from transistors to qubits. There are no Java techniques here.",
+  "themes": ["Hardware, robots & fun"],
+  "demo": false
+}

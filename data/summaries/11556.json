@@ -1,0 +1,109 @@
+{
+  "id": 11556,
+  "source": "transcript",
+  "tldr": "Dubois built Boot UI, a Spring Boot developer console, in 11 days through 223 agent-written pull requests, and shares six ingredients: model choice, specs, tests, tools, parallelism, overnight runs.",
+  "summary": [
+    "Dubois, creator of JHipster and now at GitHub, built an open-source project so he could show real numbers: Boot UI, a developer console for Spring Boot (Spring, Hibernate, a Vue.js front end) he had estimated at over six months of solo work. Time-boxed to 11 days of normal hours, it reached 1.0.0 with 223 merged pull requests, about 20 a day, mostly committed by Copilot agents in parallel, with unusually large amounts of specs and tests. He puts the gain at 15 to 20 times, for about $2,000 in tokens. The project has since passed 500 PRs, 20 releases and nearly 400,000 lines without a maintenance tax.",
+    "His ingredients: stick with one main model, partly to keep the 90% cached-token discount, have other models \"rubber duck\" complex work (half his tokens), and use small models for speed. Write specs: an AGENTS.md pinning Maven, JUnit, Docker Compose and Spotless so parallel agents stay consistent, plus specs defining done. Write tests: agents loop locally, then on GitHub Actions with CodeQL, fixing failed PRs themselves. Specs and tests form the harness, which he says matters more than the model. Equip agents: the Impeccable UI skill, Copilot's agent-merge (he never resolved a conflict by hand), a custom release skill, and the Eclipse JDT language server, saving about 20% of tokens.",
+    "The human ingredients: run many independent tasks in parallel and act as the manager of a fleet, and restructure the day. From 11:00 he orchestrates normal tasks, around 17:00 he writes specs for two or three big tasks to run overnight, and from 9:00 to 11:00 he reviews and merges their results. Caveats: Boot UI's panels are repetitive and Spring is well documented, so expect perhaps 10x elsewhere; beware scope creep, too many large PRs and underpowered models. GitHub issues and PR comments act as specs, and the Copilot mobile app and cloud agent (one-hour limit) take experiments off his laptop.",
+    "On token economics, a quiz showed that 2,000 output tokens cost more than 100,000 cached input tokens, and that switching to a half-price model can cost more because it busts the cache, as do editing AGENTS.md, compacting history or a five-minute coffee break. Caching saves only about 51% overall because output is uncached. Copilot's auto mode gives a 10% discount and is cache-aware, and a research-preview Fusion mode cascades and cross-checks models. He ended by starting a release preparation from his own agent and skill in the Copilot app, and noted that Boot UI is itself an MCP server and skill."
+  ],
+  "keyPoints": [
+    "Boot UI 1.0.0: 223 merged PRs in 11 working days, versus his estimate of more than six months by hand, at roughly $2,000 in tokens.",
+    "Half of his tokens go to rubber ducking, where other models audit what the main model produced.",
+    "The harness (AGENTS.md, specs with a definition of done, local and CI tests) matters more than which model you use.",
+    "Pointing agents at the Eclipse JDT language server gives exact Java semantics and cuts token use by around 20%, at the cost of one Eclipse backend per agent.",
+    "Work rhythm: parallel tasks during the day, specs for big tasks written around 17:00 to run overnight, morning review over coffee; his own review is the bottleneck.",
+    "Cache economics: cached input gets a 90% discount, but switching model, editing AGENTS.md, compacting or idling a few minutes busts the cache.",
+    "GitHub Advanced Security (CodeQL, Dependabot, secret protection) is part of the agent's feedback loop, not just a human safeguard."
+  ],
+  "takeaways": [
+    "Write an AGENTS.md that pins your build tools, test approach and formatting so parallel agents produce consistent code.",
+    "Have a second model review complex agent output before you look at it.",
+    "Prepare two or three well-specified large tasks at the end of the day and let agents run them overnight.",
+    "Turn any process you have done by hand two or three times, such as a release, into a custom skill.",
+    "Avoid switching models or editing agent instructions mid-session if you want to keep cached-token discounts."
+  ],
+  "quotes": [
+    {
+      "text": "Most people complain that LLMs are slow. I complain that my laptop is slow.",
+      "at": "15:18"
+    },
+    {
+      "text": "If you want something better, invest your time in specifications and in testing.",
+      "at": "17:20"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Building Boot UI in 11 days"
+    },
+    {
+      "at": "03:07",
+      "title": "The numbers from git"
+    },
+    {
+      "at": "08:11",
+      "title": "Agentic engineering, not vibe coding"
+    },
+    {
+      "at": "09:13",
+      "title": "Picking the right model"
+    },
+    {
+      "at": "12:15",
+      "title": "Specifications and tests as harness"
+    },
+    {
+      "at": "17:20",
+      "title": "Equipping agents with tools"
+    },
+    {
+      "at": "22:28",
+      "title": "Parallel agents and overnight runs"
+    },
+    {
+      "at": "27:33",
+      "title": "Caveats and the GitHub platform"
+    },
+    {
+      "at": "35:41",
+      "title": "Token economics"
+    },
+    {
+      "at": "44:57",
+      "title": "Copilot app demo"
+    }
+  ],
+  "tech": [
+    "GitHub Copilot",
+    "Copilot coding agent",
+    "GitHub Actions",
+    "CodeQL",
+    "Dependabot",
+    "GitHub Advanced Security",
+    "Spring Boot",
+    "Hibernate",
+    "Vue.js",
+    "Maven",
+    "JUnit",
+    "Docker Compose",
+    "Spotless",
+    "AGENTS.md",
+    "Agent skills",
+    "MCP",
+    "Language Server Protocol",
+    "Eclipse JDT Language Server",
+    "Impeccable",
+    "Boot UI",
+    "Quarkus"
+  ],
+  "watchIf": "You want a measured account of shipping a real Java project with a fleet of coding agents, including the workflow, costs and token-caching details.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Developer experience & tooling",
+    "Spring & frameworks"
+  ],
+  "demo": true
+}

@@ -1,0 +1,102 @@
+{
+  "id": 25042,
+  "source": "transcript",
+  "tldr": "Cavalcanti argues that delegating coding to AI removes the activity that built developers' understanding, and shares practices for staying in control: writing rules, files over chat, walk-throughs, phased delivery.",
+  "summary": [
+    "Cavalcanti, a former psychologist who now works on the Akka runtime, starts from what writing code does to us: translating requirements into code, doubting and experimenting is how we build a mental model of a system and our identity as developers. He separates fluency (syntax, idioms, standard library) from depth (runtime, memory model, concurrency). His warning example came this week: reviewing its own Scala for-comprehension in a fresh context, Claude twice claimed a failed future would be silently recovered, which is as wrong as thinking thenCompose runs after a failed CompletableFuture. Had he accepted the bug report, the agent would have rewritten correct code for nothing.",
+    "Without guidance a model drifts to the centre of its training distribution and produces average code; your knowledge is what pulls it away. He cites Lisanne Bainbridge's 1983 \"Ironies of Automation\": automate most of the work and operators lose their skills while left with tiring monitoring tasks. He fears turning code review from \"looks good to me\" into \"looks green to me\". Vibe-coding a Rust tool for his own machine is fine because nobody else is affected, but bank systems are not.",
+    "His practices start with writing rules that demand clarity over style, because agents write terse inter-agent prose into chats, Javadoc and comments, and bad patterns in the codebase (constructors that silently turn null Optionals into defaults) become tomorrow's context. Rules loaded at session start lose attention as context grows, so a hook re-injects a reminder with every prompt. He keeps summaries and notes in a never-committed nogit folder listed in his global gitignore, writes questions directly in files, and has a command answer them. A walk-through command orders a change into logical reading steps instead of alphabetical diffs.",
+    "Phased delivery is where he feels like an engineer again: after spec and plan, the agent implements one small phase, he reviews, edits or takes the next phase himself, and he writes API shapes by hand while the agent generates the plumbing. In autonomous mode he requires one commit per phase with a description, which also gives a second reviewing agent context. AI has been very good at finding flaky concurrency tests at Akka, but he insists on slowing down to build knowledge, since verification is not automated and accountability remains. He shares his commands on GitHub (octonato) and recommends Anthropic's PR Review Toolkit and the Superpowers plugins."
+  ],
+  "keyPoints": [
+    "Writing code built the mental model of the system; delegating non-trivial design and coding removes that learning unless you replace it deliberately.",
+    "A fresh-context Claude review confidently reported a non-existent bug in a Scala future chain; acting on it would have churned correct code.",
+    "Unguided models drift to average code; the developer's knowledge acts as the anchor that pulls output away from the centre.",
+    "The Bainbridge automation paradox: operators who only monitor automated work lose the skills needed for the part that cannot be automated.",
+    "Rules in agent instruction files lose attention as context grows; a hook that appends a short reminder to every prompt kept Claude following his writing rules.",
+    "Code in the repo is the agent's context for the next change, so one bad pattern (null Optional coerced to defaults in constructors) spreads.",
+    "Walk-through commands order a change into logical reading steps; phased delivery with one commit and description per phase keeps a human gate after each step."
+  ],
+  "takeaways": [
+    "Add writing rules that demand plain, clear English from your agent, and re-inject them with a prompt hook if they stop being followed.",
+    "Have the agent write summaries and walk-throughs to an uncommitted folder, and annotate questions directly in files instead of in chat.",
+    "Split agent implementation into small phases, review each one, and require one commit per phase with a description.",
+    "Keep hands-on work such as API design for yourself, and delegate the mechanical code behind it.",
+    "Before accepting an AI-reported bug, check it against your own understanding of the language and runtime."
+  ],
+  "quotes": [
+    {
+      "text": "Your knowledge is what pulls the model away from the center.",
+      "at": "18:27"
+    },
+    {
+      "text": "The code today is the context of tomorrow.",
+      "at": "27:44"
+    },
+    {
+      "text": "Don't outsource your brain.",
+      "at": "46:04"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Coding shapes our identity"
+    },
+    {
+      "at": "07:10",
+      "title": "Fluency versus depth"
+    },
+    {
+      "at": "10:15",
+      "title": "Understanding takes the time"
+    },
+    {
+      "at": "15:25",
+      "title": "Models drift to average"
+    },
+    {
+      "at": "18:27",
+      "title": "The automation paradox"
+    },
+    {
+      "at": "24:39",
+      "title": "Writing rules and hooks"
+    },
+    {
+      "at": "32:50",
+      "title": "Files instead of chat"
+    },
+    {
+      "at": "35:53",
+      "title": "Walk-throughs"
+    },
+    {
+      "at": "37:54",
+      "title": "Phased delivery"
+    },
+    {
+      "at": "42:59",
+      "title": "Slow down and own it"
+    }
+  ],
+  "tech": [
+    "Claude Code",
+    "Claude Code hooks",
+    "Claude Opus",
+    "Scala",
+    "Akka",
+    "CompletableFuture",
+    "Rust",
+    "Spec-driven development",
+    "PR Review Toolkit",
+    "Superpowers"
+  ],
+  "watchIf": "You use coding agents daily and feel your grasp of your own codebase slipping, and want specific habits for staying in control.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Teams, careers & leadership",
+    "Developer experience & tooling"
+  ],
+  "demo": false
+}

@@ -1,0 +1,81 @@
+{
+  "id": 4090,
+  "source": "transcript",
+  "tldr": "Siewert combines conflict theory, Dutch workplace statistics and two cases from her own career into five ways to get out of team conflicts and three ways to prevent them.",
+  "summary": [
+    "Siewert, a Dutch developer (Scala, Java, Kotlin) and occasional Scrum Master at Het ConsultancyHuis, limits the talk to conflicts where both sides mean well; structural bad intent needs a confidential advisor. Dutch research she cites: managers in large organisations spend about 20% of their time on team conflict, and at least 70,000 people a year call in sick over it. She describes five phases: unaware, rational (still win-win), emotional (win-lose), escalation (only losers), and resolution or not. Models such as DISC, Insights and Management Drives help, as does valuing opposites: theoretical versus pragmatic, starters versus finishers, facilitating versus directing.",
+    "With Mentimeter polls she walked through two cases. As Scrum Master, after a junior teammate's mistake caused a 5 a.m. production incident at an uptime-focused SaaS company, she was overruled by the colleague responsible for SLAs, who wanted to discuss it with the whole company at once. After a day of silence they talked, found they shared the goal of quality and stability, and worked together four more years. In a remote COVID-era team, a new teammate repeated the same stand-up update without delivering or accepting help. She raised it with the Scrum Master twice, three months apart, then backed off; he eventually left by his own choice.",
+    "Her five ways out: agree on a shared goal while the conflict is still rational; use each other's strengths and protect each other from weaknesses; when camps form, find a third way; never vent to a third party, and adapt critique to culture (colleagues have an LLM rephrase blunt Dutch feedback for recipients in India, Britain or Egypt); and learn from someone you dislike, who is often good at what you are not. To prevent conflict: kickoffs that go beyond pizza to share values and backgrounds, a compliment exercise where each person draws a teammate's name, and yearly sessions on what each person brings and wants to learn."
+  ],
+  "keyPoints": [
+    "Dutch research she cites: managers spend about 20% of their time on team conflict, and at least 70,000 people a year call in sick because of workplace conflict.",
+    "Conflicts move from unaware to rational (win-win still possible) to emotional (win-lose) to escalation (only losers); exits are easiest in the rational phase.",
+    "35% of team conflicts involve two people, 20-25% centre on one individual, and about 20% involve subgroups taking sides.",
+    "A shared goal (quality and uptime) resolved her conflict with a colleague who overruled her after a production incident.",
+    "Venting to a third party gives short-term relief but damages trust, because listeners wonder what you say about them.",
+    "Good teams use each other's strengths and also protect each other from each other's weaknesses."
+  ],
+  "takeaways": [
+    "When frustrated with a teammate, ask yourself whether you are prejudging them based on earlier experiences.",
+    "Start a difficult conversation by establishing the goal you both share.",
+    "Run a team kickoff that covers values and backgrounds, not just the project.",
+    "Try the compliment envelope: each team member draws a name and gives that person a sincere compliment.",
+    "Reach out to someone independent, such as a Scrum Master or agile coach, early rather than late."
+  ],
+  "quotes": [
+    {
+      "text": "It's not only about using each other's strengths, but it's also about protecting each other from each other's weaknesses.",
+      "at": "37:08"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Margaret Hamilton and intro"
+    },
+    {
+      "at": "07:12",
+      "title": "Why team conflict matters"
+    },
+    {
+      "at": "11:22",
+      "title": "Prevention and intent"
+    },
+    {
+      "at": "13:25",
+      "title": "Five phases of conflict"
+    },
+    {
+      "at": "16:27",
+      "title": "Personalities and differences"
+    },
+    {
+      "at": "21:39",
+      "title": "Case: production incident clash"
+    },
+    {
+      "at": "28:56",
+      "title": "Case: the underperforming teammate"
+    },
+    {
+      "at": "36:05",
+      "title": "Five ways out of conflict"
+    },
+    {
+      "at": "44:21",
+      "title": "Three ways to stay ahead"
+    }
+  ],
+  "tech": [
+    "Mentimeter",
+    "DISC",
+    "Insights Discovery",
+    "Management Drives",
+    "Scrum"
+  ],
+  "watchIf": "You are stuck in friction with a teammate, or lead a team, and want practical, experience-based approaches to defusing conflict.",
+  "themes": [
+    "Teams, careers & leadership"
+  ],
+  "demo": false
+}
