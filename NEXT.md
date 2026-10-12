@@ -40,12 +40,16 @@ Next:
      mullions, speakers and plinths on columns, extinguishers, exit signs, trusses, translucent ivy.
      Floor-1 cinema walls and rakes stop above the drop ceiling over the room (Ghost Light stacks the
      floors too close). Post: bloom, slight dispersion, vignette; AgX Medium High Contrast, -0.9 EV.
-     Reviewer scores 12/10 (fresh agent, render vs photo): ref view 4 -> 5, opening shot 3 -> 4,
-     walk to the stairwell 3.5 -> 5. Its remaining gaps, in order: light still too even (pools under
-     the downlights too weak, edges don't fall off); the ceiling over the entrance end should be a black
-     plenum with track spots, and the blue cove a softer lavender wash; surfaces too clean (dirt mask
-     from height x noise, roughness variation); carpet too beige and fine (cooler grey, stronger
-     quarter-turn sheen); curtains still too regular, screen needs a mount; ivy from planter troughs.
+     Reviewer scores (a fresh agent each round, render vs photo, out of 10):
+       round                      matched view  opening shot  to stairwell  stair foot
+       1 first pass                    4             3             3.5          -
+       2 textures, real lights         5             4             5            2
+       3 stair rebuilt, dirt           4.5           4             5            3
+       4 black entrance ceiling        5             4             4.5          3
+     Plateaued around 4-5. What the reviewers keep naming is mostly beyond procedural boxes: cloth-
+     simulated curtains, carpet with large-scale wear and traffic paths, ceiling clutter (sprinklers,
+     diffusers, signs), real thickness and edge wear everywhere. Some of their fixes were already in
+     (no world fill, nosings, bevels), which says the look, not the settings, is what's missing.
    - upstairs foyer: as before (sloped ceiling, LED lines, track spots, screen between dark columns,
      red side portals), but the tensile funnels are white fabric lit blue this year, not red
    - entrance: navy walls, blue "uitgang zaal 6/7" signs, glass front, white desks, stanchions
