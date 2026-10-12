@@ -700,11 +700,13 @@ for r in auditoriums:
     # numeral panel with the big white room number
     side_y = -along
     panel_y = yc + side_y * 2.75
-    B.box("numeral", {"x": wall_x + (0.0 if west else -0.06), "y": panel_y - 0.95, "w": 0.06, "h": 1.9}, FH + 0.33, FH + 3.38)
-    text_object(str(n), 2.6, (wall_x + face * 0.07, panel_y, FH + 1.85), (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2), M["white"], 0.02, 0.03)
-    # the schedule totem beside the door, facing the corridor (on phones, the talk is shown on it)
-    sy = yc - side_y * 2.4
-    sx = wall_x + face * 1.2
+    # proud of the corridor wall's face, which stands about 9 cm in front of the room's wall line
+    B.box("numeral", {"x": min(wall_x + face * 0.12, wall_x + face * 0.18), "y": panel_y - 0.95, "w": 0.06, "h": 1.9}, FH + 0.33, FH + 3.38)
+    text_object(str(n), 2.6, (wall_x + face * 0.2, panel_y, FH + 1.85), (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2), M["white"], 0.02, 0.03)
+    # the schedule totem in front of the room-number panel, facing the corridor (on phones, the talk is shown on it,
+    # with the big numeral rising behind it)
+    sy = panel_y
+    sx = wall_x + face * 1.1
     tw, th, tz = 0.70, 1.24, FH + 1.42
     B.box("bezel", {"x": sx - 0.035, "y": sy - tw / 2 - 0.035, "w": 0.07, "h": tw + 0.07}, tz - th / 2 - 0.09, tz + th / 2 + 0.035)
     B.box("tableFrame", {"x": sx - face * 0.07 - 0.03, "y": sy - 0.06, "w": 0.06, "h": 0.12}, FH + 0.04, tz - th / 2)
@@ -1328,7 +1330,7 @@ def seat_for(n, fov=52):
     want = fit_distance(scr["w"], scr["h"], fov, 0.8)      # the screen's edges and the black wall stay in shot
     # the right distance, near the middle, and eyes level with the screen's middle so the talk isn't keystoned
     best = min(seats, key=lambda s: abs(abs(s["bounds"]["x"] + s["bounds"]["w"] / 2 - scr["x"]) - want) +
-               abs(s["bounds"]["y"] + s["bounds"]["h"] / 2 - scr["y"]) * 0.6 + abs(FH + s["height"] + 0.8 - scr["z"]) * 2.0)
+               abs(s["bounds"]["y"] + s["bounds"]["h"] / 2 - scr["y"]) * 0.6 + abs(FH + s["height"] + 0.8 - (scr["z"] - scr["h"] / 2 + 1.3)) * 2.0)
     seat = (best["bounds"]["x"] + best["bounds"]["w"] / 2, best["bounds"]["y"] + best["bounds"]["h"] / 2, FH + best["height"] + 0.8)
     return seat, (scr["x"], seat[1], scr["z"]), fov, seats
 
@@ -1538,20 +1540,21 @@ dist = abs(scr["x"] - seat[0])
 pfov = 2 * math.degrees(math.atan(scr["h"] / 2 / 0.8 / dist))     # the screen fills 80% of a phone's height
 bpy.context.view_layer.update()
 set_res(LAPTOP)
-zlow, zhigh = scr["z"] - scr["h"] / 2, scr["z"] + scr["h"] / 2
-full = [(scr["x"], scr["y"] - scr["w"] / 2, zlow), (scr["x"], scr["y"] + scr["w"] / 2, zlow),
-        (scr["x"], scr["y"] + scr["w"] / 2, zhigh), (scr["x"], scr["y"] - scr["w"] / 2, zhigh)]
-shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(full, seat_cam)}, "size": {"screen": [scr["w"], zhigh - zlow]},
+zlow, zhigh = scr["z"] - scr["h"] / 2 - 0.02, scr["z"] + scr["h"] / 2 + 0.02      # 2 cm under the masking: no bright edge
+hw = scr["w"] / 2 + 0.02
+full = [(scr["x"], scr["y"] - hw, zlow), (scr["x"], scr["y"] + hw, zlow), (scr["x"], scr["y"] + hw, zhigh), (scr["x"], scr["y"] - hw, zhigh)]
+shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(full, seat_cam)}, "size": {"screen": [2 * hw, zhigh - zlow]},
                       "front": f"seat-{n}-front"}
 
 # phones: the walk stops at the door, and the talk is on the totem beside it (a cinema screen is far too wide to
 # read in portrait); the red portal and the corridor are soft behind it
 tot = doors[n]["totem"]
-dface, dside = doors[n]["face"], (1 if doors[n]["totem"]["y"] > doors[n]["yc"] else -1)
-ddist = 1.9                                   # a little from the side away from the door, so the red portal shows behind
-_dh = 2 * math.atan(tot["w"] / 2 / 0.86 / ddist)
-door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist * 0.96, tot["y"] + dside * ddist * 0.27, tot["z"] + 0.05),
-                     (tot["x"], tot["y"], tot["z"] - 0.02), 2 * math.degrees(math.atan(math.tan(_dh / 2) * PHONE[1] / PHONE[0])), dof=(ddist, 2.0))
+dface = doors[n]["face"]
+ddist = 2.0                                   # square on (text pinned flat never wobbles); the numeral panel frames it
+_dh = 2 * math.atan(tot["w"] / 2 / 0.8 / ddist)
+door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist, tot["y"], tot["z"] + 0.12), (tot["x"], tot["y"], tot["z"] + 0.12),
+                     2 * math.degrees(math.atan(math.tan(_dh / 2) * PHONE[1] / PHONE[0])), dof=(ddist, 2.8))
+door_cam.data.shift_y = -0.06                 # the totem a little low in frame, the numeral rising above it
 bpy.context.view_layer.update()
 set_res(PHONE)
 shots[f"door-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(tot["corners"], door_cam)}, "size": {"screen": [tot["w"], tot["h"]]}}

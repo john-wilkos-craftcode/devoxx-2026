@@ -29,7 +29,7 @@ button, input, a { font: inherit; color: inherit; }
 .face *, .face *::before, .face *::after { box-sizing: border-box; }
 .face :focus-visible { outline: 3px solid #fff; outline-offset: 3px; box-shadow: 0 0 0 7px rgba(246, 146, 30, .55); }
 .face button { cursor: pointer; }
-.face h1, .face h2, .face p { margin: 0; }
+:where(.face) :where(h1, h2, p) { margin: 0; }   /* zero specificity, so .tldr, .offnote etc. keep their spacing */
 
 /* the hall screen is an LCD: a little glare, and its light spilling onto the bezel */
 .face.is-lcd { box-shadow: 0 0 60px 6px rgba(40, 70, 220, .28); }
@@ -42,8 +42,8 @@ button, input, a { font: inherit; color: inherit; }
   opacity: .5; mix-blend-mode: soft-light; }
 
 /* chrome outside the screens: small, quiet, fixed */
-.exit { position: fixed; z-index: 5; left: 14px; top: calc(12px + env(safe-area-inset-top, 0px)); background: rgba(8, 11, 30, .72); color: var(--muted);
-  border: 1px solid rgba(174, 184, 236, .3); border-radius: 999px; padding: 7px 12px; font-size: 13px; text-decoration: none; backdrop-filter: blur(6px); }
+.exit { position: fixed; z-index: 5; left: 12px; top: calc(10px + env(safe-area-inset-top, 0px)); background: rgba(5, 7, 20, .55); color: rgba(174, 184, 236, .85);
+  border: 0; border-radius: 999px; padding: 6px 11px; font-size: 12px; text-decoration: none; backdrop-filter: blur(6px); }
 .exit:hover { color: var(--ink); border-color: var(--muted); }
 .exit:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .dock { position: fixed; z-index: 5; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; display: flex; gap: 8px; align-items: center; }
@@ -76,7 +76,7 @@ button, input, a { font: inherit; color: inherit; }
 .search::placeholder { color: #8f99d0; }
 .search:focus-visible { outline: none; border-color: var(--orange); }
 .nav { display: flex; flex-direction: column; gap: 10px; }
-.nav .strip { flex-wrap: wrap; overflow: visible; padding: 0; margin: 0; }
+.nav .days { flex-wrap: wrap; overflow: visible; padding: 0; margin: 0; }
 .pill { flex: none; background: transparent; border: 2px solid var(--line); border-radius: 9px; padding: 7px 13px; font-size: 19px; font-weight: 600; color: var(--muted); white-space: nowrap; }
 @media (hover: hover) { .pill:hover { border-color: var(--muted); color: var(--ink); } }
 .pill[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--deep); }
@@ -90,12 +90,18 @@ button, input, a { font: inherit; color: inherit; }
 .slot-head span { font-size: 18px; color: var(--muted); }
 .slot-head.is-plain span { color: var(--ink); font-size: 20px; font-weight: 600; }
 .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: auto; gap: 12px; align-content: start; padding: 6px; margin: -6px; }
-.cards > .card { height: 178px; }
+.cards > .card { height: 172px; }
+.cards .later { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 700; color: var(--muted); padding: 2px 0; }
+.cards .later::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.prog.is-tall .cards .later { font-size: 13px; }
 .cards.is-exact { grid-template-rows: repeat(2, minmax(0, 1fr)); height: 100%; }
 .cards.is-exact > .card { height: auto; min-height: 0; }
 .card { overflow: hidden; }
 .cards.is-exact .card .title { -webkit-line-clamp: 3; }
-.card .why { font-size: 16px; line-height: 1.3; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cards.is-packed > .card { height: 140px; gap: 6px; }
+.cards.is-packed .card .title { -webkit-line-clamp: 2; }
+.cards.is-packed .card .who { -webkit-line-clamp: 1; }
+.card .why { font-size: 16px; line-height: 1.35; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: none; }
 .card:not(.is-off) .why { color: var(--deep); opacity: .8; }
 .card .why mark { background: rgba(246, 146, 30, .35); color: inherit; border-radius: 3px; padding: 0 2px; }
 .card:not(.is-off) .why mark { background: rgba(10, 15, 46, .18); }
@@ -109,7 +115,7 @@ button, input, a { font: inherit; color: inherit; }
 .card .where small { font-size: 16px; font-weight: 600; }
 .card .where b.is-text { font-size: 22px; font-stretch: 100%; }
 .card .room b { font-size: 30px; font-weight: 800; font-stretch: 125%; line-height: .9; white-space: nowrap; }
-.card .title { font-size: 19px; font-weight: 700; line-height: 1.18; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.card .title { font-size: 19px; font-weight: 700; line-height: 1.18; padding-bottom: 1px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .card .who { font-size: 17px; line-height: 1.3; opacity: .88; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .card.is-off { background: var(--panel); color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
 .card.is-off .who { color: var(--muted); opacity: 1; }
@@ -132,13 +138,13 @@ button, input, a { font: inherit; color: inherit; }
 .prog.is-tall .slot { gap: 8px; }
 .prog.is-tall .slot-head b { font-size: 26px; }
 .prog.is-tall .slot-head span { font-size: 13px; }
-.prog.is-tall .cards { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; gap: 8px; }
+.prog.is-tall .cards { grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; gap: 8px; }
 .prog.is-tall .card { padding: 10px 12px 11px; gap: 4px; border-radius: 10px; }
 .prog.is-tall .card .room { font-size: 13px; }
 .prog.is-tall .card .where small { font-size: 12px; }
-.prog.is-tall .card .why { font-size: 13px; -webkit-line-clamp: 1; }
+.prog.is-tall .card .why { font-size: 13px; }
 .prog.is-tall .card .room b { font-size: 22px; }
-.prog.is-tall .card .title { font-size: 16px; -webkit-line-clamp: 3; }
+.prog.is-tall .card .title { font-size: 16px; -webkit-line-clamp: 2; padding-bottom: 1px; }
 .prog.is-tall .card .who { font-size: 13px; -webkit-line-clamp: 1; margin-top: 2px; }
 .prog.is-tall .divider { font-size: 13px; padding: 6px 0 2px; }
 .prog.is-tall .divider b { font-size: 17px; }

@@ -17,7 +17,7 @@ const ytUrl = (t, sec = 0) => `https://www.youtube.com/watch?v=${t.videoId}${sec
 const EMBED = window.self === window.top;      // YouTube can't be embedded inside the artifact sandbox
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const IMG = { laptop: [1920, 1080], phone: [1080, 2340] };
-const CANVAS = { hall: 1060, "hall-phone": 340, seat: 1300, "door-phone": 340 };   // design widths in css px
+const CANVAS = { hall: 980, "hall-phone": 340, seat: 1300, "door-phone": 340 };   // design widths in css px
 
 const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -204,14 +204,15 @@ function why(t, terms) {
   for (const [, text] of fields) {
     const lower = text.toLowerCase(), w = terms.find((x) => lower.includes(x));
     if (!w) continue;
-    const i = lower.indexOf(w), a = Math.max(0, i - 28), b = Math.min(text.length, i + w.length + 40);
+    const i = lower.indexOf(w), a = Math.max(0, i - 14), b = Math.min(text.length, i + w.length + 60);
     return el("span", { class: "why" }, a ? "…" : "", text.slice(a, i), el("mark", { text: text.slice(i, i + w.length) }), text.slice(i + w.length, b), b < text.length ? "…" : "");
   }
   return null;
 }
 function card(t, { when: showWhen = null, terms = null } = {}) {
   const n = roomNo(t), on = walkable.has(n);
-  const label = showWhen === "day" ? `${fShort.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : showWhen === "time" ? fTime.format(new Date(t.start)) : typeLabel(t);
+  const label = showWhen === "day" ? `${fShort.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : showWhen === "time" ? fTime.format(new Date(t.start))
+    : /^BOF/.test(t.room || "") ? "Downstairs" : typeLabel(t);
   const hint = terms && why(t, terms);
   return el("button", { class: `card${on ? "" : " is-off"}`, type: "button", onclick: () => goTalk(t),
       "aria-label": [t.title, speakers(t), t.room, showWhen ? when(t) : null, on ? "walks you to your seat" : null].filter(Boolean).join(", ") },
@@ -259,13 +260,11 @@ function programme(tall) {
     // a short slot leaves room for what's on next: fill the screen with the following talks, each with its time
     const later = talks.filter((t) => t.start && dayKey(t.start) === day && t.start > slot).sort((a, b) => a.start.localeCompare(b.start) || (roomNo(a) || 99) - (roomNo(b) || 99));
     const fill = here.length < (tall ? 4 : 8) ? later.slice(0, (tall ? 6 : 8) - here.length) : [];
-    const cards = el("div", { class: `cards scroller${fill.length || tall ? "" : " is-exact"}`, tabindex: "-1" },
-      here.map((t) => card(t)), fill.map((t) => card(t, { when: "time" })));
-    const allWalk = here.every((t) => walkable.has(roomNo(t)));
-    const someWalk = here.some((t) => walkable.has(roomNo(t)));
-    const hint = allWalk ? "Pick one and we'll walk you to your seat." : someWalk ? "Orange: we'll walk you to the cinema room. Others: the summary opens here." : "The summary opens here.";
+    const cards = el("div", { class: `cards scroller${tall ? "" : fill.length ? " is-packed" : " is-exact"}`, tabindex: "-1" },
+      here.map((t) => card(t, { when: fill.length ? "time" : null })),
+      fill.length ? el("div", { class: "later", text: "Later that day" }) : null, fill.map((t) => card(t, { when: "time" })));
     put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
-        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}${fill.length ? ", then what's next" : ""}. ${hint}` })),
+        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}. Pick a talk to take your seat.` })),
       cards);
     requestAnimationFrame(() => { centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
   }
@@ -312,7 +311,7 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
     put(main,
       doorRoom && tall ? el("div", { class: "door-sign" }, el("small", { text: "Room" }), el("b", { text: String(doorRoom) }), el("span", { text: "Now showing" })) : null,
       el("div", { class: "meta", text: [doorRoom && tall ? null : t.room, when(t), typeLabel(t)].filter(Boolean).join(", ") }),
-      !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? "A meeting room downstairs: no cinema seat for this one." : "No cinema seat to walk you to for this one." }) : null,
+      !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? "Downstairs meeting room, no cinema seat." : "No cinema seat to walk you to for this one." }) : null,
       el("h2", { text: t.title, style: `--title:${titleSize(t.title, 40, 31)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
       !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
