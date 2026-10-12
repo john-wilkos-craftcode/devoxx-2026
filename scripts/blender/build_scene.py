@@ -1319,8 +1319,8 @@ def set_cam(loc, target, fov):
 def hall_pose():
     """A little left of square on to the programme screen, close enough that it fills most of a laptop's view, far
     enough that the columns, the ceiling and the curtains around it say where you are."""
-    d = fit_distance(SCREEN["w"] + 2 * BEZEL, SCREEN["h"] + BEZEL + CHIN, 40, 0.78)
-    return (SCREEN["x"] - 0.1 * d, SCREEN["y"] - d, SCREEN["z"] + 0.03), (SCREEN["x"], SCREEN["y"], SCREEN["z"]), 40
+    d = fit_distance(SCREEN["w"] + 2 * BEZEL, SCREEN["h"] + BEZEL + CHIN, 40, 0.9)
+    return (SCREEN["x"] - 0.06 * d, SCREEN["y"] - d, SCREEN["z"] + 0.02), (SCREEN["x"], SCREEN["y"], SCREEN["z"]), 40
 
 
 def seat_for(n, fov=52):
@@ -1554,7 +1554,7 @@ ddist = 2.0                                   # square on (text pinned flat neve
 _dh = 2 * math.atan(tot["w"] / 2 / 0.8 / ddist)
 door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist, tot["y"], tot["z"] + 0.12), (tot["x"], tot["y"], tot["z"] + 0.12),
                      2 * math.degrees(math.atan(math.tan(_dh / 2) * PHONE[1] / PHONE[0])), dof=(ddist, 2.8))
-door_cam.data.shift_y = -0.06                 # the totem a little low in frame, the numeral rising above it
+door_cam.data.shift_y = -0.13                 # the totem low in frame, the room numeral rising above it
 bpy.context.view_layer.update()
 set_res(PHONE)
 shots[f"door-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(tot["corners"], door_cam)}, "size": {"screen": [tot["w"], tot["h"]]}}

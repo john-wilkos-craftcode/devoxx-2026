@@ -40,6 +40,7 @@ const talks = window.DEVOXX.talks.filter((t) => t.type !== "Keynote Overflow").m
   ...t, title: clean(t.title), speakers: t.speakers.map((sp) => ({ ...sp, name: capital(clean(sp.name)) })) }));
 const speakers = (t, withCompany) => t.speakers.map((sp) => withCompany && sp.company ? `${sp.name} (${sp.company})` : sp.name).join(", ");
 const when = (t) => t.start ? `${fDay.format(new Date(t.start))} ${fTime.format(new Date(t.start))}` : null;
+const whenLong = (t) => t.start ? `${fDayLong.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : null;
 const typeLabel = (t) => (t.type === "Conference" ? "" : t.type);   // a plain talk needs no label
 const titleSize = (title, big, small) => title.length > 90 ? small : title.length > 55 ? (big + small) / 2 : big;
 
@@ -200,12 +201,14 @@ const blob = (t) => [t.title, ...t.speakers.map((s) => s.name), t.room, t.track,
 function why(t, terms) {
   if (terms.every((w) => t.title.toLowerCase().includes(w))) return null;
   const s = t.s || {};
-  const fields = [["", speakers(t)], ["", (s.tech || []).join(", ")], ["", (t.keywords || []).join(", ")], ["", s.tldr || ""], ["", (t.abstract || []).join(" ")]];
-  for (const [, text] of fields) {
+  const fields = [["Speaker", speakers(t)], ["Tools", (s.tech || []).join(", ")], ["Topics", (t.keywords || []).join(", ")], ["Summary", s.tldr || ""], ["Abstract", (t.abstract || []).join(" ")]];
+  for (const [name, text] of fields) {
     const lower = text.toLowerCase(), w = terms.find((x) => lower.includes(x));
     if (!w) continue;
-    const i = lower.indexOf(w), a = Math.max(0, i - 14), b = Math.min(text.length, i + w.length + 60);
-    return el("span", { class: "why" }, a ? "…" : "", text.slice(a, i), el("mark", { text: text.slice(i, i + w.length) }), text.slice(i + w.length, b), b < text.length ? "…" : "");
+    const i = lower.indexOf(w);
+    let a = Math.max(0, i - 16);
+    if (a > 0) { const sp = text.lastIndexOf(" ", i - 1); a = sp >= a - 12 && sp >= 0 ? sp + 1 : a; }   // start on a word
+    return el("span", { class: "why" }, el("b", { text: `${name}: ` }), a ? "…" : "", text.slice(a, i), el("mark", { text: text.slice(i, i + w.length) }), text.slice(i + w.length, i + w.length + 70));
   }
   return null;
 }
@@ -218,7 +221,7 @@ function card(t, { when: showWhen = null, terms = null } = {}) {
       "aria-label": [t.title, speakers(t), t.room, showWhen ? when(t) : null, on ? "walks you to your seat" : null].filter(Boolean).join(", ") },
     el("span", { class: "room" }, n ? el("span", { class: "where" }, el("small", { text: "Room" }), el("b", { text: String(n) })) : el("span", { class: "where" }, el("b", { class: "is-text", text: t.room || "Room TBC" })),
       el("span", { class: "label", text: label })),
-    el("span", { class: "title", text: t.title }),
+    el("span", { class: "title", text: t.title, style: t.title.length > 72 ? "font-size:.86em" : null }),
     el("span", { class: "who", text: speakers(t) }),
     hint);
 }
@@ -227,11 +230,13 @@ function programme(tall) {
   const search = el("input", { class: "search", type: "search", placeholder: "Search talks, speakers, topics", "aria-label": "Search all talks", value: query });
   const dayRow = el("div", { class: "strip days", role: "group", "aria-label": "Day" });
   const timeRow = el("div", { class: "strip times", role: "group", "aria-label": "Start time" });
-  const nav = el("div", { class: "nav" }, dayRow, timeRow);
+  const nav = el("div", { class: "nav" }, tall ? dayRow : null, timeRow);
   const body = el("div", { class: "slot" });
   const panel = el("section", { class: `face prog is-lcd${tall ? " is-tall" : ""}`, "aria-label": "Programme" },
     el("div", { class: "prog-head" },
-      el("h1", { class: "brand" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })), el("small", { text: "Belgium 2026, 5–9 October" })),
+      el("h1", { class: "brand", "aria-label": "Devoxx Belgium 2026, 5 to 9 October" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })),
+        tall ? el("small", { text: "Belgium 2026, 5–9 October" }) : el("small", { text: "BE 2026" })),
+      tall ? null : dayRow,
       search),
     nav, body);
 
@@ -277,7 +282,7 @@ function programme(tall) {
 const toSeconds = (at) => { const [m, sec] = String(at).split(":").map(Number); return (m || 0) * 60 + (sec || 0); };
 function talkScreen(t, tall, onFloor, doorRoom = null) {
   const s = t.s || {};
-  const tabs = [["short", "In short"], ["points", "Key points"], ["monday", "Try this on Monday"], ["chapters", "Chapters"], ["story", "Full summary"]]
+  const tabs = [["short", "In short"], ["points", "Key points"], ["monday", "On Monday"], ["chapters", "Chapters"], ["story", "Summary"]]
     .filter(([id]) => (id === "short" && tall && s.tldr) || (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
       || (id === "chapters" && s.chapters && s.chapters.length && onFloor) || id === "story");
   const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Talk details" });
@@ -309,14 +314,14 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
   const intro = () => {
     main.textContent = "";
     put(main,
-      doorRoom && tall ? el("div", { class: "door-sign" }, el("small", { text: "Room" }), el("b", { text: String(doorRoom) }), el("span", { text: "Now showing" })) : null,
-      el("div", { class: "meta", text: [doorRoom && tall ? null : t.room, when(t), typeLabel(t)].filter(Boolean).join(", ") }),
+      doorRoom && tall ? el("div", { class: "door-sign" }, el("small", { text: "Room" }), el("b", { text: String(doorRoom) }), el("span", { text: t.start ? `Recorded ${fShort.format(new Date(t.start))} Oct` : "" })) : null,
+      el("div", { class: "meta", text: [doorRoom && tall ? null : t.room, whenLong(t), typeLabel(t), t.videoId ? null : "no recording yet"].filter(Boolean).join(", ") }),
       !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? "Downstairs meeting room, no cinema seat." : "No cinema seat to walk you to for this one." }) : null,
-      el("h2", { text: t.title, style: `--title:${titleSize(t.title, 40, 31)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
+      el("h2", { text: t.title, style: `--title:${titleSize(t.title, 40, 30)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
       !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
       el("div", { class: "actions" }, watch(), el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() })),
-      !t.videoId ? el("p", { class: "note", style: "margin-top:10px", text: "No recording yet; the summary is from the abstract." }) : null);
+      !tall && s.watchIf ? el("p", { class: "verdict", text: `Worth it if ${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.` }) : null);
   };
   playAt = (sec) => {
     main.textContent = "";
