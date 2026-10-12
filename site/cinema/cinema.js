@@ -42,7 +42,8 @@ const speakers = (t, withCompany) => t.speakers.map((sp) => withCompany && sp.co
 const when = (t) => t.start ? `${fDay.format(new Date(t.start))} ${fTime.format(new Date(t.start))}` : null;
 const whenShort = (t) => t.start ? `${fShort.format(new Date(t.start))} Oct, ${fTime.format(new Date(t.start))}` : null;
 const whenLong = (t) => t.start ? `${fDayLong.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : null;
-const typeLabel = (t) => (t.type === "Conference" ? "" : t.type);   // a plain talk needs no label
+// a plain talk needs no label; the rest in sentence case ("Hands-on lab"), BOF stays an acronym
+const typeLabel = (t) => (t.type === "Conference" ? "" : t.type === "BOF" ? "BOF" : t.type[0] + t.type.slice(1).toLowerCase());
 const titleSize = (title, big, small) => title.length > 90 ? small : title.length > 55 ? (big + small) / 2 : big;
 
 // ---------- projective pinning ----------
@@ -65,6 +66,11 @@ function basis(p) {   // the matrix taking the unit basis to p[0..2], scaled so 
 function matrix3d(w, h, dst) {   // dst: top-left, top-right, bottom-left, bottom-right
   const t = mul(basis(dst), adj(basis([[0, 0], [w, 0], [0, h], [w, h]])));
   const n = t.map((x) => x / t[8]);
+  // a square-on screen has (next to) no perspective: a plain 2D transform keeps the text rasterised sharp
+  if (Math.abs(n[6] * w) < 0.004 && Math.abs(n[7] * h) < 0.004) {
+    const [tl, tr, bl] = dst;
+    return `matrix(${(tr[0] - tl[0]) / w},${(tr[1] - tl[1]) / w},${(bl[0] - tl[0]) / h},${(bl[1] - tl[1]) / h},${tl[0]},${tl[1]})`;
+  }
   return `matrix3d(${[n[0], n[3], 0, n[6], n[1], n[4], 0, n[7], 0, 0, 1, 0, n[2], n[5], 0, n[8]].join(",")})`;
 }
 function ordered(quad) {
@@ -148,6 +154,19 @@ function watchScroll(s) {
   s.addEventListener("scroll", update, { passive: true });
   requestAnimationFrame(update);
 }
+// one tab stop per group of chips (days, times, tabs): Tab lands on the chosen one, the arrow keys move along
+function rove(group) {
+  const items = [...group.querySelectorAll("button")];
+  const on = items.find((b) => b.getAttribute("aria-pressed") === "true") || items[0];
+  for (const b of items) b.tabIndex = b === on ? 0 : -1;
+  group.onkeydown = (e) => {
+    const i = items.indexOf(document.activeElement);
+    if (i < 0 || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+    e.preventDefault();
+    const j = e.key === "Home" ? 0 : e.key === "End" ? items.length - 1 : (i + (e.key === "ArrowRight" ? 1 : -1) + items.length) % items.length;
+    items[i].tabIndex = -1; items[j].tabIndex = 0; items[j].focus();
+  };
+}
 function centre(strip) {   // bring the pressed chip into view without scrolling the page
   const on = strip.querySelector('[aria-pressed="true"]');
   if (on) strip.scrollLeft = on.offsetLeft - (strip.clientWidth - on.offsetWidth) / 2;
@@ -208,8 +227,13 @@ function why(t, terms) {
     if (!w) continue;
     const i = lower.indexOf(w);
     const a = i;                                                     // start at the match, so it's always in view
+    if (name === "Tools" || name === "Topics" || name === "Speaker") {        // lists: the matching item first, then whole items
+      const items = text.split(/,\s*/), hit = items.find((x) => x.toLowerCase().includes(w));
+      const rest = items.filter((x) => x !== hit).slice(0, 3);
+      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), rest.length ? `, ${rest.join(", ")}` : "");
+    }
     const word = text.slice(i).match(/^\S+/)[0].replace(/[,.;:]$/, "");    // the whole matched word, e.g. "Kotlin"
-    return el("span", { class: "why" }, el("b", { text: `${name}: ` }), a > 0 && name !== "Speaker" ? "…" : "", el("mark", { text: word }), text.slice(i + word.length, i + word.length + 70));
+    return el("span", { class: "why" }, el("b", { text: `${name}: ` }), a > 0 ? "…" : "", el("mark", { text: word }), text.slice(i + word.length, i + word.length + 70));
   }
   return null;
 }
@@ -228,7 +252,7 @@ function card(t, { when: showWhen = null, terms = null } = {}) {
 }
 
 function programme(tall) {
-  const search = el("input", { class: "search", type: "search", placeholder: "Search talks, speakers, topics", "aria-label": "Search all talks", value: query });
+  const search = el("input", { class: "search", type: "search", placeholder: tall ? "Search talks, speakers, topics" : "Search talks, people", "aria-label": "Search all talks", value: query });
   const dayRow = el("div", { class: "strip days", role: "group", "aria-label": "Day" });
   const timeRow = el("div", { class: "strip times", role: "group", "aria-label": "Start time" });
   const nav = el("div", { class: "nav" }, tall ? dayRow : null, timeRow);
@@ -236,7 +260,7 @@ function programme(tall) {
   const panel = el("section", { class: `face prog is-lcd${tall ? " is-tall" : ""}`, "aria-label": "Programme" },
     el("div", { class: "prog-head" },
       el("h1", { class: "brand", "aria-label": "Devoxx Belgium 2026, 5 to 9 October" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })),
-        tall ? el("small", { text: "Belgium 2026, 5–9 October" }) : el("small", { text: "BE 2026" })),
+        tall ? el("small", { text: "Belgium 2026: every talk, summarised" }) : el("small", { text: "every talk, summarised" })),
       tall ? null : dayRow,
       search),
     nav, body);
@@ -267,11 +291,17 @@ function programme(tall) {
     const later = talks.filter((t) => t.start && dayKey(t.start) === day && t.start > slot).sort((a, b) => a.start.localeCompare(b.start) || (roomNo(a) || 99) - (roomNo(b) || 99));
     const fill = here.length < (tall ? 4 : 8) ? later.slice(0, (tall ? 6 : 8) - here.length) : [];
     const cards = el("div", { class: `cards scroller${tall ? "" : fill.length ? " is-packed" : " is-exact"}`, tabindex: "-1" },
-      here.map((t) => { const c = card(t, { when: fill.length ? "time" : null }); if (fill.length) c.classList.add(here.length === 1 ? "is-now-wide" : "is-now"); return c; }),
+      here.map((t) => {
+        const c = card(t, { when: fill.length ? "time" : null });
+        if (fill.length) c.classList.add(here.length === 1 ? "is-now-wide" : "is-now");
+        if (fill.length && here.length === 1 && t.s && t.s.tldr) c.append(el("span", { class: "gist", text: t.s.tldr }));
+        return c;
+      }),
       fill.length ? el("div", { class: "later", text: "Later that day" }) : null, fill.map((t) => card(t, { when: "time" })));
     put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
-        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}. Pick a talk to take your seat.` })),
+        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}. Pick one to read its summary.` })),
       cards);
+    rove(dayRow); rove(timeRow);
     requestAnimationFrame(() => { centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
   }
   search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); draw(); });
@@ -305,6 +335,7 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
     pane.scrollTop = 0;
     requestAnimationFrame(() => watchScroll(pane));
     for (const b of tabRow.children) b.setAttribute("aria-pressed", String(b.dataset.tab === id));
+    if (tabRow.children.length) rove(tabRow);
   };
   for (const [id, label] of tabs) tabRow.append(el("button", { class: "pill", type: "button", "data-tab": id, text: label, onclick: () => fill(id) }));
   const main = el("div", { class: "talk-main" });
@@ -316,12 +347,13 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
     main.textContent = "";
     put(main,
       doorRoom && tall ? el("div", { class: "door-sign" }, el("small", { text: "Room" }), el("b", { text: String(doorRoom) }), el("span", { text: t.start ? `Recorded ${fShort.format(new Date(t.start))} Oct` : "" })) : null,
-      el("div", { class: "meta", text: [doorRoom && tall ? null : t.room, doorRoom && tall ? (t.start ? fTime.format(new Date(t.start)) : null) : whenShort(t), typeLabel(t), t.videoId ? null : "no recording yet"].filter(Boolean).join(", ") }),
-      !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? `Held downstairs in ${t.room}.` : "Held outside the cinema rooms." }) : null,
-      el("h2", { text: t.title, style: `--title:${titleSize(t.title, 40, 30)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
+      el("div", { class: "meta", text: [doorRoom && tall ? null : (!onFloor && /^BOF/.test(t.room || "") ? `${t.room} (downstairs)` : t.room),
+        doorRoom && tall ? (t.start ? fTime.format(new Date(t.start)) : null) : whenShort(t), typeLabel(t)].filter(Boolean).join(", ") }),
+      el("h2", { text: t.title, style: `--title:${onFloor ? titleSize(t.title, 40, 30) : titleSize(t.title, 34, 26)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
       !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
-      el("div", { class: "actions" }, watch(), el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() })),
+      el("div", { class: "actions" }, watch(), el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
+        t.videoId ? null : el("span", { class: "note", text: "No recording yet." })),
       !tall && s.watchIf ? el("p", { class: "verdict", text: `Worth it if ${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.` }) : null);
   };
   playAt = (sec) => {
@@ -335,7 +367,8 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
   intro();
   fill(tabs[0][0]);
   return el("section", { class: `face talk ${onFloor && !tall ? "is-projected" : "is-lcd"}${tall ? " is-tall" : ""}`, "aria-label": t.title },
-    main, el("div", { class: "talk-side" }, tabRow, pane));
+    main, el("div", { class: "talk-side" }, tabRow, pane),
+    tall ? el("div", { class: "foot", "aria-hidden": "true" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })), el("span", { text: "Belgium 2026" })) : null);
 }
 
 // ---------- moving between the hall and a seat ----------
