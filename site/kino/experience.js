@@ -89,6 +89,8 @@ const CSS = `
 .kx-exit[hidden] { display: none; }
 .kx-skip { position: fixed; z-index: 5; left: 50%; top: calc(16px + env(safe-area-inset-top, 0px)); translate: -50% 0; color: #c9cdea; font: 15px/1 "Source Serif 4", Georgia, serif; pointer-events: none; opacity: .8; }
 .kx-skip[hidden] { display: none; }
+.kx-flat { position: fixed; z-index: 5; left: 18px; top: calc(14px + env(safe-area-inset-top, 0px)); color: #c9cdea; font: 15px/1 "Source Serif 4", Georgia, serif;
+  background: rgba(14, 12, 28, .7); border: 1px solid #3A3060; border-radius: 999px; padding: 8px 14px; text-decoration: none; }
 .kx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 `;
 
@@ -108,7 +110,9 @@ export function startExperience(k) {
   const live = el("p", { class: "kx-sr", "aria-live": "polite" });
   const exitBtn = el("button", { class: "kx-exit", type: "button", text: "EXIT", title: "Back to the hall (Esc)", hidden: true, onclick: () => goLobby() });
   const skipNote = el("p", { class: "kx-skip", text: "Click to skip", hidden: true });
+  const flatLink = el("a", { class: "kx-flat", href: "../", text: "Plain programme" });
   document.body.append(live, exitBtn, skipNote);
+  if (EMBED) document.body.append(flatLink);
 
   // ---------- the programme wall: the big LED screen at the north end of the exhibition hall ----------
   const WALL = { x: corridor.x + corridor.w / 2, y: 18.0, z: 3.15, w: 8, h: 4.5 };

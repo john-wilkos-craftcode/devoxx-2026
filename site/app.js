@@ -49,6 +49,10 @@
       .filter(Boolean).join(" ").toLowerCase();
   }
 
+  // The 3D cinema needs WebGL and room; inside the claude.ai artifact it is published separately.
+  const kinoLink = $("#kino-link");
+  if (kinoLink && (!EMBED || !window.WebGLRenderingContext)) kinoLink.remove();
+
   // ---------- theme (lights) ----------
   const root = document.documentElement;
   const lightsBtn = $("#lights");

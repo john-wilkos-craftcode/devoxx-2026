@@ -3,7 +3,11 @@
 Every session of Devoxx Belgium 2026 (5 to 9 October, Kinepolis Antwerp), summarised from what the
 speakers actually said, as a static site styled like a cinema programme.
 
-Open `site/index.html` directly, or serve it:
+Live at **https://john-wilkos-craftcode.github.io/devoxx-2026/**, with the 3D cinema at
+[`/kino/`](https://john-wilkos-craftcode.github.io/devoxx-2026/kino/): the programme on the
+exhibition hall's LED wall, a walk up the stairs to your seat, and the talk on the cinema screen.
+
+Locally, serve the `site/` folder:
 
 ```sh
 python3 -m http.server -d site 8765   # http://localhost:8765
@@ -40,6 +44,12 @@ python3 scripts/build_site.py
 ```
 
 The site itself (`site/index.html`, `styles.css`, `app.js`) is plain HTML, CSS and JavaScript with
-no build step. Talk pages are addressable as `#/talk/<id>`.
+no build step. Talk pages are addressable as `#talk-<id>`, in both the flat site and the cinema.
+
+The cinema (`site/kino/`) is Three.js. The venue is Loïc Magnette's Kinepolis model from the Devoxx
+Robot Games entry [Ghost Light](https://github.com/LoMagnette/ghost-light) (MIT), regenerated with
+`tools/venue/`; see `site/kino/THIRD_PARTY.md`. `?dev` gives free-look camera views.
+
+Pushing to `main` deploys `site/` to GitHub Pages (`.github/workflows/pages.yml`).
 
 Summaries are machine-written from machine transcripts and can be wrong; the recording is the source of truth.
