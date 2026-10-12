@@ -1,0 +1,49 @@
+{
+  "id": 22932,
+  "source": "transcript",
+  "tldr": "Gee and Santrosyan argue that enterprise AI means calling models as bounded components from existing Java systems that already encode the business rules, not handing the process to an autonomous agent.",
+  "summary": [
+    "Trisha Gee, now an independent consultant, and Andrey Santrosyan, founder of Redouble AI (multi-agent systems for regulated industries), start from the anxiety many Java developers feel: is Java the new COBOL, and do they need to learn Python? They separate three kinds of AI work: training models, building AI tools, and integrating AI into business software. The third runs where Java already runs. Gee reframes legacy as a positive: decades of business rules, edge cases, regulations and integrations make the legacy system the business. She compares the moment to cloud in 2011, which changed deployment and practices but not the need to encode business logic.",
+    "Santrosyan says the VC picture of 'drop the company into a prompt' is a consumer model, where a person at a screen is in charge. In the enterprise the system is in charge: a bank teller cannot write and deploy a tool to process your loan, however smart they are. He distinguishes interactive agents (chat, fixed-tool assistants, coding agents and OpenClaw, which can invent tools) from asynchronous, non-interactive agents triggered by events with an enumerated toolset. He sees the latter as the future of enterprise agents, and agents that create and run their own tools in production as 'the path to Skynet'. Practical uses include mapping spreadsheets with arbitrary column names and date formats, or filling forms from free text.",
+    "On uncertainty, Gee uses a story from building online car sales at Ford in 2000, where every bank API failure mode had to be handled deterministically. The point: uncertainty is inevitable, but letting it spread is an architectural choice. 'The AI thinks this is a large Diavola pizza' (from James Ward's pizza-ordering example) or 'an invoice for 1,870 euros' is not a confirmed order or an approved expense. The existing system still checks the menu, delivery area and payment. Guardrails and authorization belong in tool code, but scope matters too: an agent authorised for a whole loop can hallucinate that it is on step 23 instead of 17. They argue the application should call the agent, not expose itself over MCP for the agent to drive.",
+    "Running agents inside the application avoids shipping data out, avoids the 'agentic telephone game' between agents, and lets errors be reported to agents as clearly as to users. Santrosyan's Level 3 support case for a German industrial-networking manufacturer involved gigabytes of nested log archives, hundreds of thousands of agents and millions of tool calls per ticket. Token limits should be handled like a connection pool, not with retry and back-off, and virtual threads suit the workload. Parsing logs deterministically and sending only rows that throw exceptions to a cheap model cut cost from about $3,000 per ticket with a frontier model to $1.26. Redouble open-sourced its core platform the day before. In Q&A they argue engineering judgement about edge cases does not go away."
+  ],
+  "keyPoints": [
+    "Most enterprise AI work is integrating models into existing systems, and that runs where Java already runs: wiring in a model is like wiring in a data source.",
+    "Enterprise systems encode the company's rules in code, so an agent should be a component the system uses, not the thing in charge.",
+    "They see asynchronous, event-triggered agents with a fixed, enumerated toolset as the right enterprise shape, and agents that write and run their own tools in production as dangerous.",
+    "Treat model output as 'the AI thinks X' and pass it back into deterministic code that validates, authorises and acts on it.",
+    "Put authorization and guardrails in the tool code, and enforce scope as well (for example which loop iteration an agent may act on), because non-deterministic steps can lose track of state.",
+    "Passing data between agents risks corruption, while passing IDs means every agent needs database access. Running agents in-process avoids both.",
+    "Manage token-per-minute limits like a connection pool instead of retry-with-backoff, and use virtual threads for very large numbers of agent tasks.",
+    "In Santrosyan's log-triage case, deterministic parsing with a cheap-model fallback for unparseable rows cut the cost per ticket from about $3,000 to $1.26."
+  ],
+  "takeaways": [
+    "Find the parts of your workflows that need human judgement on messy input (spreadsheets, free text, odd log lines) and call a model just for those.",
+    "Keep validation, authorization and business rules in your existing Java code, and treat every model response as unverified input.",
+    "Have your application call the agent rather than exposing the application for an external agent to drive.",
+    "Benchmark cheaper or local models per task before defaulting to a frontier model.",
+    "Throttle model calls with a pool-style resource limiter instead of retry loops."
+  ],
+  "quotes": [
+    {"text": "Uncertainty is inevitable, but letting it propagate through your own application is an architectural choice.", "at": "16:01"},
+    {"text": "The AI thinks this is an invoice for 1,870 euros is definitely not the same thing as this claim contains an approved expense of 1,870 euros.", "at": "18:26"},
+    {"text": "It's not code that we produce. It's what goes into that code. It's the engineering.", "at": "41:34"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Are Java developers left behind"},
+    {"at": "03:25", "title": "Three kinds of AI work"},
+    {"at": "04:40", "title": "Legacy is the business"},
+    {"at": "07:02", "title": "The system is in charge"},
+    {"at": "10:33", "title": "Interactive versus asynchronous agents"},
+    {"at": "14:48", "title": "Containing uncertainty"},
+    {"at": "22:17", "title": "Boundaries, scope and who calls whom"},
+    {"at": "29:01", "title": "Level 3 support at scale"},
+    {"at": "35:26", "title": "Why Java fits"},
+    {"at": "38:54", "title": "Q&A"}
+  ],
+  "tech": ["Java", "Virtual threads", "Project Loom", "MCP", "OpenClaw", "Claude", "Redouble AI"],
+  "watchIf": "You maintain enterprise Java systems and want an argument for adding AI as a bounded component instead of rewriting around agents.",
+  "themes": ["AI agents & agentic coding", "Architecture & design", "LLMs in Java apps"],
+  "demo": false
+}

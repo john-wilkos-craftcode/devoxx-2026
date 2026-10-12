@@ -1,0 +1,47 @@
+{
+  "id": 12751,
+  "source": "transcript",
+  "tldr": "Hillaert argues that microservice failures come from ownership, boundaries and relationships rather than technology, and uses strategic DDD and context mapping, with leasing-industry examples, as tools for thinking about them.",
+  "summary": [
+    "Steven Hillaert, a solution architect at Sofico (leasing software), opens with the familiar arc: services call services, the web gets tangled, a message broker is added, and the coupling remains. Autonomy and ownership are not things microservices give you; you have to design for them. His definition: a microservice is a cohesive set of capabilities in a clear business context that can be deployed and evolved independently. Technically, it is just a deployment boundary. He organises the talk around three causes of failure: ownership, boundaries and relationships.",
+    "Ownership needs one accountable team that keeps the model coherent, evolves the service and runs it. That team must be given decision rights, including the right to refuse outside changes, and must also take ownership of failures. The service itself must own its capabilities, rules and the data those rules need. For boundaries, he uses the strategic side of DDD (domains, bounded contexts, ubiquitous language) as questions to ask rather than a methodology. A 'vehicle' means a configurable offer in quoting and a physical car in contracts. A credit domain may split into retail and fleet bounded contexts that live in one service as two modules, or one bounded context may be split into two services because fleet brings 90% of revenue and should not be put at risk by retail changes.",
+    "For relationships, Hillaert explains context mapping with stories about cooking steak with his wife: who calls whom does not show who depends on whom. Whoever has to adapt is downstream, whether they make the call or not. Refusing someone else's model is an anti-corruption layer; adopting it wholesale is being a conformist; customer-supplier means the downstream side has influence. A shared kernel between two services that each conform to different upstreams is a warning sign. He suggests using context maps when reasoning about a specific change, not to model the whole landscape.",
+    "On implementation, he prefers 'a monolith implemented modularly' to the term modular monolith, and warns that bad boundaries hidden as in-process calls become network hops when services are extracted. Communication style should follow from the relationship. Many synchronous reads hint at a wrong boundary or a need to replicate data. Async messaging still needs versioned contracts. Orchestration makes process state and compensation easier than choreography, at the cost of a single point of failure. He rejects mandatory layering of experience, domain and data services. A read-only vehicle/VIN database can be a 'service' on its own. A service should be as big as it needs to be to stay coherent, even with 100 endpoints."
+  ],
+  "keyPoints": [
+    "Autonomy and ownership are design outcomes, not properties you get by splitting a system into deployables.",
+    "Ownership works both ways: the team is given decision rights (technology, refusing requests) and must take responsibility when things break. The service must own its rules and the data behind them.",
+    "Bounded contexts do not map one-to-one to services. Two contexts can share one deployable as modules, and one context can be split for risk, performance, legal or organisational reasons.",
+    "Overlap between boundaries is unavoidable. Make it deliberate and explicit, and accept duplicated data such as vehicle information where each service uses it for different decisions.",
+    "The upstream/downstream direction is about who has to adapt, not who calls whom. Anti-corruption layer, conformist, customer-supplier and shared kernel describe the real coupling.",
+    "A modular monolith does not make later extraction easy: hidden boundary mistakes become network hops once you pull the modules apart.",
+    "Orchestration gives one place to see process state and run compensations, while choreography avoids a single point of failure but nobody owns the process.",
+    "Forcing calls through BFF, domain and data service layers takes away service autonomy. A BFF may implement a new capability itself until it proves broadly useful."
+  ],
+  "takeaways": [
+    "For each service, name the single accountable team and check that the data its business rules need lives inside its boundary.",
+    "When planning a change, sketch the context-map relationship (upstream, conformist, ACL) between the affected services instead of only the call graph.",
+    "Treat frequent synchronous reads to another service as a signal to revisit the boundary or replicate the data.",
+    "Pick orchestration for multi-service processes that need visible state and compensation.",
+    "Before creating a new service, ask whose success depends on it, what data must stay consistent and what transactions you need."
+  ],
+  "quotes": [
+    {"text": "When everybody starts actually somehow owning this service, nobody is owning its problems.", "at": "06:07"},
+    {"text": "It needs to be as big as it needs to be to be coherent.", "at": "43:18"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why microservices go wrong"},
+    {"at": "03:31", "title": "Defining a microservice"},
+    {"at": "06:07", "title": "Team and service ownership"},
+    {"at": "09:24", "title": "Boundaries and cohesion"},
+    {"at": "11:38", "title": "DDD and bounded contexts"},
+    {"at": "20:13", "title": "Relationships and context mapping"},
+    {"at": "29:27", "title": "Modular monolith and communication"},
+    {"at": "34:35", "title": "Orchestration versus choreography"},
+    {"at": "35:38", "title": "Service layering and size"}
+  ],
+  "tech": ["Domain-Driven Design", "Context mapping", "Bounded contexts", "Anti-corruption layer", "Backend for frontend", "Event storming", "Domain storytelling", "Modular monolith", "Saga orchestration"],
+  "watchIf": "You are splitting a system into services, or living with a distributed monolith, and want a vocabulary for ownership and coupling that goes beyond the call graph.",
+  "themes": ["Architecture & design"],
+  "demo": false
+}

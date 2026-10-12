@@ -21,7 +21,8 @@ Output: `data/summaries/<id>.json`, then run `python3 scripts/validate_summaries
   read-only mount of the repo" is useful.
 - Neutral, precise, readable English. No hype words ("game-changing", "revolutionary", "deep dive into").
   Refer to speakers by surname or full name, using they/them unless the talk makes pronouns clear.
-- Do not invent. If the transcript is poor or truncated, say less rather than guessing.
+- Do not invent. If the transcript is poor or truncated, say less rather than guessing. A name you
+  cannot verify (tool, product, person) is left out, never kept "as heard".
 - Attribute surprising or newsworthy claims you can't verify (industry events, model or company news,
   dramatic numbers) to the speaker: "Schrijver said X", not "X happened".
 - Quotes: lightly cleaned (drop "uh", fix caption errors) but faithful to the words used. Only memorable

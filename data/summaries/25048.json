@@ -1,0 +1,47 @@
+{
+  "id": 25048,
+  "source": "transcript",
+  "tldr": "Borges presents Brewlet, an experimental containerd shim and operator that runs Java JARs pushed as OCI artifacts on Kubernetes with a node-provided JDK, so platform teams can patch the JDK and dependencies without app rebuilds.",
+  "summary": [
+    "Bruno Borges argues that ownership has shifted too far onto developers: they write the business code but also own the dependencies, the JDK and the base OS image, so every CVE forces every team to rebuild and redeploy. He contrasts this with the Java EE days, when developers shipped a WAR and the platform team patched the application server. The model for his alternative is SpinKube (originally KWasm), where the WebAssembly runtime lives on the node, developers push a .wasm module to an OCI registry, and a runtimeClassName routes the pod to that runtime. Java bytecode is portable in the same way.",
+    "Brewlet (brew + kubelet), built over about three months, applies this to Java. Unlike Buildpacks or Cloud Foundry, which still produce a container image, the registry holds only the JAR, its dependencies and a JVM launch configuration. On kubectl apply, the scheduler picks a node by runtime class, containerd calls the Brewlet shim (a TTRPC task service), and the shim assembles an OCI bundle: the app and dependencies under /app, the JDK from a platform-approved image mounted read-only, and runc starting the JVM as PID 1 with normal cgroup limits. Platform teams declare approved JDKs per node pool in a node profile. Developers use either a Deployment with runtimeClassName and annotations or a JavaApplication CRD covering replicas, JVM options, ports, service creation and autoscaling.",
+    "Borges also proposes managed dependency bundles: the platform team approves a BOM and publishes it as an immutable OCI artifact that applications reference, so a library CVE means pointing at a new bundle and restarting, not rebuilding. After a projector outage filled with Q&A, the AKS demo installed Brewlet via its CLI (which wraps a Helm chart), listed node profiles with Temurin 25, Temurin 27 and distroless JDKs, built a Spring Boot 'show my JVM' app with the Brewlet Maven plugin, pushed it to Azure Container Registry after a Docker Desktop hiccup, and inspected its layers. He then switched the app from JDK 25 to 27 by changing only the node profile, with the same artifact digest.",
+    "He closes on how it was built: 12 weeks, about 600 commits (more than half AI-assisted), 48,000 lines of Go he could not have written himself, guided by a 2,200-line specification and an extensive test harness. Kind and Docker Desktop surfaced about 70% of bugs; the rest appeared only on real clusters. His recipe for a custom platform is a containerd shim, a node provisioner, a RuntimeClass and a CRD. Brewlet is experimental, pre-1.0, and on GitHub under the Microsoft organisation."
+  ],
+  "keyPoints": [
+    "The OCI artifact holds separate layers for the app JAR, the classpath dependencies, snapshot dependencies and a JVM config, and supports classpath, fat-JAR and JPMS launch modes.",
+    "The shim is a containerd Runtime v2 TTRPC task service that builds config.json and a rootfs. The JDK comes from a pinned image digest, for example mcr.microsoft.com/openjdk/jdk, and is mounted read-only.",
+    "The pod's userland is the JDK image the platform chose, so a distroless JDK means no shell in the pod. Limits, probes and other Kubernetes tooling work as with normal containers.",
+    "Node profiles list approved JDK distributions and major versions per node pool. Without an explicit distribution, the choice is currently alphabetical.",
+    "Brewlet and regular container workloads can share a cluster, since only pods with the Brewlet runtime class are affected.",
+    "Managed dependency bundles move BOM ownership to the platform team, so dependency CVEs need a restart rather than a rebuild.",
+    "The live demo moved a running Spring Boot app from JDK 25 to JDK 27 without rebuilding or re-pushing the application artifact.",
+    "Borges said Istio, Prometheus and static files served from outside the JAR are untested, and a Gradle plugin does not exist yet (the CLI can be called from Gradle)."
+  ],
+  "takeaways": [
+    "Decide explicitly whether app teams or a platform team should own JDK and dependency patching in your organisation.",
+    "Look at runtimeClassName and containerd shims as a way to build platform features on Kubernetes instead of encoding everything in images.",
+    "Try Brewlet on Kind or Docker Desktop with a sample Spring Boot or Quarkus app, but not in production yet.",
+    "When building infrastructure with coding agents, invest in the specification and test harness first, and test on real clusters as well as local ones."
+  ],
+  "quotes": [
+    {"text": "Devs write one of these layers only, but they own all of them.", "at": "01:55"},
+    {"text": "Runtime class name is the door.", "at": "48:59"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Who owns the runtime"},
+    {"at": "04:49", "title": "From SpinKube to Java"},
+    {"at": "09:03", "title": "Buildpacks and Cloud Foundry compared"},
+    {"at": "10:04", "title": "Shims, bundles and runc"},
+    {"at": "14:13", "title": "Node profiles and CRDs"},
+    {"at": "19:15", "title": "Managed dependency bundles"},
+    {"at": "21:26", "title": "Demo setup and Q&A"},
+    {"at": "29:17", "title": "Live demo on AKS"},
+    {"at": "42:23", "title": "Swapping JDK 25 to 27"},
+    {"at": "46:55", "title": "Built with agents"}
+  ],
+  "tech": ["Brewlet", "Kubernetes", "containerd", "runc", "TTRPC", "OCI", "RuntimeClass", "CRDs", "Helm", "SpinKube", "KWasm", "WebAssembly", "Spring Boot", "Quarkus", "Maven", "Eclipse Temurin", "Microsoft Build of OpenJDK", "AKS", "Azure Container Registry", "Kind", "Buildpacks", "Cloud Foundry", "Go"],
+  "watchIf": "You run Java on Kubernetes and are tired of rebuilding every service image for each JDK or base-image CVE, or you want to see how runtime classes and containerd shims work.",
+  "themes": ["Cloud native & Kubernetes", "Security & supply chain", "AI agents & agentic coding"],
+  "demo": true
+}

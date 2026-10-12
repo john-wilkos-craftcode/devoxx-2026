@@ -54,7 +54,13 @@ function addBox(key, material, b, bottom, top) {
     new THREE.Vector3(b.w, top - bottom, b.h));
   batches.get(key).matrices.push(m);
 }
+const DEBUG_COLORS = params.has("debugmat");
+const debugPalette = [0xff3b3b, 0x3bff6b, 0x3b7bff, 0xffe23b, 0xff3bf0, 0x3bfff0, 0xff9a3b, 0xffffff, 0x9a3bff, 0x6b6b6b];
 function flushBoxes() {
+  let k = 0;
+  for (const [key, b] of batches) {
+    if (DEBUG_COLORS) { b.material = new THREE.MeshBasicMaterial({ color: debugPalette[k++ % debugPalette.length] }); console.log("debugmat", key, "#" + b.material.color.getHexString()); }
+  }
   for (const [, { material, matrices }] of batches) {
     const mesh = new THREE.InstancedMesh(unitBox, material, matrices.length);
     matrices.forEach((m, i) => mesh.setMatrixAt(i, m));
@@ -98,14 +104,20 @@ const plateUnder = (p) => p.linkId ? 0 : groundAt(p.floor, p.bounds.x + p.bounds
 
 // Walls and columns: Ghost Light keeps them low (3.2 m) for its isometric camera; ours run floor
 // to ceiling, and on floor 1 down past the seating rakes so auditoriums are closed rooms.
+const auditoriums = venue.rooms.filter((r) => r.kind === "auditorium" && r.floor === 1);
 for (const o of venue.obstacles) {
   if (o.hidden) continue;   // collision-only volumes (seat blocks), never drawn
   const datum = o.floor * FH;
-  const tall = o.height >= 3;
+  const tall = o.height >= 3 && !o.linkId;   // treads cut to a flight can be 3 m up and are not walls
   const isColumn = tall && o.bounds.w < 1.2 && o.bounds.h < 1.2;
   const under = datum + plateUnder(o);
   const bottom = tall && o.floor === 1 ? datum - RAKE_DEPTH : under + (o.base || 0);
-  const top = tall ? datum + CLEAR : under + o.height;
+  let top = tall ? datum + CLEAR : under + o.height;
+  // Auditorium rakes on floor 1 dip as low as 2 m above floor 0: ground-floor walls under them stop short.
+  if (o.floor === 0) for (const a of auditoriums) {
+    const b = a.bounds, ob = o.bounds;
+    if (ob.x < b.x + b.w && ob.x + ob.w > b.x && ob.y < b.y + b.h && ob.y + ob.h > b.y) top = Math.min(top, FH - (a.rake || 0) - 0.35);
+  }
   const key = isColumn ? "column" : tall ? "wall" : (o.material && M[o.material] ? o.material : "low");
   addBox(key, M[key] || M.concrete, o.bounds, bottom, top);
 }
@@ -123,20 +135,37 @@ for (const d of venue.decor) {
 }
 
 // ---------- floors (with stairwell voids) and the ceiling ----------
-function plate(b, z, material, holes = []) {
-  const shape = new THREE.Shape([
-    new THREE.Vector2(b.x, b.y), new THREE.Vector2(b.x + b.w, b.y),
-    new THREE.Vector2(b.x + b.w, b.y + b.h), new THREE.Vector2(b.x, b.y + b.h)]);
+// A floor plate minus its voids. Voids often touch the room's outline (a rake runs wall to wall),
+// which shape triangulation silently ignores, so cut the rectangle into cells instead of using holes.
+function subtractRects(b, holes) {
+  const xs = new Set([b.x, b.x + b.w]), ys = new Set([b.y, b.y + b.h]);
   for (const h of holes) {
-    shape.holes.push(new THREE.Path([
-      new THREE.Vector2(h.x, h.y), new THREE.Vector2(h.x, h.y + h.h),
-      new THREE.Vector2(h.x + h.w, h.y + h.h), new THREE.Vector2(h.x + h.w, h.y)]));
+    for (const x of [h.x, h.x + h.w]) if (x > b.x && x < b.x + b.w) xs.add(x);
+    for (const y of [h.y, h.y + h.h]) if (y > b.y && y < b.y + b.h) ys.add(y);
   }
-  const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape), material);
-  mesh.rotation.x = -Math.PI / 2;
-  mesh.position.y = z;
-  scene.add(mesh);
-  return mesh;
+  const X = [...xs].sort((a, c) => a - c), Y = [...ys].sort((a, c) => a - c), out = [];
+  for (let j = 0; j < Y.length - 1; j++) {
+    let run = null;
+    for (let i = 0; i < X.length - 1; i++) {
+      const mx = (X[i] + X[i + 1]) / 2, my = (Y[j] + Y[j + 1]) / 2;
+      const inHole = holes.some((h) => mx > h.x && mx < h.x + h.w && my > h.y && my < h.y + h.h);
+      if (!inHole && run) run.w = X[i + 1] - run.x;
+      else if (!inHole) run = { x: X[i], y: Y[j], w: X[i + 1] - X[i], h: Y[j + 1] - Y[j] };
+      else if (run) { out.push(run); run = null; }
+    }
+    if (run) out.push(run);
+  }
+  return out;
+}
+function plate(b, z, material, holes = []) {
+  const meshes = subtractRects(b, holes).map((r) => {
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(r.w, r.h), material);
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.position.copy(v3(r.x + r.w / 2, r.y + r.h / 2, z));
+    scene.add(mesh);
+    return mesh;
+  });
+  return meshes;
 }
 const floorMat = {
   corridor: mat(C.carpetNavy, { roughness: 1, side: THREE.DoubleSide }),
@@ -154,7 +183,7 @@ for (const r of venue.rooms) {
   plate(r.bounds, z, material, r.voids || []);
 }
 const ceilMat = mat(C.ceiling, { roughness: 1, side: THREE.DoubleSide });
-const ceilings = venue.extents.map((e) => plate(e, FH + CLEAR, ceilMat));
+const ceilings = venue.extents.flatMap((e) => plate(e, FH + CLEAR, ceilMat));
 
 // ---------- the cinema corridor: pale vault coves, blue LED lines, warm downlights ----------
 const corridor = venue.rooms.find((r) => r.id === "corridor").bounds;
@@ -202,29 +231,45 @@ const grand = venue.links.find((l) => l.id === "grand-stair").bounds;
   const pts = [];
   for (let i = 0; i <= 24; i++) {
     const t = i / 24;
-    pts.push(new THREE.Vector2(0.1 + 2.1 * Math.pow(t, 2.6), t * 2.4));
+    pts.push(new THREE.Vector2(0.12 + 2.8 * Math.pow(t, 2.6), t * 3.0));
   }
   const geo = new THREE.LatheGeometry(pts, 48);
   const funnelMat = mat(C.funnel, { roughness: 0.7, side: THREE.DoubleSide, emissive: 0x6f8cff, emissiveIntensity: 0.02 });
-  const fy = grand.y + grand.h * 0.55;
+  const fy = grand.y + grand.h + 1.8;   // over the top landing, as in the photos
   for (const fx of [grand.x + grand.w * 0.17, grand.x + grand.w * 0.5, grand.x + grand.w * 0.83]) {
     const f = new THREE.Mesh(geo, funnelMat);
-    f.position.copy(v3(fx, fy, FH + CLEAR - 2.4));
+    f.position.copy(v3(fx, fy, FH + CLEAR - 3.0));
     scene.add(f);
     point(0x4a7dff, 90, 9, fx, fy, FH + 0.6);
   }
 }
 
-// ---------- grand staircase: nosing stripes and tubular rails splitting it into three runs ----------
+// ---------- steps: Ghost Light keeps stairs and seating rakes as links (rise, riser, direction) and
+// builds their treads in its renderer, so build them here: solid terraces and carpeted treads ----------
+const terrace = mat(0x1d2030, { roughness: 1 });
+const nosing = mat(0x5d6694, { roughness: 0.8 });
+for (const L of venue.links) {
+  if (!(L.riser > 0)) continue;
+  const datum = L.from * FH, b = L.bounds, n = Math.round(L.rise / L.riser);
+  const alongX = L.axis === "x", len = alongX ? b.w : b.h, going = len / n;
+  const isRake = L.id.startsWith("rake-");
+  for (let i = 0; i < n; i++) {
+    const top = datum + L.base + (L.ascending ? (i + 1) : (n - i)) * L.riser;
+    const slice = alongX ? { x: b.x + i * going, y: b.y, w: going, h: b.h } : { x: b.x, y: b.y + i * going, w: b.w, h: going };
+    addBox(isRake ? "terrace" : "stair", isRake ? terrace : M.stair, slice, datum + L.base - 0.3, top);
+    if (!isRake) {
+      // the lighter stripe on the edge you step up onto
+      const edge = L.ascending ? 0 : going - 0.05;
+      const strip = alongX ? { x: slice.x + edge, y: b.y, w: 0.05, h: b.h } : { x: b.x, y: slice.y + edge, w: b.w, h: 0.05 };
+      addBox("nosing", nosing, strip, top - 0.004, top + 0.006);
+    }
+  }
+}
+
+// ---------- grand staircase rails, splitting it into three runs ----------
 {
   const L = venue.links.find((l) => l.id === "grand-stair");
-  const b = L.bounds, steps = Math.round(L.rise / L.riser), going = b.h / steps;
-  const nosing = mat(0x8d98c9, { roughness: 0.8 });
-  const at = (i) => L.ascending ? b.y + i * going : b.y + b.h - (i + 1) * going;
-  for (let i = 0; i < steps; i++) {
-    const top = L.base + (i + 1) * L.riser;
-    addBox("nosing", nosing, { x: b.x, y: L.ascending ? at(i) : at(i) + going - 0.05, w: b.w, h: 0.05 }, top - 0.004, top + 0.006);
-  }
+  const b = L.bounds;
   const railMat = M.steel, r = 0.025;
   const z0 = L.base, z1 = L.base + L.rise, y0 = L.ascending ? b.y : b.y + b.h, y1 = L.ascending ? b.y + b.h : b.y;
   const len = Math.hypot(b.h, L.rise);
@@ -443,7 +488,7 @@ const door = (n) => doors.find((d) => d.n === n);
 const VIEWS = {
   corridor: { pos: [cx, -44, FH + 1.7], look: [cx, 10, FH + 1.9], fov: 62 },
   stairs: { pos: [grand.x + grand.w * 0.42, grand.y + grand.h * 0.3, 1.2 + 5 * 0.3 + 2.6], look: [grand.x + grand.w * 0.5, grand.y + grand.h + 8, FH + 1.8], fov: 70 },
-  stairtop: { pos: [grand.x + grand.w / 2, grand.y + grand.h + 2.5, FH + 1.7], look: [grand.x + grand.w / 2, grand.y - 4, 2.5], fov: 66 },
+  stairtop: { pos: [grand.x + grand.w * 0.45, grand.y + grand.h + 0.6, FH + 2.4], look: [grand.x + grand.w * 0.5, grand.y + 2, 1.2], fov: 70 },
   door5: (() => { const d = door(5); return { pos: [d.wallX + d.face * 7, d.yc - 4, FH + 1.6], look: [d.wallX, d.yc + 1, FH + 1.7], fov: 60 }; })(),
   seat8: (() => {
     // a real seat two-thirds of the way up room 8's rake, eyes 1.15 m over the pan
@@ -465,12 +510,14 @@ const VIEWS = {
   })(),
 };
 VIEWS.room8 = (() => { const r = door(8).room.bounds; return { pos: [r.x + 2, r.y + 2, FH + 4.8], look: [r.x + r.w, r.y + r.h, FH - 2.5], fov: 75 }; })();
+VIEWS.side8 = (() => { const r = door(8).room.bounds; return { pos: [r.x + r.w / 2, r.y - 25, FH + 1], look: [r.x + r.w / 2, r.y + r.h / 2, FH - 1], fov: 60, plan: true, cutaway: r }; })();
 VIEWS.plan = { pos: [cx, -10, 120], look: [cx, -9.9, 0], fov: 60, plan: true };
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 function setView(name) {
   const v = VIEWS[name] || VIEWS.corridor;
   for (const c of ceilings) c.visible = !v.plan;
+  if (v.cutaway) camera.near = 24.5;
   scene.fog.density = v.plan ? 0 : 0.012;
   const inRoom = venue.rooms.find((r) => r.kind === "auditorium" && r.floor === 1 &&
     v.pos[0] > r.bounds.x && v.pos[0] < r.bounds.x + r.bounds.w && v.pos[1] > r.bounds.y && v.pos[1] < r.bounds.y + r.bounds.h);

@@ -1,0 +1,99 @@
+{
+  "id": 7040,
+  "source": "transcript",
+  "tldr": "Gonzalez shows, with Clever Cloud's 15-year-old API, how to sort each capability into wrap, reshape (intent-based endpoints) or redesign (prepare/inspect/execute, task IDs, human approval) so agents use it safely.",
+  "summary": [
+    "Horacio Gonzalez, head of DevRel at Clever Cloud, opens with a real failure. A user asked an agent to set their app to Java 25. The agent found the right endpoint, set CC_JAVA_VERSION and reported success, but the app never restarted, because the docs never said that changing an environment variable needs a restart. The problem is the semantic gap: humans bring implicit knowledge and notice danger, agents do not. He lists four questions an API must answer explicitly: dependencies (what must happen first), reversibility, blast radius, and completion (how do I know it finished). Clever Cloud's 310 operations have no descriptions, and only about 40 have summaries. He treats MCP as an implementation detail; the issue is API design.",
+    "His framework sorts each capability into wrap, reshape or redesign. Wrap works when everything is explicit, typed and bounded, which he estimates covers 60-70% of an API. Exposing every endpoint as a tool floods the context, so he points to Cloudflare's code mode: two tools, search and execute, over roughly 2,500 endpoints, using under 1,000 tokens instead of about a million. Clever Cloud added a third tool, doc, and he said AWS put 15,000 endpoints behind eight tools so new services appear without redeploying. MCP tool annotations are only hints and models can ignore them, so they do not make an endpoint safe.",
+    "Reshape is for knowledge that exists but is scattered. When asked why an app was down, a model understood each of seven atomic endpoints (logs, deployments, scaling, instances and so on) but could not chain them. The fix is an added intent endpoint, 'diagnose application', that aggregates the data in deterministic code. Postmark did the same with a 'diagnose delivery' function and went from five parameter-heavy endpoints to 25 intent tools; GitHub cut its MCP server from about 100 tools to 50. The goal is a change in the unit of affordance, from endpoint-shaped to intent-shaped.",
+    "Redesign is for structural danger. Two similar endpoints unlink an add-on and delete it with its data. Asked to remove a database from an app, two of seven model and harness combinations deleted it. A warning in Swagger is like a sign at a cliff edge; you need a barrier. That means a prepare/inspect/execute flow (list dependent apps, confirm a backup, get a deletion plan ID), task IDs with pollable state for async actions such as restart, and human approval via 2FA for billing. Descriptions still matter in all three strategies. Measure them with weekly behavioural tests of golden prompts across models and harnesses. He ends by recommending an open-source tool (its name is unclear in the recording) that applies a similar framework."
+  ],
+  "keyPoints": [
+    "Agents fail on implicit knowledge, such as an environment-variable change needing a restart, even when they call the right endpoint correctly.",
+    "Every capability should state its dependencies, reversibility, blast radius and how to detect completion.",
+    "Wrap when everything is explicit, reshape when knowledge is scattered across conventions and docs, and redesign when a mistake would be expensive.",
+    "Code mode (search + execute, plus doc at Clever Cloud) exposes very large APIs to models in a few tools instead of one tool per endpoint.",
+    "MCP annotations such as destructive hints are advisory and can be ignored. Real safety boundaries belong in the API, as OWASP also advises.",
+    "Intent-based endpoints like 'diagnose application' or Postmark's 'diagnose delivery' do deterministic aggregation in code instead of relying on the model to chain calls.",
+    "Destructive operations should require a prepare step that returns a plan ID. Async operations should return a task ID with pollable state, and money-related actions should require human 2FA approval.",
+    "Gonzalez cited early research suggesting better descriptions improve multi-step task success by around 10%, and more (20-30%) for poorly documented APIs like Clever Cloud's."
+  ],
+  "takeaways": [
+    "Audit your OpenAPI spec for operations with no description and add purpose, side effects, async behaviour and when not to use each one.",
+    "Sort your capabilities into wrap, reshape and redesign, and start redesigning anything that deletes data or moves money.",
+    "Add intent-level endpoints for the multi-call workflows your support engineers perform by hand.",
+    "Return operation or task IDs with status from long-running actions instead of a bare 'restarting'.",
+    "Set up behavioural tests that run golden prompts against several models and harnesses on a schedule."
+  ],
+  "quotes": [
+    {
+      "text": "Why are you using a non-deterministic tool to do something deterministic?",
+      "at": "25:22"
+    },
+    {
+      "text": "You cannot trust a non-deterministic system to do the safety boundaries.",
+      "at": "33:04"
+    },
+    {
+      "text": "Don't guess, evaluate.",
+      "at": "43:12"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "The Java 25 that never applied"
+    },
+    {
+      "at": "04:20",
+      "title": "The semantic gap"
+    },
+    {
+      "at": "07:08",
+      "title": "Wrap, reshape or redesign"
+    },
+    {
+      "at": "11:49",
+      "title": "Wrapping and code mode"
+    },
+    {
+      "at": "18:36",
+      "title": "Reshaping into intents"
+    },
+    {
+      "at": "28:11",
+      "title": "Redesigning destructive operations"
+    },
+    {
+      "at": "38:00",
+      "title": "Human approval and descriptions"
+    },
+    {
+      "at": "41:43",
+      "title": "Behavioural tests and human benefits"
+    },
+    {
+      "at": "44:36",
+      "title": "Tool tip and wrap-up"
+    }
+  ],
+  "tech": [
+    "MCP",
+    "OpenAPI",
+    "Swagger",
+    "Cloudflare Code Mode",
+    "Spring AI",
+    "Postmark",
+    "GitHub MCP server",
+    "AWS",
+    "Clever Cloud",
+    "Claude Code",
+    "OWASP"
+  ],
+  "watchIf": "You own a public or internal API that agents are starting to call and want a concrete way to decide what to expose as-is and what to rebuild.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Architecture & design"
+  ],
+  "demo": false
+}

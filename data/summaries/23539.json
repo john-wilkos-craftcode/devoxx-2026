@@ -1,0 +1,47 @@
+{
+  "id": 23539,
+  "source": "transcript",
+  "tldr": "Klang and Bateman present JEP 540, a small, strict, immutable JSON API proposed as an incubator for JDK 28, aimed at one-off scripts, configs, tests and the JDK's own tooling rather than replacing Jackson.",
+  "summary": [
+    "Viktor Klang opens with the everyday cases where pulling in Jackson feels excessive: a small config file, a JSON body for an HTTP request, a test against a JSON-returning service, a JShell exploration, or a one-off question such as the average temperature in Santa Clara over the next week from the US National Weather Service API. JEP 540, proposed as an incubator for JDK 28, is narrower than the abandoned 2014 JEP 198: no streaming, builders or object mapping, only a sealed JsonValue hierarchy (string, number, boolean, null, object, array) plus Json.parse and Json.toDisplayString.",
+    "Klang walks through code. A config is read with Files.readString, parsed, and navigated with get(\"charset\") and get(\"port\"), and tryGet returns an Optional for absent fields so a default such as 8080 can be supplied. A POST to an imaginary social network builds a JsonObject.of(map) and sends its compact toString() through java.net.http.HttpClient. Accessors never coerce: calling the string accessor on a number fails. Because the tree is immutable and sealed, a pattern-matching switch can accept IDs that are either numbers or strings. Navigation fails fast with an exception that reports the path and document offset.",
+    "Klang then argues against Postel's law for JSON. Being 'liberal' is not a single dimension: comments, trailing commas and duplicate keys (first or last wins?) each change what a document means depending on the parser. JEP 540 therefore implements RFC 8259 strictly and rejects all three. Alan Bateman covers JDK-internal uses: HttpClient body handlers, marshalling of structural data, a JSON alternative to JMX over RMI, and serviceability tools that already emit JSON, such as jfr print --json and jcmd Thread.dump_to_file.",
+    "Bateman demos short programs over the JSON thread dump, whose schema is in the HotSpotDiagnosticMXBean.dumpThreads Javadoc: list thread IDs and names, filter virtual threads via an optional boolean, and print held monitors, where tryValue handles the JSON nulls produced by lock elimination. He also round-trips java.util.Properties to JSON. Klang adds that a simple built-in API also makes it easier for LLMs to generate small Java tools. In Q&A: values are immutable, objects have no defined key order by design, generation is less mature than parsing, record mapping is out of scope (Gavin Bierman's work on structural data may help later), and the JEP explains BigDecimal handling."
+  ],
+  "keyPoints": [
+    "JEP 540 proposes a JSON API as an incubator module for JDK 28. It needs --add-modules and prints the usual incubator warning.",
+    "The model is a sealed JsonValue with six subtypes mirroring the JSON spec, all immutable. Json.parse turns text into a tree; toDisplayString(indent) pretty-prints and toString() is compact.",
+    "Navigation uses get(index), get(name), tryGet (Optional when absent) and tryValue (empty Optional for JSON null). Accessors such as asLong, asBoolean, asList and asMap never coerce between types.",
+    "Errors are eager and include the failing path and offset into the document.",
+    "Parsing is strict RFC 8259: no comments, no trailing commas, no duplicate member names, so a document means the same thing whatever parser reads it.",
+    "The JDK already emits JSON from jfr print --json and jcmd Thread.dump_to_file. Bateman used the thread dump (nested arrays, optional fields, explicit nulls, mixed types) as a test case for the API.",
+    "Possible JDK uses include HttpClient body handlers/publishers, JSON-persisted Properties, and a REST-style alternative to JMX over RMI and serialization.",
+    "The API is explicitly a starting point: once you need comments, object mapping or streaming, the speakers recommend moving to a full library."
+  ],
+  "takeaways": [
+    "Download the JEP 540 early-access build and try it on a one-off script or JShell session instead of adding a Jackson dependency.",
+    "Use jcmd <pid> Thread.dump_to_file -format=json and jfr print --json to get diagnostics you can process with small programs.",
+    "Treat JSON documents as strict RFC 8259 and avoid relying on parser-specific leniency like comments or duplicate keys.",
+    "Send feedback on what works and what confuses you to core-libs-dev@openjdk.org while the API is still incubating."
+  ],
+  "quotes": [
+    {"text": "If the meaning of a JSON document changes based on which JSON parser you use, you have a problem.", "at": "26:17"},
+    {"text": "If we make it easier for people to do simple things, we also make it easier for LLMs to do simple things.", "at": "40:59"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Everyday JSON use cases"},
+    {"at": "08:05", "title": "JEP 540 versus JEP 198"},
+    {"at": "11:55", "title": "Parsing a config file"},
+    {"at": "15:54", "title": "HTTP requests and the weather"},
+    {"at": "20:02", "title": "Data-oriented design and errors"},
+    {"at": "23:46", "title": "Against Postel's law"},
+    {"at": "27:49", "title": "JSON inside the JDK"},
+    {"at": "32:46", "title": "Processing thread dumps"},
+    {"at": "38:31", "title": "Properties as JSON"},
+    {"at": "42:19", "title": "Wrap-up and Q&A"}
+  ],
+  "tech": ["JEP 540", "JEP 198", "RFC 8259", "java.net.http.HttpClient", "JShell", "JDK Flight Recorder", "jcmd", "HotSpotDiagnosticMXBean", "java.util.Properties", "Jackson", "JMX", "Sealed interfaces", "Pattern matching"],
+  "watchIf": "You write small Java tools, tests or scripts that touch JSON and want to know what the built-in API will look like and why it is so strict.",
+  "themes": ["Java language & JDK"],
+  "demo": false
+}

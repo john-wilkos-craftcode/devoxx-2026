@@ -1,0 +1,45 @@
+{
+  "id": 22916,
+  "source": "transcript",
+  "tldr": "Mihalceanu runs a local LLM from Java today by calling ONNX Runtime GenAI through jextract-generated FFM bindings, then writes a Llama model as plain Java that Project Babylon's code reflection turns into an ONNX graph.",
+  "summary": [
+    "Ana-Maria Mihalceanu defines a programming model as the abstractions through which a programmer, human or AI, expresses computation without caring how it is executed. Java's model was shaped around the CPU, while AI inference lives in a separate ecosystem. She walks through the inference pipeline (tokenization, embedding, transformer layers, sampling, decoding), notes that almost all the compute sits in the repeated transformer layers, and explains that models ship as weight files in formats such as PyTorch .pt, ONNX and GGUF, each with its own native runtime.",
+    "The first bridge is the Foreign Function and Memory API. jextract reads a C header and generates Java bindings in which each C symbol becomes a method backed by a downcall handle, with memory segments for native buffers. In the demo she runs jextract against the ONNX Runtime GenAI header, ignores the warnings for C constructs it cannot map, and runs a single Java class with --enable-native-access that tokenizes a prompt, generates token by token with a Phi-3 mini 4K Instruct ONNX model, and frees the native sequence afterwards. ONNX was chosen because LangChain4j, DJL and inference4j already build on it.",
+    "She then opens the model file in Netron: a large graph of repeated layers whose operator nodes pass protobuf-serialized data. To write that graph in Java she turns to Project Babylon's code reflection, currently a draft JEP heading for incubation. A method annotated @Reflect, such as a ReLU activation, can be retrieved as a FuncOp code model: an immutable tree of operations, bodies, blocks and values that can be traversed, built and transformed into other code models. Bytecode is too low-level and JVM-specific for this, which is why the higher-level model exists.",
+    "In the Babylon ONNX example, OpGen generates an annotated Java method for each operator in the ONNX operator schema, and ProtoGen generates protobuf builder classes used by OnnxBuilder. A Llama model with 16 transformer layers is written in under 200 lines of Java: config constants from the GenAI config JSON, weights loaded in the constructor, and an @Reflect forward method that is transformed into an ONNX model and run through an ONNX Runtime GenAI session. The demo answered a 'tell me a joke' prompt. She closes by noting that HotSpot JIT, intrinsics and the Vector API help on the CPU side, and that Juan Fumero's work takes Babylon to GPUs."
+  ],
+  "keyPoints": [
+    "jextract (early-access builds from jdk.java.net/jextract, also on SDKMAN) generates FFM bindings from a C header. Warnings about unmapped C constructs can usually be ignored.",
+    "Calling ONNX Runtime GenAI through FFM lets a single Java class run local LLM inference with --enable-native-access and a library path, with no wrapper library.",
+    "The generated bindings map one-to-one to the native API, so the runtime's C documentation can be followed directly.",
+    "Babylon's code reflection exposes @Reflect-annotated methods and lambdas as FuncOp code models: operations containing bodies, blocks and SSA-style values that you can traverse, build and transform.",
+    "Transformations go from code model to code model rather than to bytecode, keeping enough semantics to target foreign programming models such as ONNX, CUDA or PyTorch.",
+    "In the Babylon ONNX example, OpGen generates Java operator methods from the ONNX operator schema and ProtoGen generates the protobuf classes used to emit ONNX models.",
+    "Mihalceanu said a Llama LLM expressed in Java takes fewer than 200 lines, with weights read from the open-weights file at construction time."
+  ],
+  "takeaways": [
+    "Try jextract on the C header of a native library you currently wrap with JNI or a third-party binding.",
+    "Run a small ONNX model locally from Java through FFM before reaching for a hosted inference API.",
+    "Open your model files in Netron to understand the graph you are executing.",
+    "Clone Project Babylon and run the code reflection ONNX examples to see where Java-authored models are heading."
+  ],
+  "quotes": [
+    {"text": "My toothbrush has an AI feature. And I'm wondering what AI is running on my toothbrush.", "at": "03:08"},
+    {"text": "Bytecode is too low level and can translate away useful information.", "at": "27:12"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "What is a programming model"},
+    {"at": "04:31", "title": "How LLM inference works"},
+    {"at": "07:19", "title": "FFM API and jextract"},
+    {"at": "11:30", "title": "Demo: ONNX GenAI via FFM"},
+    {"at": "17:19", "title": "Inspecting a model in Netron"},
+    {"at": "20:12", "title": "Babylon code reflection"},
+    {"at": "28:29", "title": "OpGen, ProtoGen and OnnxBuilder"},
+    {"at": "30:54", "title": "Demo: Llama in Java"},
+    {"at": "36:05", "title": "Wrap-up"}
+  ],
+  "tech": ["Foreign Function & Memory API", "jextract", "Project Babylon", "Code reflection", "ONNX", "ONNX Runtime GenAI", "Phi-3", "Llama", "Netron", "Protocol Buffers", "LangChain4j", "DJL", "inference4j", "Vector API", "SDKMAN"],
+  "watchIf": "You want to run AI models from Java without Python glue, or want to see how Project Babylon's code reflection actually works.",
+  "themes": ["LLMs in Java apps", "Java language & JDK"],
+  "demo": true
+}
