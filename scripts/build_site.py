@@ -1,9 +1,13 @@
 """Merge talks_base.json, summaries and the recap into site/data.js.
 
 data.js (not .json) so the site also works when index.html is opened from disk.
-Usage: python3 scripts/build_site.py
+With --artifact, also writes build/artifact/ for publishing as a claude.ai artifact: the page
+without its document wrapper (the artifact adds its own), plus the CSS, JS and data files.
+Usage: python3 scripts/build_site.py [--artifact]
 """
 import html
+import shutil
+import sys
 import json
 import re
 from datetime import datetime, timezone
@@ -60,5 +64,21 @@ def main():
         print(f"missing summaries: {' '.join(map(str, missing))}")
 
 
+def build_artifact():
+    site, out = ROOT / "site", ROOT / "build" / "artifact"
+    out.mkdir(parents=True, exist_ok=True)
+    page = (site / "index.html").read_text()
+    head = page[page.index("<head>") + 6:page.index("</head>")]
+    body = page[page.index("<body>") + 6:page.index("</body>")]
+    keep = [line for line in head.splitlines()
+            if "<title>" in line or "fonts.g" in line or 'rel="stylesheet"' in line]
+    (out / "index.html").write_text("\n".join(keep) + "\n" + body.strip() + "\n")
+    for name in ("styles.css", "app.js", "data.js"):
+        shutil.copy(site / name, out / name)
+    print(f"{out.relative_to(ROOT)}: index.html, styles.css, app.js, data.js")
+
+
 if __name__ == "__main__":
     main()
+    if "--artifact" in sys.argv:
+        build_artifact()

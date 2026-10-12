@@ -2,6 +2,9 @@
   "use strict";
 
   const DATA = window.DEVOXX || { talks: [] };
+  // Framed (e.g. published as a claude.ai artifact): the sandbox blocks YouTube embeds and
+  // third-party images, so link out to YouTube and use initials instead of speaker photos.
+  const EMBED = window.self === window.top;
   const TZ = "Europe/Brussels";
   const talks = DATA.talks
     .filter((t) => t.type !== "Keynote Overflow")
@@ -117,7 +120,7 @@
         tr.count ? el("p", { class: "trend-count", text: `${tr.count} talks touched on this` }) : null,
         el("p", { text: tr.body }),
         el("ul", { class: "trend-talks" }, linked.map((t) =>
-          el("li", {}, el("a", { href: `#/talk/${t.id}`, text: `${t.title}, ${speakerNames(t)}` })))),
+          el("li", {}, el("a", { href: `#talk-${t.id}`, text: `${t.title}, ${speakerNames(t)}` })))),
       ));
     }
   } else {
@@ -127,7 +130,7 @@
   // ---------- favourites ----------
   const favs = [...talks].sort((a, b) => b.favourites - a.favourites).slice(0, 10);
   $("#fav-list").append(...favs.map((t) => el("li", {},
-    el("a", { href: `#/talk/${t.id}` },
+    el("a", { href: `#talk-${t.id}` },
       el("span", {},
         el("span", { class: "fav-title", text: t.title }),
         el("span", { class: "fav-meta", text: `${speakerNames(t)}, ${t.favourites} bookmarks` }))))));
@@ -152,7 +155,7 @@
     });
     return parts.length ? `Sessions that are normally filmed: ${parts.join(", ")}. The channel uploads day by day, so most of these are probably still in the queue.` : "";
   }
-  const missingRow = (t) => el("li", {}, el("a", { href: `#/talk/${t.id}` },
+  const missingRow = (t) => el("li", {}, el("a", { href: `#talk-${t.id}` },
     el("span", { class: "m-title", text: t.title }),
     el("span", { class: "m-who", text: `${speakerNames(t)}, ${t.type}` }),
     el("span", { class: "m-when", text: t.start ? `${fShortDay.format(new Date(t.start))}, ${time(t.start)}` : "" })));
@@ -217,7 +220,7 @@
   // ---------- listing ----------
   function ticket(t) {
     const [roomWord, roomNum] = (t.room || "").split(" ");
-    return el("a", { class: "ticket", href: `#/talk/${t.id}` },
+    return el("a", { class: "ticket", href: `#talk-${t.id}` },
       el("div", { class: "stub" },
         el("span", { class: "stub-room" }, roomWord, roomNum ? el("b", { text: roomNum }) : null),
         el("span", { class: "stub-len", text: `${t.duration} min` }),
@@ -286,19 +289,22 @@
   const body = $("#screen-body");
   let openedFromPage = false;
 
+  const ytUrl = (t, seconds = 0) => `https://www.youtube.com/watch?v=${t.videoId}${seconds ? `&t=${seconds}s` : ""}`;
+
   function playerFor(t) {
     if (!t.videoId) {
       return el("div", { class: "player player-empty" },
         el("div", {}, el("strong", { text: "No recording yet" }),
           el("span", { text: "This summary is based on the session abstract. Devoxx usually uploads late recordings within a few weeks." })));
     }
+    if (!EMBED) {
+      return el("a", { class: "player player-link", href: ytUrl(t), target: "_blank", rel: "noopener" },
+        el("span", { class: "player-link-cta", text: "Watch on YouTube" }),
+        el("span", { class: "player-link-note", text: (t.s && t.s.chapters && t.s.chapters.length)
+          ? "The recording opens in a new tab. Chapters and quotes below open it at that moment."
+          : "The recording opens in a new tab." }));
+    }
     const box = el("div", { class: "player" });
-    const poster = () => {
-      box.textContent = "";
-      box.append(
-        el("img", { src: `https://i.ytimg.com/vi/${t.videoId}/hqdefault.jpg`, alt: "", loading: "lazy" }),
-        el("button", { type: "button", "aria-label": `Play ${t.title}`, onclick: () => play(0) }));
-    };
     const play = (start) => {
       box.textContent = "";
       box.append(el("iframe", {
@@ -307,18 +313,24 @@
       }));
     };
     box.play = play;
-    poster();
+    box.append(
+      el("img", { src: `https://i.ytimg.com/vi/${t.videoId}/hqdefault.jpg`, alt: "", loading: "lazy" }),
+      el("button", { type: "button", "aria-label": `Play ${t.title}`, onclick: () => play(0) }));
     return box;
   }
 
-  function seekButton(t, at, player, label) {
-    return el("button", { type: "button", class: "seek", disabled: !t.videoId, text: label || at,
-      onclick: () => { player.play(toSeconds(at)); player.scrollIntoView({ behavior: "smooth", block: "start" }); } });
+  // A control that jumps to a moment: plays inline when embedding, otherwise opens YouTube there.
+  function seekTo(t, at, player, cls, ...kids) {
+    const seconds = toSeconds(at);
+    if (!t.videoId) return el("button", { type: "button", class: cls, disabled: true }, ...kids);
+    if (!EMBED) return el("a", { class: cls, href: ytUrl(t, seconds), target: "_blank", rel: "noopener" }, ...kids);
+    return el("button", { type: "button", class: cls,
+      onclick: () => { player.play(seconds); player.scrollIntoView({ behavior: "smooth", block: "start" }); } }, ...kids);
   }
 
   function avatar(sp) {
     const initials = sp.name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("");
-    if (!sp.image) return el("span", { class: "avatar", text: initials });
+    if (!sp.image || !EMBED) return el("span", { class: "avatar", text: initials });
     const img = el("img", { class: "avatar", src: sp.image, alt: "", loading: "lazy", referrerpolicy: "no-referrer" });
     img.addEventListener("error", () => img.replaceWith(el("span", { class: "avatar", text: initials })));
     return img;
@@ -337,7 +349,7 @@
         el("ol", {}, s.takeaways.map((p) => el("li", { text: p })))) : null,
       s.quotes && s.quotes.length ? section("Heard on stage", el("div", { class: "quotes" }, s.quotes.map((q) =>
         el("blockquote", { class: "quote" }, el("p", { text: q.text }),
-          el("footer", {}, seekButton(t, q.at, player, `at ${q.at}`)))))) : null,
+          el("footer", {}, seekTo(t, q.at, player, "seek", `at ${q.at}`)))))) : null,
       t.abstract.length ? el("details", { class: "abstract" }, el("summary", { text: "Original abstract" }),
         t.abstract.map((p) => el("p", { text: p }))) : null,
     );
@@ -345,9 +357,7 @@
     const aside = el("aside", { class: "feature-aside" },
       s.watchIf ? el("div", { class: "watch" }, el("h3", { text: "Watch it if" }), el("p", { text: s.watchIf })) : null,
       s.chapters && s.chapters.length ? section("Chapters", el("ol", { class: "chapters" }, s.chapters.map((c) =>
-        el("li", {}, el("button", { type: "button", disabled: !t.videoId,
-          onclick: () => { player.play(toSeconds(c.at)); player.scrollIntoView({ behavior: "smooth", block: "start" }); } },
-          el("time", { text: c.at }), el("span", { text: c.title })))))) : null,
+        el("li", {}, seekTo(t, c.at, player, "chapter", el("time", { text: c.at }), el("span", { text: c.title })))))) : null,
       s.tech && s.tech.length ? section("Mentioned", el("div", { class: "chips" }, s.tech.map((x) => el("span", { class: "tag", text: x })))) : null,
       section(t.speakers.length > 1 ? "Speakers" : "Speaker", el("div", { class: "speakers" }, t.speakers.map((sp) =>
         el("div", { class: "speaker" }, avatar(sp), el("div", {},
@@ -356,7 +366,7 @@
       el("p", { class: "source-note", text: s.source === "transcript"
         ? "Summarised from a machine transcript of the recording. Check the video before quoting it."
         : "Summarised from the official abstract, so it describes what the session set out to cover." }),
-      t.videoId ? el("p", {}, el("a", { href: `https://www.youtube.com/watch?v=${t.videoId}`, target: "_blank", rel: "noopener", text: "Open on YouTube" })) : null,
+      t.videoId ? el("p", {}, el("a", { href: ytUrl(t), target: "_blank", rel: "noopener", text: "Open on YouTube" })) : null,
     );
 
     return el("div", { class: "feature" },
@@ -383,7 +393,7 @@
     const i = order.indexOf(id);
     const nav = (a, target) => {
       a.setAttribute("aria-disabled", String(target == null));
-      a.href = target == null ? "#" : `#/talk/${target}`;
+      a.href = target == null ? "#" : `#talk-${target}`;
     };
     nav($("#prev"), i > 0 ? order[i - 1] : null);
     nav($("#next"), i < order.length - 1 ? order[i + 1] : null);
@@ -412,13 +422,13 @@
   }
 
   function route() {
-    const m = location.hash.match(/^#\/talk\/(\d+)/);
+    const m = location.hash.match(/^#talk-(\d+)$/);
     if (m) openTalk(Number(m[1]));
     else closeTalk();
   }
 
   document.addEventListener("click", (e) => {
-    const a = e.target.closest('a[href^="#/talk/"]');
+    const a = e.target.closest('a[href^="#talk-"]');
     if (a && !dialog.contains(a)) openedFromPage = true;
   });
   $("#close").addEventListener("click", leaveTalk);

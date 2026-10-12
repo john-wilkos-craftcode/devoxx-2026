@@ -5,3 +5,4 @@ __pycache__/
 data/raw/audio/
 data/raw/captions/
 data/raw/caption_batch.txt
+build/

@@ -1,0 +1,46 @@
+{
+  "id": 31453,
+  "source": "transcript",
+  "tldr": "Using no slides, Rentea demos a vibe-coded review dashboard that helps humans review AI-written pull requests, built on deterministic artefacts generated from code and test runs.",
+  "summary": [
+    "Rentea presents with zero slides and continues from a session the previous day that ended with a human facing a 1,000-line AI pull request. Everything happens in an open-source review tool he vibe-coded without reading its code: a Python server, a generated HTML report and a VS Code extension (IntelliJ planned) that jumps to the relevant lines. The demo PR on a Spring PetClinic microservices setup was built by Claude Code agents. The report lists implementation assumptions, 14 open review issues and 25 auto-fixed findings from a quorum of five adversarial reviewers (/code-review plus /simplify). Per-stage costs were about $15 for implementation, $5 for review and $9 for auto-fixes. His rules: review with a smarter model than the one that wrote the code, let the coder agent reject nits, and rebase before calling in a human.",
+    "His main point is that most of the report is produced by scripts, not by an LLM, so it does not drift or hallucinate. PlantUML domain diagrams come from Java reflection, or from a schema dump after running migrations on an empty Testcontainers database, with additions highlighted in the PR diff. oasdiff flags breaking OpenAPI changes, which matters when one DTO is shared by several endpoints. Draw.io PNGs carry their XML inside the file, so a test can check the diagram against the code. When AI changes the diagram, it is marked for a human to re-lay it out, which preserves the reader's spatial memory. Coverage is collected per changed line, so the reviewer sees exactly which tests ran through the diff. AI is used only for the semantic check of tests against the ticket.",
+    "For runtime behaviour, end-to-end tests run against the services with the OpenTelemetry Java agent, browser instrumentation and 100% sampling into Grafana. An annotation on a test starts a trace, and a script turns the traces into PlantUML sequence diagrams showing REST requests and responses, SQL with parameters and cross-service calls. One diagram exposed a Hibernate N+1 query. JVM flags let OpenTelemetry record calls across module JARs, which shows the real dependencies in a modular monolith, and @WithSpan works even on private methods. Other tabs include Playwright Trace Viewer recordings, ArchUnit checks against PlantUML package diagrams, C4 container diagrams checked against observed calls, and a CodeCity-style 3D view of size, branches, churn, bug-fix commits, coupling and acceptance coverage.",
+    "He closes with smaller guardrails: programmatic UI checks for hand-rolled combo boxes and inline styles, IntelliJ-style structural search with a Java parser, and a CODEOWNERS file so that changes to contracts or guardrail files require seniors. He asks open-source users to file issues instead of AI-generated pull requests, since maintainers have more tokens than they do. The talk is chaotic and hard to follow without the screen, but the repositories are public."
+  ],
+  "keyPoints": [
+    "Ask AI to write a script that generates a diagram, not to draw the diagram. Scripted artefacts cost no tokens to regenerate and cannot hallucinate.",
+    "A quorum of adversarial review agents runs after every substantial task, with a smarter model reviewing than writing. The coder agent may reject nits, and auto-fixes are still shown to the human.",
+    "PlantUML domain and schema diagrams are generated from reflection or a migrated Testcontainers database, and the diff highlights what the PR added.",
+    "Draw.io PNGs embed their XML, so tests can check diagrams against code. Humans re-lay them out by hand to keep the layout familiar.",
+    "Per-line coverage of the diff shows exactly which tests exercise the changed code. AI then checks the tests against the ticket's requirements.",
+    "The OpenTelemetry Java agent with 100% sampling in end-to-end tests turns traces into sequence diagrams with HTTP payloads and SQL, which exposed an N+1 query.",
+    "OpenTelemetry can capture calls across module JARs at runtime, revealing actual dependencies in a modular monolith.",
+    "oasdiff detects breaking API changes. ArchUnit, CODEOWNERS and C4 diagrams checked against observed calls act as further architectural guardrails."
+  ],
+  "takeaways": [
+    "Run an adversarial review agent (or several) on any agent task longer than 10-15 minutes before a human looks at it.",
+    "Generate architecture diagrams from code or runtime traces with scripts, and add tests that fail when a diagram drifts.",
+    "Attach the OpenTelemetry Java agent to your end-to-end test environment and inspect the traces for N+1 queries and unexpected cross-service calls.",
+    "Add oasdiff to CI to catch breaking OpenAPI changes, and a CODEOWNERS rule for contract and guardrail files."
+  ],
+  "quotes": [
+    {"text": "You don't ask AI for an opinion, 'draw me a picture'. You ask it to write a script that would produce the diagram tomorrow with zero tokens and with precision.", "at": "41:15"},
+    {"text": "Do not dare to submit pull requests to open source anymore. Do submit them issues. They have more tokens than you do.", "at": "17:55"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Zero slides and token costs"},
+    {"at": "02:53", "title": "Adversarial review quorum"},
+    {"at": "12:36", "title": "Test fixtures and demo replay"},
+    {"at": "17:55", "title": "API breaking-change detection"},
+    {"at": "20:50", "title": "Generated PlantUML and Draw.io tests"},
+    {"at": "28:00", "title": "Coverage of the diff"},
+    {"at": "32:33", "title": "Traces to sequence diagrams"},
+    {"at": "39:46", "title": "ArchUnit, C4 and CodeCity"},
+    {"at": "46:05", "title": "UI drift and code owners"}
+  ],
+  "tech": ["Claude Code", "Spring PetClinic", "PlantUML", "Draw.io", "Testcontainers", "OpenTelemetry", "Grafana", "Playwright", "ArchUnit", "oasdiff", "C4 model", "CodeCity", "Hibernate", "Docker", "VS Code", "IntelliJ IDEA", "CODEOWNERS", "Mistral"],
+  "watchIf": "You review large AI-generated pull requests and want ideas for deterministic, script-generated review artefacts. Expect a chaotic, slide-free live tour.",
+  "themes": ["AI agents & agentic coding", "Architecture & design", "Testing & quality"],
+  "demo": true
+}

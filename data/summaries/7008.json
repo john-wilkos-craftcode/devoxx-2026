@@ -1,0 +1,49 @@
+{
+  "id": 7008,
+  "source": "transcript",
+  "tldr": "iBOOD's CTO describes how his 13-person team works with AI and without Scrum, sprints, branches, pull requests or code reviews, deploying around 100 times a day through small steps and autonomous micro-teams.",
+  "summary": [
+    "Hoogendoorn, CTO of the Dutch e-commerce company iBOOD (130 staff, 13 in tech), presented from a slide tool he had built himself two weeks earlier. When he joined six years ago, the company suffered from what he calls technical death: modified open-source ERP, CMS, CRM and PIM systems, with customer accounts stored in the CMS and synchronised everywhere. Everyone in tech was busy keeping things alive. He argues the cause is always organisational. AI now changes the work so quickly that he rebuilt a sales dashboard in two hours without writing code, and he openly does not know where this ends.",
+    "He structures the talk as seven habits. Prioritisation: a broad company vision guides a 70/20/10 split between the target architecture, additions to existing systems, and small requests in a Slack channel. Ideas must serve the goals, be actionable, be small, and be the most important thing; the rest goes to a \"someday maybe\" column that is never revisited. Complexity: using the Cynefin framework, most software problems are complex rather than complicated, so they need safe-to-fail experiments in very small steps. Ownership: a single TypeScript stack, collective code ownership and Dee Hock's \"simplify to amplify\". People pick their own work, much like Amsterdam's Alexanderplein works better without traffic lights.",
+    "The list of things they dropped is long: Scrum, sprints, retrospectives, Scrum masters, product owners, stories, estimates, branches, pull requests and code reviews. Blame is gone too. They keep stand-ups, event storming, voluntary pair programming, Thursday office days and weekly Lean Coffee sessions. About half the team has built a personal IDE around running agent threads in parallel, and Hoogendoorn runs eight sessions at once. A strong foundation of identical service architecture, templated pipelines and automated infrastructure lets them go fast with AI. Team knowledge goes into Claude skills, including a \"pushback\" skill that stops the model from folding when told it is wrong.",
+    "Micro-teams form around one small item, ship it within the day and dissolve. With 170 repositories, trunk-based development, thousands of automated tests, AI-fixed Sonar issues and testing in production, the team deploys about 100 times a day. Following Deming, quality is built in rather than inspected afterwards, which makes code reviews redundant. Motivation follows Dan Pink's purpose, mastery and autonomy. The newest step is a sandbox called iBox, where business users build their own dashboards on limited APIs. He closes with Jason Gorman's point that AI gets you 80-90% of the way, so developers still need to be good swimmers."
+  ],
+  "keyPoints": [
+    "Work is split 70/20/10: 70% toward the target architecture, 20% additions to existing systems, 10% small requests through a Slack channel.",
+    "Ideas are filtered by four questions: does it serve the goals, is it actionable, is it small enough, is it the most important thing right now.",
+    "Cynefin: most software work is complex, so it needs experiments that are allowed to fail, run in tiny steps.",
+    "No Scrum, sprints, estimates, product owners, branches, pull requests or code reviews. Quality comes from pairing, automation and trunk-based development across 170 repositories.",
+    "Around 100 production deploys a day with 13 people. The AI is being given the job of fixing pipeline failures and Sonar issues.",
+    "Half the team has built a personal IDE around parallel agent threads. Running many sessions leaves people \"totally cooked\" by the end of the day.",
+    "Team knowledge is encoded as Claude skills, including a custom pushback skill against the model's tendency to agree.",
+    "Developers become product engineers: prototypes in under an hour shorten feedback loops with the business, and business users get a sandbox (iBox) to build their own tools."
+  ],
+  "takeaways": [
+    "Filter incoming work against explicit goals and admit that the \"someday maybe\" column is a bin.",
+    "Encode your architecture conventions and components as agent skills so generated code follows them.",
+    "Stop estimating story points and shorten your feedback cycle from sprints to days.",
+    "Invest in identical service templates and fully automated pipelines before trying to speed up with AI.",
+    "Try dropping one ceremony, such as the retrospective, and see whether anyone misses it."
+  ],
+  "quotes": [
+    {"text": "Simple, clear purpose and principles give rise to complex and intelligent behavior. Complex rules and regulations give rise to simple and stupid behavior.", "at": "21:30"},
+    {"text": "Missing the bus is not a big deal if you know there'll be another one along in five minutes.", "at": "40:45"},
+    {"text": "A code generation tool that gets you 80 to 90 percent of the way is like a boat that takes you 80-90% of the way. We still need to be very good swimmers.", "at": "50:01"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Technical death at iBOOD"},
+    {"at": "04:02", "title": "AI and the scary new world"},
+    {"at": "07:42", "title": "Prioritisation and the 70/20/10 split"},
+    {"at": "15:08", "title": "Complexity and experiments"},
+    {"at": "18:52", "title": "Owning the work and autonomy"},
+    {"at": "26:40", "title": "What we stopped doing"},
+    {"at": "28:00", "title": "Personal IDEs and Claude skills"},
+    {"at": "34:25", "title": "Micro-teams and continuous delivery"},
+    {"at": "42:08", "title": "Automation instead of code review"},
+    {"at": "46:08", "title": "Fun, change and the ego system"}
+  ],
+  "tech": ["Claude Code", "Claude Design", "TypeScript", "Jira", "SonarQube", "Trunk-based development", "Cynefin framework", "Lean Coffee", "Event storming", "Kubernetes"],
+  "watchIf": "You lead a small product team and want a provocative, experience-based account of dropping Scrum and code reviews while scaling up AI-assisted development.",
+  "themes": ["Teams, careers & leadership", "AI agents & agentic coding"],
+  "demo": false
+}

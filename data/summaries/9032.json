@@ -1,0 +1,48 @@
+{
+  "id": 9032,
+  "source": "transcript",
+  "tldr": "Vila argues that AI coding slows teams down when done naively. He lists practical guardrails (decomposition, model choice, specs, skills over MCP, sandboxing, deterministic checks) and calls for measuring AI's value end to end.",
+  "summary": [
+    "Vila, formerly at Sonar and now AI enabler at GK Software, opens with figures from several reports: AI making developers 19% slower, 0% improvement in DORA metrics, and 44% trust. He says these numbers reflect AI done badly. Causes include low suggestion acceptance, senior developers' implicit domain knowledge never reaching the agent, ever-larger outputs from token-billed models, and poisoned long contexts. Done well, reports show 55% faster work and 30% more code. Yet in his company's AI discovery sessions every team claims to feel faster and none has a baseline to prove it.",
+    "His practices start with decomposition: plan with a big model, and use sub-agents defined by function (docs, tests, implementation), each pinned to a smaller model, instead of Opus for every loop. Model choice should follow data. Sonar's leaderboard of more than 4,000 Java tasks analysed with SonarQube shows no model with zero issues or vulnerabilities. GLM-5 had the lowest bug and issue density, and Kimi K2 produced about half the lines of Claude Opus 4.5 at a similar pass rate. Prompts should include negative constraints (\"don't use Spring\"). Specs should be written out with entity models, JSON examples, UML diagrams and acceptance tests. Frameworks such as Simon Martinelli's AI Unified Process, Spec Kit, OpenSpec or BMAD are worth adopting only once the team is mature with specs.",
+    "A quiz on an income-tax method made the point that an agent writing tests from the code alone will happily assert the bug, a negative tax, because code is not the source of truth. He recommends skills over local MCP servers: 25 servers with 20 tools each load 500 tool descriptions into every context, while a skill adds one line. MCP risks include leaked secrets from files in context, look-alike \"double agent\" servers (a dozen GitHub MCPs with identical descriptions), CVEs in dependencies, and tool confusion between GitHub and SonarQube \"issues\". Isolation options are Docker sandboxes, Podman, ToolHive and VS Code's MCP sandbox.",
+    "Verification should be deterministic. He found a team whose 10,000-line skill duplicated what their SonarQube Enterprise already checked. Use hooks to block PII and run analysis on agent output, use SonarQube for IDE, make quality gates blocking, and package shared skills and instructions with APM. Team maturity matters more than individual skill, and he suggests tracking Slack/Teams message volume as a sign of developers isolating themselves with agents. Faros data shows more code but fewer deployments, bigger pull requests, double the incidents per PR and four times the review time. Measure from end to end with DORA or DX Core 4."
+  ],
+  "keyPoints": [
+    "Plan with a large model and implement with smaller ones. Define sub-agents by function (tests, docs, implementation), not by human role.",
+    "Sonar's 4,000-task Java leaderboard: no model produces zero vulnerabilities. GLM-5 introduced the fewest bugs, and Claude models produce far more lines than Kimi K2 or Gemini at a similar pass rate.",
+    "More generated lines means more review work, so output volume is a selection criterion, not just pass rate.",
+    "Specs should carry entity models, JSON examples, sequence diagrams and acceptance tests. Code alone lets an agent cement bugs into tests.",
+    "Prefer skills over many local MCP servers: each MCP tool description sits in context on every call, while a skill costs one line until used.",
+    "MCP threats: secret leakage, look-alike servers on marketplaces, CVEs in dependencies, and ambiguous tool overlap. Sandbox them with Docker, ToolHive or VS Code.",
+    "Use AI only where reasoning is needed. Run Sonar, Snyk and GitHub Advanced Security as deterministic checks, triggered by agent hooks and enforced by blocking quality gates.",
+    "Faros data: more output but fewer deployments, double the incidents per PR and four times the review time, so measure from end to end with DORA or DX Core 4."
+  ],
+  "takeaways": [
+    "Measure a productivity baseline now, covering the whole delivery pipeline and not just code generation.",
+    "Pin sub-agents for routine tasks to cheaper models and keep the largest model for planning.",
+    "Replace locally installed MCP servers with skills where possible, and sandbox the ones you keep.",
+    "Add an agent hook that runs SonarQube or another linter on generated code, and make your CI quality gate blocking.",
+    "Write negative constraints and acceptance criteria into your specs before asking an agent to implement."
+  ],
+  "quotes": [
+    {"text": "If you have shit, AI will multiply that and you will have a big pile of shit.", "at": "42:02"},
+    {"text": "AI will give you time, potentially, but it will never give you confidence.", "at": "44:34"},
+    {"text": "We only need AI when we need reasoning. But if not, use deterministic tools.", "at": "38:54"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why AI makes us slower"},
+    {"at": "08:34", "title": "No baseline, no metrics"},
+    {"at": "10:44", "title": "Decompose and choose models"},
+    {"at": "17:33", "title": "Sonar model leaderboard"},
+    {"at": "20:50", "title": "Constraints and specs before code"},
+    {"at": "26:59", "title": "Code is not the source of truth"},
+    {"at": "30:34", "title": "Skills, MCP and security"},
+    {"at": "36:25", "title": "Sandboxing and deterministic guardrails"},
+    {"at": "42:02", "title": "Team maturity and measuring value"}
+  ],
+  "tech": ["MCP", "Claude Code", "Claude Opus", "GLM-5", "Kimi K2", "Gemini", "SonarQube", "SonarQube for IDE", "Snyk", "GitHub Advanced Security", "Docker Sandboxes", "ToolHive", "Podman", "Spec Kit", "OpenSpec", "BMAD Method", "AI Unified Process", "APM", "Cucumber", "DORA metrics", "DX Core 4", "Faros AI"],
+  "watchIf": "You are rolling out coding agents in a company and need concrete guardrails and an argument for measuring whether they actually pay off.",
+  "themes": ["AI agents & agentic coding", "Security & supply chain", "Testing & quality"],
+  "demo": false
+}

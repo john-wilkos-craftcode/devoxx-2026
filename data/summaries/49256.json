@@ -1,0 +1,46 @@
+{
+  "id": 49256,
+  "source": "transcript",
+  "tldr": "Subramaniam argues that the reasoning behind important decisions is what code never captures, and makes the case for short, immutable, plain-text decision records kept in Git.",
+  "summary": [
+    "Subramaniam starts by questioning Martin Fowler's definition of architecture as decisions that are hard to change, since plenty of bad code is hard to change too. He proposes instead that architecture is the set of decisions with high impact. Design and architecture sit on a spectrum. Picking a library is design, and a facade can reduce how much of your code touches it. Choosing a language, database or framework is architectural: a library is like renting a house, a framework like buying one. The higher the impact, the more deliberate the decision should be, with reversibility and explicit trade-offs in mind.",
+    "Code shows what was done but not why, and comments are too low-level to carry strategic reasoning. Most developers end up as software archaeologists, inheriting decisions from people who have left. He lists the poor reasons behind many decisions: past experience, familiarity, technology from 15 years ago, infatuation with what everyone else uses, and unquestioned corporate standards. He tells of a team expecting a two-week change that would take three months because of old decisions nobody could explain, and of a decision document his supervisor forced him to write that later stopped a colleague from repeating his mistakes.",
+    "Writing an ADR is useful in itself: nobody wants to write \"because it's all I know\" in a document that will be reviewed. Every technical decision and corporate standard should have an expiration date and be revisited every three, six or twelve months. An ADR has a title, context, status, the decision, the options considered with pros and cons (he wants at least three), and the consequences for scalability, performance and security. It contains no code-level detail. His rules: ADRs are immutable apart from status and typos, new ADRs supersede old ones and link back to them like a linked list, they stay short, use plain text, are numbered sequentially and live in Git so they can be diffed and reviewed through pull requests. ADR tools are fine if they store plain text behind the UI."
+  ],
+  "keyPoints": [
+    "Subramaniam defines architecture as decisions with high impact, rather than Fowler's \"decisions that are hard to change\".",
+    "Library choices are design decisions that a facade can make reversible. Frameworks lock you in, like buying rather than renting a house.",
+    "Code and comments record what was done. ADRs record why, which is strategic rather than tactical.",
+    "Writing a decision down makes it awkward to justify it by familiarity, infatuation or \"corporate standard\".",
+    "Corporate standards should carry an expiration date and be re-evaluated on a 3/6/12-month cadence.",
+    "ADR structure: title, context, status, decision, at least three options with pros and cons, and consequences. No code.",
+    "ADRs are immutable. A new ADR supersedes an old one and references it, so the original reasoning survives.",
+    "Keep ADRs short, in plain text, sequentially numbered and in Git, and review them through pull requests."
+  ],
+  "takeaways": [
+    "Write an ADR for your next high-impact choice, such as a framework or database, listing at least three options and their consequences.",
+    "Store ADRs as numbered plain-text files in the repository and review them through pull requests.",
+    "Never edit an accepted ADR's reasoning. Write a new one that supersedes it.",
+    "Put a review date on your team's technology standards."
+  ],
+  "quotes": [
+    {"text": "Using a library is like renting a house, but using a framework is like buying a house.", "at": "09:47"},
+    {"text": "While the painting is still there, the meaning is lost forever.", "at": "20:31"},
+    {"text": "Every technical decision should have an expiration label.", "at": "33:03"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "What is architecture?"},
+    {"at": "07:14", "title": "Libraries, frameworks and reversibility"},
+    {"at": "12:13", "title": "Trade-offs and the why"},
+    {"at": "17:10", "title": "Software archaeology"},
+    {"at": "21:42", "title": "How decisions really get made"},
+    {"at": "24:30", "title": "Documentation that matters"},
+    {"at": "33:03", "title": "Expiration labels on standards"},
+    {"at": "42:42", "title": "What goes in an ADR"},
+    {"at": "45:05", "title": "Rules: immutable, short, versioned"}
+  ],
+  "tech": ["Architecture Decision Records", "Git", "Facade pattern"],
+  "watchIf": "Your team keeps inheriting decisions nobody can explain and you want a lightweight, persuasive argument for recording them.",
+  "themes": ["Architecture & design", "Teams, careers & leadership"],
+  "demo": false
+}

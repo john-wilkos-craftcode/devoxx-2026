@@ -1,0 +1,48 @@
+{
+  "id": 4087,
+  "source": "transcript",
+  "tldr": "Darwish explains a coding agent as model plus harness and argues that developers control the outer harness: guides, deterministic sensors, gated checks, bounded repair loops and explicit acceptance criteria.",
+  "summary": [
+    "Darwish, a data engineer at Xomnia and former Java/Scala developer, said up front that the live from-scratch Java build promised in the abstract had moved to a self-guided workshop linked by QR code. The talk covers the concepts only. Their motivation is that agentic coding feels like moving from Java back to JavaScript: fast, but with little safety. The concerns are maintainability, rising token costs and EU AI Act audit trails. Vendor claims (Stripe's thousand-plus agent PRs, Google's 75% AI-generated code, Uber's 70% agent PRs) are self-reported. Gartner forecasts that 40% of companies using coding agents may scale back by the end of 2027.",
+    "An agent is the model plus a harness. Terminal-Bench showed Claude Opus 4.5 scoring differently in different harnesses, and the minimal Terminus 2 harness with only a bash tool beat Claude Code. Following Birgitta Böckeler's work on harness engineering, Darwish separates the inner harness (the vendor's loop: call the model, run tool calls, feed results back, with nothing deciding when to stop) from the outer harness that users control. Böckeler's two axes divide the outer harness into guides (before acting) and sensors (feedback after). Each can be computational (scaffolding generators, compilers, linters, ArchUnit-style rules, tests) or inferential (AGENTS.md/CLAUDE.md, LLM reviewers).",
+    "A Claude Haiku-generated bookshelf app showed the gap: the borrow logic let a second member take an already-lent book, and the generated test suite had no assertions. Darwish argues for behaviour-driven Given/When/Then specs alongside TDD, so the developer stays the owner of the business logic. Research shows 82% of agents solve a task on the first loop, but success drops to 67.3% after a failed iteration, often because a bloated context hides an answer the agent had already found.",
+    "His proposed outer loop: guide with AGENTS.md and a spec, then compile as a gate, then run independent checks (lint, business behaviour, architecture boundaries) and report all failures together. Only after those pass does the expensive full test suite run. Repairs happen in a fresh context with a focused prompt (purpose, failed property, diagnostics, reproduction) and a fixed budget before handing back to a human. Microsoft's Angular library port, where 221 of 222 tests passed but the agent had hardcoded the demo, shows why hard architecture tests matter. Vendors are adding hooks, repo maps, sandboxing and separate review agents. The session ended about ten minutes early."
+  ],
+  "keyPoints": [
+    "Agent = model + harness. On Terminal-Bench the same Claude Opus 4.5 scored differently per harness, and a bash-only harness (Terminus 2) beat Claude Code.",
+    "The inner agent loop is just: call the model, execute tool calls, feed results back. Nothing in it decides when to stop.",
+    "Böckeler's matrix: guides versus sensors, each computational (deterministic) or inferential (LLM-based). Java already has strong computational sensors.",
+    "Agent success fell from 82% on the first attempt to 67.3% after a failed loop, as bloated context makes agents miss or abandon correct answers.",
+    "Gate the pipeline: compile first, then lint, behaviour and architecture checks in parallel with all failures reported together, and only then the slow full test suite.",
+    "Repair in a fresh context with a focused prompt and a hard iteration budget instead of letting one agent loop for hours.",
+    "Architecture tests (for example \"no domain class touches the database\") stop agents from taking shortcuts, like the hardcoded demo in Microsoft's Angular library port.",
+    "Write behaviour-driven Given/When/Then specs so business decisions are not left to the model. A Haiku-built app shipped a borrowing bug and a test suite with no assertions."
+  ],
+  "takeaways": [
+    "Add deterministic architecture tests (ArchUnit or similar) for the boundaries your AGENTS.md describes.",
+    "Configure agent hooks to compile and lint after edits, and run the full test suite only once the cheap checks pass.",
+    "Cap repair attempts and start a fresh context with a targeted failure description rather than letting the agent loop.",
+    "Write acceptance criteria as Given/When/Then scenarios before handing a feature to an agent.",
+    "Stop the coding agent from editing the tests that define success."
+  ],
+  "quotes": [
+    {"text": "The model is the brain that only just chooses what action needs to be taken. The harness basically decides how the action is taken.", "at": "12:04"},
+    {"text": "Agents find a way to get to their objective. If there's a hard test in place, they won't go that far.", "at": "32:42"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "From JavaScript vibes to Java safety"},
+    {"at": "03:07", "title": "Why harnesses matter now"},
+    {"at": "06:58", "title": "Agent equals model plus harness"},
+    {"at": "10:43", "title": "Inner and outer harness"},
+    {"at": "13:26", "title": "Guides and sensors"},
+    {"at": "19:33", "title": "The bookshelf bug and BDD"},
+    {"at": "23:27", "title": "Why agent loops degrade"},
+    {"at": "24:42", "title": "A gated outer loop"},
+    {"at": "31:22", "title": "Architecture tests and tooling"},
+    {"at": "36:49", "title": "Four takeaways"}
+  ],
+  "tech": ["Claude Code", "Codex CLI", "Gemini CLI", "Cursor", "Windsurf", "OpenCode", "Pi", "Terminal-Bench", "Terminus 2", "Claude Opus 4.5", "Claude Haiku", "AGENTS.md", "CLAUDE.md", "ArchUnit", "Graphify", "EU AI Act"],
+  "watchIf": "You use Claude Code or similar agents on a long-lived Java codebase and want a mental model for adding deterministic checks and bounded loops around them. Note that there is no live coding.",
+  "themes": ["AI agents & agentic coding", "Testing & quality"],
+  "demo": false
+}

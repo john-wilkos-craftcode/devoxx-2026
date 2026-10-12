@@ -167,7 +167,7 @@ button, input, select { font: inherit; color: inherit; }
 }
 .tile.is-red { color: var(--velvet); }
 .marquee.is-lit .tile { animation: hang .5s cubic-bezier(.2, 1.5, .4, 1) backwards; animation-delay: var(--delay, 0s); }
-@keyframes hang { from { opacity: 0; transform: translateY(-.4em) rotate(calc(var(--rot, 0deg) * 6)); } }
+@keyframes hang { from { transform: translateY(-.4em) rotate(calc(var(--rot, 0deg) * 6)); } }
 
 .hero-copy { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 32px; margin-top: clamp(28px, 4vw, 48px); align-items: end; }
 .lede { margin: 0; font-size: clamp(19px, 2vw, 23px); line-height: 1.5; max-width: 34em; }
@@ -219,7 +219,7 @@ button, input, select { font: inherit; color: inherit; }
 /* ---------- Programme ---------- */
 .programme { padding: clamp(40px, 6vw, 72px) 0 80px; border-top: 1px solid var(--line); }
 .toolbar {
-  position: sticky; top: 0; z-index: 10; margin: 12px 0 8px;
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; margin: 12px 0 8px;
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
@@ -336,6 +336,21 @@ button, input, select { font: inherit; color: inherit; }
   box-shadow: 0 0 0 10px rgba(255, 201, 60, .25); transition: scale .15s;
 }
 .player button:hover::after { scale: 1.07; }
+/* Link-out player for sandboxes that can't embed YouTube: the talk's title on the screen. */
+.player-link {
+  aspect-ratio: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px;
+  padding: clamp(22px, 4vw, 40px); text-decoration: none; color: #EEEBF7;
+  background: radial-gradient(120% 140% at 0% 0%, #3A2D6B 0%, #17122B 75%);
+}
+.player-link-note { color: #A39CC2; font-size: 15px; max-width: 34em; }
+.player-link-cta {
+  display: inline-flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 600;
+  background: var(--bulb); color: #17122B; padding: 12px 22px 12px 16px; border-radius: 999px;
+}
+.player-link-cta::before {
+  content: ""; width: 0; height: 0; border-left: 12px solid #17122B; border-top: 8px solid transparent; border-bottom: 8px solid transparent;
+}
+.player-link:hover .player-link-cta { box-shadow: 0 0 0 6px rgba(255, 201, 60, .3); }
 .player-empty {
   aspect-ratio: auto; min-height: 180px; display: grid; place-items: center; text-align: center;
   background: var(--surface); box-shadow: none; padding: 32px; color: var(--muted);
@@ -368,19 +383,19 @@ button, input, select { font: inherit; color: inherit; }
 .quote p { margin: 0; font-style: italic; font-size: 20px; line-height: 1.45; max-width: 32em; }
 .quote p::before { content: "\201C"; } .quote p::after { content: "\201D"; }
 .quote footer { color: var(--muted); font-size: 14px; margin-top: 6px; }
-.seek { background: none; border: 0; padding: 0; color: var(--hot); cursor: pointer; font-size: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.seek { display: inline; background: none; border: 0; padding: 0; color: var(--hot); cursor: pointer; font-size: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .seek:disabled { color: var(--muted); cursor: default; text-decoration: none; }
 
 .feature-aside > * + * { margin-top: 32px; }
 .chapters { list-style: none; padding: 0; margin: 0; }
 .chapters li + li { border-top: 1px solid var(--line); }
-.chapters button {
+.chapters .chapter {
   width: 100%; display: grid; grid-template-columns: 56px 1fr; gap: 8px; text-align: left; padding: 9px 0;
-  background: none; border: 0; cursor: pointer; font-size: 15px; line-height: 1.35;
+  background: none; border: 0; cursor: pointer; font-size: 15px; line-height: 1.35; text-decoration: none;
 }
-.chapters button:hover span:last-child { text-decoration: underline; text-decoration-color: var(--accent); }
-.chapters button:disabled { cursor: default; }
-.chapters button:disabled:hover span:last-child { text-decoration: none; }
+.chapters .chapter:hover span { text-decoration: underline; text-decoration-color: var(--accent); }
+.chapters .chapter:disabled { cursor: default; }
+.chapters .chapter:disabled:hover span { text-decoration: none; }
 .chapters time { font: 700 17px/1.2 var(--display); color: var(--accent); letter-spacing: .02em; }
 :root[data-theme="light"] .chapters time { color: var(--hot); }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .chapters time { color: var(--hot); } }
