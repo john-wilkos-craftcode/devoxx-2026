@@ -86,10 +86,10 @@ def build_artifact():
     body = page[page.index("<body>") + 6:page.index("</body>")]
     head = "\n".join(l for l in head.splitlines() if "<meta charset" not in l and 'name="viewport"' not in l)
     (kout / "index.html").write_text(head.strip() + "\n" + body.strip() + "\n")
-    for name in ("kino.js", "venue.json"):
+    for name in ("kino.js", "experience.js", "venue.json"):
         shutil.copy(kino / name, kout / name)
     shutil.copy(site / "data.js", kout / "data.js")
-    print(f"{kout.relative_to(ROOT)}: index.html, kino.js, venue.json, data.js")
+    print(f"{kout.relative_to(ROOT)}: index.html, kino.js, experience.js, venue.json, data.js")
 
 
 if __name__ == "__main__":
