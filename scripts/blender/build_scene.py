@@ -380,7 +380,7 @@ M = {
     "panelLight": emissive("panelLight", 0xfff3e6, 8.0),       # the look of the panels; area lights below do the lighting      # about 4000 K, like the photos
     # the HTML is pinned over these in the browser: they glow the panels' navy, so their light on the room matches
     "screen": emissive("screen", 0x111a4a, 3.0),
-    "programme": emissive("programme", 0x15205a, 3.0),
+    "programme": emissive("programme", 0x1d2c7a, 6.0),
     "schedule": emissive("schedule", 0x1c2a6b, 1.5),
     "scheduleCard": emissive("scheduleCard", 0xff7a1a, 2.5),
     "scheduleText": emissive("scheduleText", 0xf4f4f4, 2.0),
@@ -714,10 +714,13 @@ for r in auditoriums:
         sb = sd["bounds"]
         z0 = FH + plate_under(sd) + sd.get("base", 0)
         z1 = FH + plate_under(sd) + sd["height"]
+        # as in the 2026 photos, the screen starts above the "#DEVOXX" standing on the stage (letters up to 1.5 m)
+        z0 = max(z0, FH + plate_under(sd) + 2.1)
+        z1 = max(z1, FH + CLEAR - 0.8)                  # and runs up close to the ceiling
         w = sb["h"]
         h = min(z1 - z0, w * 776 / 2048)
         x = sb["x"] + sb["w"] + 0.02 if west else sb["x"] - 0.02
-        zc = (z0 + z1) / 2
+        zc = z0 + h / 2
         corners = [(x, sb["y"], zc - h / 2), (x, sb["y"] + w, zc - h / 2), (x, sb["y"] + w, zc + h / 2), (x, sb["y"], zc + h / 2)]
         B.mesh("screen", corners, [(0, 1, 2, 3)])
         screens[n] = {"corners": corners, "x": x, "y": sb["y"] + w / 2, "z": zc, "w": w, "h": h, "west": west}
@@ -1299,17 +1302,17 @@ def set_cam(loc, target, fov):
 
 
 def hall_pose():
-    """Square on to the programme screen, close enough that it fills most of a laptop's view (the frame is cropped
-    to the viewport, so the screen keeps a margin of curtain and ceiling round it at 16:10 as well as 16:9)."""
-    d = fit_distance(SCREEN["w"] + 2 * BEZEL, SCREEN["h"] + BEZEL + CHIN, 40, 0.8)
-    return (SCREEN["x"], SCREEN["y"] - d, SCREEN["z"]), (SCREEN["x"], SCREEN["y"], SCREEN["z"]), 40
+    """A little left of square on to the programme screen, close enough that it fills most of a laptop's view, far
+    enough that the columns, the ceiling and the curtains around it say where you are."""
+    d = fit_distance(SCREEN["w"] + 2 * BEZEL, SCREEN["h"] + BEZEL + CHIN, 40, 0.78)
+    return (SCREEN["x"] - 0.1 * d, SCREEN["y"] - d, SCREEN["z"] + 0.03), (SCREEN["x"], SCREEN["y"], SCREEN["z"]), 40
 
 
 def seat_for(n, fov=52):
     door, scr = doors[n], screens[n]
     b = door["room"]["bounds"]
     seats = [d for d in pans if d["floor"] == 1 and inside(b, d["bounds"]["x"], d["bounds"]["y"])]
-    want = fit_distance(scr["w"], scr["h"], fov, 0.92)
+    want = fit_distance(scr["w"], scr["h"], fov, 0.8)      # the screen's edges and the black wall stay in shot
     # the right distance, near the middle, and eyes level with the screen's middle so the talk isn't keystoned
     best = min(seats, key=lambda s: abs(abs(s["bounds"]["x"] + s["bounds"]["w"] / 2 - scr["x"]) - want) +
                abs(s["bounds"]["y"] + s["bounds"]["h"] / 2 - scr["y"]) * 0.6 + abs(FH + s["height"] + 0.8 - scr["z"]) * 2.0)
@@ -1488,8 +1491,8 @@ def still_cam(name, loc, look, fov, sensor="VERTICAL", dof=None, level_for=None)
 # laptop: the hall screen; phone: the totem, the big screen soft behind it
 pos, look, fov = hall_pose()
 hall_cam = still_cam("cam-hall", pos, look, fov)
-tdist = 1.7                           # the totem fills 84% of a phone's width; the stand, floor and room show round it
-_hfov = 2 * math.atan(TOTEM["w"] / 2 / 0.84 / tdist)
+tdist = 1.7                           # the totem fills 90% of a phone's width; a little stand, floor and room round it
+_hfov = 2 * math.atan(TOTEM["w"] / 2 / 0.9 / tdist)
 phone_hall_cam = still_cam("cam-hall-phone", (TOTEM["x"], TOTEM["y"] - tdist, TOTEM["z"] + 0.04), (TOTEM["x"], TOTEM["y"], TOTEM["z"] - 0.02),
                            2 * math.degrees(math.atan(math.tan(_hfov / 2) * PHONE[1] / PHONE[0])), dof=(tdist, 1.8))
 bpy.context.view_layer.update()       # matrix_world is stale until the depsgraph runs
@@ -1511,7 +1514,12 @@ seat_cam = still_cam(f"cam-seat-{n}", seat, look_end, fov_end, level_for=WALK_AS
 scr = screens[n]
 dist = abs(scr["x"] - seat[0])
 pfov = 2 * math.degrees(math.atan(scr["h"] / 2 / 0.8 / dist))     # the screen fills 80% of a phone's height
-seat_phone_cam = still_cam(f"cam-seat-phone-{n}", seat, (scr["x"], seat[1], scr["z"]), pfov, level_for=PHONE[0] / PHONE[1])
+# phones see the left end of the screen: its edge and the black wall show, the talk sits on what's in view
+edge_y = scr["y"] + scr["w"] / 2 if not scr["west"] else scr["y"] - scr["w"] / 2      # the viewer's left
+inward = -1 if not scr["west"] else 1
+vis_w = 2 * dist * math.tan(math.radians(pfov) / 2) * PHONE[0] / PHONE[1]
+phone_look_y = edge_y + inward * (0.5 * vis_w - 0.07 * vis_w)
+seat_phone_cam = still_cam(f"cam-seat-phone-{n}", (seat[0], phone_look_y, seat[2]), (scr["x"], phone_look_y, scr["z"]), pfov, level_for=PHONE[0] / PHONE[1])
 bpy.context.view_layer.update()
 set_res(LAPTOP)
 # the talk goes on the screen above the "#DEVOXX" standing in front of it
@@ -1522,8 +1530,8 @@ full = [(scr["x"], scr["y"] - scr["w"] / 2, zlow), (scr["x"], scr["y"] + scr["w"
 shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(full, seat_cam)}, "size": {"screen": [scr["w"], zhigh - zlow]},
                       "front": f"seat-{n}-front", "clear_bottom": round((word_top.get(n, zlow) + 0.15 - zlow) / (zhigh - zlow), 4)}
 set_res(PHONE)
-half_w = dist * math.tan(math.radians(pfov) / 2) * PHONE[0] / PHONE[1] * 1.03   # edge to edge: the frame crops the screen
-y0, y1 = max(scr["y"] - scr["w"] / 2, seat[1] - half_w), min(scr["y"] + scr["w"] / 2, seat[1] + half_w)
+far_y = edge_y + inward * min(scr["w"], 0.95 * vis_w)          # the frame's right side crops the rest of the screen
+y0, y1 = min(edge_y, far_y), max(edge_y, far_y)
 z0, z1 = zlow, zhigh
 sub = [(scr["x"], y0, z0), (scr["x"], y1, z0), (scr["x"], y1, z1), (scr["x"], y0, z1)]
 shots[f"seat-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(sub, seat_phone_cam)}, "size": {"screen": [y1 - y0, z1 - z0]},

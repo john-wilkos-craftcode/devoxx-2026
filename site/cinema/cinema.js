@@ -17,7 +17,7 @@ const ytUrl = (t, sec = 0) => `https://www.youtube.com/watch?v=${t.videoId}${sec
 const EMBED = window.self === window.top;      // YouTube can't be embedded inside the artifact sandbox
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const IMG = { laptop: [1920, 1080], phone: [1080, 2340] };
-const CANVAS = { hall: 1280, "hall-phone": 340, seat: 1600, "seat-phone": 360 };   // design widths in css px
+const CANVAS = { hall: 1060, "hall-phone": 340, seat: 1300, "seat-phone": 360 };   // design widths in css px
 
 const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -90,12 +90,19 @@ const shotKey = (base) => {
 };
 const canvasFor = (key) => CANVAS[key.replace(/-\d+$/, "")];
 
+// How a still sits in the viewport: cropped to fill it (cover) unless that would cut more than 6% off a side and
+// risk cutting into a screen, then letterboxed (contain), black bars like a cinema.
+function fit(key) {
+  const [iw, ih] = IMG[key.includes("phone") ? "phone" : "laptop"];
+  const W = stage.clientWidth, H = stage.clientHeight;
+  const cover = Math.max(W / iw, H / ih), crop = Math.max(1 - W / (iw * cover), 1 - H / (ih * cover)) / 2;
+  const s = crop > 0.06 ? Math.min(W / iw, H / ih) : cover;
+  return { iw, ih, s, ox: (W - iw * s) / 2, oy: (H - ih * s) / 2, contain: crop > 0.06 };
+}
 let face = null;      // { el, key, overlayName, w, h }
 function place() {
   if (!face) return;
-  const [iw, ih] = IMG[face.key.includes("phone") ? "phone" : "laptop"];
-  const W = stage.clientWidth, H = stage.clientHeight, s = Math.max(W / iw, H / ih);
-  const ox = (W - iw * s) / 2, oy = (H - ih * s) / 2;
+  const { iw, ih, s, ox, oy } = fit(face.key);
   const quad = shots[face.key].overlay[face.overlayName];
   face.el.style.transform = matrix3d(face.w, face.h, ordered(quad).map(([x, y]) => [ox + x * iw * s, oy + y * ih * s]));
 }
@@ -105,7 +112,7 @@ function mount(panel, key, overlayName) {
   const w = canvasFor(key), h = Math.round(w * mh / mw);
   panel.style.width = `${w}px`;
   panel.style.height = `${h}px`;
-  if (shots[key].clear_bottom) panel.style.paddingBottom = `${Math.round(shots[key].clear_bottom * h)}px`;   // keep clear of the letters
+  if (shots[key].clear_bottom > 0) panel.style.paddingBottom = `${Math.round(shots[key].clear_bottom * h)}px`;   // keep clear of the letters
   overlay.append(panel);
   face = { el: panel, key, overlayName, w, h };
   place();
@@ -116,7 +123,11 @@ let resizeTimer = 0;
 addEventListener("resize", () => {
   place();
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => { const next = form(); if (next !== shape && !busy) { shape = next; rerender(); } }, 180);
+  resizeTimer = setTimeout(() => {
+    const next = form();
+    if (next !== shape && !busy) { shape = next; rerender(); }
+    else if (face) { const mode = fit(face.key).contain ? "contain" : "cover"; plate.style.objectFit = front.style.objectFit = mode; place(); }
+  }, 180);
 });
 
 // fade the edge of anything that scrolls, on the side where there's more
@@ -143,6 +154,8 @@ const showStill = (key) => new Promise((resolve) => {
     if (fr) { front.src = `media/${fr}.webp`; front.hidden = false; } else front.hidden = true;
     resolve();
   };
+  const mode = fit(key).contain ? "contain" : "cover";
+  plate.style.objectFit = front.style.objectFit = clip.style.objectFit = mode;
   if (plate.getAttribute("src") === src) { done(); return; }
   const img = new Image();
   img.onload = img.onerror = done;
@@ -188,7 +201,7 @@ function card(t, { withWhen = false, next = false } = {}) {
 
 function programme(tall) {
   const search = el("input", { class: "search", type: "search", placeholder: "Search talks, speakers, topics", "aria-label": "Search all talks", value: query });
-  const dayRow = el("div", { class: tall ? "strip days" : "days", role: "group", "aria-label": "Day" });
+  const dayRow = el("div", { class: "strip days", role: "group", "aria-label": "Day" });
   const timeRow = el("div", { class: "strip times", role: "group", "aria-label": "Start time" });
   const nav = el("div", { class: "nav" }, dayRow, timeRow);
   const body = el("div", { class: "slot" });
@@ -221,15 +234,20 @@ function programme(tall) {
     }
     const here = inSlot(slot);
     const cards = el("div", { class: "cards scroller", tabindex: "-1" }, here.map((t) => card(t)));
-    // a short slot leaves room to show what's on next
-    const later = startsOn(day).filter((s) => s > slot);
-    if (!tall && here.length <= 4 && later.length) {
-      const nextSlot = later[0], nextTalks = inSlot(nextSlot).slice(0, 4);
-      put(cards, el("div", { class: "next-head" }, el("b", { text: `Next, ${fTime.format(new Date(nextSlot))}` }), el("span", { text: nextTalks.length < inSlot(nextSlot).length ? `${inSlot(nextSlot).length} sessions` : "" })),
-        nextTalks.map((t) => card(t, { next: true })));
+    // a short slot leaves room for what's on next: carry on through the day, each slot under its own time
+    let count = here.length;
+    for (const s of startsOn(day).filter((x) => x > slot)) {
+      if (count >= (tall ? 6 : 8)) break;
+      const more = inSlot(s);
+      put(cards, el("div", { class: "divider" }, el("b", { text: fTime.format(new Date(s)) }), el("span", { text: `${more.length} ${more.length === 1 ? "session" : "sessions"}` })),
+        more.map((t) => card(t)));
+      count += more.length + (tall ? 1 : 4);
     }
+    const allWalk = here.every((t) => walkable.has(roomNo(t)));
+    const someWalk = here.some((t) => walkable.has(roomNo(t)));
+    const hint = allWalk ? "Pick one and we'll walk you to your seat." : someWalk ? "Orange ones walk you to your seat; the others open right here." : "These open right here.";
     put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
-        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}. Pick one and we'll walk you to your seat.` })),
+        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}. ${hint}` })),
       cards);
     requestAnimationFrame(() => { centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
   }
@@ -275,8 +293,8 @@ function talkScreen(t, tall, onFloor) {
     main.textContent = "";
     put(main,
       el("div", { class: "meta", text: [t.room, when(t), typeLabel(t)].filter(Boolean).join(", ") }),
-      !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? `${t.room} is a meeting room downstairs, so this one has no cinema seat.` : "This session has no cinema seat to walk you to." }) : null,
-      el("h2", { text: t.title, style: `--title:${titleSize(t.title, 46, 36)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
+      !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? "A meeting room downstairs: no cinema seat for this one." : "No cinema seat to walk you to for this one." }) : null,
+      el("h2", { text: t.title, style: `--title:${titleSize(t.title, 40, 31)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
       !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
       el("div", { class: "actions" }, watch(), el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() })),
