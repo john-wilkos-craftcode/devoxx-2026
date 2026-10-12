@@ -1,0 +1,68 @@
+{
+  "id": 10020,
+  "source": "transcript",
+  "tldr": "Magnette walks through every workflow and agentic pattern in LangChain4j's agentic modules with live demos, arguing you should start with plain workflows and add autonomy only when needed.",
+  "summary": [
+    "After a refresher on LangChain4j AI services (system and user messages, @Tool classes, input and output guardrails with retry), Magnette defines an agent as a model working towards a goal with tools and context. In LangChain4j that is an interface annotated @Agent with a capability description and an output key, built with the agentic builder from the separate langchain4j-agentic dependency. Agents share state through the AgenticScope instead of passing messages, and a Planner interface (init, firstAction, nextAction) decides what runs next. All demos use dog-themed rescue scenarios on a local model via Ollama.",
+    "The first half covers workflows, which map onto ordinary control flow: sequence; loop with an exit-condition lambda on a reviewer's score, a max-iterations cap and an option to test the exit after every agent; parallel with your own executor and an output function to merge results; a parallel mapper that runs one agent per item of a collection; and conditional routing, where he recommends a classifier that returns an annotated enum rather than a string. Typed keys replace string output keys to catch typos and type mismatches at compile time. He adds human-in-the-loop agents for approval steps, optional agents and an error handler with attempt counting and retry, plain-Java non-AI agents, AgentListener hooks, the AgentMonitor's HTML report of topology and timing, and a lambda that picks a cheap or strong chat model per call.",
+    "After the break come the patterns in langchain4j-agentic-patterns. The LLM supervisor picks sub-agents itself, with an invocation cap and a choice of chat memory or summarised context; the smallest Llama 3.2 never delegated at all. The goal-oriented planner builds a graph from agents' inputs and outputs and follows the shortest path, fixed once chosen. Peer-to-peer fires any agent whose inputs changed; blackboard adds a conflict strategy choosing who goes next. Voting aggregates verdicts (any 'not safe' vetoes ice skating), debate runs rounds through a shared debate context until a convergence strategy or round limit hands off to a judge, and Belief-Desire-Intention plans by prioritised desires with activation conditions and definitions of done.",
+    "He then implements a custom Planner in plain Java, nests loops, sequences, parallel mappers and voting planners (every pattern is itself an agent), and shows the declarative annotations (@SequenceAgent, @LoopAgent, @SupervisorAgent, @PlannerAgent), async agents, A2A integration and an agent registry. His advice: most client systems are workflows, so start there; the supervisor is the most flexible but costly and hard to audit. In the Q&A, Mario Fusco, who builds the agentic module, introduced a new router pattern backed by decision models that return probabilities instead of text, and invited contributions of new planners."
+  ],
+  "keyPoints": [
+    "Agentic features need `langchain4j-agentic` for workflows and `langchain4j-agentic-patterns` for supervisor-free patterns such as GOAP, peer-to-peer, blackboard, voting, debate and BDI.",
+    "AgenticScope is the shared state between agents; the Planner interface with init, firstAction and nextAction drives every workflow and pattern.",
+    "Loops need an explicit exit condition plus a max-iteration cap; more iterations cost more tokens and do not fix poor inputs.",
+    "Use typed keys and enum outputs instead of strings for output keys and routing decisions to get compile-time safety.",
+    "AgentMonitor generates an HTML report with the agent topology and time spent per step, without needing Grafana.",
+    "A supervisor needs a capable model and has unpredictable paths and cost; the goal-oriented planner fixes a shortest path (fewest agents, not cheapest) from inputs and outputs.",
+    "Voters sharing the same model, tools or context share the same biases, so more voters do not guarantee independent judgements.",
+    "Workflows, patterns and non-AI agents are all agents and can be nested freely, so LangChain4j can even serve as a plain workflow orchestrator."
+  ],
+  "takeaways": [
+    "Start new agentic features as sequence, loop, parallel or conditional workflows and move to autonomous patterns only when they fall short.",
+    "Replace string output keys with typed keys before your agent graph grows.",
+    "Put deterministic steps such as calculations in non-AI agents rather than asking an LLM.",
+    "Add a human-in-the-loop agent before any sensitive external action, and an error handler with bounded retries for flaky outputs like JSON.",
+    "Attach the AgentMonitor HTML report to see where an agentic system spends its time."
+  ],
+  "quotes": [
+    {
+      "text": "The patterns you don't use are the ones you don't need to debug.",
+      "at": "129:23"
+    },
+    {
+      "text": "Please don't write a planner that uses an LLM. That's not smart.",
+      "at": "120:42"
+    }
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "LangChain4j refresher"},
+    {"at": "09:49", "title": "Agents, scope and planner"},
+    {"at": "15:45", "title": "Sequence and loop workflows"},
+    {"at": "31:04", "title": "Parallel and conditional workflows"},
+    {"at": "49:19", "title": "Typed keys, humans and errors"},
+    {"at": "60:17", "title": "Observability and model switching"},
+    {"at": "69:15", "title": "Supervisor and goal-oriented planning"},
+    {"at": "83:03", "title": "Peer-to-peer and blackboard"},
+    {"at": "94:24", "title": "Voting, debate and BDI"},
+    {"at": "119:34", "title": "Custom planners and composition"}
+  ],
+  "tech": [
+    "LangChain4j",
+    "langchain4j-agentic",
+    "AgenticScope",
+    "AgentMonitor",
+    "Quarkus",
+    "Ollama",
+    "Llama 3.2",
+    "A2A",
+    "Guardrails"
+  ],
+  "watchIf": "You build LLM features in Java and need to choose how much control to give agents, with working LangChain4j code for each option.",
+  "themes": [
+    "AI agents & agentic coding",
+    "LLMs in Java apps",
+    "Architecture & design"
+  ],
+  "demo": true
+}

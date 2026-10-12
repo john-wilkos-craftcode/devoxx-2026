@@ -1,0 +1,48 @@
+{
+  "id": 10034,
+  "source": "transcript",
+  "tldr": "Zinck explains how Decathlon's gift card order API fixed its database-plus-Kafka dual write by letting Debezium stream the order tables, and how heartbeats and monitoring prevent the WAL from filling the disk.",
+  "summary": [
+    "Zinck's gift card team at Decathlon saved orders in Postgres and published Kafka messages from the same API to drive activation, emails and wallet updates. That dual write caused inconsistencies: a rolled-back transaction left a message behind (an email could still go out), and consumers picked up messages for large B2B orders before the insert committed. Compensating messages cannot unsend an email, retries do not fix rollbacks, and writing to the database first still fails when Kafka is down. She compares the outbox pattern (an outbox table in the same transaction, read by a Debezium connector on Kafka Connect) with three variants: publish to Kafka first and persist in a consumer (rejected because customers must see their order immediately), write messages straight into the log with Postgres `pg_logical_emit_message`, or use the operational table as the outbox. Decathlon chose the last: Debezium streams the order, order line and gift card tables to one topic each, and one consumer per action does the fulfilment.",
+    "The trade-offs are that table schema changes leak into consumers, and idempotency is harder without a message ID because one order produces several change events. The gains: a simpler, faster API, extension by adding a consumer (SMS, invoices), and error handling moved to Kafka consumer error handlers with retries and dead-letter topics. The most important part covers Debezium on Postgres: the connector advances a replication slot, and WAL older than the oldest slot is deleted. If the watched table rarely changes or the connector stops, the WAL grows until the database runs out of disk. The fixes are a heartbeat (a one-row table updated every 60,000 ms via the heartbeat action and included in the connector's tables) and an alert on the heartbeat topic's messages-in rate, which unlike connector metrics stays available when the connector dies."
+  ],
+  "keyPoints": [
+    "Publishing to Kafka and writing to the database in one API call cannot be made consistent; rollbacks and timing races both produced wrong side effects.",
+    "Using the order table itself as the outbox removes the outbox table and purge job, but couples consumers to the table layout and complicates idempotency.",
+    "A stopped or idle Debezium connector stops its replication slot from advancing, so Postgres keeps WAL until the disk fills and the database crashes.",
+    "Configure a heartbeat on every connector, writing a timestamp to a dedicated table that the connector also captures.",
+    "Alert on the heartbeat topic's messages-in rate dropping below one per minute, since connector-level metrics disappear when the connector stops."
+  ],
+  "takeaways": [
+    "Check your services for any code path that writes to the database and publishes to Kafka in the same request.",
+    "Add a heartbeat table and heartbeat action query to every Debezium connector, even on busy tables.",
+    "Monitor topic-level write rate for the heartbeat topic, not just database free space, to catch a dead connector within minutes.",
+    "If consumers belong to other teams, put a schema registry or contract in place before exposing table change events."
+  ],
+  "quotes": [],
+  "chapters": [
+    {"at": "00:00", "title": "Gift card order architecture"},
+    {"at": "01:32", "title": "The dual write problem"},
+    {"at": "04:23", "title": "Failed workarounds"},
+    {"at": "05:46", "title": "Outbox pattern and variants"},
+    {"at": "12:31", "title": "Decathlon's solution"},
+    {"at": "14:57", "title": "How Debezium can crash Postgres"},
+    {"at": "19:51", "title": "Heartbeats and monitoring"},
+    {"at": "23:55", "title": "Q&A"}
+  ],
+  "tech": [
+    "Apache Kafka",
+    "Debezium",
+    "Kafka Connect",
+    "PostgreSQL",
+    "Write-ahead log",
+    "Outbox pattern",
+    "pg_logical_emit_message"
+  ],
+  "watchIf": "You publish Kafka events from an API that also writes to a database, or you run Debezium against Postgres in production.",
+  "themes": [
+    "Architecture & design",
+    "Data & databases"
+  ],
+  "demo": false
+}

@@ -1,0 +1,66 @@
+{
+  "id": 16444,
+  "source": "transcript",
+  "tldr": "Rocher and Wuerthinger launch Pyronaut: a pre-compiled, PGO-optimised Micronaut and GraalVM base onto which Python or Java application code is loaded dynamically, giving millisecond restarts without native image builds.",
+  "summary": [
+    "Wuerthinger, who leads GraalVM, frames the server-side dilemma: scripting languages give instant edit-run cycles, while Java and especially native image give better runtime efficiency at the cost of slow builds, which hurts coding agents as much as humans. Measuring the Micronaut PetClinic, they found only about 300 of roughly 10,000 loaded classes (3%) are user code, and even less CPU time is spent there; the rest is the JDK, Micronaut and libraries in roughly equal thirds. So the stable 97% can be compiled ahead of time once, while the 3% stays dynamic, using Crema to load classes into a native image at runtime and GraalPy for Python.",
+    "The result, announced the week before as Pyronaut 0.1, is a native base containing the JDK, Micronaut, Netty, GraalPy and javac. Rocher demos a Python endpoint where imported Java annotations become Python decorators; `pyronaut dev main.py` starts in 290 ms with Swagger UI from OpenAPI generated at build time, and `pyronaut test` runs pytest functional tests with an injected HTTP client. A pyproject.toml project gets Java and Python dependencies, IDE stubs that Pylance (and therefore coding agents) use for completion, and a Python PetClinic using Micronaut Data JDBC repositories type-checked at compile time, Jinja templates, Flyway and an Oracle Database container started automatically.",
+    "The same base runs Java scripts: `pyronaut dev app.java` compiles and starts a Micronaut server in 75 ms, functional JUnit tests finish almost instantly, inline dependency declarations pull in MySQL via Testcontainers, and `pyronaut install` generates IntelliJ or VS Code config without a build tool. It also runs existing Maven Micronaut projects (81 ms start). For production it builds a JAR, a JVM image or a Docker image on the native base that, they said, starts in 7 to 8 ms, with the base's memory shared between co-located apps and optimised with profile-guided optimisation.",
+    "On throughput they claimed Pyronaut beats FastAPI with Granian or Gunicorn on an OCI instance, and a port of the FastAPI full-stack template reached six times the throughput on the profile page and three times on creates, with server-side rendering via GraalJS on the same VM. The Python global interpreter lock still serialises Python code; removing it, virtual threads, G1 and Shenandoah support are planned, and Kotlin and Groovy are on the list."
+  ],
+  "keyPoints": [
+    "In the PetClinic measurement only 3% of loaded classes were user code; the JDK, Micronaut and third-party libraries each accounted for about a third of the rest.",
+    "Pyronaut ships that 97% as a pre-built, PGO-optimised native base and loads user Python or Java code dynamically on top via Crema and GraalPy.",
+    "Java annotations imported in Python become decorators that are identity functions at runtime; Micronaut's build-time metadata is identical for both languages.",
+    "Generated stubs give IDEs and coding agents completion across Python and Java APIs without extra configuration.",
+    "Startup figures shown: 290 ms for a Python app in dev mode, 75 ms for a Java script including javac, 7 to 8 ms in a production container.",
+    "The Python GIL still applies to GraalPy and caps Python throughput; removing it is the main planned performance step.",
+    "Existing Maven-based Micronaut projects can use `pyronaut dev` and `pyronaut test` after `pyronaut install` reads the POM."
+  ],
+  "takeaways": [
+    "Run `pip install pyronaut` and try `pyronaut dev` on an existing Micronaut Maven project to measure the restart and test loop.",
+    "Point your coding agent at a fast, single-command test runner; feedback speed matters as much for agents as for people.",
+    "If you write Python services, compare Pyronaut's build-time checked repositories and OpenAPI generation with your current FastAPI setup.",
+    "Treat it as a 0.1 release: prototype with it, but check GIL-bound throughput before betting production workloads on it."
+  ],
+  "quotes": [
+    {
+      "text": "If you use a regular javac, you will not even compile the Java source to class files in 75 milliseconds.",
+      "at": "28:25"
+    }
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Introductions"},
+    {"at": "01:42", "title": "The server-side dilemma"},
+    {"at": "04:11", "title": "Only 3% is your code"},
+    {"at": "08:07", "title": "GraalPy and the native base"},
+    {"at": "09:31", "title": "Pyronaut Python demo"},
+    {"at": "15:00", "title": "Projects, stubs and PetClinic"},
+    {"at": "23:10", "title": "Performance versus FastAPI"},
+    {"at": "25:34", "title": "Java scripts on Pyronaut"},
+    {"at": "38:33", "title": "Production builds and memory sharing"},
+    {"at": "41:56", "title": "Getting started and samples"}
+  ],
+  "tech": [
+    "Pyronaut",
+    "Micronaut",
+    "GraalVM",
+    "GraalPy",
+    "GraalVM native image",
+    "Crema",
+    "GraalJS",
+    "FastAPI",
+    "pytest",
+    "Micronaut Data JDBC",
+    "Testcontainers",
+    "Flyway",
+    "LangChain4j"
+  ],
+  "watchIf": "You want fast edit-test loops for Java or Python services, for yourself or your coding agents, without giving up native-image start-up in production.",
+  "themes": [
+    "Spring & frameworks",
+    "JVM performance & runtime",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}

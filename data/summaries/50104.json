@@ -1,0 +1,58 @@
+{
+  "id": 50104,
+  "source": "transcript",
+  "tldr": "Ysebie, an iText developer at Apryse, draws lessons on adoption from PDF's history and from his own push to get Brotli compression, about 20% smaller files, into the PDF standard and the major viewers.",
+  "summary": [
+    "Ysebie, born in 1996, works on the open source iText PDF SDK at Apryse, on a format four years older than he is. His first job was extracting data from supplier PDFs, which he found surprisingly hard: a PDF is a set of small stack-based drawing programs that select fonts and place glyphs at precomputed positions, with no notion of tables, lists or even reading order. Lesson one: solve the right problem, which there meant phoning the supplier and asking for JSON. He then asks why PDF survives the regular 'PDF killers', including Microsoft's XPS: fixed layout, cryptographic signatures and real redaction already work, and technical superiority loses to distribution, investment and trust. Adobe's free Reader removed friction for receivers, and handing the format to ISO and the PDF Association ended dependence on a single vendor.",
+    "The same adoption problem now applies to changing PDF itself: libraries will not produce a feature viewers cannot open, and viewers will not implement what nobody produces. His case study is replacing 1980s-era Flate compression with Brotli, chosen because it decompresses fast for create-once, read-often documents and has mature, freely licensed reference implementations. He implemented it in iText, published '20% smaller PDFs for free' via the PDF Association, posted it to Hacker News (and was called AI slop), and coverage by Heise spread it widely. He then sent a pull request to Mozilla's pdf.js, which they closed and reimplemented a day later, used that to get Chromium's PDFium to follow, and said the Brotli addition has since been formally released as part of the PDF 2.0 ecosystem. His closing lesson: a little initiative moves a lot."
+  ],
+  "keyPoints": [
+    "PDF text extraction is hard because the file stores drawing instructions with absolute positions, not structured content or reading order.",
+    "Formats that are technically better than PDF, such as XPS, failed on distribution, investment and trust, not on technology.",
+    "Changing a mature standard needs producers and consumers to adopt together; his route was propose, draft with prototypes, implement on both sides, then roll out.",
+    "Brotli was preferred over faster alternatives because PDFs are compressed once and decompressed many times, and a new filter must be safe to license and interoperable across languages.",
+    "Public attention (blog post, Hacker News, Heise) gave him leverage to get pdf.js and PDFium to add Brotli decoding."
+  ],
+  "takeaways": [
+    "Before writing a parser for an unstructured format, ask whoever produces the data for a structured version.",
+    "When proposing a new format or feature, plan for distribution and adoption on both the producer and consumer side, not just the implementation.",
+    "Ship a working implementation and a pull request to the projects that matter instead of waiting for them to prioritise it."
+  ],
+  "quotes": [
+    {
+      "text": "Good engineering solves a problem, but when this problem is solved the hard part begins.",
+      "at": "11:04"
+    },
+    {
+      "text": "If you take a little initiative, you really can make a whole lot of things move forward.",
+      "at": "32:57"
+    }
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Working on iText"},
+    {"at": "03:01", "title": "Parsing PDFs at a startup"},
+    {"at": "04:16", "title": "How PDF works"},
+    {"at": "08:12", "title": "Why PDF killers fail"},
+    {"at": "12:29", "title": "How PDF won adoption"},
+    {"at": "18:43", "title": "Changing a mature standard"},
+    {"at": "21:21", "title": "Brotli for 20% smaller PDFs"},
+    {"at": "27:25", "title": "Making noise and viewer support"},
+    {"at": "32:57", "title": "Take initiative"}
+  ],
+  "tech": [
+    "PDF",
+    "iText",
+    "Brotli",
+    "Deflate",
+    "pdf.js",
+    "PDFium",
+    "PDF/A",
+    "PDF 2.0"
+  ],
+  "watchIf": "You maintain a library, protocol or format others depend on and want to get a change adopted across an ecosystem.",
+  "themes": [
+    "Legacy modernization",
+    "Teams, careers & leadership"
+  ],
+  "demo": false
+}

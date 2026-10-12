@@ -1,14 +1,58 @@
 {
   "id": 50103,
-  "source": "abstract",
-  "tldr": "A lunch talk on training a Unitree G1 humanoid robot to walk and dance with reinforcement learning in NVIDIA Isaac Sim, ending with a live dance.",
-  "summary": ["The TNG speakers introduce reinforcement learning basics, policies and rewards, then move into simulation with NVIDIA Isaac Sim and the Unitree RL Lab. They run through shaping a walking policy before turning to dancing.", "For the dancing policy, the talk covers retargeting human motion from videos to the Unitree G1 robot and training an imitation policy. The session ends with the humanoid robot performing a dance."],
-  "keyPoints": ["Introduction to reinforcement learning: policies and rewards.", "Simulation with NVIDIA Isaac Sim and Unitree RL Lab.", "Shaping a walking policy first.", "Retargeting human video motion to the Unitree G1 for imitation learning.", "Closes with a live robot dance."],
-  "takeaways": ["Explore Isaac Sim and Unitree RL Lab to experiment with robot policies in simulation."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Reinforcement learning", "NVIDIA Isaac Sim", "Unitree RL Lab", "Unitree G1"],
-  "watchIf": "You want a light, visual introduction to reinforcement learning with a humanoid robot.",
-  "themes": ["Hardware, robots & fun"],
-  "demo": false
+  "source": "transcript",
+  "tldr": "TNG's innovation hacking team shows how they took a Unitree G1 humanoid from falling over to dancing: reward-shaped RL in Isaac Sim, motion capture retargeting, and sim-to-real fixes.",
+  "summary": [
+    "Endres, Förtsch and Lübbe of TNG's innovation hacking team bought a €50,000 Unitree G1 that, out of the box, just stood there waving. After dismissing classical approaches (zero moment point control as in Honda's ASIMO, and model-based control as in Caltech's Cassie work), they turned to reinforcement learning. They explain the basics with Q-learning on the Frozen Lake grid and Atari Breakout, then why a robot with 29 continuous degrees of freedom needs actor-critic methods, where a critic network turns sparse rewards into a dense quality signal, citing OpenAI Five's Dota training as a scale reference.",
+    "Training happens in NVIDIA Isaac Sim on the manufacturer's digital twin. Standing is rewarded via pelvis height, upright posture and both feet on the ground; walking adds a reward for matching a commanded velocity plus penalties for stumbling and jumping. Bad rewards were exploited: a fallen robot pushed into a 'downward dog' pose because it kept the pelvis high, and another learned a sack-race hop because jumping registers as velocity. The final walking policy needed a long list of carefully balanced reward terms.",
+    "For dancing they skip describing moves and use motion capture: MediaPipe extracts joints from video into SMPL format, then GMR, an inverse-kinematics retargeting tool, maps the human skeleton onto the robot's proportions. An imitation policy tracks per-joint target frames over time. Sim-to-real needed a wooden 'robot hanging device', and dynamic moves exposed worn gears and a burned cable, handled by randomising actuator gains in simulation and by repairing the robot. Since each policy learns one dance, they finish with NVIDIA's SONIC motion-tracking model, which performed a dance it was never trained on."
+  ],
+  "keyPoints": [
+    "Q-learning stores a value per state-action pair and a greedy policy picks the highest; this does not scale to 29 continuous joints, hence actor-critic deep RL.",
+    "Train in simulation on the vendor's digital twin first; the untrained policy in Isaac Sim falls the same way the real robot did.",
+    "Reward hacking is the main obstacle: pelvis-height rewards produced a yoga-like pose and velocity rewards produced jumping.",
+    "The motion pipeline is video to MediaPipe key points to SMPL to GMR retargeting to an imitation policy that tracks every joint's pose over time.",
+    "The sim-to-real gap widens with dynamic motions and hardware wear; randomising actuator gains in training helps cover a worn robot.",
+    "One imitation policy per dance does not scale; according to the speakers, NVIDIA's SONIC scales network size, data and compute to track unseen motions."
+  ],
+  "takeaways": [
+    "Start from a digital twin in a simulator before running any learned policy on real hardware.",
+    "Watch training rollouts for unintended behaviour and add explicit penalties for every shortcut the policy finds.",
+    "Use domain randomisation of physical parameters such as actuator gains to make policies tolerate real-world variation.",
+    "Rig a physical safety harness before sim-to-real tests; the speakers' wooden frame was enough."
+  ],
+  "quotes": [
+    {
+      "text": "Let's call this a sophisticated robot hanging device.",
+      "at": "33:04"
+    }
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Innovation hacking team"},
+    {"at": "01:51", "title": "A robot that won't dance"},
+    {"at": "03:14", "title": "Classical walking control"},
+    {"at": "07:15", "title": "Reinforcement learning basics"},
+    {"at": "13:31", "title": "Actor-critic methods"},
+    {"at": "17:01", "title": "Standing in simulation"},
+    {"at": "21:07", "title": "Walking and reward hacking"},
+    {"at": "25:01", "title": "Motion capture and retargeting"},
+    {"at": "31:48", "title": "Sim-to-real and worn joints"},
+    {"at": "37:48", "title": "Generalising with SONIC"}
+  ],
+  "tech": [
+    "Unitree G1",
+    "NVIDIA Isaac Sim",
+    "Reinforcement learning",
+    "Q-learning",
+    "Actor-critic",
+    "MediaPipe",
+    "SMPL",
+    "GMR",
+    "NVIDIA SONIC"
+  ],
+  "watchIf": "You are curious how humanoid robots learn locomotion and motion imitation, and want an accessible, demo-heavy tour of the real pitfalls.",
+  "themes": [
+    "Hardware, robots & fun"
+  ],
+  "demo": true
 }

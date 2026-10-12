@@ -1,0 +1,63 @@
+{
+  "id": 44601,
+  "source": "transcript",
+  "tldr": "Adams argues that once agents have found a working path, it should be distilled from a Neo4j context graph into deterministic code, leaving the LLM only the final judgement or summary.",
+  "summary": [
+    "Adams, a developer advocate at Neo4j, starts from the problem that agents relearn everything on every run while their telemetry rots in storage. Naively storing all past trajectories as memory makes things worse at scale: vector search returns lookalikes (a v1 API memory instead of v2) and bad memories compound. He compares plain-text wikis, vector embeddings, fine-tuned models and knowledge graphs, favouring graphs because entities, relations and provenance stay explicit and inspectable. A context graph records conversations, extracted entities, reasoning traces and tool calls, so patterns that keep leading to success can be promoted into skills or code.",
+    "The first demo answers 'should we approve a $25,000 credit increase?' twice. A Claude Sonnet tool-calling agent makes many calls and lands on 'conditionally approve', after saying 'decline' on an earlier run. The alternative runs ten fixed Cypher queries (accounts, flagged transactions, support tickets, precedents, policies), does ratio arithmetic in code, and hands the evidence to a small classifier-style model that returns yes, no or escalate: faster, cheaper and consistent.",
+    "The second, Java-based demo assesses a company's financial exposure to a customer. The graph describes the business operation, its owning team, four exposure dimensions, the MCP tools behind them (SAP, Salesforce, PagerDuty, Jira and others) and required permissions. A compiler generates the Java workflow from the graph, and a CI check flags drift between graph and committed code. When the security team adds a fifth 'security risk' edge, the check fails, the run is refused for lacking security-read permission, and only after the grant is committed and recompiled does the report surface a critical vulnerability in a payments gateway. Team-owned, versioned skills tell the LLM how to interpret each result."
+  ],
+  "keyPoints": [
+    "More memory can make an agent worse: similarity search retrieves lookalike memories (negative transfer) and bad memories compound over time.",
+    "Knowledge graphs keep provenance, so a distilled skill or procedure can be traced back to the agent runs and evidence that produced it.",
+    "Paths that evaluations show succeed repeatedly can be promoted into fixed retrieval queries plus code, removing tool choice from the model.",
+    "A free tool-calling agent gave different credit verdicts on consecutive runs; fixed queries plus a three-way classifier gave a typed yes/no/escalate answer with no tool calls.",
+    "In the exposure demo, the workflow's control flow is generated Java from the graph; the LLM only writes the final summary report.",
+    "A preflight check in CI compares the context graph with the committed workflow and fails on drift; permission changes take effect only after review, commit and recompile.",
+    "Skills that tell the LLM how to read accounts-receivable ageing, contract terms or CVE findings should be versioned artifacts owned by the responsible team."
+  ],
+  "takeaways": [
+    "Evaluate your agent runs and turn the consistently successful tool sequences into deterministic code or at least a skill file.",
+    "Do arithmetic such as loan-to-value ratios in code rather than asking the model to calculate it.",
+    "Gate agent workflows on a CI check that the deployed workflow still matches its declared source of truth.",
+    "Keep interpretation skills under version control, owned and approved by the team that owns the underlying system."
+  ],
+  "quotes": [
+    {
+      "text": "Once your agents have shown you how, don't just make them figure it out every time.",
+      "at": "38:45"
+    },
+    {
+      "text": "Smaller models can do just as well when they have the right context in front of them.",
+      "at": "21:50"
+    }
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Neo4j and the premise"},
+    {"at": "03:02", "title": "Agents that never learn"},
+    {"at": "05:38", "title": "Ways to store memory"},
+    {"at": "09:43", "title": "Context graphs"},
+    {"at": "13:30", "title": "Demo: credit increase decision"},
+    {"at": "21:50", "title": "The graph as source code"},
+    {"at": "24:35", "title": "Demo: compiled exposure workflow"},
+    {"at": "30:14", "title": "Adding security risk and permissions"},
+    {"at": "37:17", "title": "Versioned skills and the knowledge layer"}
+  ],
+  "tech": [
+    "Neo4j",
+    "Cypher",
+    "Knowledge graphs",
+    "MCP",
+    "Claude Sonnet",
+    "Java",
+    "Agent skills",
+    "Vector embeddings"
+  ],
+  "watchIf": "You run tool-calling agents on repeatable business processes and want them auditable, consistent and cheaper.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Architecture & design",
+    "Data & databases"
+  ],
+  "demo": true
+}

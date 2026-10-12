@@ -1,0 +1,58 @@
+{
+  "id": 10021,
+  "source": "transcript",
+  "tldr": "Magnette live-codes a 'dog' clone of cat to show that modern Java plus JBang, Picocli, GraalVM and TamboUI covers the jobs you currently write in Bash.",
+  "summary": [
+    "Tired of forgetting Bash syntax twice a year, Magnette builds a 'dog' command that does what cat does. He runs it with plain `java Dog.java` (single-file source launch, there since JDK 11 via JEP 330), then splits it into helper classes in sub-packages with no Maven or Gradle layout, which the multi-file source launcher compiles in memory. Java 25's instance main methods remove the class and `public static void main(String[] args)`, the implicitly available `IO` class replaces the BufferedReader boilerplate for reading input, and a shebang line on an extensionless file lets the script live in your bin directory.",
+    "JBang adds what plain Java lacks: `//DEPS` lines with Gradle-style coordinates (he pulls in LangChain4j to prompt an LLM from a script), automatic JDK download for machines without Java, and `jbang export native` to build a GraalVM native image, with `//NATIVE_OPTIONS` to fix the reflection Jackson needs. `jbang init` with the CLI template generates a Picocli skeleton whose annotations produce help, version and typed options. He closes with TamboUI, a Java terminal UI library inspired by Rust's Ratatui, running a small game while Claude Code works, and an unreleased GraalVM feature that cut a 0.3-second script start-up sharply on second run."
+  ],
+  "keyPoints": [
+    "`java File.java` has run single-file programs without javac since JDK 11; multi-file source launching handles helper classes in plain directories.",
+    "Java 25 makes `void main()` plus the `IO` class enough for a readable script; a shebang requires dropping the `.java` extension.",
+    "JBang reads dependencies, Java version, native-image and JVM options from comment lines at the top of the file and can install a JDK if none is present.",
+    "Native images of scripts using reflection-heavy libraries such as Jackson need reflection configuration, which JBang can pass in-file.",
+    "Picocli via `jbang init` gives a real CLI with generated help and typed options in a single file."
+  ],
+  "takeaways": [
+    "Write your next throwaway automation as a single Java file run with `java` and a shebang instead of Bash.",
+    "Install JBang and use `//DEPS` when a script needs a library, rather than creating a Maven project.",
+    "Start CLI tools from the JBang Picocli template so help and argument parsing come for free.",
+    "Try `jbang export native` for scripts you run often and where JVM start-up matters."
+  ],
+  "quotes": [
+    {
+      "text": "All the code you don't write is the code without bugs.",
+      "at": "11:15"
+    }
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Why not Bash or JavaScript"},
+    {"at": "02:39", "title": "Single-file source launch"},
+    {"at": "04:47", "title": "Multi-file scripts"},
+    {"at": "07:59", "title": "Java 25 trims the boilerplate"},
+    {"at": "11:15", "title": "Shebang scripts"},
+    {"at": "13:24", "title": "JBang and dependencies"},
+    {"at": "16:54", "title": "GraalVM native images"},
+    {"at": "19:28", "title": "CLIs with Picocli"},
+    {"at": "23:05", "title": "Terminal UIs with TamboUI"},
+    {"at": "26:10", "title": "Faster scripts with GraalVM"}
+  ],
+  "tech": [
+    "JBang",
+    "JEP 330",
+    "JEP 458",
+    "Java 25",
+    "Instance main methods",
+    "Picocli",
+    "GraalVM native image",
+    "LangChain4j",
+    "TamboUI",
+    "Jackson"
+  ],
+  "watchIf": "You still reach for Bash or Python for small automation jobs and would rather use the Java you write every day.",
+  "themes": [
+    "Java language & JDK",
+    "Developer experience & tooling"
+  ],
+  "demo": true
+}
