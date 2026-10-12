@@ -1,0 +1,89 @@
+{
+  "id": 16401,
+  "source": "transcript",
+  "tldr": "Iacono explains homomorphic encryption from RSA through BFV noise budgets and Gentry's bootstrapping, then runs an OpenFHE health-score demo that is about 20,000 times slower than plaintext.",
+  "summary": [
+    "Andrea Iacono starts from where data lives: TLS covers the network and encryption at rest covers disk, though he warns that under the US CLOUD Act an American provider can be compelled to hand over plaintext even for EU-hosted data, so keys should not be held by the same provider. Memory is the gap: apps decrypt data to process it, and Meltdown, Spectre, cold-boot attacks, Heartbleed, Cloudbleed and Log4Shell all exposed in-memory data. Homomorphic encryption closes it by letting a server add and multiply ciphertexts so the decrypted result matches the same operations on plaintext. Textbook RSA is homomorphic for multiplication only, making it partially homomorphic.",
+    "He then builds intuition for BFV, which rests on learning with errors (shown with scalars; real schemes use large polynomials). The plaintext modulus t splits the 0..q range into q/t buckets; each value sits somewhere in its bucket plus noise. Additions add little noise, but each multiplication pushes the value further until it leaves the bucket and decrypts to garbage, so BFV is somewhat homomorphic and a larger t means fewer operations. Craig Gentry's bootstrapping evaluates decryption homomorphically to re-centre the noise, giving fully homomorphic encryption at the cost of tens of seconds per value. In practice you size the parameters for a known multiplicative depth and avoid bootstrapping.",
+    "The demo is a cardiovascular risk score in Python using OpenFHE's bindings (no Java binding exists). The client builds a BFV context with plaintext modulus 65537 and multiplicative depth 1, encrypts age, cholesterol, HDL, blood pressure and Boolean flags, and sends serialized ciphertexts. The server computes a weighted sum blind, and the client decrypts the score (430) and classifies it, since comparisons are costly in BFV. His benchmark: 0.43 microseconds in plaintext against 7.71 milliseconds encrypted, with serialization taking more than twice the computation. He closes on testing, branching costs and how CKKS and TFHE differ from BFV."
+  ],
+  "keyPoints": [
+    "Homomorphic encryption lets a server compute on ciphertexts: the encryption of a sum or product equals the sum or product of the encryptions, so results decrypt correctly on the client.",
+    "Textbook RSA is partially homomorphic (multiplication only); BFV is somewhat homomorphic (both operations, limited count); bootstrapping makes a scheme fully homomorphic.",
+    "In BFV, noise grows slightly with each addition but quickly with each multiplication; once a value leaves its q/t bucket it decrypts to a wrong value, and a larger plaintext modulus t means fewer allowed operations.",
+    "With OpenFHE's leveled SHE mode you declare the multiplicative depth up front and the library picks q so no bootstrapping is needed; bootstrapping can take tens of seconds per value.",
+    "His benchmark: 0.43 microseconds in plaintext versus 7.71 milliseconds homomorphically, roughly 20,000 times slower, and he said results five years ago would have been about ten times worse.",
+    "OpenFHE and similar libraries do not raise an error when noise overflows; they silently return a wrong value, so use oracle tests with known results and boundary cases, and never mock the library.",
+    "Branching is the costliest operation in BFV (approximated with polynomials), which is why the demo classifies on the client; TFHE handles Boolean gates and lookups cheaply but integer arithmetic poorly, and CKKS works on approximate real numbers for machine learning.",
+    "Learning with errors, the basis of BFV, is considered quantum-safe."
+  ],
+  "takeaways": [
+    "Keep encryption keys for cloud-hosted databases outside the provider that hosts the data.",
+    "Try OpenFHE's Python bindings on a small weighted-sum computation before considering homomorphic encryption for a sensitive workload.",
+    "Choose the scheme by workload: BFV for exact integer arithmetic, CKKS for approximate real-number or ML maths, TFHE for comparisons and Boolean logic.",
+    "Test homomorphic code with oracle tests at parameter boundaries against the real library, since overflow returns silently wrong values."
+  ],
+  "quotes": [
+    {
+      "text": "OpenFHE and a lot of other libraries do not throw an error. If you decrypt a value and the library gives you back a value which is not the one you encrypted, it silently gives you back the wrong value.",
+      "at": "38:48"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Network, disk and memory"
+    },
+    {
+      "at": "04:14",
+      "title": "What homomorphic encryption is"
+    },
+    {
+      "at": "06:55",
+      "title": "RSA as partially homomorphic"
+    },
+    {
+      "at": "09:39",
+      "title": "Learning with errors and BFV"
+    },
+    {
+      "at": "15:01",
+      "title": "Noise and buckets"
+    },
+    {
+      "at": "18:43",
+      "title": "Gentry's bootstrapping"
+    },
+    {
+      "at": "21:25",
+      "title": "Health score with OpenFHE"
+    },
+    {
+      "at": "34:57",
+      "title": "Live run and benchmark"
+    },
+    {
+      "at": "38:48",
+      "title": "Testing, branching and schemes"
+    },
+    {
+      "at": "45:29",
+      "title": "Q&A"
+    }
+  ],
+  "tech": [
+    "OpenFHE",
+    "Python",
+    "BFV",
+    "CKKS",
+    "TFHE",
+    "RSA",
+    "Learning with errors",
+    "TLS"
+  ],
+  "watchIf": "You handle sensitive data such as health or financial records and want an accessible, maths-light explanation of what homomorphic encryption can do today and what it costs.",
+  "themes": [
+    "Security & supply chain"
+  ],
+  "demo": true
+}

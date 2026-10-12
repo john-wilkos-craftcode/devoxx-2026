@@ -1,0 +1,90 @@
+{
+  "id": 17751,
+  "source": "transcript",
+  "tldr": "Sasse uses game design as a lens on AI adoption: decide whether AI makes the old game cheaper or creates a new, better one, and redesign roles, rules and gatekeepers.",
+  "summary": [
+    "Miriam Sasse, a mechanical engineer who has led deep-tech and machine-learning teams, frames organisational design as game design, the approach of her book Level Up: look at rules, roles, available moves and feedback, and ask whether you would want to play. The deep dive is a workshop. Six times the audience discusses a question with neighbours and posts answers to a Padlet, which she reads out. The first round, on how AI changes the rules at work, surfaced less implementation and more review, seniority losing value, a new 'AI context manager' role and developers describing themselves as 'meat proxies' pressing buttons.",
+    "Her central contrast is efficiency versus customer value. Elevator maker Schindler uses machine learning for predictive maintenance, which helps engineers but not loyalty; the US bank USAA uses data and AI to support customers through life events such as marriage or retirement, so they say they love their bank. A team that claims to do both often has no strategy, leaving developers to decide. She offers a 'system card' that maps start and end, roles, rules (including the AI Act), stakeholders, teams, technology, market and society, and shows a 40-person simulation company's card six years later, annotated with pluses and minuses.",
+    "On strategy, she gives five tests: a good strategy is not a triviality every competitor could write, does not make decisions for employees but guides them, is not a goal (her ex-employer's revenue-target 'Strategy 800'), is tangible, and is an entrepreneurial bet whose opposite is also plausible. She distinguishes assistance mode (AI on demand), integration mode (AI on a fixed path, changing roles and exception handling) and agent mode (AI as a team player, needing new rules about whom agents may contact and who can stop them), and says no mode is automatically better. She also warns against AI becoming the 'alpha player' of a cooperative board game.",
+    "After the break come four gatekeepers: finance (no money), IT (technically impossible), HR (no skills) and compliance (too risky). They are not villains: design the game around them from the start, giving finance a capped investment and feedback loop, IT boundaries, HR a learning path and compliance traceability and human decision points. A robot producing status reports faster improves the old game; asking whether the report should exist is the new game, as streaming was to the CD. If AI saves 20% of a team's time and the organisation fills it with 20% more tickets, Gerald Weinberg's context-switching losses eat the gain. Speed, she concludes, is not strategy."
+  ],
+  "keyPoints": [
+    "Efficiency AI does the same thing faster and cheaper (Schindler's predictive maintenance); value AI makes new things possible for customers (USAA's life-event services). Picking 'both' without priorities usually means no strategy.",
+    "A system card maps not just the process but roles, rules and laws, stakeholders, neighbouring teams, technology, market and society; redrawing it after AI adoption exposes roles that appeared or vanished.",
+    "Five tests of a good strategy: no trivialities, guides decisions without making them, is not a numeric goal, is tangible, and is a bet whose opposite would also be a reasonable choice.",
+    "Three AI modes: assistance (ad hoc, organisation unchanged), integration (AI on a fixed path, roles and exception handling change) and agent (AI as a player, requiring rules on authority, monitoring and stopping agents).",
+    "AI alpha-player warning signs: suggestions accepted without scrutiny, criticism of AI output seen as a waste of time, expertise concentrated in a few specialists, unclear who verifies and corrects, and people acting as clickers rather than designers.",
+    "Involve finance, IT, HR and compliance from the start; constraints make the game playable, as in Yahtzee, where five dice and few choices still make a good game.",
+    "Citing Gerald Weinberg, she said switching between two tasks loses about 20% of time, three 40%, four 60% and five 75%, so filling AI-saved time with more tickets can cancel the gain.",
+    "From game design: negative changes such as role changes should never be a surprise; announce them early. Positive things may be surprises."
+  ],
+  "takeaways": [
+    "Write down whether your AI initiative aims at efficiency or customer value, and test the strategy against the five principles.",
+    "Redraw your team's system card with AI in it and mark which roles, rules and stakeholders are added or removed.",
+    "Bring finance, IT, HR and compliance into an AI pilot at the start, each with what they need: a budget cap, boundaries, a learning path, traceability.",
+    "Before automating a report or process step with AI, ask whether it still needs to exist.",
+    "Decide explicitly what the time saved by AI is for, instead of letting it fill up with more parallel tickets."
+  ],
+  "quotes": [
+    {
+      "text": "Sometimes if you say we are doing both, it just means there is no strategy at all. And who has to decide on what to do if there is no strategy? The developer.",
+      "at": "25:43"
+    },
+    {
+      "text": "Negative things should not be a surprise, positive things can be a surprise.",
+      "at": "122:38"
+    },
+    {
+      "text": "Speed alone is not a strategy and automation is not transformation.",
+      "at": "148:00"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Organisations as games"
+    },
+    {
+      "at": "09:28",
+      "title": "How AI rewrites the rules"
+    },
+    {
+      "at": "17:43",
+      "title": "Efficiency or customer loyalty"
+    },
+    {
+      "at": "27:51",
+      "title": "System cards"
+    },
+    {
+      "at": "46:56",
+      "title": "Strategy principles and AI modes"
+    },
+    {
+      "at": "70:38",
+      "title": "The AI alpha player"
+    },
+    {
+      "at": "90:18",
+      "title": "Four gatekeepers"
+    },
+    {
+      "at": "108:48",
+      "title": "Old game versus new game"
+    },
+    {
+      "at": "132:03",
+      "title": "What to do with saved time"
+    }
+  ],
+  "tech": [
+    "Padlet",
+    "EU AI Act"
+  ],
+  "watchIf": "You shape how your team or company adopts AI and want a workshop-style framework for questioning strategy, roles and gatekeepers rather than a tool demo; expect much of the recording to be audience discussion.",
+  "themes": [
+    "Teams, careers & leadership",
+    "AI agents & agentic coding"
+  ],
+  "demo": false
+}

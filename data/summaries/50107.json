@@ -1,0 +1,98 @@
+{
+  "id": 50107,
+  "source": "transcript",
+  "tldr": "Salm argues that shipping agents is a platform problem: an AI gateway, an MCP gateway with approved tools, agent identity, shared guardrails and OpenTelemetry-based cost observability belong in the platform.",
+  "summary": [
+    "Timo Salm, a Broadcom solution architect and Agentic AI Foundation ambassador, starts from the point that a Spring AI agent takes a few lines of code but production raises other questions. Which model is approved? Where do credentials live? What stops an agent calling a harmful tool? Why did it act as it did? He compares today with the early container years, when every team had to work out Kubernetes and security on its own. Most organisations already have a developer platform; it now has to grow to meet agents' needs. Hardcoding provider SDKs and keys in every agent makes switching providers a multi-week change.",
+    "On security, Salm said the Spring portfolio of over 50 projects used to see about one vulnerability a month. Since March, scanning with frontier models found over 450 candidates and led to more than 200 published vulnerabilities across four releases, and researchers now report about 40 a month. Smaller models can turn a published CVE and patch into an exploit within hours, and low-severity CVEs can be chained, so platforms need automated patching and tests, not four weeks of manual testing. He cited 1Password research finding only 70 of 100 AI-generated security fixes fully correct. Platform-as-a-product still applies: start from real use cases, not GPUs nobody asked for.",
+    "The core is a list of platform capabilities. An OpenAI-compatible AI gateway with virtual keys lets the platform switch models, route between public and private models and enforce budgets with no code change. An MCP gateway with a registry exposes only approved tools, handles single sign-on and token exchange, and audits usage; Broadcom forbids local stdio MCP servers. Agent identity replaces all-powerful service accounts with per-user, per-task tokens. Guardrails sit at three layers: application (structured-output validation, human-in-the-loop), gateway (data masking, prompt-injection filters) and runtime (sandboxed containers, deny-by-default network). Observability uses Micrometer and OpenTelemetry's GenAI conventions to show the cost per interaction."
+  ],
+  "keyPoints": [
+    "Put model access behind one OpenAI-compatible AI gateway with virtual keys, so swapping Gemini for OpenAI or a private model is platform configuration, not a code change or key rotation across hundreds of apps.",
+    "Salm said frontier-model scanning found over 450 possible vulnerabilities in Spring since March, leading to more than 200 published fixes in four releases, against roughly one a month before.",
+    "Exploits can follow a CVE publication within hours and low-severity CVEs can be chained, so patching and testing must be automated rather than waiting weeks for manual tests.",
+    "An MCP gateway and registry (for example Agent Gateway, contributed by Solo.io to the Agentic AI Foundation) provides approved tools, SSO token exchange, tracing and audit; avoid local stdio MCP servers.",
+    "Service accounts don't fit agents: an agent should carry an identity derived from the user's login with tokens scoped to only the tools a task needs, which limits prompt-injection damage.",
+    "Guardrails belong at three layers: application (validate structured output, human approval for actions), gateway (data masking, prompt-injection checks, allowed tools) and runtime (isolated containers, deny-by-default networking).",
+    "Spring AI's SafeGuardAdvisor is a simple word allow/deny list; the hard part is maintaining such lists, which is why a central team should own them.",
+    "Spring AI emits Micrometer observations for token usage and calls to vector stores; with OpenTelemetry (including GenAI semantic conventions) the platform can show the cost of each interaction."
+  ],
+  "takeaways": [
+    "Ask your platform team for a single model endpoint with virtual keys instead of embedding provider API keys and model names in your agent.",
+    "Connect coding and runtime agents to tools through an approved MCP gateway rather than arbitrary downloaded MCP servers.",
+    "Automate dependency patching and tests so a security fix can reach production in hours, and read patch release notes for breaking changes.",
+    "Turn on Spring AI observations and OpenTelemetry export so each agent interaction reports tokens and cost.",
+    "If you are the platform team, collect one or two real agent use cases before building GPU clusters or gateways."
+  ],
+  "quotes": [
+    {
+      "text": "The question is not whether you can do it. The question is whether you should do that.",
+      "at": "20:30"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "From agent demo to production"
+    },
+    {
+      "at": "06:53",
+      "title": "Lessons from the container era"
+    },
+    {
+      "at": "10:41",
+      "title": "AI-found vulnerabilities and patching"
+    },
+    {
+      "at": "17:38",
+      "title": "Platform as a product"
+    },
+    {
+      "at": "21:31",
+      "title": "Model access via AI gateway"
+    },
+    {
+      "at": "27:58",
+      "title": "MCP gateway and approved tools"
+    },
+    {
+      "at": "31:47",
+      "title": "Agent identity"
+    },
+    {
+      "at": "34:47",
+      "title": "Guardrails in three layers"
+    },
+    {
+      "at": "38:40",
+      "title": "Observability and cost"
+    },
+    {
+      "at": "44:15",
+      "title": "What stays in your code"
+    }
+  ],
+  "tech": [
+    "Spring AI",
+    "Spring Boot",
+    "Model Context Protocol",
+    "Agent2Agent",
+    "Agent Gateway",
+    "Agentic AI Foundation",
+    "OpenTelemetry",
+    "Micrometer",
+    "Dependabot",
+    "Renovate",
+    "Spring Application Advisor",
+    "Tanzu Platform",
+    "pgvector",
+    "Kubernetes"
+  ],
+  "watchIf": "You are on a platform team, or a developer about to put a Spring AI agent in production, and want a checklist of what the platform should provide for agents.",
+  "themes": [
+    "Cloud native & Kubernetes",
+    "Security & supply chain",
+    "AI agents & agentic coding"
+  ],
+  "demo": false
+}

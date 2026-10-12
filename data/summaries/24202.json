@@ -1,0 +1,100 @@
+{
+  "id": 24202,
+  "source": "transcript",
+  "tldr": "Sghiouar demos Agent Substrate, which multiplexes mostly idle, sandboxed agents onto a shared Kubernetes worker pool, snapshotting memory and disk so agents suspend and wake in under 500 ms.",
+  "summary": [
+    "Abdel Sghiouar, a Google Cloud developer advocate, presents Agent Substrate, which follows the Agent Sandbox project and which he said is being donated to the CNCF; it runs on any Kubernetes, not just GKE. Agents, from coding CLIs such as Codex to notebooks, are idle most of the time, waiting for the LLM or for human approval, so one pod per agent wastes resources. Agent images can also be tens of gigabytes, so pulling them from a registry on every start is too slow. Platform teams also need to sandbox what agents do, including prompt-injected web content.",
+    "Agent Substrate is, he admits, another scheduler on top of Kubernetes. It separates actors (the agents) from workers (pods in pre-provisioned worker pools built from templates). Agents wake via a router on a request or a monitor when their own loop runs. He said the controller activates an agent in under 500 milliseconds and handles 500 activations per second. Snapshots of memory and file system go to any S3-compatible store (GCS in the demo), so agents can 'teleport' between nodes. It has its own API server and router, a node-level snapshotter, a pluggable sandbox (gVisor, Kata Containers, Firecracker) and Postgres instead of etcd, which was too slow.",
+    "The demos on GKE use a kubectl plugin to suspend and resume actors. An in-memory HTTP counter keeps its count across suspends (5, 6, 7); an interactive shell suspends on exit and still has the file written; a Jupyter notebook resumes with the variable x still in memory. He shows agent spaces, a namespace-like grouping, with actors from different templates sharing one worker pod; teleportation is described but not shown. Users he cited include Lovable, which needs a workspace within 30 seconds of sign-up, and Anthropic. In Q&A: scale pools with HPA and the cluster autoscaler; agents cannot be queued yet."
+  ],
+  "keyPoints": [
+    "Agents spend most of their time waiting for the LLM or a human, so mapping each agent to a long-running pod wastes compute.",
+    "Agent Substrate decouples actors (agents, shipped as ordinary OCI containers injected into pods) from workers (pre-provisioned pods built from templates).",
+    "Sghiouar said agents activate in under 500 ms and the controller handles 500 activations per second; it uses its own API server and Postgres because the Kubernetes API server and etcd were too slow.",
+    "Suspend snapshots both memory and file system to S3-compatible storage, which lets an agent resume on a different node ('teleport'); with gVisor even GPU memory can be preserved.",
+    "Sandboxing is pluggable through runtime classes: gVisor, a user-space kernel that intercepts syscalls, or micro-VMs such as Kata Containers or Firecracker, which need nested virtualization.",
+    "Bake shared dependencies into the worker pool image so agent containers stay small and start faster.",
+    "Agents wake via the router on an incoming request, via a monitor when their own loop needs to run, or suspend themselves through the API; agent spaces group actors for multi-tenancy.",
+    "It is framework-agnostic (LangChain, Google ADK, kagent, MCP servers, Codex, OpenCode) since an actor is just a process; Lovable uses it to meet a 30-second sign-up-to-workspace target."
+  ],
+  "takeaways": [
+    "Measure how much of the time your agent pods are actually busy before giving every agent its own pod.",
+    "Run agents that execute tools or shell commands under gVisor or a micro-VM runtime class rather than standard runc.",
+    "Pre-build heavy agent dependencies into a warm worker image instead of pulling multi-gigabyte agent images on each start.",
+    "Put a horizontal pod autoscaler and cluster autoscaler on worker pools and accept a few seconds of cold start after idle periods."
+  ],
+  "quotes": [
+    {
+      "text": "Haven't you just built another scheduler on top of Kubernetes? The answer is yes.",
+      "at": "01:58"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "From Agent Sandbox to Substrate"
+    },
+    {
+      "at": "01:58",
+      "title": "Why agents waste pods"
+    },
+    {
+      "at": "04:49",
+      "title": "Actors and worker pools"
+    },
+    {
+      "at": "09:03",
+      "title": "Activation, snapshots and teleporting"
+    },
+    {
+      "at": "10:29",
+      "title": "Components and sandboxing"
+    },
+    {
+      "at": "13:23",
+      "title": "Demo: in-memory counter"
+    },
+    {
+      "at": "19:01",
+      "title": "Demo: shell and Jupyter"
+    },
+    {
+      "at": "25:30",
+      "title": "Agent spaces and multi-tenancy"
+    },
+    {
+      "at": "29:05",
+      "title": "Recap and real users"
+    },
+    {
+      "at": "34:34",
+      "title": "Q&A"
+    }
+  ],
+  "tech": [
+    "Agent Substrate",
+    "Agent Sandbox",
+    "Kubernetes",
+    "GKE",
+    "gVisor",
+    "Kata Containers",
+    "Firecracker",
+    "PostgreSQL",
+    "etcd",
+    "Google Cloud Storage",
+    "Jupyter",
+    "kubectl",
+    "Horizontal Pod Autoscaler",
+    "kagent",
+    "Google ADK",
+    "LangChain",
+    "KEDA",
+    "Knative"
+  ],
+  "watchIf": "You run, or plan to run, many coding or AI agents on Kubernetes and want to see a working way to sandbox them and stop paying for idle pods.",
+  "themes": [
+    "Cloud native & Kubernetes",
+    "AI agents & agentic coding"
+  ],
+  "demo": true
+}

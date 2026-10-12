@@ -1,0 +1,102 @@
+{
+  "id": 9017,
+  "source": "transcript",
+  "tldr": "Gheorghe-Roman shows how a Spring AI agent for military resource allocation runs fully air-gapped: local models behind one ChatClient, self-hosted MCP tools, precise tool descriptions and human approval for writes.",
+  "summary": [
+    "Mihaela Gheorghe-Roman, a senior software architect at Systematic working on a command-and-control platform, describes taking an AI agent to production in a defence network with no internet, no cloud APIs and no external services. Only two people in the room had run an agent unattended in production. Air-gapped means more than pointing an SDK at localhost: no cloud inference, no pulling a newer model (an upgrade can trigger formal re-accreditation), no external registries or SaaS observability, and every dependency must be inside the boundary on day one. She names the category DDIL: disconnected, denied, intermittent, low-bandwidth.",
+    "Her simplified scenario: six units across three sectors, a priority-one mission, and an agent recommending allocations. The key decision comes before any code. Reads (unit status, availability, conflict detection) run freely and are logged. Any write that changes state a human must know about, such as reallocating a unit, can only be proposed and must wait for human approval; if in doubt, treat it as a write. Unlike a shopping order, a wrong reallocation cannot be returned. Third-party models like Mistral and in-house ones face the same accreditation; she said Anthropic's terms exclude defence use. The demo uses Ollama with Llama 3.2 as a stand-in.",
+    "The architecture is a Spring AI advisor chain (logging, approval, audit), a local chat model behind the provider-agnostic ChatClient, and @Tool methods, some exposed by self-hosted MCP servers owned by other teams. A small local model picks tools only from the description, so she gives a four-sentence docstring: what it returns, when to use it, the ID format, and a negative instruction pointing mission questions to another tool. In the recorded demo, with tools off the agent invents a status for a non-existent unit, Phantom 9; with tools on it says the unit does not exist. The approval demo shows approve and reject; a timeout counts as rejection."
+  ],
+  "keyPoints": [
+    "Air-gapped deployment removes cloud inference, same-day model upgrades (an upgrade may require re-accreditation), external registries and SaaS observability; every dependency must be inside the boundary before the mission starts.",
+    "Split tools into reads, which run freely and are logged, and writes, which the agent may only propose with prepared parameters; any state change a human must know about is a write, and if in doubt it's a write.",
+    "A Spring AI advisor chain wraps each call in a fixed order: logging, approval, audit, with audit recorded on the way out once everything is resolved.",
+    "Keep every model behind Spring AI's ChatClient so switching local model profiles or adopting a newly accredited model is a configuration line, not a business-logic change.",
+    "Self-hosted MCP servers owned by different teams (units, logistics, intelligence) act as the tool registry; tools wrap existing internal REST services or operational data stores.",
+    "A small local model chooses tools only from the description, so write it as a prompt: what it returns, when to use it, the expected ID format, and a negative instruction naming the tool to use instead.",
+    "With tool calling off, Llama 3.2 confidently gave a status, location and 92% readiness for a non-existent unit; with tools on it reported the unit was not found. A bigger model does not fix poor descriptions.",
+    "Unanswered approval requests time out after a product-defined interval and count as rejections; proposals include a score breakdown and confidence level so the operator can see why the agent suggested them."
+  ],
+  "takeaways": [
+    "Classify every agent tool as read or write before writing code, and route all writes through an explicit human approval step.",
+    "Rewrite your tool descriptions to state output, when to use, argument format and which similar tool not to confuse it with.",
+    "Access models only through a provider-agnostic abstraction such as Spring AI's ChatClient so a model swap is pure configuration.",
+    "Decide explicitly whether an approval timeout means reject, and log who approved what, when and why for later reconstruction.",
+    "Size hardware for worst-case concurrent load, not for the demo, when running models locally."
+  ],
+  "quotes": [
+    {
+      "text": "If we are in doubt whether it is considered a read or a write, then it's a write operation. It's less risky.",
+      "at": "18:48"
+    },
+    {
+      "text": "The description field isn't just a code comment, it's the actual prompt.",
+      "at": "33:40"
+    },
+    {
+      "text": "Local models hallucinate exactly the same way cloud models do. Running on your own hardware doesn't make a model more thoughtful.",
+      "at": "40:13"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Agents with no internet"
+    },
+    {
+      "at": "08:02",
+      "title": "Why defence raises the stakes"
+    },
+    {
+      "at": "10:37",
+      "title": "What air-gapped takes away"
+    },
+    {
+      "at": "13:06",
+      "title": "The battalion scenario"
+    },
+    {
+      "at": "17:20",
+      "title": "Read versus write operations"
+    },
+    {
+      "at": "21:17",
+      "title": "Local models and accreditation"
+    },
+    {
+      "at": "24:11",
+      "title": "Architecture and MCP tools"
+    },
+    {
+      "at": "33:40",
+      "title": "Tool descriptions as prompts"
+    },
+    {
+      "at": "37:40",
+      "title": "Demo: grounding versus hallucination"
+    },
+    {
+      "at": "41:41",
+      "title": "Demo: approval gateway"
+    },
+    {
+      "at": "46:02",
+      "title": "Lessons beyond defence"
+    }
+  ],
+  "tech": [
+    "Spring AI",
+    "Model Context Protocol",
+    "Ollama",
+    "Llama 3.2",
+    "Mistral",
+    "JSON-RPC"
+  ],
+  "watchIf": "You build agents for regulated or isolated environments such as defence, healthcare or finance and need a concrete pattern for local models, tool design and human approval of writes.",
+  "themes": [
+    "LLMs in Java apps",
+    "AI agents & agentic coding",
+    "Security & supply chain"
+  ],
+  "demo": true
+}
