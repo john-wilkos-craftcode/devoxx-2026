@@ -1,0 +1,43 @@
+{
+  "id": 5541,
+  "source": "transcript",
+  "tldr": "A biography of Ted Nelson, from a nexialist boyhood to hypertext, Computer Lib and Xanadu, asking how the web might have turned out had Xanadu been a protocol rather than a product.",
+  "summary": [
+    "Norås opened with a minute's silence for Margaret Hamilton, whose death he said had been reported that morning. He then told Ted Nelson's story. Nelson was born in Chicago in 1937 to the Hollywood director Ralph Nelson and the actress Celeste Holm, and raised by his academic grandparents. Pulp sci-fi shaped him, above all A. E. van Vogt's The Voyage of the Space Beagle, whose 'nexialist' works across every discipline. Two other influences were Vannevar Bush's 1945 essay As We May Think, with its microfilm-based Memex, and a florist's 'flowers by wire' sign. Norås reads that sign as the moment Nelson started thinking in protocols.",
+    "Nelson was unimpressed by Engelbart's 1968 Mother of All Demos, which he saw as recreating the office on screen. Inspired by William Burroughs' cut-up technique, he built JOT, a 'hypertextual editor' that appended every change to the end of the tape rather than overwriting it. Norås compares this to Git. Nelson's 1965 ACM paper, 'A File Structure for the Complex, the Changing and the Indeterminate', introduced the word hypertext. In 1974 he self-published Computer Lib, a cut-and-paste manifesto against the 'computer priesthood' that Microsoft republished in 1987. On its flip side was Dream Machines, his vision of computers as a new literature.",
+    "Dream Machines and Literary Machines (1980) laid out Xanadu: franchised Xanadu cafes, two-way links, transclusion with full version history, user annotations, and transcopyright micropayments. Norås links two-way links to PageRank and annotations to social media. Xanadu stayed vapourware while the Macintosh, the web and Netscape took off, and Nelson is credited mainly with the back button, which Norås dates to 1967. The closing 'what if' imagines Xanadu as a protocol specification in the ARPANET era. Norås argues it could have helped against misinformation, made sample-based music easy to clear, and let AI training data be traced back and paid for."
+  ],
+  "keyPoints": [
+    "The Voyage of the Space Beagle's 'nexialist', who mediates across all sciences, became Nelson's lifelong self-image. As a child he drew a business card naming himself a nexialist.",
+    "Vannevar Bush's Memex (Life magazine, 10 September 1945) stored information on microfilm, linked it with levers, and let you share the reels: the blueprint for Xanadu.",
+    "JOT, the Juggler of Text, stored text as elements on tape and appended changes instead of overwriting them. Norås describes this as version history long before Git.",
+    "Nelson's 1965 ACM paper in Cleveland introduced hypertext, three years before Engelbart's Mother of All Demos.",
+    "Computer Lib/Dream Machines (1974) was a self-published flip book, typed, cut up and glued by hand, arguing that 'you can and must understand computers now'.",
+    "Xanadu's features included two-way links, transclusion (citation with version history), annotations and transcopyright micropayments. Norås maps these to PageRank, social media and fair payment for creators.",
+    "Norås argues that bidirectional links and transclusion would leave a trail from AI output back to its sources, so authors could be paid for training data."
+  ],
+  "takeaways": [
+    "Read Vannevar Bush's As We May Think and browse Computer Lib/Dream Machines; Norås says both are freely findable online.",
+    "When designing a system, ask whether it should be an open protocol rather than a closed product.",
+    "Consider append-only change history and two-way references as design tools for traceability and provenance."
+  ],
+  "quotes": [
+    {"text": "Ladies and gentlemen and everyone in between, Ted Nelson is the inventor of hypertext, the technology that drives the web as we know it today.", "at": "21:46"},
+    {"text": "The only thing that he gets credit for when the web takes off is the back button.", "at": "36:44"}
+  ],
+  "chapters": [
+    {"at": "00:00", "title": "Remembering Margaret Hamilton"},
+    {"at": "02:37", "title": "Childhood and the nexialist"},
+    {"at": "09:08", "title": "Vannevar Bush and the Memex"},
+    {"at": "14:35", "title": "Mother of All Demos"},
+    {"at": "18:38", "title": "JOT and the birth of hypertext"},
+    {"at": "22:54", "title": "Computer Lib and Dream Machines"},
+    {"at": "27:29", "title": "Xanadu and Literary Machines"},
+    {"at": "35:41", "title": "The web overtakes Xanadu"},
+    {"at": "37:46", "title": "What if Xanadu were a protocol"}
+  ],
+  "tech": ["Hypertext", "Xanadu", "Memex", "World Wide Web", "Git", "Mosaic", "Netscape Navigator", "PageRank"],
+  "watchIf": "You enjoy computing history and want the story of hypertext's inventor told as an argument about open protocols versus walled gardens.",
+  "themes": ["Hardware, robots & fun"],
+  "demo": false
+}
