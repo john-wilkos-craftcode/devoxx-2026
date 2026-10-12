@@ -1,10 +1,10 @@
 {
   "id": 23533,
   "source": "transcript",
-  "tldr": "Arhipov recaps lesser-known IntelliJ IDEA debugger features and shows a coding agent using them through a bundled debugger skill and MCP tools, gathering runtime evidence with logpoints instead of print statements.",
+  "tldr": "Arhipov recaps lesser-known IntelliJ IDEA debugger features, then shows a coding agent using them via a bundled debugger skill and MCP tools, collecting evidence with logpoints instead of print statements.",
   "summary": [
-    "Arhipov starts from the point that breakpoints, value changes and HotSwap are JVM runtime capabilities exposed through a debugging protocol, so an agent can use them without a human at the IDE window. He walks through a run of features: Trace Stream Chain for visualising data flowing through a stream, method breakpoints on interface methods that stop in every implementation, wildcard method breakpoints that catch reflective calls, proxies and generated code, and logpoints, which are non-suspending breakpoints with an evaluated expression. He also shows a breakpoint that stays disabled until another one has been hit, so it only fires on a particular call path.",
-    "Each feature is then handed to an agent. IntelliJ IDEA bundles a debugger skill (installable into .agents/skills for a project) that tells the agent how and in what order to call the IDE's debugger tools through a single router MCP endpoint. Its principle is debugger-first, logpoint-first root cause analysis: collect evidence from logpoints and breakpoints rather than editing code with print lines. In the demos the agent finds a duplicate-keyboard bug caused by BigDecimal comparison in a stream, traces a 'never used' method to a reflective call through a non-constant method name, and reproduces a flaky concurrency test because its two logpoints add enough latency for both threads to pass the check-then-add."
+    "Arhipov starts from the point that breakpoints, value changes and HotSwap are JVM runtime capabilities exposed through a debugging protocol, so an agent can use them without a human at the IDE. He walks through Trace Stream Chain for visualising data flowing through a stream, method breakpoints on interface methods that stop in every implementation, wildcard method breakpoints that catch reflective calls, proxies and generated code, and logpoints: non-suspending breakpoints with an evaluated expression. He also shows a breakpoint that stays disabled until another one is hit, so it fires only on a particular call path.",
+    "Each feature is then handed to an agent. IntelliJ IDEA bundles a debugger skill (installable into .agents/skills) that tells the agent how and in what order to call the IDE's debugger tools through a single router MCP endpoint. Its principle is logpoint-first root cause analysis: gather runtime evidence instead of editing code with print lines. In the demos the agent finds a duplicate-keyboard bug caused by BigDecimal comparison in a stream, traces a 'never used' method to a reflective call through a non-constant method name, and reproduces a flaky concurrency test because its logpoints widen the race window."
   ],
   "keyPoints": [
     "Method breakpoints on an interface method stop in whichever implementation runs; wildcard class and method patterns also catch proxies, bytecode weaving and generated code.",
@@ -19,20 +19,61 @@
     "Try a breakpoint that stays disabled until another one is hit when you only care about one call path into a shared method."
   ],
   "quotes": [
-    {"text": "Why do you think people add println statements instead of adding the breakpoint? Because it's very hard to figure out where you have to set the breakpoint.", "at": "22:41"}
+    {
+      "text": "Why do you think people add println statements instead of adding the breakpoint? Because it's very hard to figure out where you have to set the breakpoint.",
+      "at": "22:41"
+    }
   ],
   "chapters": [
-    {"at": "00:00", "title": "Debugger as runtime window"},
-    {"at": "02:37", "title": "Stream debugging and Trace Stream Chain"},
-    {"at": "06:57", "title": "Agent fixes the stream bug"},
-    {"at": "12:09", "title": "Method and wildcard breakpoints"},
-    {"at": "16:37", "title": "Agent traces a reflective call"},
-    {"at": "20:10", "title": "Logpoints and the debugger skill"},
-    {"at": "26:36", "title": "Breakpoint dependencies for call paths"},
-    {"at": "29:32", "title": "Reproducing a race condition"}
+    {
+      "at": "00:00",
+      "title": "Debugger as runtime window"
+    },
+    {
+      "at": "02:37",
+      "title": "Stream debugging and Trace Stream Chain"
+    },
+    {
+      "at": "06:57",
+      "title": "Agent fixes the stream bug"
+    },
+    {
+      "at": "12:09",
+      "title": "Method and wildcard breakpoints"
+    },
+    {
+      "at": "16:37",
+      "title": "Agent traces a reflective call"
+    },
+    {
+      "at": "20:10",
+      "title": "Logpoints and the debugger skill"
+    },
+    {
+      "at": "26:36",
+      "title": "Breakpoint dependencies for call paths"
+    },
+    {
+      "at": "29:32",
+      "title": "Reproducing a race condition"
+    }
   ],
-  "tech": ["IntelliJ IDEA", "IntelliJ debugger", "Logpoints", "Method breakpoints", "Trace Stream Chain", "HotSwap", "MCP", "Agent skills", "Java Streams", "BigDecimal"],
+  "tech": [
+    "IntelliJ IDEA",
+    "IntelliJ debugger",
+    "Logpoints",
+    "Method breakpoints",
+    "Trace Stream Chain",
+    "HotSwap",
+    "MCP",
+    "Agent skills",
+    "Java Streams",
+    "BigDecimal"
+  ],
   "watchIf": "You use coding agents in IntelliJ IDEA and want them to debug with runtime evidence instead of scattering print statements through your code.",
-  "themes": ["AI agents & agentic coding", "Developer experience & tooling"],
+  "themes": [
+    "AI agents & agentic coding",
+    "Developer experience & tooling"
+  ],
   "demo": true
 }

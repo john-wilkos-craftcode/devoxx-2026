@@ -1,12 +1,12 @@
 {
   "id": 15354,
   "source": "transcript",
-  "tldr": "Paumard and Forax explain JEP 401 value classes, previewing in JDK 28: what giving up identity changes, how scalarization and heap flattening perform in benchmarks, and why null-safety is still unsolved.",
+  "tldr": "Paumard and Forax explain JEP 401 value classes, previewing in JDK 28: what giving up identity changes, how scalarization and flattening perform, and why null-safety remains unsolved.",
   "summary": [
-    "Paumard and Forax open with Tony Hoare's 'billion-dollar mistake' and the news that JEP 401 (value objects) is in the JDK 28 early-access builds as a preview feature, alongside a companion JEP for strict field initialization in the JVM. Valhalla's goal is to give classes the benefits of primitives, a dense memory layout and no pointer chasing, and to make new primitive-like types such as Float16 possible. Their core argument is that identity is an address: without an address there is no header and no mutation, so a value class is implicitly final with final fields. Declaring one is just a matter of putting 'value' in front of a class or record.",
-    "Forax's demos show what changes. == on value objects compares fields recursively, so it is no longer cheap. The default hashCode is derived from the fields. synchronized on a value object fails to compile, and through an Object reference it throws an IdentityException at runtime, as does creating a WeakReference. Because construction must not be observable, value class fields are strict: they have to be assigned before super(), using the flexible constructor bodies delivered in JDK 25, which the speakers recommend for all classes. Value classes can only extend abstract value classes or Object; Record and Number are now abstract value classes.",
-    "On performance, a JMH mixtape benchmark sums song durations three ways. With value records the object loop runs as fast as the primitive loop and triggers no GC at all, because the JIT scalarizes objects into registers, including parameters and return values. Streams get no benefit, because erasure hides the value type behind Object. Heap flattening is a trade-off: atomic access limits flattening to about 64 bits including a null-marker byte, which is why the song uses a short rather than an int duration. Decoding flattened 100-element arrays is slower than chasing pointers, and flattening only wins somewhere between 1,000 and 10,000 elements. In a JFR trace of a full application, allocation dropped from about 107 GB to a few MB.",
-    "The bytecode barely changes: javac clears a repurposed identity flag, marks fields strict and adds a LoadableDescriptors attribute so classes load early. Existing code therefore benefits without recompiling. With --enable-preview on JDK 28, Integer, Optional, LocalDate, Duration and other value-based classes become value classes. The last hour covers explorations that may never ship: '!' null-restricted types, prototyped on a branch but set aside because nullness is a storage property and it changes overload resolution, and primitive classes with no encapsulation, non-atomic flattening, a default value and possibly operator overloading. Their answer to the title is no."
+    "Paumard and Forax open with Tony Hoare's 'billion-dollar mistake' and the news that JEP 401 (value objects) is in the JDK 28 early-access builds as a preview, alongside a companion JVM JEP for strict field initialization. Valhalla aims to give classes the benefits of primitives, a dense memory layout and no pointer chasing, and to make primitive-like types such as Float16 possible. Their core argument: identity is an address. Without an address there is no header and no mutation, so a value class is implicitly final with final fields. You declare one by putting 'value' in front of a class or record.",
+    "Forax's demos show what changes. == on value objects compares fields recursively, so it is no longer cheap. The default hashCode is derived from the fields. synchronized fails to compile, and through an Object reference it throws IdentityException at runtime, as does creating a WeakReference. Value class fields are strict: they must be assigned before super(), using the flexible constructor bodies from JDK 25, which the speakers recommend for all classes. Value classes may only extend abstract value classes or Object; Record and Number are now abstract value classes.",
+    "A JMH mixtape benchmark sums song durations three ways. With value records, the object loop matches the primitive loop and triggers no GC, because the JIT scalarizes objects into registers, even across calls and returns. Streams gain nothing, since erasure hides the value type. Heap flattening is a trade-off: atomic access limits it to about 64 bits including a null-marker byte, hence a short rather than an int duration. For 100-element arrays, decoding flattened data was slower than chasing pointers; flattening only won between 1,000 and 10,000 elements. In a JFR trace of a full application, allocation fell from about 107 GB to a few MB.",
+    "javac only clears a repurposed identity flag, marks fields strict and adds a LoadableDescriptors attribute so classes load early, so existing code benefits without recompiling. With --enable-preview on JDK 28, Integer, Optional, LocalDate, Duration and other value-based classes become value classes. The last hour covers explorations that may never ship: '!' null-restricted types, prototyped but set aside because nullness is a storage property and it changes overload resolution, and primitive classes with no encapsulation, non-atomic flattening, a default value and possibly operator overloading. Their answer to the title question is no."
   ],
   "keyPoints": [
     "JEP 401 value objects are planned as a preview in JDK 28 (March 2027), building on JEP 513 flexible constructor bodies (final in JDK 25) and a JVM JEP for strict field initialization.",
@@ -26,23 +26,76 @@
     "Keep candidate value records small (for example a short instead of an int) if you want them flattened in arrays."
   ],
   "quotes": [
-    {"text": "Code like a class, works like an int.", "at": "127:43"},
-    {"text": "Will Valhalla fix Tony's billion-dollar mistake? Short answer, no. Sorry, Tony.", "at": "157:22"}
+    {
+      "text": "Code like a class, works like an int.",
+      "at": "127:43"
+    },
+    {
+      "text": "Will Valhalla fix Tony's billion-dollar mistake? Short answer, no. Sorry, Tony.",
+      "at": "157:22"
+    }
   ],
   "chapters": [
-    {"at": "00:00", "title": "Tony Hoare and null"},
-    {"at": "08:33", "title": "Goals of Valhalla"},
-    {"at": "16:45", "title": "Identity, address and mutability"},
-    {"at": "38:23", "title": "Demo: equality, hashCode, synchronization"},
-    {"at": "53:11", "title": "Strict fields and constructors"},
-    {"at": "68:43", "title": "Abstract value classes"},
-    {"at": "73:21", "title": "Scalarization benchmarks"},
-    {"at": "90:18", "title": "Heap flattening trade-offs"},
-    {"at": "116:08", "title": "Class files and migration"},
-    {"at": "129:48", "title": "Null-restriction and primitive classes"}
+    {
+      "at": "00:00",
+      "title": "Tony Hoare and null"
+    },
+    {
+      "at": "08:33",
+      "title": "Goals of Valhalla"
+    },
+    {
+      "at": "16:45",
+      "title": "Identity, address and mutability"
+    },
+    {
+      "at": "38:23",
+      "title": "Demo: equality, hashCode, synchronization"
+    },
+    {
+      "at": "53:11",
+      "title": "Strict fields and constructors"
+    },
+    {
+      "at": "68:43",
+      "title": "Abstract value classes"
+    },
+    {
+      "at": "73:21",
+      "title": "Scalarization benchmarks"
+    },
+    {
+      "at": "90:18",
+      "title": "Heap flattening trade-offs"
+    },
+    {
+      "at": "116:08",
+      "title": "Class files and migration"
+    },
+    {
+      "at": "129:48",
+      "title": "Null-restriction and primitive classes"
+    }
   ],
-  "tech": ["Project Valhalla", "JEP 401", "JEP 513", "JDK 28", "Value classes", "Records", "JMH", "JFR", "HotSpot JIT", "Project Lilliput", "Vector API", "Float16", "IntelliJ IDEA"],
+  "tech": [
+    "Project Valhalla",
+    "JEP 401",
+    "JEP 513",
+    "JDK 28",
+    "Value classes",
+    "Records",
+    "JMH",
+    "JFR",
+    "HotSpot JIT",
+    "Project Lilliput",
+    "Vector API",
+    "Float16",
+    "IntelliJ IDEA"
+  ],
   "watchIf": "You want a precise picture of what value classes change in Java semantics and performance before they preview in JDK 28, including the limitations.",
-  "themes": ["Java language & JDK", "JVM performance & runtime"],
+  "themes": [
+    "Java language & JDK",
+    "JVM performance & runtime"
+  ],
   "demo": true
 }
