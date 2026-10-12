@@ -1,0 +1,109 @@
+{
+ "intro": "Devoxx Belgium 2026 was mostly about working with coding agents: about a third of the sessions sat in the agentic engineering track, and most asked less what agents can do than how to check, review and contain them. The Java platform team showed a runtime that keeps getting leaner and faster, from compact object headers (on by default in JDK 27, speakers said) to Leyden's AOT cache and Valhalla value classes. Architecture and people talks argued for clear boundaries and for keeping the skills that AI makes easy to skip.",
+ "trends": [
+  {
+   "title": "The harness outweighs the model",
+   "body": "Several speakers said the system around an agent decides results more than the model does. Darwish cited Terminal-Bench, where the same Claude Opus 4.5 scored differently per harness. Rules in CLAUDE.md or AGENTS.md proved unreliable: Podlesniuk saw one of three runs ignore a word-for-word rule, and Petruzalek watched an agent edit a blocking hook script. The fix shown repeatedly was executable checks (ArchUnit, Error Prone, Maven Enforcer, OpenRewrite) whose failure messages become the agent's context. Speakers split on tooling: Grall and Charrière favoured plain CLIs and bash over MCP, while Ward and Tzolov's eval had an MCP docs server answer in 19 seconds against 318 for a shell agent.",
+   "count": 23,
+   "talkIds": [
+    4087,
+    5507,
+    16414,
+    25671,
+    21690,
+    23529
+   ]
+  },
+  {
+   "title": "Review is the new bottleneck",
+   "body": "Agents make code cheap, but speakers agreed human review time has not shrunk. Martignole described huge PRs and an $86,000 bill as Back Market grew to 350 engineers on Claude Code. Rentea wants a fresh-context, adversarial AI to review before any human does; Cavalcanti showed such a review confidently reporting a bug that did not exist. Rivas and Martinelli review a short spec or plan instead of a 5,000-line PR, and Lippert and Gavrilescu want tools that show changes at architecture level. Hoogendoorn's team has dropped pull requests and code review for pairing and trunk-based development, while Schrijver insisted that if you bring it to review, it is your code.",
+   "count": 18,
+   "talkIds": [
+    8171,
+    31452,
+    25042,
+    7008,
+    16414,
+    17782
+   ]
+  },
+  {
+   "title": "Treat coding agents as untrusted code",
+   "body": "Security speakers agreed that prompt injection cannot be fixed with prompts. Gross called a coding agent remote code execution by design. Moraes showed \"treat as data\" wrappers beaten by forged closing tags and cited AgentDojo attack success of 45.5% on Qwen3 4B and about 5% on GPT-5. Vermeer demoed poisoned MCP tool descriptions and hidden instructions in skills, and argued pinned versions beat approval prompts. The shared answer was isolation: microVM sandboxes rather than containers (Šelajev noted the Docker socket gives root), host allowlists, and credentials swapped in by a proxy so they never enter the sandbox. Mehmandarov kept tag sandwiching, paired with closing-tag detection and canary tokens.",
+   "count": 16,
+   "talkIds": [
+    7011,
+    21654,
+    9035,
+    25657,
+    48301,
+    5502
+   ]
+  },
+  {
+   "title": "AI-found CVEs force faster patching",
+   "body": "Several speakers said models now find vulnerabilities faster than teams patch them. According to Salm, frontier-model scanning found over 450 possible vulnerabilities in Spring since March, leading to more than 200 fixes; Cvetkovic said Spring fixed more CVEs in a few months of 2026 than in the previous 13 years. Belfius said reported vulnerabilities roughly doubled around Claude Mythos's release, and Semeteys noted curl ended its bug bounty under duplicate and fabricated reports. Advice converged: automate upgrades and tests, rank CVEs by reachability and exposure rather than CVSS (Finkelshtein: Spring4Shell only hits WAR deployments on standalone Tomcat), and meet the Cyber Resilience Act's reporting duties, live since September 2026.",
+   "count": 14,
+   "talkIds": [
+    50107,
+    50109,
+    49254,
+    8194,
+    4051,
+    52102
+   ]
+  },
+  {
+   "title": "The JVM gets leaner and faster",
+   "body": "Pressler's keynote argued that if AI makes syntax matter less, the runtime matters more; platform talks brought numbers. Speakers said compact object headers are the default in JDK 27; van Dijk and Przybyl saw a 10-million-object heap drop from about 190 MB to 114 MB, though Parlog said to measure decompression's CPU cost. Leyden's AOT cache took a Quarkus REST app from about 350 ms to 80 ms startup, with caveats on custom class loaders. JEP 401 value classes are planned as a preview in JDK 28 according to the speakers, but Paumard and Forax warned generic code loses scalarization and null-safety remains open. Structured concurrency, they said, is proposed as final in JDK 28.",
+   "count": 19,
+   "talkIds": [
+    49251,
+    23543,
+    15354,
+    5510,
+    9752,
+    29351
+   ]
+  },
+  {
+   "title": "Java reaches native code and GPUs",
+   "body": "A cluster of talks used FFM, the Vector API and Project Babylon to run numeric and AI work in Java without JNI or Python. Fumero's Babylon-based HAT brought a tiled matrix multiply to 78 µs against 77 µs for cuTile Python. TornadoVM's jitLLM reported decode at 93% of llama.cpp, and Peterssen's 3.3 MB Quixotic jar runs 17 model families on the CPU. Speakers differed on how far pure Java goes: Peterssen said only matrix multiply needs native code, while Przybyl showed the Vector API's gain halving against a well-written scalar loop and noted Elasticsearch now calls a C++ kernel through FFM. Sevarac found packaging CUDA the hard part.",
+   "count": 12,
+   "talkIds": [
+    21657,
+    14452,
+    17556,
+    19730,
+    22947,
+    22916
+   ]
+  },
+  {
+   "title": "Boundaries before services",
+   "body": "Architecture talks pushed back on service count as a goal. Klaver's Port of Rotterdam had more than 4.5 microservices per engineer and is consolidating into Spring Modulith services along event-storming boundaries; Hillaert argued bounded contexts need not map one-to-one to services. Van de Ven warned that hexagonal layers relocate dependencies rather than remove them, while Vandeperre and van der Meer used separate build modules and ArchUnit to keep agent-written code clean. On consistency, Trandafir, Zinck and Sulyz all started from the dual-write problem, then covered outbox or Debezium CDC (with heartbeats so Postgres WAL cannot fill the disk), sagas with idempotent compensations, and reconciliation as the final net.",
+   "count": 16,
+   "talkIds": [
+    8153,
+    12751,
+    8186,
+    17791,
+    10034,
+    16418
+   ]
+  },
+  {
+   "title": "From writing code to judging it",
+   "body": "Speakers agreed developer roles are shifting, not disappearing, but disagreed on what to hold on to. Clark and Rohrer traced \"programmers will be unnecessary\" predictions back to Fortran in 1956 and named de-skilling as the real risk. Rentea's keynote urged moves toward product, architecture or quality work and concluded that hand debugging no longer pays, while Cavalcanti cited Bainbridge's automation paradox: people who only monitor lose the skills for what cannot be automated. Schrijver cited measured gains of 5-15% and METR's finding that developers felt faster while being 19% slower. Debois and ING treated scaling as an enablement problem, with shared, reviewed skills and agents rather than individual habits.",
+   "count": 20,
+   "talkIds": [
+    51951,
+    8164,
+    25042,
+    19706,
+    21671,
+    9023
+   ]
+  }
+ ]
+}

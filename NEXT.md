@@ -24,6 +24,5 @@ Next:
 2. Render the Room 8 walk + seat still, build a test page: <video> transitions, stills, and the HTML
    programme/talk pinned onto the screens with a CSS perspective transform from shots.json.
 3. Then all 14 rooms (~7 h of GPU, overnight), and retire the WebGL version.
-4. The "What we heard this week" recap: an agent was writing `data/recap.json` at 17:00. If it is
-   there, check it, run `python3 scripts/build_site.py --artifact`, commit and push.
+4. Done: the "What we heard this week" recap (`data/recap.json`) is live.
 5. Later: slide-by-slide navigation (`scripts/detect_slides.py` works; prefers H.264).
