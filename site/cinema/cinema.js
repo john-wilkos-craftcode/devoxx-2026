@@ -40,6 +40,7 @@ const talks = window.DEVOXX.talks.filter((t) => t.type !== "Keynote Overflow").m
   ...t, title: clean(t.title), speakers: t.speakers.map((sp) => ({ ...sp, name: capital(clean(sp.name)) })) }));
 const speakers = (t, withCompany) => t.speakers.map((sp) => withCompany && sp.company ? `${sp.name} (${sp.company})` : sp.name).join(", ");
 const when = (t) => t.start ? `${fDay.format(new Date(t.start))} ${fTime.format(new Date(t.start))}` : null;
+const whenShort = (t) => t.start ? `${fShort.format(new Date(t.start))} Oct, ${fTime.format(new Date(t.start))}` : null;
 const whenLong = (t) => t.start ? `${fDayLong.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : null;
 const typeLabel = (t) => (t.type === "Conference" ? "" : t.type);   // a plain talk needs no label
 const titleSize = (title, big, small) => title.length > 90 ? small : title.length > 55 ? (big + small) / 2 : big;
@@ -206,9 +207,9 @@ function why(t, terms) {
     const lower = text.toLowerCase(), w = terms.find((x) => lower.includes(x));
     if (!w) continue;
     const i = lower.indexOf(w);
-    let a = Math.max(0, i - 16);
-    if (a > 0) { const sp = text.lastIndexOf(" ", i - 1); a = sp >= a - 12 && sp >= 0 ? sp + 1 : a; }   // start on a word
-    return el("span", { class: "why" }, el("b", { text: `${name}: ` }), a ? "…" : "", text.slice(a, i), el("mark", { text: text.slice(i, i + w.length) }), text.slice(i + w.length, i + w.length + 70));
+    const a = i;                                                     // start at the match, so it's always in view
+    const word = text.slice(i).match(/^\S+/)[0].replace(/[,.;:]$/, "");    // the whole matched word, e.g. "Kotlin"
+    return el("span", { class: "why" }, el("b", { text: `${name}: ` }), a > 0 && name !== "Speaker" ? "…" : "", el("mark", { text: word }), text.slice(i + word.length, i + word.length + 70));
   }
   return null;
 }
@@ -221,7 +222,7 @@ function card(t, { when: showWhen = null, terms = null } = {}) {
       "aria-label": [t.title, speakers(t), t.room, showWhen ? when(t) : null, on ? "walks you to your seat" : null].filter(Boolean).join(", ") },
     el("span", { class: "room" }, n ? el("span", { class: "where" }, el("small", { text: "Room" }), el("b", { text: String(n) })) : el("span", { class: "where" }, el("b", { class: "is-text", text: t.room || "Room TBC" })),
       el("span", { class: "label", text: label })),
-    el("span", { class: "title", text: t.title, style: t.title.length > 72 ? "font-size:.86em" : null }),
+    el("span", { class: "title", text: t.title }),
     el("span", { class: "who", text: speakers(t) }),
     hint);
 }
@@ -266,7 +267,7 @@ function programme(tall) {
     const later = talks.filter((t) => t.start && dayKey(t.start) === day && t.start > slot).sort((a, b) => a.start.localeCompare(b.start) || (roomNo(a) || 99) - (roomNo(b) || 99));
     const fill = here.length < (tall ? 4 : 8) ? later.slice(0, (tall ? 6 : 8) - here.length) : [];
     const cards = el("div", { class: `cards scroller${tall ? "" : fill.length ? " is-packed" : " is-exact"}`, tabindex: "-1" },
-      here.map((t) => card(t, { when: fill.length ? "time" : null })),
+      here.map((t) => { const c = card(t, { when: fill.length ? "time" : null }); if (fill.length) c.classList.add(here.length === 1 ? "is-now-wide" : "is-now"); return c; }),
       fill.length ? el("div", { class: "later", text: "Later that day" }) : null, fill.map((t) => card(t, { when: "time" })));
     put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
         el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}. Pick a talk to take your seat.` })),
@@ -282,11 +283,11 @@ function programme(tall) {
 const toSeconds = (at) => { const [m, sec] = String(at).split(":").map(Number); return (m || 0) * 60 + (sec || 0); };
 function talkScreen(t, tall, onFloor, doorRoom = null) {
   const s = t.s || {};
-  const tabs = [["short", "In short"], ["points", "Key points"], ["monday", "On Monday"], ["chapters", "Chapters"], ["story", "Summary"]]
+  const tabs = [["short", "In short"], ["points", "Key points"], ["monday", "What to try"], ["chapters", "Chapters"], ["story", "Full summary"]]
     .filter(([id]) => (id === "short" && tall && s.tldr) || (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
       || (id === "chapters" && s.chapters && s.chapters.length && onFloor) || id === "story");
   const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Talk details" });
-  const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Talk details" });
+  const tabRow = el("div", { class: `tabs${tall ? " strip" : ""}`, role: "group", "aria-label": "Talk details" });
   let playAt = null;
   const chapter = (c) => {
     const kids = [el("time", { text: c.at }), el("span", { text: c.title })];
@@ -315,8 +316,8 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
     main.textContent = "";
     put(main,
       doorRoom && tall ? el("div", { class: "door-sign" }, el("small", { text: "Room" }), el("b", { text: String(doorRoom) }), el("span", { text: t.start ? `Recorded ${fShort.format(new Date(t.start))} Oct` : "" })) : null,
-      el("div", { class: "meta", text: [doorRoom && tall ? null : t.room, whenLong(t), typeLabel(t), t.videoId ? null : "no recording yet"].filter(Boolean).join(", ") }),
-      !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? "Downstairs meeting room, no cinema seat." : "No cinema seat to walk you to for this one." }) : null,
+      el("div", { class: "meta", text: [doorRoom && tall ? null : t.room, doorRoom && tall ? (t.start ? fTime.format(new Date(t.start)) : null) : whenShort(t), typeLabel(t), t.videoId ? null : "no recording yet"].filter(Boolean).join(", ") }),
+      !onFloor ? el("p", { class: "offnote", text: /^BOF/.test(t.room || "") ? `Held downstairs in ${t.room}.` : "Held outside the cinema rooms." }) : null,
       el("h2", { text: t.title, style: `--title:${titleSize(t.title, 40, 30)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
       !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,

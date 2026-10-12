@@ -1319,7 +1319,7 @@ def set_cam(loc, target, fov):
 def hall_pose():
     """A little left of square on to the programme screen, close enough that it fills most of a laptop's view, far
     enough that the columns, the ceiling and the curtains around it say where you are."""
-    d = fit_distance(SCREEN["w"] + 2 * BEZEL, SCREEN["h"] + BEZEL + CHIN, 40, 0.9)
+    d = fit_distance(SCREEN["w"] + 2 * BEZEL, SCREEN["h"] + BEZEL + CHIN, 40, 0.86)
     return (SCREEN["x"] - 0.06 * d, SCREEN["y"] - d, SCREEN["z"] + 0.02), (SCREEN["x"], SCREEN["y"], SCREEN["z"]), 40
 
 
@@ -1521,9 +1521,15 @@ phone_hall_cam = still_cam("cam-hall-phone", (TOTEM["x"], TOTEM["y"] - tdist, TO
                            2 * math.degrees(math.atan(math.tan(_hfov / 2) * PHONE[1] / PHONE[0])), dof=(tdist, 1.8))
 bpy.context.view_layer.update()       # matrix_world is stale until the depsgraph runs
 set_res(LAPTOP)
-shots["hall"] = {"kind": "still", "overlay": {"programme": screen_quad(screen_corners, hall_cam)}, "size": {"programme": [SCREEN["w"], SCREEN["h"]]}}
+def grow(corners, by=0.01):
+    """The quad a little larger, so the HTML tucks under the bezel and the screen's own glow never peeks out."""
+    c = Vector([sum(p[i] for p in corners) / 4 for i in range(3)])
+    return [tuple(c + (Vector(p) - c) * (1 + by / max(0.1, (Vector(p) - c).length))) for p in corners]
+
+
+shots["hall"] = {"kind": "still", "overlay": {"programme": screen_quad(grow(screen_corners), hall_cam)}, "size": {"programme": [SCREEN["w"], SCREEN["h"]]}}
 set_res(PHONE)
-shots["hall-phone"] = {"kind": "still", "overlay": {"programme": screen_quad(totem_corners, phone_hall_cam)}, "size": {"programme": [TOTEM["w"], TOTEM["h"]]}}
+shots["hall-phone"] = {"kind": "still", "overlay": {"programme": screen_quad(grow(totem_corners), phone_hall_cam)}, "size": {"programme": [TOTEM["w"], TOTEM["h"]]}}
 
 # the walk: segment A (shared per stair) from frame 1, segment B (this room) right after it
 frames_a = walk_a(west, 1)
@@ -1557,7 +1563,7 @@ door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist, tot["y"],
 door_cam.data.shift_y = -0.13                 # the totem low in frame, the room numeral rising above it
 bpy.context.view_layer.update()
 set_res(PHONE)
-shots[f"door-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(tot["corners"], door_cam)}, "size": {"screen": [tot["w"], tot["h"]]}}
+shots[f"door-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(grow(tot["corners"]), door_cam)}, "size": {"screen": [tot["w"], tot["h"]]}}
 (OUT / f"shots-{n}.json").write_text(json.dumps(shots, indent=1))
 
 # ---------------------------------------------------------------------------------- render settings

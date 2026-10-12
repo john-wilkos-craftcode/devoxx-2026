@@ -43,8 +43,8 @@ button, input, a { font: inherit; color: inherit; }
   opacity: .5; mix-blend-mode: soft-light; }
 
 /* chrome outside the screens: small, quiet, fixed */
-.exit { position: fixed; z-index: 5; left: 12px; top: calc(10px + env(safe-area-inset-top, 0px)); background: rgba(5, 7, 20, .55); color: rgba(174, 184, 236, .85);
-  border: 0; border-radius: 999px; padding: 6px 11px; font-size: 12px; text-decoration: none; backdrop-filter: blur(6px); }
+.exit { position: fixed; z-index: 5; left: 12px; top: calc(10px + env(safe-area-inset-top, 0px)); background: rgba(5, 7, 20, .7); color: #D5DBF7;
+  border: 1px solid rgba(174, 184, 236, .28); border-radius: 999px; padding: 6px 12px; font-size: 14px; text-decoration: none; backdrop-filter: blur(6px); }
 .exit:hover { color: var(--ink); border-color: var(--muted); }
 .exit:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .dock { position: fixed; z-index: 5; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; display: flex; gap: 8px; align-items: center; }
@@ -100,9 +100,11 @@ button, input, a { font: inherit; color: inherit; }
 .cards.is-exact > .card { height: auto; min-height: 0; }
 .card { overflow: hidden; }
 .cards.is-exact .card .title { -webkit-line-clamp: 4; }
-.cards.is-packed > .card { height: 140px; gap: 6px; }
+.cards.is-packed > .card { height: 156px; gap: 6px; }
 .cards.is-packed .card .title { -webkit-line-clamp: 2; }
-.cards.is-packed .card .who { -webkit-line-clamp: 1; }
+.cards.is-packed > .card.is-now, .cards.is-packed > .card.is-now-wide { height: 176px; }
+.cards.is-packed > .card.is-now-wide { grid-column: span 2; }
+.cards.is-packed .card.is-now .title, .cards.is-packed .card.is-now-wide .title { -webkit-line-clamp: 3; }
 .card .why { font-size: 17px; line-height: 1.35; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: none; }
 .card .why b { font-weight: 700; }
 .results .cards > .card, .slot .cards.scroller[aria-label="Search results"] > .card { height: auto; min-height: 172px; }
@@ -119,7 +121,7 @@ button, input, a { font: inherit; color: inherit; }
 .card .where small { font-size: 16px; font-weight: 600; }
 .card .where b.is-text { font-size: 22px; font-stretch: 100%; }
 .card .room b { font-size: 30px; font-weight: 800; font-stretch: 125%; line-height: .9; white-space: nowrap; }
-.card .title { font-size: 19px; font-weight: 700; line-height: 1.17; padding-bottom: 1px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.card .title { font-size: 18px; font-weight: 700; line-height: 1.18; padding-bottom: 1px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .card .who { font-size: 17px; line-height: 1.25; opacity: .88; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .card.is-off { background: var(--panel); color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
 .card.is-off .who { color: var(--muted); opacity: 1; }
@@ -135,7 +137,7 @@ button, input, a { font: inherit; color: inherit; }
 .prog.is-tall .prog-head { flex-direction: column; align-items: stretch; gap: 10px; }
 .prog.is-tall .brand { font-size: 25px; gap: 8px; }
 .prog.is-tall .brand small { font-size: 13px; }
-.prog.is-tall .search { width: 100%; font-size: 16px; padding: 9px 12px; border-radius: 9px; }
+.prog.is-tall .search { width: 100%; flex: none; margin-left: 0; font-size: 16px; padding: 9px 12px; border-radius: 9px; }
 .prog.is-tall .nav { gap: 12px; }
 .prog.is-tall .days .pill { font-size: 14px; padding: 6px 8px; }
 .prog.is-tall .days { gap: 5px; }
@@ -192,14 +194,19 @@ button, input, a { font: inherit; color: inherit; }
 .door-sign b { font-size: 44px; font-weight: 800; font-stretch: 125%; line-height: .9; color: var(--orange); }
 .door-sign span { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--muted); }
 
-.talk.is-tall { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 14px; padding: 22px 18px 16px 22px; }
+.talk.is-tall { display: flex; flex-direction: column; gap: 12px; padding: 22px 18px 16px 22px; }
+.talk.is-tall .talk-main { display: contents; }
+.talk.is-tall .talk-side { flex: 1; order: 2; min-height: 0; }
+.talk.is-tall .actions { order: 3; margin-top: 4px; }
+.talk.is-tall .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; position: relative; padding: 4px; margin: -4px -4px 4px; }
+.talk.is-tall .tabs::-webkit-scrollbar { display: none; }
 .talk.is-tall .meta { font-size: 13px; }
 .talk.is-tall .offnote { margin-top: 6px; }
 .talk.is-tall h2 { margin-top: 6px; font-size: var(--title-s, 23px); }
 .talk.is-tall .who-l { margin-top: 6px; font-size: 14px; }
 .talk.is-tall .actions { margin-top: 10px; gap: 8px; }
 .talk.is-tall .btn { font-size: 14px; padding: 8px 12px; border-radius: 9px; border-width: 1.5px; }
-.talk.is-tall .tabs { gap: 6px; margin-bottom: 8px; }
+.talk.is-tall .tabs { gap: 6px; }
 .talk.is-tall .tabs .pill { font-size: 13px; padding: 5px 9px; border-radius: 7px; border-width: 1.5px; }
 .talk.is-tall .pane { font-size: 15px; line-height: 1.45; padding-right: 4px; }
 .talk.is-tall .pane ul, .talk.is-tall .pane ol { gap: 7px; }
