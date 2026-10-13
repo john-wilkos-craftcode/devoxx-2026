@@ -271,7 +271,7 @@ function programme(tall) {
   const panel = el("section", { class: `face prog is-lcd${tall ? " is-tall" : ""}`, "aria-label": "Programme" },
     el("div", { class: "prog-head" },
       el("h1", { class: "brand", "aria-label": "Devoxx Belgium 2026, 5 to 9 October" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })),
-        el("small", { text: `Belgium 2026: ${talks.length} talks, summarised` })),
+        el("small", { text: `Belgium 2026: ${window.DEVOXX.talks.length} talks, summarised` })),
       tall ? null : dayRow,
       search),
     nav, body,

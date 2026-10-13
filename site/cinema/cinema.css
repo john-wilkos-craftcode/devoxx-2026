@@ -23,7 +23,7 @@ button, input, a { font: inherit; color: inherit; }
 .front[hidden] { display: none; }
 
 /* a face is a screen's content: fixed canvas, pinned with matrix3d */
-.face { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: auto; box-sizing: border-box; overflow: hidden;
+.face { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: auto; box-sizing: border-box; overflow: clip;
   background: var(--night); color: var(--ink); animation: on .45s ease-out both; }
 @keyframes on { from { opacity: 0; filter: brightness(1.8); } to { opacity: 1; filter: none; } }
 .face *, .face *::before, .face *::after { box-sizing: border-box; }
@@ -72,7 +72,7 @@ button, input, a { font: inherit; color: inherit; }
 .brand { display: flex; align-items: baseline; gap: 10px; font-weight: 800; font-stretch: 125%; font-size: 30px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
 .brand .x { color: var(--orange); }
 .brand small { font-weight: 500; font-stretch: 100%; font-size: 16px; color: var(--muted); letter-spacing: 0; }
-.search { margin-left: auto; width: 170px; min-width: 140px; flex: 0 1 170px; background: var(--panel); border: 2px solid var(--line); border-radius: 10px; padding: 11px 15px; font-size: 18px; color: var(--ink); }
+.search { margin-left: auto; width: 150px; min-width: 0; flex: 0 1 150px; background: var(--panel); border: 2px solid var(--line); border-radius: 10px; padding: 11px 15px; font-size: 18px; color: var(--ink); }
 .search::placeholder { color: #8f99d0; }
 .face .search:focus-visible { outline: none; box-shadow: none; border-color: var(--orange); }
 .nav { display: flex; flex-direction: column; gap: 10px; }
@@ -289,3 +289,21 @@ button, input, a { font: inherit; color: inherit; }
 .who-l { line-height: 1.4; }
 .talk.is-tall .tldr { display: block; -webkit-line-clamp: unset; }
 .card .where b.is-text { font-size: 22px; }
+.prog-head { min-width: 0; }
+.prog:not(.is-tall) .brand small { font-size: 15px; }
+/* laptop talk: "Worth it if" under the speakers, the short summary whole on the right */
+.talk:not(.is-tall) .talk-main > .verdict { grid-column: 1; grid-row: 4; margin-top: 12px; font-size: 18px; }
+.talk:not(.is-tall) .talk-main > .tldr { grid-row: 1 / span 4; display: block; -webkit-line-clamp: unset; overflow: visible; }
+.talk:not(.is-tall) .pane ul, .talk:not(.is-tall) .pane ol { align-items: start; }
+.talk.is-tall .foot::before { content: ""; position: absolute; left: 0; right: 0; top: -24px; height: 24px; background: linear-gradient(transparent, var(--night)); pointer-events: none; }
+.talk.is-tall .pane { padding-bottom: 8px; }
+/* round 17: the subtitle under the wordmark frees the header for a usable search box */
+.prog:not(.is-tall) .brand { flex-direction: column; align-items: flex-start; gap: 3px; font-size: 30px; }
+.prog:not(.is-tall) .search { width: 200px; flex: 0 1 200px; min-width: 150px; }
+/* the cinema header: title on the left, the whole short summary and the verdict on the right, both compact */
+.talk:not(.is-tall) .talk-main > .verdict { grid-column: 2; grid-row: auto; margin-top: 10px; font-size: 17px; }
+.talk:not(.is-tall) .talk-main > .tldr { grid-row: 1 / span 4; font-size: 17px; line-height: 1.38; }
+.talk:not(.is-tall) .talk-main > h2 { --title: 34px; }
+.talk:not(.is-tall) .talk-main > .meta { font-size: 19px; }
+.talk:not(.is-tall) .talk-main > .who-l { font-size: 18px; }
+.talk:not(.is-tall) .talk-main { grid-template-rows: auto auto auto 1fr; }
