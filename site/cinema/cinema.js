@@ -238,7 +238,7 @@ function why(t, terms) {
     if (name === "Mentions" || name === "Topics" || name === "Speaker") {        // lists: the matching item first, then whole items
       const items = text.split(/,\s*/), hit = items.find((x) => x.toLowerCase().includes(w));
       const more = items.length - 1;
-      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? ` and ${more}\u00a0more` : "");
+      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? `, plus ${more}\u00a0other ${name === "Topics" ? "topics" : "tools"}` : "");
     }
     // a sentence from the summary: a few words before the match, the match, the rest of the line
     const word = text.slice(i).match(/^\S+/)[0].replace(/[,.;:)]$/, "");
@@ -255,7 +255,7 @@ function card(t, { when: showWhen = null, terms = null } = {}) {
   const hint = terms && why(t, terms);
   return el("button", { class: `card${on ? "" : " is-off"}`, type: "button", onclick: () => goTalk(t),
       "aria-label": [t.title, speakers(t), t.room, showWhen ? when(t) : null, on ? "walks you to your seat" : null].filter(Boolean).join(", ") },
-    el("span", { class: "room" }, n ? el("span", { class: "where" }, el("small", { text: "Room" }), el("b", { text: String(n) })) : el("span", { class: "where" }, el("b", { class: "is-text", text: t.room || "Room TBC" })),
+    el("span", { class: "room" }, n ? el("span", { class: "where" }, el("small", { text: "Room" }), el("b", { text: String(n) })) : el("span", { class: "where" }, ...(/^(\S+) (\d+)$/.test(t.room || "") ? [el("small", { text: t.room.split(" ")[0] }), el("b", { text: t.room.split(" ")[1] })] : [el("b", { class: "is-text", text: t.room || "Room TBC" })])),
       el("span", { class: "label", text: label })),
     el("span", { class: "title", text: t.title }),
     el("span", { class: "who", text: speakers(t) }),
@@ -271,7 +271,7 @@ function programme(tall) {
   const panel = el("section", { class: `face prog is-lcd${tall ? " is-tall" : ""}`, "aria-label": "Programme" },
     el("div", { class: "prog-head" },
       el("h1", { class: "brand", "aria-label": "Devoxx Belgium 2026, 5 to 9 October" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })),
-        el("small", { text: "Belgium 2026, summarised" })),
+        el("small", { text: `Belgium 2026: ${talks.length} talks, summarised` })),
       tall ? null : dayRow,
       search),
     nav, body,
@@ -328,8 +328,9 @@ function programme(tall) {
 const toSeconds = (at) => { const [m, sec] = String(at).split(":").map(Number); return (m || 0) * 60 + (sec || 0); };
 function talkScreen(t, tall, onFloor, doorRoom = null) {
   const s = t.s || {};
-  const tabs = [["short", "In short"], ["points", "Key points"], ["monday", "What to try"], ["chapters", "Chapters"], ["story", s.tldr ? "Summary" : "Full summary"]]
-    .filter(([id]) => (id === "short" && s.tldr) || (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
+  // the short summary is in the header; the tabs are the reading, the same on every device
+  const tabs = [["points", "Key points"], ["monday", "What to try"], ["chapters", "Chapters"], ["story", "Full summary"]]
+    .filter(([id]) => (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
       || (id === "chapters" && s.chapters && s.chapters.length && onFloor) || id === "story");
   const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Talk details" });
   const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Talk details" });
@@ -354,6 +355,7 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
   };
   for (const [id, label] of tabs) tabRow.append(el("button", { class: "pill", type: "button", "data-tab": id, text: label, onclick: () => fill(id) }));
   const main = el("div", { class: "talk-main" });
+  const sideHead = el("div", { class: "side-head" }, tabRow);   // laptops: the tabs and the actions share a row
   const watch = () => t.videoId
     ? (EMBED && onFloor ? el("button", { class: "btn is-main", type: "button", text: "Play the recording", onclick: () => playAt(0) })
       : el("a", { class: "btn is-main", href: ytUrl(t), target: "_blank", rel: "noopener", text: "Watch on YouTube" }))
@@ -365,23 +367,29 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
         whenShort(t), typeLabel(t)].filter(Boolean).map((x) => x.replace(/ /g, "\u00a0").replace(/-/g, "\u2011")).join(", ") }),
       el("h2", { text: t.title, style: `--title:${onFloor ? titleSize(t.title, 40, 30) : titleSize(t.title, 34, 26)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
+      s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
       s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth it if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null,
-      el("div", { class: "actions" }, watch(), tall ? null : el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
-        t.videoId ? null : el("span", { class: "note", text: "No recording yet." })),
-      null);
+      tall ? actions() : null);
+    if (!tall) { sideHead.querySelector(".actions")?.remove(); sideHead.append(actions()); }
   };
+  function actions() {
+    return el("div", { class: "actions" }, watch(), tall ? null : el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
+      t.videoId ? null : el("span", { class: "note", text: "No recording yet." }));
+  }
   playAt = (sec) => {
-    main.textContent = "";
-    put(main, el("div", { class: "meta", text: t.title }),
+    const at = tall ? main : pane;                               // laptops: the recording takes the reading area
+    at.textContent = "";
+    if (!tall) for (const b of tabRow.children) b.setAttribute("aria-pressed", "false");
+    put(at, tall ? el("div", { class: "meta", text: t.title }) : null,
       el("div", { class: "player" }, el("iframe", { src: `https://www.youtube-nocookie.com/embed/${t.videoId}?autoplay=1&rel=0&start=${sec}`, title: t.title,
         allow: "autoplay; encrypted-media; picture-in-picture; fullscreen", allowfullscreen: true })),
-      el("div", { class: "actions" }, el("button", { class: "btn", type: "button", text: "Close the recording", onclick: intro }),
-        el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() })));
+      el("div", { class: "actions" }, el("button", { class: "btn", type: "button", text: "Close the recording", onclick: () => (tall ? intro() : fill(tabs[0][0])) }),
+        tall ? el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }) : null));
   };
   intro();
-  fill((!tall && tabs.find(([id]) => id === "points")) ? "points" : tabs[0][0]);   // laptops open on the key points: the most to read
+  fill(tabs[0][0]);
   return el("section", { class: `face talk ${onFloor && !tall ? "is-projected" : "is-lcd"}${tall ? " is-tall" : ""}`, "aria-label": t.title },
-    main, el("div", { class: "talk-side" }, tabRow, pane),
+    main, el("div", { class: "talk-side" }, tall ? tabRow : sideHead, pane),
     tall ? el("div", { class: "foot" }, el("span", { "aria-hidden": "true" }, "DEVOX", el("span", { class: "x", text: "X" })),
       el("button", { type: "button", text: "Back to the programme", onclick: () => goHall() })) : null);
 }

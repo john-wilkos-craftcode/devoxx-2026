@@ -268,3 +268,24 @@ button, input, a { font: inherit; color: inherit; }
 .prog:not(.is-tall) .nav .strip.times { flex-wrap: nowrap; overflow: visible; padding: 0; margin: 0; mask-image: none; gap: 5px; justify-content: space-between; }
 .prog:not(.is-tall) .times .pill { padding: 5px 6px; font-size: 16px; }
 .talk:not(.is-tall) .tabs .pill { padding: 5px 10px; }
+
+/* round 16: the laptop talk is a compact header across the screen, the reading below it at full width */
+.talk:not(.is-tall) { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 14px; padding: 26px 46px 20px; }
+.talk:not(.is-tall) .talk-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: start; }
+.talk:not(.is-tall) .talk-main > .meta { grid-column: 1; grid-row: 1; }
+.talk:not(.is-tall) .talk-main > h2 { grid-column: 1; grid-row: 2; }
+.talk:not(.is-tall) .talk-main > .who-l { grid-column: 1; grid-row: 3; }
+.talk:not(.is-tall) .talk-main > .offnote { grid-column: 1; grid-row: 4; }
+.talk:not(.is-tall) .talk-main > .tldr { grid-column: 2; grid-row: 1 / span 3; margin-top: 2px; -webkit-line-clamp: 3; font-size: 19px; }
+.talk:not(.is-tall) .talk-main > .verdict { grid-column: 2; grid-row: 4; margin-top: 8px; font-size: 18px; }
+.talk:not(.is-tall) .side-head { display: flex; align-items: center; gap: 16px; padding-top: 12px; border-top: 1px solid var(--line); margin-bottom: 12px; }
+.talk:not(.is-tall) .side-head .tabs { margin: 0; flex-wrap: nowrap; }
+.talk:not(.is-tall) .side-head .actions { margin: 0 0 0 auto; flex-wrap: nowrap; }
+.talk:not(.is-tall) .pane ul, .talk:not(.is-tall) .pane ol { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; row-gap: 10px; }
+.talk:not(.is-tall) .pane > div:has(> .chapter) { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; }
+.talk:not(.is-tall) .pane p { max-width: 62em; }
+.talk:not(.is-tall) .player { max-height: none; height: 100%; width: auto; aspect-ratio: 16 / 9; margin: 0; }
+.talk:not(.is-tall) .pane:has(.player) { display: flex; gap: 16px; align-items: flex-start; }
+.who-l { line-height: 1.4; }
+.talk.is-tall .tldr { display: block; -webkit-line-clamp: unset; }
+.card .where b.is-text { font-size: 22px; }
