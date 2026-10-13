@@ -749,42 +749,109 @@ for r in auditoriums:
         screens[n] = {"corners": corners, "x": x, "y": sb["y"] + w / 2, "z": zc, "w": w, "h": h, "west": west}
 
 # ---------------------------------------------------------------------------------- seats
+# A Kinepolis seat, after the 2026 photos: a tall back tilted ~13 degrees, a little wider at the top, with rounded top
+# corners and its sides drawn forward like shallow wings, a thick padded cushion, a padded armrest on a dark standard
+# between neighbours, and the white seat-number tag at the top of the back. Local axes: +x is where the seat faces,
+# y across the row (seats are 0.52 apart, rows 1 m), z up from the seat's origin, which is 0.42 m above the rake.
+M["seatTag"] = material("seatTag", 0xd9dce4, 0.55)
+SEAT_MATS = [M["seat"], M["seatFrame"], M["seatTag"]]
+
+
+def slab(bm, outline, thick, bevel, mat, xform, wings=0.0):
+    """Extrude a 2D outline (y, z points, counter-clockwise) through `thick` in -x from x = 0, pad its edges with a
+    rounded bevel, bend its sides forward by `wings` (x += wings * y^2), then place it with `xform`."""
+    new = bmesh.new()
+    vs = [new.verts.new((0.0, y, z)) for (y, z) in outline]
+    face = new.faces.new(vs)
+    ext = bmesh.ops.extrude_face_region(new, geom=[face])
+    for v in [g for g in ext["geom"] if isinstance(g, bmesh.types.BMVert)]:
+        v.co.x -= thick
+    bmesh.ops.recalc_face_normals(new, faces=new.faces)
+    cap_edges = [e for e in new.edges if abs(e.verts[0].co.x - e.verts[1].co.x) < 1e-6]
+    bmesh.ops.bevel(new, geom=cap_edges, offset=bevel, segments=3, profile=0.6, affect="EDGES")
+    for v in new.verts:
+        v.co.x += wings * v.co.y ** 2
+        v.co = xform @ v.co
+    for f in new.faces:
+        f.material_index = mat
+        f.smooth = True
+    me = bpy.data.meshes.new("tmp")
+    new.to_mesh(me)
+    new.free()
+    bm.from_mesh(me)
+    bpy.data.meshes.remove(me)
+
+
+def rounded_rect(w0, w1, h, r_top, r_bot, z0=0.0, steps=6):
+    """Outline of a tapered rounded rectangle, w0 wide at the bottom and w1 at the top, from z0 to z0 + h."""
+    pts = []
+    for (cy, cz, r, a0) in ((w0 / 2 - r_bot, z0 + r_bot, r_bot, -90), (w1 / 2 - r_top, z0 + h - r_top, r_top, 0),
+                            (-w1 / 2 + r_top, z0 + h - r_top, r_top, 90), (-w0 / 2 + r_bot, z0 + r_bot, r_bot, 180)):
+        for k in range(steps + 1):
+            a = math.radians(a0 + 90 * k / steps)
+            pts.append((cy + r * math.cos(a), cz + r * math.sin(a)))
+    return pts
+
+
 seat_me = bpy.data.meshes.new("seat-model")
 bm = bmesh.new()
-# a cinema seat, as in the photos: deep cushion, tall padded back with a rounded top, an armrest on one side
-for (sx, sy, sz, x, y, z, rz) in ((0.5, 0.52, 0.14, 0.02, 0, -0.06, 0), (0.16, 0.54, 0.8, -0.25, 0, 0.34, 0.13),
-                                  (0.19, 0.5, 0.2, -0.31, 0, 0.7, 0.2), (0.46, 0.08, 0.07, -0.02, 0.3, 0.17, 0)):
-    m = Matrix.Translation((x, y, z)) @ Matrix.Rotation(-rz, 4, "Y") @ Matrix.Diagonal((sx, sy, sz, 1))
-    bmesh.ops.create_cube(bm, size=1.0, matrix=m)
-bmesh.ops.bevel(bm, geom=list(bm.edges), offset=0.06, segments=4, affect="EDGES")   # padded, not boxes
+tilt = Matrix.Rotation(math.radians(-13), 4, "Y")              # top of the back leans away from the screen
+# back: 0.76 tall, 0.44 -> 0.47 wide, 15 cm of padding; its front face at x = -0.2 at the bottom
+slab(bm, rounded_rect(0.44, 0.47, 0.76, 0.1, 0.03), 0.15, 0.035, 0, Matrix.Translation((-0.2, 0, -0.06)) @ tilt, wings=0.35)
+# a headrest roll across the top of the front, a seam's width proud of the back
+slab(bm, rounded_rect(0.4, 0.42, 0.2, 0.07, 0.05), 0.04, 0.018, 0, Matrix.Translation((-0.2, 0, -0.06)) @ tilt @ Matrix.Translation((0.03, 0, 0.5)), wings=0.35)
+# cushion: 0.5 deep, its front rolled
+slab(bm, rounded_rect(0.44, 0.44, 0.13, 0.05, 0.05, z0=-0.13), 0.5, 0.045, 0, Matrix.Translation((0.3, 0, 0.02)) @ Matrix.Rotation(math.radians(-3), 4, "Y"))
+# armrest pad on the +y side (the neighbour supplies the other) and the standard under it
+slab(bm, rounded_rect(0.075, 0.075, 0.075, 0.03, 0.03), 0.46, 0.025, 0, Matrix.Translation((0.24, 0.26, 0.17)))
+slab(bm, rounded_rect(0.035, 0.035, 0.62, 0.005, 0.005, z0=-0.43), 0.3, 0.006, 1, Matrix.Translation((0.12, 0.26, 0)))
+rim = bmesh.ops.create_cone(bm, cap_ends=True, segments=20, radius1=0.042, radius2=0.042, depth=0.025,
+                            matrix=Matrix.Translation((0.2, 0.26, 0.255)))            # cupholder rim at the arm's front
+for f in {f for v in rim["verts"] for f in v.link_faces}:
+    f.material_index = 1
+# the seat number on the back, near the top, a few millimetres proud
+slab(bm, rounded_rect(0.04, 0.04, 0.03, 0.004, 0.004, z0=0.6), 0.003, 0.001, 2,
+     Matrix.Translation((-0.2, 0, -0.06)) @ tilt @ Matrix.Translation((-0.15 - 0.002, 0, 0)))
 bm.to_mesh(seat_me)
 bm.free()
-frame_me = bpy.data.meshes.new("seat-frame")
-bm = bmesh.new()
-for (sx, sy, sz, x, y, z) in ((0.46, 0.06, 0.05, 0, 0.27, 0.2), (0.06, 0.06, 0.62, -0.05, 0.27, -0.12), (0.2, 0.4, 0.06, -0.08, 0, -0.3)):
-    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((x, y, z)) @ Matrix.Diagonal((sx, sy, sz, 1)))
-bm.to_mesh(frame_me)
-bm.free()
-seats_bm, frames_bm = bmesh.new(), bmesh.new()
+for m_ in SEAT_MATS:
+    seat_me.materials.append(m_)
+seat_model = bpy.data.objects.new("seat-model", seat_me)
+scene.collection.objects.link(seat_model)
+seat_model.hide_render = True                       # only its instances render
+seat_model.location = (0, 0, -100)
+
+# every seat is an instance of the model (geometry nodes: instance on a point cloud, turned per point), so 5000
+# seats cost one seat's memory
 pans = [d for d in venue["decor"] if d.get("material") == "seat"]
+pts, rots = [], []
 for d in pans:
     b = d["bounds"]
     room = next((r for r in auditoriums if inside(r["bounds"], b["x"], b["y"])), None)
     faces_west = room is None or room["bounds"]["x"] < corridor["x"]
-    mat = Matrix.Translation((b["x"] + b["w"] / 2, b["y"] + b["h"] / 2, d["floor"] * FH + plate_under(d) + d["height"])) @ \
-        Matrix.Rotation(math.pi if faces_west else 0, 4, "Z")
-    for src, dst in ((seat_me, seats_bm), (frame_me, frames_bm)):
-        tmp = src.copy()
-        tmp.transform(mat)
-        dst.from_mesh(tmp)
-        bpy.data.meshes.remove(tmp)
-for name, bm_, mat in (("seats", seats_bm, M["seat"]), ("seat-frames", frames_bm, M["seatFrame"])):
-    me = bpy.data.meshes.new(name)
-    bm_.to_mesh(me)
-    bm_.free()
-    ob = bpy.data.objects.new(name, me)
-    ob.data.materials.append(mat)
-    scene.collection.objects.link(ob)
+    pts.append((b["x"] + b["w"] / 2, b["y"] + b["h"] / 2, d["floor"] * FH + plate_under(d) + d["height"]))
+    rots.append(math.pi if faces_west else 0.0)
+cloud = bpy.data.meshes.new("seats")
+cloud.from_pydata(pts, [], [])
+cloud.attributes.new("rot", "FLOAT", "POINT").data.foreach_set("value", rots)
+seats_ob = bpy.data.objects.new("seats", cloud)
+scene.collection.objects.link(seats_ob)
+ng = bpy.data.node_groups.new("seat-instances", "GeometryNodeTree")
+ng.interface.new_socket("Geometry", in_out="INPUT", socket_type="NodeSocketGeometry")
+ng.interface.new_socket("Geometry", in_out="OUTPUT", socket_type="NodeSocketGeometry")
+g_in, g_out = ng.nodes.new("NodeGroupInput"), ng.nodes.new("NodeGroupOutput")
+inst, info = ng.nodes.new("GeometryNodeInstanceOnPoints"), ng.nodes.new("GeometryNodeObjectInfo")
+info.inputs["Object"].default_value = seat_model
+info.transform_space = "ORIGINAL"
+rot_attr, euler = ng.nodes.new("GeometryNodeInputNamedAttribute"), ng.nodes.new("ShaderNodeCombineXYZ")
+rot_attr.data_type = "FLOAT"
+rot_attr.inputs["Name"].default_value = "rot"
+ng.links.new(g_in.outputs[0], inst.inputs["Points"])
+ng.links.new(info.outputs["Geometry"], inst.inputs["Instance"])
+ng.links.new(rot_attr.outputs["Attribute"], euler.inputs["Z"])
+ng.links.new(euler.outputs["Vector"], inst.inputs["Rotation"])
+ng.links.new(inst.outputs["Instances"], g_out.inputs[0])
+seats_ob.modifiers.new("seat-instances", "NODES").node_group = ng
 
 # ---------------------------------------------------------------------------------- auditorium and corridor dressing
 # From the 2026 auditorium photos: a black room under a star field of small ceiling spots, a box-truss light
@@ -1823,7 +1890,7 @@ def front_layer(camera, wh, name, names=None):
     """What stands in front of a screen on a transparent background, everything else held out, so the page can lay it
     over the HTML on the screen: in the cinema this room's "#DEVOXX" and the seats, in the hall `names` (the plants
     and the ivy)."""
-    keep = {o for o in scene.objects if (o.name in names if names else o.name.startswith(f"word-{n}-") or o.name in ("seats", "seat-frames"))}
+    keep = {o for o in scene.objects if (o.name in names if names else o.name.startswith(f"word-{n}-") or o.name == "seats")}
     held = [o for o in scene.objects if o.type in ("MESH", "CURVE", "FONT") and o not in keep and not o.is_holdout]
     for o in held:
         o.is_holdout = True
