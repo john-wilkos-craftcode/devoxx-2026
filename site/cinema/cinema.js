@@ -195,6 +195,17 @@ const showStill = (key) => new Promise((resolve) => {
   img.src = src;
 });
 
+// fetch a room's walk when its card is pointed at or focused, so the click plays at once without every walk
+// being downloaded up front (a lot on a phone's data plan)
+const warmed = new Set();
+function warm(n) {
+  if (!walkable.has(n) || warmed.has(n) || reduceMotion) return;
+  warmed.add(n);
+  const l = document.createElement("link");
+  l.rel = "prefetch"; l.href = `media/walk-${n}.mp4`;
+  document.head.append(l);
+}
+
 let skipWalk = null;
 function playClip(name, { from = 0, until = null } = {}) {
   return new Promise((resolve) => {
@@ -202,15 +213,24 @@ function playClip(name, { from = 0, until = null } = {}) {
     const done = () => { clip.onended = clip.onerror = clip.ontimeupdate = null; skipWalk = null; skipBtn.hidden = true; resolve(); };
     skipWalk = done;
     clip.src = `media/${name}.mp4`;
+    clip.classList.remove("is-shown");
     clip.hidden = false;
     clip.onended = done;
     clip.onerror = done;                       // a missing clip is a cut, not a dead end
     if (until != null) clip.ontimeupdate = () => { if (clip.currentTime >= until) { clip.pause(); done(); } };
-    const go = () => { if (from) clip.currentTime = from; clip.play().then(() => { skipBtn.hidden = false; }).catch(done); };
+    // fade in over the still: on laptops the first frame is the still, on phones (a crop of the laptop walk) it softens the cut
+    const go = () => { if (from) clip.currentTime = from; clip.play().then(() => { clip.classList.add("is-shown"); skipBtn.hidden = false; }).catch(done); };
     if (clip.readyState >= 1) go(); else clip.addEventListener("loadedmetadata", go, { once: true });
   });
 }
-const hideClip = () => { clip.pause(); clip.hidden = true; clip.removeAttribute("src"); clip.load(); };
+// fade the clip out over the still that replaced it, then let it go
+const hideClip = () => new Promise((resolve) => {
+  clip.pause();
+  const gone = () => { clip.hidden = true; clip.removeAttribute("src"); clip.load(); resolve(); };
+  if (clip.hidden || !clip.classList.contains("is-shown") || reduceMotion) { clip.classList.remove("is-shown"); gone(); return; }
+  clip.classList.remove("is-shown");
+  setTimeout(gone, 400);
+});
 skipBtn.addEventListener("click", () => skipWalk && skipWalk());
 const say = (text) => { statusBox.textContent = text || ""; statusBox.hidden = !text; };
 
@@ -253,7 +273,7 @@ function card(t, { when: showWhen = null, terms = null } = {}) {
   const label = showWhen === "day" ? `${fShort.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : showWhen === "time" ? fTime.format(new Date(t.start))
     : /^BOF/.test(t.room || "") ? "Downstairs" : typeLabel(t);
   const hint = terms && why(t, terms);
-  return el("button", { class: `card${on ? "" : " is-off"}`, type: "button", onclick: () => goTalk(t),
+  return el("button", { class: `card${on ? "" : " is-off"}`, type: "button", onclick: () => goTalk(t), onpointerenter: () => warm(n), onfocus: () => warm(n),
       "aria-label": [t.title, speakers(t), t.room, showWhen ? when(t) : null, on ? "walks you to your seat" : null].filter(Boolean).join(", ") },
     el("span", { class: "room" }, n ? el("span", { class: "where" }, el("small", { text: "Room" }), el("b", { text: String(n) })) : el("span", { class: "where" }, ...(/^(\S+) (\d+)$/.test(t.room || "") ? [el("small", { text: t.room.split(" ")[0] }), el("b", { text: t.room.split(" ")[1] })] : [el("b", { class: "is-text", text: t.room || "Room TBC" })])),
       el("span", { class: "label", text: label })),
@@ -405,7 +425,8 @@ async function toHall(withWalk) {
   }
   room = null; current = null;
   await showStill(shotKey("hall"));
-  hideClip();
+  // phones: the walk is a crop of the laptop's, so let it fade off the still before the screen lights up
+  if (shape === "phone") await hideClip(); else hideClip();
   say("");
   mount(programme(shape === "phone"), shotKey("hall"), "programme");
 }
@@ -415,7 +436,8 @@ async function toSeat(t, withWalk) {
   unmount();
   if (withWalk) { say(`Walking to Room ${n}`); await playClip(`walk-${n}`, { until: shape === "phone" ? doorTime(n) : null }); }
   await showStill(shotKey(`seat-${n}`));
-  hideClip();
+  // phones: the walk is a crop of the laptop's, so let it fade off the still before the screen lights up
+  if (shape === "phone") await hideClip(); else hideClip();
   say("");
   room = n; current = t;
   mount(talkScreen(t, shape === "phone", true, n), shotKey(`seat-${n}`), "screen");
@@ -461,5 +483,4 @@ const deep = /^#talk-(\d+)$/.exec(location.hash);
 const first = deep && talks.find((t) => t.id === Number(deep[1]));
 if (first) await open(first, false); else await toHall(false);
 loading.classList.add("is-done");
-// warm the cache for the walks, so the first click plays at once
-for (const n of walkable) { const l = document.createElement("link"); l.rel = "prefetch"; l.href = `media/walk-${n}.mp4`; document.head.append(l); }
+
