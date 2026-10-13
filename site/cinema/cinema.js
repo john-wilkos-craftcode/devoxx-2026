@@ -17,7 +17,7 @@ const ytUrl = (t, sec = 0) => `https://www.youtube.com/watch?v=${t.videoId}${sec
 const EMBED = window.self === window.top;      // YouTube can't be embedded inside the artifact sandbox
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const IMG = { laptop: [1920, 1080], phone: [1080, 2340] };
-const CANVAS = { hall: 980, "hall-phone": 340, seat: 1300, "door-phone": 340 };   // design widths in css px
+const CANVAS = { hall: 980, "hall-phone": 340, seat: 1180, "door-phone": 340 };   // design widths in css px
 
 const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -238,7 +238,7 @@ function why(t, terms) {
     if (name === "Mentions" || name === "Topics" || name === "Speaker") {        // lists: the matching item first, then whole items
       const items = text.split(/,\s*/), hit = items.find((x) => x.toLowerCase().includes(w));
       const more = items.length - 1;
-      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? `\u00a0+${more}\u00a0more` : "");
+      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? ` and ${more}\u00a0more` : "");
     }
     // a sentence from the summary: a few words before the match, the match, the rest of the line
     const word = text.slice(i).match(/^\S+/)[0].replace(/[,.;:)]$/, "");
@@ -263,7 +263,7 @@ function card(t, { when: showWhen = null, terms = null } = {}) {
 }
 
 function programme(tall) {
-  const search = el("input", { class: "search", type: "search", placeholder: tall ? "Search talks, speakers, topics" : "Search", "aria-label": "Search all talks", value: query });
+  const search = el("input", { class: "search", type: "search", placeholder: tall ? "Search talks, speakers, topics" : "Search talks", "aria-label": "Search all talks", value: query });
   const dayRow = el("div", { class: "strip days", role: "group", "aria-label": "Day" });
   const timeRow = el("div", { class: "strip times", role: "group", "aria-label": "Start time" });
   const nav = el("div", { class: "nav" }, tall ? dayRow : null, timeRow);
@@ -328,8 +328,8 @@ function programme(tall) {
 const toSeconds = (at) => { const [m, sec] = String(at).split(":").map(Number); return (m || 0) * 60 + (sec || 0); };
 function talkScreen(t, tall, onFloor, doorRoom = null) {
   const s = t.s || {};
-  const tabs = [["short", "In short"], ["points", "Key points"], ["monday", "What to try"], ["chapters", "Chapters"], ["story", "Full summary"]]
-    .filter(([id]) => (id === "short" && tall && s.tldr) || (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
+  const tabs = [["short", "In short"], ["points", "Key points"], ["monday", "What to try"], ["chapters", "Chapters"], ["story", s.tldr ? "Summary" : "Full summary"]]
+    .filter(([id]) => (id === "short" && s.tldr) || (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
       || (id === "chapters" && s.chapters && s.chapters.length && onFloor) || id === "story");
   const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Talk details" });
   const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Talk details" });
@@ -362,12 +362,10 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
     main.textContent = "";
     put(main,
       el("div", { class: "meta", text: [!onFloor && /^BOF/.test(t.room || "") ? `${t.room} (downstairs)` : t.room,
-        whenShort(t), typeLabel(t)].filter(Boolean).map((x) => x.replace(/ /g, "\u00a0")).join(", ") }),
+        whenShort(t), typeLabel(t)].filter(Boolean).map((x) => x.replace(/ /g, "\u00a0").replace(/-/g, "\u2011")).join(", ") }),
       el("h2", { text: t.title, style: `--title:${onFloor ? titleSize(t.title, 40, 30) : titleSize(t.title, 34, 26)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
       s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth it if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null,
-      !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
-      !tall && s.tldr && (s.summary || []).length ? el("button", { class: "more", type: "button", text: "Read the full summary", onclick: () => fill("story") }) : null,
       el("div", { class: "actions" }, watch(), tall ? null : el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
         t.videoId ? null : el("span", { class: "note", text: "No recording yet." })),
       null);
@@ -381,7 +379,7 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
         el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() })));
   };
   intro();
-  fill(tabs[0][0]);
+  fill((!tall && tabs.find(([id]) => id === "points")) ? "points" : tabs[0][0]);   // laptops open on the key points: the most to read
   return el("section", { class: `face talk ${onFloor && !tall ? "is-projected" : "is-lcd"}${tall ? " is-tall" : ""}`, "aria-label": t.title },
     main, el("div", { class: "talk-side" }, tabRow, pane),
     tall ? el("div", { class: "foot" }, el("span", { "aria-hidden": "true" }, "DEVOX", el("span", { class: "x", text: "X" })),

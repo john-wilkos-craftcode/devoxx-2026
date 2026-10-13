@@ -72,12 +72,12 @@ button, input, a { font: inherit; color: inherit; }
 .brand { display: flex; align-items: baseline; gap: 10px; font-weight: 800; font-stretch: 125%; font-size: 30px; line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
 .brand .x { color: var(--orange); }
 .brand small { font-weight: 500; font-stretch: 100%; font-size: 16px; color: var(--muted); letter-spacing: 0; }
-.search { margin-left: auto; width: 230px; min-width: 0; flex: 0 1 230px; background: var(--panel); border: 2px solid var(--line); border-radius: 10px; padding: 11px 15px; font-size: 18px; color: var(--ink); }
+.search { margin-left: auto; width: 170px; min-width: 140px; flex: 0 1 170px; background: var(--panel); border: 2px solid var(--line); border-radius: 10px; padding: 11px 15px; font-size: 18px; color: var(--ink); }
 .search::placeholder { color: #8f99d0; }
 .face .search:focus-visible { outline: none; box-shadow: none; border-color: var(--orange); }
 .nav { display: flex; flex-direction: column; gap: 10px; }
 .prog-head .days { flex-wrap: nowrap; overflow: visible; padding: 0; margin: 0; gap: 6px; }
-.prog-head .days .pill { padding: 6px 10px; font-size: 18px; }
+.prog-head .days .pill { padding: 6px 9px; font-size: 17px; }
 .pill { flex: none; background: transparent; border: 2px solid var(--line); border-radius: 9px; padding: 7px 13px; font-size: 19px; font-weight: 600; color: var(--muted); white-space: nowrap; }
 @media (hover: hover) { .pill:hover { border-color: var(--muted); color: var(--ink); } }
 .pill[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--deep); }
@@ -212,7 +212,7 @@ button, input, a { font: inherit; color: inherit; }
 .talk.is-tall .foot .x { color: var(--orange); }
 .talk.is-tall .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; position: relative; padding: 4px; margin: -4px -4px 4px; }
 .talk.is-tall .tabs::-webkit-scrollbar { display: none; }
-.talk.is-tall .meta { font-size: 13px; }
+.talk.is-tall .meta { font-size: 15px; }
 .talk.is-tall .offnote { margin-top: 6px; }
 .talk.is-tall h2 { margin-top: 6px; font-size: var(--title-s, 23px); }
 .talk.is-tall .who-l { margin-top: 6px; font-size: 14px; }
@@ -230,7 +230,7 @@ button, input, a { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) { .face { animation: none; } .card { transition: none; } }
 
 /* a lone talk's card grows to fit its summary; nothing is cut */
-.prog .cards.is-packed > .card.is-now-wide { height: auto; min-height: 0; overflow: visible; }   /* overflow:hidden would let the grid squash it */
+.prog .cards.is-packed > .card.is-now-wide { height: auto; min-height: auto; overflow: visible; }   /* content-sized: the grid can't squash it */
 .prog.is-tall .cards.is-packed .card.is-now-wide .title { -webkit-line-clamp: unset; display: block; }
 .prog .cards.is-packed > .card.is-now-wide .gist { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -241,14 +241,14 @@ button, input, a { font: inherit; color: inherit; }
 .talk.is-tall .talk-side { order: 2; flex: none; }
 .talk.is-tall .pane { overflow: visible; flex: none; }
 .talk.is-tall .pane.more-b { mask-image: none; }
-.talk.is-tall .tabs { position: sticky; top: -22px; z-index: 1; flex-wrap: wrap; overflow: visible; background: var(--night); padding: 8px 0; margin: 0; }
+.talk.is-tall .tabs { flex-wrap: wrap; overflow: visible; padding: 8px 0; margin: 0; }
 .talk.is-tall .tabs.more-r, .talk.is-tall .tabs.more-l { mask-image: none; }
 .talk.is-tall .foot { position: sticky; bottom: -16px; margin: 18px -18px -16px -22px; padding: 10px 18px 14px 22px; background: var(--night); }
 .talk.is-tall .foot button { background: none; border: 0; padding: 0; font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 
 /* round 14 */
 .card { overflow: visible; }                                      /* each line is clamped itself; the grid never squashes a card */
-.prog:not(.is-tall) .cards.scroller[aria-label="Search results"] > .card { min-height: 0; }
+.prog:not(.is-tall) .cards.scroller[aria-label="Search results"] > .card { min-height: auto; height: auto; padding-bottom: 18px; }
 .card .why.is-quote { font-style: normal; }
 .card .why mark, .card:not(.is-off) .why mark { box-shadow: none; text-decoration: none; font-weight: 800; }
 .card .why mark { color: var(--orange); }
@@ -258,7 +258,6 @@ button, input, a { font: inherit; color: inherit; }
 .card.is-later:not(.is-off) .who { color: var(--muted); opacity: 1; }
 .prog:not(.is-tall) .cards.is-packed > .card.is-later { height: 176px; }
 .prog:not(.is-tall) .cards.is-packed > .card.is-later .title { -webkit-line-clamp: 3; }
-.face.is-projected h2 { text-shadow: 0 0 18px rgba(170, 190, 255, .35); }
 .face.is-projected .btn.is-main { box-shadow: 0 0 22px rgba(246, 146, 30, .35); }
 .tabs .pill:not([aria-pressed="true"]) { color: var(--ink); border-color: #3B4A92; }
 .more { align-self: flex-start; margin-top: 6px; background: none; border: 0; padding: 0; font-size: 18px; font-weight: 700; color: var(--orange); text-decoration: underline; text-underline-offset: 4px; }
@@ -266,3 +265,6 @@ button, input, a { font: inherit; color: inherit; }
 .prog-foot { padding-top: 6px; position: relative; z-index: 1; }
 .talk.is-tall .foot { margin-top: auto; }
 .talk.is-tall .talk-side { margin-bottom: 18px; }
+.prog:not(.is-tall) .nav .strip.times { flex-wrap: nowrap; overflow: visible; padding: 0; margin: 0; mask-image: none; gap: 5px; justify-content: space-between; }
+.prog:not(.is-tall) .times .pill { padding: 5px 6px; font-size: 16px; }
+.talk:not(.is-tall) .tabs .pill { padding: 5px 10px; }
