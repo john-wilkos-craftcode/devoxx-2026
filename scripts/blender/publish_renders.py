@@ -9,6 +9,9 @@
   stair climb was (its camera tumbles: an euler wrap under motion blur) and without the rest at the top. Smeared
   frames elsewhere (the same wrap, or a whip pan) are replaced by a blend of the good frames either side (see mend).
   The way back is a fade on the page, not a clip. H.264, yuv420p, faststart.
+- Phones have their own portrait walk: phone-a-<side> (leaving the hall totem) and phone-b-<n> (a push-in on the
+  room's door totem), joined the same way into walk-phone-<n>.mp4.
+- A clip newer than its frames (and this script) is not encoded again.
 - shots-<n>.json files are merged into media/shots.json, so rooms rendered on different nights add up.
 """
 import json
@@ -98,18 +101,8 @@ def mend(ims):
         out[i] = Image.blend(ims[lo], ims[hi], (i - lo) / (hi - lo))
     return out, sorted(bad)
 
-for key, info in sorted(shots.items()):
-    if not key.startswith("walk-b-"):
-        continue
-    n = key.split("-")[-1]
-    a, b = frames_of(f"walk-a-{info['side']}"), frames_of(key)
-    if not a or not b:
-        continue
-    fps = info.get("fps", 30)
-    a = a[:CUT_A[info["side"]]]
-    b = b[SKIP_B:]
-    ims_a, bad_a = mend([Image.open(p).convert("RGB") for p in a])
-    ims_b, bad_b = mend([Image.open(p).convert("RGB") for p in b])
+def dip_join(ims_a, ims_b, out, fps):
+    """Join two halves with a short dip to black and encode them to out."""
     black = Image.new("RGB", ims_a[0].size)
     fo, bl, fi = DIP
     for k in range(fo):
@@ -121,12 +114,43 @@ for key, info in sorted(shots.items()):
         for i, im in enumerate(seq):
             im.save(Path(tmp) / f"f_{i:04d}.png", compress_level=1)
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", str(Path(tmp) / "f_%04d.png"), *ENC,
-                        str(OUT / f"walk-{n}.mp4")], check=True)
-    (OUT / f"walk-{n}-back.mp4").unlink(missing_ok=True)
-    # where the phone's walk stops: the door, counted in the joined clip
-    door = len(ims_a) + bl + info["door_frame"] - SKIP_B if info.get("door_frame") is not None else None
-    shots[f"walk-{n}"] = {"kind": "clip", "frames": len(seq), "fps": fps, "door_frame": door}
-    print(f"walk-{n}.mp4 ({len(ims_a)} + {bl} + {len(ims_b)} frames, mended {bad_a} + {[SKIP_B + i for i in bad_b]})")
+                        str(out)], check=True)
+    return len(seq)
+
+
+def fresh(out, *frame_lists):
+    """out is newer than every frame it is made from (and this script): skip it."""
+    newest = max([Path(__file__).stat().st_mtime] + [p.stat().st_mtime for fl in frame_lists for p in fl])
+    return out.exists() and out.stat().st_mtime > newest
+
+
+for key, info in sorted(shots.items()):
+    if key.startswith("walk-b-"):          # laptops: the landscape walk to the seat
+        n = key.split("-")[-1]
+        a, b = frames_of(f"walk-a-{info['side']}"), frames_of(key)
+        if not a or not b:
+            continue
+        a, b, out = a[:CUT_A[info["side"]]], b[SKIP_B:], OUT / f"walk-{n}.mp4"
+        (OUT / f"walk-{n}-back.mp4").unlink(missing_ok=True)
+        if fresh(out, a, b) and f"walk-{n}" in shots:
+            continue
+        ims_a, bad_a = mend([Image.open(p).convert("RGB") for p in a])
+        ims_b, bad_b = mend([Image.open(p).convert("RGB") for p in b])
+        frames = dip_join(ims_a, ims_b, out, info.get("fps", 30))
+        # where the old phone walk stopped (the door), counted in the joined clip; kept for rooms without a phone walk
+        door = len(a) + DIP[1] + info["door_frame"] - SKIP_B if info.get("door_frame") is not None else None
+        shots[f"walk-{n}"] = {"kind": "clip", "frames": frames, "fps": info.get("fps", 30), "door_frame": door}
+        print(f"walk-{n}.mp4 ({len(a)} + {DIP[1]} + {len(b)} frames, mended {bad_a} + {[SKIP_B + i for i in bad_b]})")
+    elif key.startswith("phone-b-"):       # phones: their own portrait walk, the hall totem to the door totem
+        n = key.split("-")[-1]
+        a, b, out = frames_of(f"phone-a-{info['side']}"), frames_of(key), OUT / f"walk-phone-{n}.mp4"
+        if len(a) < shots[f"phone-a-{info['side']}"]["frames"] or len(b) < info["frames"]:
+            continue                       # not (fully) rendered yet
+        if fresh(out, a, b) and f"walk-phone-{n}" in shots:
+            continue
+        frames = dip_join([Image.open(p).convert("RGB") for p in a], [Image.open(p).convert("RGB") for p in b], out, info["fps"])
+        shots[f"walk-phone-{n}"] = {"kind": "clip", "frames": frames, "fps": info["fps"]}
+        print(f"walk-phone-{n}.mp4 ({len(a)} + {DIP[1]} + {len(b)} frames)")
 
 existing.write_text(json.dumps(shots, indent=1))
 print(f"shots.json: {', '.join(sorted(shots))}")

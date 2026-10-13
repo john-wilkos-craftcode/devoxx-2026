@@ -1,4 +1,4 @@
-# Where this stands (13/10, 18:30)
+# Where this stands (13/10, 22:45)
 
 ## Right now
 - **All eight rooms (3-10) rendered and published** into `site/cinema/media/` (stills, cut-out layers, walks).
@@ -11,12 +11,19 @@
   out. The way back is a fade through black on the page, no reversed clip any more.
   If the walks are ever rendered again: make the camera's euler compatible frame to frame
   (`rot.to_euler("XYZ", previous)`) in `keyframe_segment`, then the stair can go back in.
+- **Phones get their own portrait walks** (`scripts/blender/render_phone_walks.sh`, ~1 h 50 for all eight rooms):
+  the laptop walk cropped to portrait looked broken. From the hall totem still the camera steps back and turns
+  away (left across the hall for west rooms; right for east, after first stepping clear of the stairwell glass
+  beside the totem, which otherwise fills the frame as a blur), a dip to black, then a push-in on the room's door
+  totem that settles on its still. 540x1170, eulers kept compatible frame to frame (no smears).
+  publish_renders.py joins them into `walk-phone-<n>.mp4`; cinema.js plays them on phones.
+- Live on Pages since 13/10 ~19:45 (laptop walks mended, fade back, text fixes); the phone walks are committed but not pushed yet.
 - **Text fixes:** the talk's summary scrolls inside the left column on laptops so the buttons stay on the cinema
   screen; programme cards shorten their title, then speakers, until they fit. `tools/ux/overflow.mjs` checks
   every talk and slot.
 - WebGL page retired: `site/kino/` deleted, the venue model and credits moved to `data/venue/`.
 - Serve locally with `node tools/ux/serve.mjs` (byte ranges; Python's http.server can't seek videos).
-- **Not pushed.** Pushing to main deploys GitHub Pages; ask John first.
+- Pushing to main deploys GitHub Pages; ask John first.
 
 ## The cinema page (`site/cinema/`), status
 - Diegetic UI pinned onto Blender stills with a CSS matrix (2D when square on, so text is sharp): programme on

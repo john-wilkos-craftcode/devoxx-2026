@@ -47,6 +47,7 @@ ap.add_argument("--preview", action="store_true", help="EEVEE, low resolution: f
 ap.add_argument("--lookdev", action="store_true", help="Cycles at half resolution: look-dev you can trust")
 ap.add_argument("--walk-samples", type=int, default=24, help="samples for walk frames (motion blur hides the rest)")
 ap.add_argument("--walk-engine", default="cycles", choices=["cycles", "eevee"])
+ap.add_argument("--step", type=int, default=1, help="render every n-th frame of a clip (look-dev)")
 args = ap.parse_args(argv)
 ROOT = Path(args.root)
 venue = json.loads((ROOT / "data" / "venue" / "venue.json").read_text())["venue"]
@@ -1778,6 +1779,67 @@ door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist, tot["y"],
 bpy.context.view_layer.update()
 set_res(PHONE)
 shots[f"door-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(grow(tot["corners"]), door_cam)}, "size": {"screen": [tot["w"], tot["h"]]}}
+
+# phones get their own portrait walk, so nothing is cropped: from the hall still the camera steps back and turns away
+# from the totem towards the room's side (left for the west stair), a dip to black (publish_renders.py), then it
+# comes down the corridor and settles on the room's door-totem still. Each frame's euler is made compatible with
+# the last: a wrap past ±180° is a full spin under motion blur (the smears in the laptop walks).
+PHONE_WALK = (540, 1170)
+
+
+def keyed_cam(name, like, poses):
+    """A camera with like's lens, keyframed from frame 1 through poses: (location, look target, focus distance)."""
+    ob = bpy.data.objects.new(name, like.data.copy())
+    scene.collection.objects.link(ob)
+    prev = None
+    for f, (loc, look, focus) in enumerate(poses):
+        q = (Vector(look) - Vector(loc)).to_track_quat("-Z", "Y")
+        prev = q.to_euler("XYZ", prev) if prev else q.to_euler("XYZ")
+        ob.location, ob.rotation_euler = loc, prev
+        ob.keyframe_insert("location", frame=1 + f)
+        ob.keyframe_insert("rotation_euler", frame=1 + f)
+        if ob.data.dof.use_dof:
+            ob.data.dof.focus_distance = focus
+            ob.data.dof.keyframe_insert("focus_distance", frame=1 + f)
+    return ob
+
+
+def leave_hall(turn, step, yaw, seconds=1.3):
+    """From the hall totem still, a step back while turning `yaw` degrees towards the stair (turn -1 left, 1 right).
+    The yaw itself is eased, not the view direction: blending directions collapses on turns past 90°."""
+    l0 = Vector(phone_hall_cam.location)                           # square on to the totem: looking along +y
+    l1 = l0 + Vector((step[0], step[1], 0.0))
+    frames, poses = int(seconds * FPS), []
+    for f in range(frames + 1):
+        u = (f / frames) ** 2                                      # from rest, gathering speed into the dip
+        loc, a = l0.lerp(l1, u), math.radians(turn * yaw * u)
+        poses.append((loc, loc + Vector((math.sin(a), math.cos(a), -0.02 * u)) * 4, tdist + (4 - tdist) * u))
+    return poses
+
+
+def reach_door(seconds=2.0):
+    """A curved push-in on the totem from the corridor, from the side the walk comes from (turning in from looking
+    down the corridor sweeps the tight lens across the door)."""
+    e = Vector(door_cam.location)
+    tc = Vector((tot["x"], tot["y"], _dz))
+    s = 1 if landing(west)[2][1] > tot["y"] else -1
+    a, c = e + Vector((dface * 3.5, s * 1.5, 0.1)), e + Vector((dface * 1.2, s * 0.3, 0.0))
+    frames, poses = int(seconds * FPS), []
+    for f in range(frames + 1):
+        u = 1 - (1 - f / frames) ** 2                             # moving as it fades in, at rest on the still
+        loc = a * (1 - u) ** 2 + c * 2 * u * (1 - u) + e * u ** 2
+        poses.append((loc, tc, (tc - loc).length))
+    return poses
+
+
+# west: left across the hall past its screen; east: the stairwell's glass is beside the totem, so away from it and
+# round to look south down the hall along the glass, the way to that stair's foot
+_pa = leave_hall(-1, (-0.9, -0.9), 75) if west else leave_hall(1, (-1.8, -0.8), 70)
+_pb = reach_door()
+phone_a = keyed_cam(f"cam-phone-a-{side}", phone_hall_cam, _pa)
+phone_b = keyed_cam(f"cam-phone-b-{n}", door_cam, _pb)
+shots[f"phone-a-{side}"] = {"kind": "clip", "frames": len(_pa), "fps": FPS}
+shots[f"phone-b-{n}"] = {"kind": "clip", "frames": len(_pb), "fps": FPS, "side": side}
 (OUT / f"shots-{n}.json").write_text(json.dumps(shots, indent=1))
 
 # ---------------------------------------------------------------------------------- render settings
@@ -1940,6 +2002,15 @@ for what in [w for w in args.render.split(",") if w]:
         clip(1, frames_a + 1, f"walk-a-{side}")
     elif what == "walk-b":
         clip(first_b, frames_b + 1, f"walk-b-{n}")
+    elif what in ("phone-a", "phone-b"):
+        ob = phone_a if what == "phone-a" else phone_b
+        walk_settings()
+        set_res(PHONE_WALK)
+        scene.camera = ob
+        scene.frame_start, scene.frame_end, scene.frame_step = 1, shots[ob.name[4:]]["frames"], args.step
+        scene.render.filepath = str(OUT / ob.name[4:] / "f_")
+        bpy.ops.render.render(animation=True)
+        scene.camera, scene.frame_step = cam, 1
     elif what == "walk-b-door":     # only up to just through the door (from there on the corridor is out of sight)
         clip(first_b, min(frames_b + 1, doors[n]["door_frame"] + 12), f"walk-b-{n}")
 print("done", json.dumps({k: v.get("frames") for k, v in shots.items()}))

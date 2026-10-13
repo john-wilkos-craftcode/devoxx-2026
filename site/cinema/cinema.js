@@ -101,6 +101,8 @@ const doorTime = (n) => {
   const w = shots[`walk-${n}`];
   return w && w.door_frame != null ? w.door_frame / w.fps : null;
 };
+// phones have their own portrait walk, from the hall totem to the door totem; else the laptop's, stopped at the door
+const walkClip = (n) => (shape === "phone" && shots[`walk-phone-${n}`] ? `walk-phone-${n}` : `walk-${n}`);
 const canvasFor = (key) => CANVAS[key.replace(/-\d+$/, "")];
 
 // How a still sits in the viewport: cropped to fill it (cover) unless that would cut more than 6% off a side and
@@ -216,7 +218,7 @@ function warm(n) {
   if (!walkable.has(n) || warmed.has(n) || reduceMotion) return;
   warmed.add(n);
   const l = document.createElement("link");
-  l.rel = "prefetch"; l.href = `media/walk-${n}.mp4`;
+  l.rel = "prefetch"; l.href = `media/${walkClip(n)}.mp4`;
   document.head.append(l);
 }
 
@@ -232,7 +234,7 @@ function playClip(name, { from = 0, until = null } = {}) {
     clip.onended = done;
     clip.onerror = done;                       // a missing clip is a cut, not a dead end
     if (until != null) clip.ontimeupdate = () => { if (clip.currentTime >= until) { clip.pause(); done(); } };
-    // fade in over the still: on laptops the first frame is the still, on phones (a crop of the laptop walk) it softens the cut
+    // fade in over the still (the first frame is the still), which hides the moment the video starts
     const go = () => { if (from) clip.currentTime = from; clip.play().then(() => { clip.classList.add("is-shown"); skipBtn.hidden = false; }).catch(done); };
     if (clip.readyState >= 1) go(); else clip.addEventListener("loadedmetadata", go, { once: true });
   });
@@ -453,9 +455,9 @@ async function toHall(withWalk) {
 async function toSeat(t, withWalk) {
   const n = roomNo(t);
   unmount();
-  if (withWalk) { say(`Walking to Room ${n}`); await playClip(`walk-${n}`, { until: shape === "phone" ? doorTime(n) : null }); }
+  if (withWalk) { say(`Walking to Room ${n}`); await playClip(walkClip(n), { until: walkClip(n) === `walk-${n}` && shape === "phone" ? doorTime(n) : null }); }
   await showStill(shotKey(`seat-${n}`));
-  // phones: the walk is a crop of the laptop's, so let it fade off the still before the screen lights up
+  // phones: let the walk fade off the still before the totem lights up
   if (shape === "phone") await hideClip(); else hideClip();
   say("");
   room = n; current = t;

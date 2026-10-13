@@ -654,5 +654,103 @@
   "frames": 144,
   "fps": 30,
   "door_frame": 76
+ },
+ "phone-a-east": {
+  "kind": "clip",
+  "frames": 40,
+  "fps": 30
+ },
+ "phone-b-10": {
+  "kind": "clip",
+  "frames": 61,
+  "fps": 30,
+  "side": "east"
+ },
+ "phone-a-west": {
+  "kind": "clip",
+  "frames": 40,
+  "fps": 30
+ },
+ "phone-b-3": {
+  "kind": "clip",
+  "frames": 61,
+  "fps": 30,
+  "side": "west"
+ },
+ "phone-b-4": {
+  "kind": "clip",
+  "frames": 61,
+  "fps": 30,
+  "side": "west"
+ },
+ "phone-b-5": {
+  "kind": "clip",
+  "frames": 61,
+  "fps": 30,
+  "side": "west"
+ },
+ "phone-b-6": {
+  "kind": "clip",
+  "frames": 61,
+  "fps": 30,
+  "side": "west"
+ },
+ "phone-b-7": {
+  "kind": "clip",
+  "frames": 61,
+  "fps": 30,
+  "side": "east"
+ },
+ "phone-b-8": {
+  "kind": "clip",
+  "frames": 61,
+  "fps": 30,
+  "side": "east"
+ },
+ "phone-b-9": {
+  "kind": "clip",
+  "frames": 61,
+  "fps": 30,
+  "side": "east"
+ },
+ "walk-phone-10": {
+  "kind": "clip",
+  "frames": 105,
+  "fps": 30
+ },
+ "walk-phone-3": {
+  "kind": "clip",
+  "frames": 105,
+  "fps": 30
+ },
+ "walk-phone-4": {
+  "kind": "clip",
+  "frames": 105,
+  "fps": 30
+ },
+ "walk-phone-5": {
+  "kind": "clip",
+  "frames": 105,
+  "fps": 30
+ },
+ "walk-phone-6": {
+  "kind": "clip",
+  "frames": 105,
+  "fps": 30
+ },
+ "walk-phone-7": {
+  "kind": "clip",
+  "frames": 105,
+  "fps": 30
+ },
+ "walk-phone-8": {
+  "kind": "clip",
+  "frames": 105,
+  "fps": 30
+ },
+ "walk-phone-9": {
+  "kind": "clip",
+  "frames": 105,
+  "fps": 30
  }
 }
