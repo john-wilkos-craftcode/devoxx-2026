@@ -83,7 +83,7 @@ function ordered(quad) {
 // ---------- the stage ----------
 const stage = document.getElementById("stage");
 const plate = document.getElementById("plate"), clip = document.getElementById("clip"), overlay = document.getElementById("overlay");
-const front = document.getElementById("front");
+const front = document.getElementById("front"), fade = document.getElementById("fade");
 const loading = document.getElementById("loading"), statusBox = document.getElementById("status"), skipBtn = document.getElementById("skip");
 const shots = await fetch("media/shots.json").then((r) => r.json());
 const walkable = new Set(Object.keys(shots).filter((k) => /^seat-\d+$/.test(k)).map((k) => Number(k.split("-")[1])));
@@ -98,8 +98,8 @@ const shotKey = (base) => {
 };
 // on a phone the walk stops at the door: the time into walk-<n>.mp4 when the camera passes it
 const doorTime = (n) => {
-  const b = shots[`walk-b-${n}`], a = b && shots[`walk-a-${b.side}`];
-  return a && b.door_frame != null ? (a.frames + b.door_frame) / b.fps : null;
+  const w = shots[`walk-${n}`];
+  return w && w.door_frame != null ? w.door_frame / w.fps : null;
 };
 const canvasFor = (key) => CANVAS[key.replace(/-\d+$/, "")];
 
@@ -136,6 +136,7 @@ function mount(panel, key, overlayName) {
   overlay.append(panel);
   face = { el: panel, key, overlayName, w, h };
   place();
+  fitCards(panel);
   for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s);
 }
 const unmount = () => { if (face) { face.el.remove(); face = null; } front.hidden = true; };
@@ -149,6 +150,19 @@ addEventListener("resize", () => {
     else if (face) { const mode = fit(face.key).contain ? "contain" : "cover"; plate.style.objectFit = front.style.objectFit = mode; place(); }
   }, 180);
 });
+
+// a card's text must fit its fixed height: shorten the title, then the speakers, a line at a time until it does
+function fitCards(root) {
+  const lines = (e) => (e && parseInt(getComputedStyle(e).webkitLineClamp, 10)) || 0;
+  for (const c of root.querySelectorAll(".card")) {
+    const title = c.querySelector(".title"), who = c.querySelector(".who");
+    for (let i = 0; i < 4 && c.scrollHeight > c.clientHeight + 1; i++) {
+      if (lines(title) > 2) title.style.webkitLineClamp = lines(title) - 1;
+      else if (lines(who) > 1) who.style.webkitLineClamp = 1;
+      else break;
+    }
+  }
+}
 
 // fade the edge of anything that scrolls, on the side where there's more
 function watchScroll(s) {
@@ -232,6 +246,11 @@ const hideClip = () => new Promise((resolve) => {
   setTimeout(gone, 400);
 });
 skipBtn.addEventListener("click", () => skipWalk && skipWalk());
+// fade the whole stage to black and back
+const dip = (on) => new Promise((resolve) => {
+  fade.classList.toggle("is-on", on);
+  setTimeout(resolve, 450);
+});
 const say = (text) => { statusBox.textContent = text || ""; statusBox.hidden = !text; };
 
 // ---------- the programme ----------
@@ -307,7 +326,7 @@ function programme(tall) {
           el("span", { text: `${hits.length} ${hits.length === 1 ? "talk matches" : "talks match"} “${query}”, in programme order` })),
         hits.length ? el("div", { class: "cards scroller", tabindex: "0", "aria-label": "Search results" }, hits.map((t) => card(t, { when: "day", terms })))
           : el("p", { class: "empty", text: "Nothing matches. Try a speaker's surname or a tool, like Kotlin or Quarkus." }));
-      if (face) for (const s of panel.querySelectorAll(".scroller")) watchScroll(s);
+      if (face) { for (const s of panel.querySelectorAll(".scroller")) watchScroll(s); requestAnimationFrame(() => fitCards(panel)); }
       return;
     }
     for (const d of days) {
@@ -337,7 +356,7 @@ function programme(tall) {
           : `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session. Choose it to read its summary." : "sessions. Pick one to read its summary."}` })),
       cards);
     rove(dayRow); rove(timeRow);
-    requestAnimationFrame(() => { centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
+    requestAnimationFrame(() => { fitCards(panel); centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
   }
   search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); draw(); });
   draw();
@@ -387,9 +406,12 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
         whenShort(t), typeLabel(t), t.videoId ? null : "no recording yet"].filter(Boolean).map((x) => x.replace(/ /g, "\u00a0").replace(/-/g, "\u2011")).join(", ") }),
       el("h2", { text: t.title, style: `--title:${onFloor ? titleSize(t.title, 40, 30) : titleSize(t.title, 34, 26)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
-      s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
-      s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth it if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null,
+      // laptops: the summary scrolls if it's long, so the buttons stay on the screen
+      el("div", { class: "intro scroller" },
+        s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
+        s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth it if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null),
       actions());
+    for (const sc of main.querySelectorAll(".scroller")) watchScroll(sc);
   };
   function actions() {
     return el("div", { class: "actions" }, watch(), tall ? null : el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
@@ -417,18 +439,15 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
 let room = null, current = null, busy = false;
 
 async function toHall(withWalk) {
+  // the way back is a fade through black, not the walk played backwards
+  const dipped = withWalk && room && !reduceMotion;
+  if (dipped) await dip(true);
   unmount();
-  if (withWalk && room) {
-    say("Back to the hall");
-    const d = shape === "phone" ? doorTime(room) : null, total = shots[`walk-${room}`] ? shots[`walk-${room}`].frames / 30 : 0;
-    await playClip(`walk-${room}-back`, { from: d != null && total ? Math.max(0, total - d) : 0 });
-  }
   room = null; current = null;
   await showStill(shotKey("hall"));
-  // phones: the walk is a crop of the laptop's, so let it fade off the still before the screen lights up
-  if (shape === "phone") await hideClip(); else hideClip();
-  say("");
+  hideClip();
   mount(programme(shape === "phone"), shotKey("hall"), "programme");
+  if (dipped) dip(false);
 }
 
 async function toSeat(t, withWalk) {

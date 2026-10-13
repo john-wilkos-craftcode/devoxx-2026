@@ -1,5 +1,5 @@
 // Screenshot the cinema page (site/cinema/) through its main states on laptop and phone viewports, for the UX
-// review agents (see RUBRIC.md). Serve the site first: python3 -m http.server 8765 -d site
+// review agents (see RUBRIC.md). Serve the site first: node tools/ux/serve.mjs
 //   node tools/ux/shoot.mjs tools/ux/out/r1 [baseUrl]
 import { chromium } from "playwright-core";
 import fs from "node:fs";

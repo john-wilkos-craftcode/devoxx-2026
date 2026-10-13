@@ -23,6 +23,8 @@ button, input, a { font: inherit; color: inherit; }
 .overlay { position: absolute; inset: 0; pointer-events: none; }
 .front { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .front[hidden] { display: none; }
+.fade { position: absolute; inset: 0; z-index: 3; background: #000; opacity: 0; pointer-events: none; transition: opacity .45s ease; }
+.fade.is-on { opacity: 1; }
 
 /* a face is a screen's content: fixed canvas, pinned with matrix3d */
 .face { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: auto; box-sizing: border-box; overflow: clip;
@@ -175,7 +177,10 @@ button, input, a { font: inherit; color: inherit; }
 .verdict b { color: var(--orange); font-weight: 700; }
 .talk.is-tall .verdict { font-size: 14px; margin-top: 8px; }
 .tldr { margin-top: 14px; font-size: 21px; line-height: 1.42; max-width: 36em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 18px; flex: none; }
+.intro { flex: 0 1 auto; padding-right: 10px; }
+.intro .tldr { display: block; -webkit-line-clamp: unset; }   /* it scrolls instead */
+.talk.is-tall .intro { overflow: visible; mask-image: none; padding-right: 0; }
 .btn { display: inline-flex; align-items: center; border-radius: 10px; padding: 11px 18px; font-size: 18px; font-weight: 700; text-decoration: none;
   border: 2px solid var(--line); background: var(--panel); color: var(--ink); white-space: nowrap; }
 .btn:hover { border-color: var(--muted); }

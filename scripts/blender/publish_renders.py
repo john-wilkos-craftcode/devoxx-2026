@@ -5,8 +5,10 @@
 - Stills (hall, hall-phone, seat-<n>, seat-phone-<n>) become JPEGs; their -front layers (what stands in front of
   the cinema screen, on transparency) become WebP.
 - The walk is rendered in two halves: walk-a-<side> (the hall to the top of that side's stair, shared by its rooms)
-  and walk-b-<n> (the corridor and the room). They meet at rest, so they are joined into walk-<n>.mp4, and the
-  same frames played backwards make walk-<n>-back.mp4 for the way out. H.264, yuv420p, faststart.
+  and walk-b-<n> (the corridor and the room). They are joined into walk-<n>.mp4 with a short dip to black where the
+  stair climb was (its camera tumbles: an euler wrap under motion blur) and without the rest at the top. Smeared
+  frames elsewhere (the same wrap, or a whip pan) are replaced by a blend of the good frames either side (see mend).
+  The way back is a fade on the page, not a clip. H.264, yuv420p, faststart.
 - shots-<n>.json files are merged into media/shots.json, so rooms rendered on different nights add up.
 """
 import json
@@ -15,6 +17,7 @@ import sys
 import tempfile
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -45,6 +48,56 @@ def frames_of(name):
 
 
 ENC = ["-c:v", "libx264", "-preset", "slow", "-crf", "21", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an"]
+CUT_A = {"west": 43, "east": 37}     # last frame of walk-a before the stair climb
+SKIP_B = 8                           # walk-b starts at rest at the top of the stair: drop the slow start
+DIP = (6, 4, 6)                      # frames fading out, black, fading in
+
+
+def mend(ims):
+    """Replace smeared frames by a blend of the good frames either side. Two kinds, both from the camera's yaw:
+    - a wrap past ±180° that motion blur draws as a full spin: one to three frames that are blurred across the
+      frame and out of line with their neighbours (the frames either side are close to each other);
+    - a whip pan (rooms 3 and 10 turn round at the top of the stair): a few frames blurred to under 60% of the
+      sharpness around them. Blending these makes a short dissolve instead.
+    And one not from the yaw: brushing past the door's portal or leaf."""
+    grey = [np.asarray(im.convert("L").resize((640, 360)), dtype=np.float32) for im in ims]
+    gx = np.array([np.abs(np.diff(g, axis=1)).mean() for g in grey])         # detail across the frame: what a yaw smear blurs
+    small = [g[::4, ::4] for g in grey]
+    d = lambda i, j: float(np.abs(small[i] - small[j]).mean())
+    ratio = {}
+    for i in range(len(ims)):
+        around = np.r_[gx[max(0, i - 6):max(0, i - 2)], gx[i + 3:i + 7]]     # skip the near neighbours: smears come in runs
+        if len(around) >= 3 and gx[i] < 0.85 * np.median(around):
+            ratio[i] = gx[i] / np.median(around)
+    runs = []
+    for i in sorted(ratio):
+        if runs and i == runs[-1][-1] + 1:
+            runs[-1].append(i)
+        else:
+            runs.append([i])
+    bad = set()
+    for r in runs:
+        a, b = r[0] - 1, r[-1] + 1
+        if a < 0 or b >= len(ims):
+            continue
+        out_of_line = len(r) <= 3 and sum(d(k, k + 1) for k in range(a, b)) > 3.5 * d(a, b) + 3
+        whip = len(r) <= 8 and min(ratio[i] for i in r) < 0.6
+        # the doorway: a frame or two where the camera brushes the portal or a door leaf (a flash of red or black)
+        brush = len(r) <= 2 and min(ratio[i] for i in r) < 0.8 and sum(d(k, k + 1) for k in range(a, b)) > 1.3 * d(a, b)
+        if out_of_line or whip or brush:
+            bad.update(r)
+    # and any single frame far out of line with its neighbours, blurred or not
+    bad.update(i for i in range(1, len(ims) - 1) if d(i - 1, i) + d(i, i + 1) > 2 * d(i - 1, i + 1) + 6)
+    out = list(ims)
+    for i in sorted(bad):
+        lo, hi = i - 1, i + 1
+        while lo in bad and lo > 0:
+            lo -= 1
+        while hi in bad and hi < len(ims) - 1:
+            hi += 1
+        out[i] = Image.blend(ims[lo], ims[hi], (i - lo) / (hi - lo))
+    return out, sorted(bad)
+
 for key, info in sorted(shots.items()):
     if not key.startswith("walk-b-"):
         continue
@@ -53,14 +106,27 @@ for key, info in sorted(shots.items()):
     if not a or not b:
         continue
     fps = info.get("fps", 30)
+    a = a[:CUT_A[info["side"]]]
+    b = b[SKIP_B:]
+    ims_a, bad_a = mend([Image.open(p).convert("RGB") for p in a])
+    ims_b, bad_b = mend([Image.open(p).convert("RGB") for p in b])
+    black = Image.new("RGB", ims_a[0].size)
+    fo, bl, fi = DIP
+    for k in range(fo):
+        ims_a[-fo + k] = Image.blend(ims_a[-fo + k], black, (k + 1) / (fo + 1))
+    for k in range(fi):
+        ims_b[k] = Image.blend(black, ims_b[k], (k + 1) / (fi + 1))
+    seq = ims_a + [black] * bl + ims_b
     with tempfile.TemporaryDirectory() as tmp:
-        listing = Path(tmp) / "frames.txt"
-        listing.write_text("".join(f"file '{p}'\nduration {1 / fps:.6f}\n" for p in a + b))
-        for name, vf in ((f"walk-{n}.mp4", []), (f"walk-{n}-back.mp4", ["-vf", "reverse"])):
-            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(listing), "-r", str(fps), *vf, *ENC,
-                            str(OUT / name)], check=True)
-    shots[f"walk-{n}"] = {"kind": "clip", "frames": len(a) + len(b), "fps": fps}
-    print(f"walk-{n}.mp4 and walk-{n}-back.mp4 ({len(a)} + {len(b)} frames)")
+        for i, im in enumerate(seq):
+            im.save(Path(tmp) / f"f_{i:04d}.png", compress_level=1)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", str(Path(tmp) / "f_%04d.png"), *ENC,
+                        str(OUT / f"walk-{n}.mp4")], check=True)
+    (OUT / f"walk-{n}-back.mp4").unlink(missing_ok=True)
+    # where the phone's walk stops: the door, counted in the joined clip
+    door = len(ims_a) + bl + info["door_frame"] - SKIP_B if info.get("door_frame") is not None else None
+    shots[f"walk-{n}"] = {"kind": "clip", "frames": len(seq), "fps": fps, "door_frame": door}
+    print(f"walk-{n}.mp4 ({len(ims_a)} + {bl} + {len(ims_b)} frames, mended {bad_a} + {[SKIP_B + i for i in bad_b]})")
 
 existing.write_text(json.dumps(shots, indent=1))
 print(f"shots.json: {', '.join(sorted(shots))}")

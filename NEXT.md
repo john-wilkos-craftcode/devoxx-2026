@@ -1,25 +1,22 @@
-# Where this stands (13/10, 11:00)
+# Where this stands (13/10, 18:30)
 
 ## Right now
-- **Render queue running** (restarted 13/10 10:53 after the plants and seats, ETA ~19:00): `scripts/blender/render_rooms.sh` renders
-  the hall stills (+ their cut-out layers hall-front / hall-phone-front: plants and ivy over the HTML), both shared walk halves (walk-a-east/-west) and, per room 3-10, the seat still + cut-out
-  layer, the phone door still and the room's walk half (walk-b-N), into `C:\Users\wilkojo\kino-renders\final`,
-  then runs `publish_renders.py` into `site/cinema/media/`. Log: `final/render_rooms.log`. Restartable: rooms
-  already done are skipped. It waits for any running Blender, so never start a second Blender meanwhile
-  (4 GB GPU).
-- New since the last review round: real potted plants (Poly Haven money trees, CC0, `scripts/fetch_models.py` into
-  gitignored `data/models/`) either side of the hall screen and beside the totem, slid until a leaf or two crosses
-  the screen edge and laid over the HTML by a cut-out layer; ivy over the screen capped at ~4 cm onto the glass.
-  Cinema seats remodelled after the photos (John chose modelling over a CC-BY/BlenderKit asset), instanced.
+- **All eight rooms (3-10) rendered and published** into `site/cinema/media/` (stills, cut-out layers, walks).
+  Rooms 3 and 6 re-rendered up to their door after their phone totems were moved: room 3's stood over the west
+  stairwell (its phone still was solid blue), room 6's against the railing round a floor opening. build_scene.py
+  now moves a totem to the number-panel side of its door when anything stands there.
+- **The walks are fixed in post, not re-rendered** (John: "tired of rendering"). The stair climb's camera tumbles
+  (its euler rotation wraps past ±180° under motion blur), so publish_renders.py cuts it: hall → stairwell, a
+  dip to black, the corridor upstairs (without the rest at the top). One-frame smears elsewhere are blended
+  out. The way back is a fade through black on the page, no reversed clip any more.
+  If the walks are ever rendered again: make the camera's euler compatible frame to frame
+  (`rot.to_euler("XYZ", previous)`) in `keyframe_segment`, then the stair can go back in.
+- **Text fixes:** the talk's summary scrolls inside the left column on laptops so the buttons stay on the cinema
+  screen; programme cards shorten their title, then speakers, until they fit. `tools/ux/overflow.mjs` checks
+  every talk and slot.
+- WebGL page retired: `site/kino/` deleted, the venue model and credits moved to `data/venue/`.
+- Serve locally with `node tools/ux/serve.mjs` (byte ranges; Python's http.server can't seek videos).
 - **Not pushed.** Pushing to main deploys GitHub Pages; ask John first.
-
-## When the queue is done
-1. Serve `python3 -m http.server 8765 -d site`, open /cinema/, check the walk videos there and back on laptop
-   and phone (known risk: on phones the landscape walk is cropped to portrait and its first frame doesn't match
-   the totem shot; the phone walk stops at the door via `door_frame` in shots.json).
-2. Rerun `node tools/ux/shoot.mjs tools/ux/out/rN` and the two judges (see `tools/ux/RUBRIC.md`) once with
-   real walks and all rooms orange.
-3. Ask John: push?
 
 ## The cinema page (`site/cinema/`), status
 - Diegetic UI pinned onto Blender stills with a CSS matrix (2D when square on, so text is sharp): programme on
@@ -29,8 +26,7 @@
   `tools/ux/shoot.mjs`): plateau at UX ~8 (laptop) / 7.5-8.5 (phone), art ~7 / 7-8. Score history in
   `tools/ux/RUBRIC.md`. What the art judges keep asking for: real cinema seats, real foliage, the screen
   lighting the room, more hall around the hall screen (conflicts with legibility at 1280).
-- Main site's "Enter the cinema" link points to `cinema/`. The WebGL `site/kino/` is still there; retire it
-  once the cinema page ships.
+- Main site's "Enter the cinema" link points to `cinema/`. The WebGL `site/kino/` is retired (13/10).
 
 ## Earlier (12/10)
 Done:
