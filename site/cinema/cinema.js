@@ -228,7 +228,8 @@ const blob = (t) => [t.title, ...t.speakers.map((s) => s.name), t.room, t.track,
 function why(t, terms) {
   if (terms.every((w) => t.title.toLowerCase().includes(w))) return null;
   const s = t.s || {};
-  const fields = [["Speaker", speakers(t)], ["Mentions", (s.tech || []).join(", ")], ["Topics", (t.keywords || []).join(", ")], ["Summary", s.tldr || ""], ["Abstract", (t.abstract || []).join(" ")]];
+  const fields = [["Speaker", speakers(t)], ["Summary", [s.tldr, ...(s.summary || [])].filter(Boolean).join(" ")], ["Abstract", (t.abstract || []).join(" ")],
+    ["Mentions", (s.tech || []).join(", ")], ["Topics", (t.keywords || []).join(", ")]];
   for (const [name, text] of fields) {
     const lower = text.toLowerCase(), w = terms.find((x) => lower.includes(x));
     if (!w) continue;
@@ -239,8 +240,11 @@ function why(t, terms) {
       const more = items.length - 1;
       return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? `\u00a0+${more}\u00a0more` : "");
     }
-    const word = text.slice(i).match(/^\S+/)[0].replace(/[,.;:]$/, "");    // the whole matched word, e.g. "Kotlin"
-    return el("span", { class: "why" }, el("b", { text: `${name}: ` }), a > 0 ? "…" : "", el("mark", { text: word }), text.slice(i + word.length, i + word.length + 70));
+    // a sentence from the summary: a few words before the match, the match, the rest of the line
+    const word = text.slice(i).match(/^\S+/)[0].replace(/[,.;:)]$/, "");
+    let from = Math.max(0, text.lastIndexOf(" ", Math.max(0, i - 24)));
+    if (i - from > 30) from = i;
+    return el("span", { class: "why is-quote" }, from > 0 ? "…" : "", text.slice(from, i).trimStart(), el("mark", { text: word }), text.slice(i + word.length, i + word.length + 90));
   }
   return null;
 }
@@ -306,7 +310,8 @@ function programme(tall) {
         if (fill.length && here.length === 1 && t.s && t.s.tldr) c.append(el("span", { class: "gist", text: t.s.tldr }));
         return c;
       }),
-      fill.length ? el("div", { class: "later", text: "Later that day" }) : null, fill.map((t) => card(t, { when: "time" })));
+      fill.length ? el("div", { class: "later", text: "Later that day" }) : null,
+      fill.map((t) => { const c = card(t, { when: "time" }); c.classList.add("is-later"); return c; }));
     put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
         el("span", { text: tall ? `${here.length} ${here.length === 1 ? "session" : "sessions"}, ${fShort.format(new Date(slot))} Oct`
           : `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session. Choose it to read its summary." : "sessions. Pick one to read its summary."}` })),
@@ -362,7 +367,8 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
       el("div", { class: "who-l", text: speakers(t, true) }),
       s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth it if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null,
       !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
-      el("div", { class: "actions" }, watch(), el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
+      !tall && s.tldr && (s.summary || []).length ? el("button", { class: "more", type: "button", text: "Read the full summary", onclick: () => fill("story") }) : null,
+      el("div", { class: "actions" }, watch(), tall ? null : el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
         t.videoId ? null : el("span", { class: "note", text: "No recording yet." })),
       null);
   };

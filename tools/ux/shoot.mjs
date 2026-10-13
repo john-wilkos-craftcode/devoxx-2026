@@ -40,7 +40,7 @@ for (const v of VIEWS) {
     await shot("4-talk");
     const tabs = page.locator(".face.talk .tabs .pill");
     if (await tabs.count() > 2) { await tabs.nth(2).click(); await shot("5-talk-tab"); }
-    await page.locator(".face.talk .btn", { hasText: "Back to the programme" }).click();
+    await page.locator(".face.talk button", { hasText: "Back to the programme" }).first().click();
     await page.waitForSelector(".face.prog", { timeout: 20000 });
     await shot("6-back");
   } else log.push(`${v.name}: no walkable card in the first slot`);

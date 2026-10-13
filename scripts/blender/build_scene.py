@@ -348,7 +348,7 @@ M = {
     "exitSign": emissive("exitSign", 0x18c060, 4.0),
     "downlight": emissive("downlight", 0xfff1e0, 25.0),
     "bezel": material("bezel", 0x0b0b0e, 0.28, 0.4, bevel=0.006),     # satin black, catching a highlight on its edge
-    "plate": material("plate", 0xf6921e, 0.5, emission=0xe2701a, strength=0.8),   # backlit room-number plate, brand orange
+    "plate": material("plate", 0xf6921e, 0.5, emission=0xd85e14, strength=1.8),   # backlit room-number plate, brand orange
     "plateText": material("plateText", 0x0a0f2e, 0.4),
     "foliage": material("foliage", 0x4a7a3a, 0.55, sheen=0.3),
     "tableFrame": material("tableFrame", 0x111114, 0.4, 0.6),
@@ -362,7 +362,7 @@ M = {
     "posterA": emissive("posterA", 0x3a5cff, 3.0),
     "posterB": emissive("posterB", 0xff6a2a, 3.0),
     "posterC": emissive("posterC", 0xc9d6ff, 3.0),
-    "seat": material("seat", 0x34416e, 0.85, sheen=0.9, noise_bump=0.5, speckle=0.14),
+    "seat": material("seat", 0x15182a, 0.7, sheen=1.0, noise_bump=0.6, speckle=0.18),   # near-black fabric, picked out by rim light
     "seatFrame": material("seatFrame", 0x15161b, 0.5, 0.4),
     "steel": material("steel", 0xb8bcc4, 0.3, 0.9),
     "portal": material("portal", 0xc61d3b, 0.55, emission=0xc61d3b, strength=0.15),
@@ -732,8 +732,8 @@ for r in auditoriums:
         z0 = FH + plate_under(sd) + sd.get("base", 0)
         z1 = FH + plate_under(sd) + sd["height"]
         # as in the 2026 photos, the screen starts above the "#DEVOXX" standing on the stage (letters up to 1.5 m)
-        z0 = max(z0, FH + plate_under(sd) + 2.1)
-        z1 = max(z1, FH + CLEAR - 0.8)                  # and runs up close to the ceiling
+        z0 = max(z0, FH + plate_under(sd) + 1.6)        # clear above the small #DEVOXX on its riser
+        z1 = max(z1, FH + CLEAR - 0.45)                 # and runs up close to the ceiling
         w = sb["h"]
         h = min(z1 - z0, w * 776 / 2048)
         x = sb["x"] + sb["w"] + 0.02 if west else sb["x"] - 0.02
@@ -1135,7 +1135,7 @@ for i, o in enumerate(venue["obstacles"]):
 
 # the programme screen: 16:10 like a laptop panel, thin bezel with a deeper chin, in front of the curtains
 SCREEN = {"x": SX, "y": NORTH - 0.32, "z": 1.7, "w": 3.6, "h": 2.25}
-BEZEL, CHIN = 0.07, 0.18
+BEZEL, CHIN = 0.05, 0.05      # a thin, even frame
 B.box("bezel", {"x": SX - SCREEN["w"] / 2 - BEZEL, "y": SCREEN["y"] - 0.05, "w": SCREEN["w"] + 2 * BEZEL, "h": 0.1},
       SCREEN["z"] - SCREEN["h"] / 2 - CHIN, SCREEN["z"] + SCREEN["h"] / 2 + BEZEL)
 sy_ = SCREEN["y"] - 0.055
@@ -1261,7 +1261,7 @@ for (lx, ly, lz, _) in stair_lamps:
     so = bpy.data.objects.new(spot.name, spot)
     so.location = (lx, ly, lz)
     scene.collection.objects.link(so)
-_hs = area("hall-screen-spill", (SCREEN["x"], SCREEN["y"] - 0.2, SCREEN["z"]), 1.0, 160, (0.4, 0.5, 1.0), rot=(-math.pi / 2, 0, 0))   # facing into the room
+_hs = area("hall-screen-spill", (SCREEN["x"], SCREEN["y"] - 0.2, SCREEN["z"]), 1.0, 420, (0.4, 0.5, 1.0), rot=(-math.pi / 2, 0, 0))   # facing into the room
 _hs.data.shape, _hs.data.size, _hs.data.size_y = "RECTANGLE", SCREEN["w"], SCREEN["h"]
 _hs.visible_camera = False
 # the Hollywood room: an area light under each hexagon panel, a narrow spot in each downlight (they throw the
@@ -1290,13 +1290,13 @@ if _room:
     for (hx, hy, hz, rn) in house_spots:
         if rn == args.room:
             li = bpy.data.lights.new(f"house-{hx:.1f}-{hy:.1f}", "SPOT")
-            li.energy, li.spot_size, li.spot_blend, li.color = 90, math.radians(44), 0.4, (1.0, 0.93, 0.85)   # house lights down
+            li.energy, li.spot_size, li.spot_blend, li.color = 40, math.radians(44), 0.4, (1.0, 0.93, 0.85)   # house lights down
             so = bpy.data.objects.new(li.name, li)
             so.location = (hx, hy, hz)
             scene.collection.objects.link(so)
     if args.room in screens:                                   # the projection's light on the room, from the screen (unseen)
         scr_ = screens[args.room]
-        ob = area("screen-spill", (scr_["x"] + (0.25 if scr_["west"] else -0.25), scr_["y"], scr_["z"]), 1.0, 1100, (0.42, 0.52, 1.0),
+        ob = area("screen-spill", (scr_["x"] + (0.25 if scr_["west"] else -0.25), scr_["y"], scr_["z"]), 1.0, 650, (0.42, 0.52, 1.0),
                   rot=(0, -math.pi / 2 if scr_["west"] else math.pi / 2, 0))     # facing into the room
         ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", scr_["h"], scr_["w"]
         ob.visible_camera = False
