@@ -398,6 +398,7 @@ _mixs.inputs["Fac"].default_value = 0.3
 _fnt.links.new(_fnt.nodes["Principled BSDF"].outputs["BSDF"], _mixs.inputs[1])
 _fnt.links.new(_tr.outputs["BSDF"], _mixs.inputs[2])
 _fnt.links.new(_mixs.outputs["Shader"], _fnt.nodes["Material Output"].inputs["Surface"])
+M["ivy"] = M["foliage"]
 M["frostedGlass"].node_tree.nodes["Principled BSDF"].inputs["Transmission Weight"].default_value = 1.0
 M["frostedGlass"].node_tree.nodes["Principled BSDF"].inputs["IOR"].default_value = 1.5
 
@@ -1114,16 +1115,21 @@ def curtain(name, x0, x1, y, z1, pleat=0.36, amp=0.065, face=-1):
 curtain("curtain-north", hall["x"] + 0.2, hall["x"] + hall["w"] - 6.9, NORTH, HALL_CEIL + 0.05)
 # above the screen, as along the coffer: a blue LED line at the curtain head and ivy trailing from the ceiling
 B.box("cove", {"x": hall["x"] + 0.2, "y": NORTH - 0.32, "w": hall["w"] - 7.1, "h": 0.03}, HALL_CEIL - 0.035, HALL_CEIL - 0.01)
+# (its own object, "ivy", so the hall's cut-out layer can lay it over the programme: over the screen the strands
+# stop a few centimetres past the bezel, so they overlap the glass's margin and never the text)
 for gx in [SX + k * 0.9 for k in range(-6, 7)]:
     for _ in range(9):
         x, y, z = gx + rng.uniform(-0.45, 0.45), NORTH - 0.55 + rng.uniform(-0.12, 0.12), HALL_CEIL - 0.01
-        for _ in range(int(rng.uniform(0.1, 0.55) ** 1.3 / 0.025) + 2):
+        steps = int(rng.uniform(0.1, 0.55) ** 1.3 / 0.025) + 2
+        if abs(x - SX) < 1.75 + 0.15:
+            steps = min(steps, rng.choice((2, 3, 4, 5, 6)))   # at most ~4 cm onto the glass
+        for _ in range(steps):
             x, y, z = x + rng.uniform(-0.02, 0.02), y + rng.uniform(-0.015, 0.015), z - 0.025
             u = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1.6, -0.2))).normalized()
             v = u.cross(Vector((0, 0, 1))).normalized() if abs(u.z) < 0.98 else Vector((1, 0, 0))
             c, a_, b_ = Vector((x, y, z)), 0.045 * rng.uniform(0.7, 1.25), 0.026 * rng.uniform(0.7, 1.25)
             fold = u.cross(v) * b_ * 0.35
-            B.mesh("foliage", [c, c + u * a_ * 0.35 + v * b_ + fold, c + u * a_, c + u * a_ * 0.35 - v * b_ + fold], [(0, 1, 2), (0, 2, 3)])
+            B.mesh("ivy", [c, c + u * a_ * 0.35 + v * b_ + fold, c + u * a_, c + u * a_ * 0.35 - v * b_ + fold], [(0, 1, 2), (0, 2, 3)])
 # divider curtains drawn back against the columns away from the middle aisle
 for i, o in enumerate(venue["obstacles"]):
     b = o["bounds"]
@@ -1155,6 +1161,78 @@ ty_ = TOTEM["y"] - 0.035
 totem_corners = [(TOTEM["x"] - TOTEM["w"] / 2, ty_, TOTEM["z"] - TOTEM["h"] / 2), (TOTEM["x"] + TOTEM["w"] / 2, ty_, TOTEM["z"] - TOTEM["h"] / 2),
                  (TOTEM["x"] + TOTEM["w"] / 2, ty_, TOTEM["z"] + TOTEM["h"] / 2), (TOTEM["x"] - TOTEM["w"] / 2, ty_, TOTEM["z"] + TOTEM["h"] / 2)]
 B.mesh("programme", totem_corners, [(0, 1, 2, 3)])
+
+# ---------------------------------------------------------------------------------- potted plants
+# Real plant models (Poly Haven, CC0; scripts/fetch_models.py) in tall anthracite planters: one either side of the
+# programme screen, one beside the phone totem. Each stands a little in front of its screen and is slid sideways
+# (once the cameras exist, see fit_plant) until its outermost leaves just cross the screen's edge: the hall's cut-out
+# layer lays them over the HTML there, in the margin, never over text.
+MODELS = ROOT / "data" / "models"
+M["planter"] = material("planter", 0x2a2c31, 0.5, bevel=0.012, grime=0.1)
+M["soil"] = material("soil", 0x241c16, 1.0, noise_bump=1.0, speckle=0.3)
+
+
+def model_parts(asset):
+    """The mesh objects of a model fetched by scripts/fetch_models.py, by name, not linked into the scene."""
+    p = MODELS / asset / f"{asset}.blend"
+    if not p.exists():
+        print(f"model {asset} missing (run scripts/fetch_models.py); leaving it out")
+        return {}
+    with bpy.data.libraries.load(str(p)) as (src, dst):
+        dst.objects = list(src.objects)
+    for img in bpy.data.images:                  # the appended images point next to the library: make them absolute
+        fp = img.filepath.replace("\\", "/")
+        if "textures/" in fp and asset in fp:
+            img.filepath = str(MODELS / asset / "textures" / fp.rsplit("/", 1)[-1])
+    return {o.name.replace(asset + "_", ""): o for o in dst.objects if o and o.type == "MESH"}
+
+
+pachira, calathea = model_parts("pachira_aquatica_01"), model_parts("calathea_orbifolia_01")
+plants = []          # (root empty, the screen's corners it leans over, the side it stands on, its camera's name)
+
+
+def planter_plant(name, x, y, tree, turn, size=0.46, height=0.62):
+    """A square planter with a tree and a few low clumps round its trunk, all parented to an empty at the planter's
+    foot, so the whole thing can be slid into place later."""
+    root = bpy.data.objects.new(name, None)
+    root.location = (x, y, 0)
+    scene.collection.objects.link(root)
+    bm = bmesh.new()
+    t, hs = 0.025, size / 2
+    for (bx, by, bw, bh) in ((-hs, -hs, size, t), (-hs, hs - t, size, t), (-hs, -hs, t, size), (hs - t, -hs, t, size)):
+        bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation((bx + bw / 2, by + bh / 2, height / 2)) @ Matrix.Diagonal((bw, bh, height, 1)))
+    bmesh.ops.bevel(bm, geom=list(bm.edges), offset=0.004, segments=2, affect="EDGES")
+    soil = bmesh.new()
+    bmesh.ops.create_cube(soil, size=1.0, matrix=Matrix.Translation((0, 0, height - 0.05)) @ Matrix.Diagonal((size - 2 * t, size - 2 * t, 0.02, 1)))
+    parts = []
+    for nm, b_, mat in ((f"{name}-pot", bm, M["planter"]), (f"{name}-soil", soil, M["soil"])):
+        me = bpy.data.meshes.new(nm)
+        b_.to_mesh(me)
+        b_.free()
+        ob = bpy.data.objects.new(nm, me)
+        ob.data.materials.append(mat)
+        parts.append(ob)
+    rng_p = random.Random(name)
+    for key, loc, rz, s in [(f"leaves_{tree}", (0, 0, height - 0.05), turn, 1.0), (f"bark_{tree}", (0, 0, height - 0.05), turn, 1.0)] + \
+            [(k, (rng_p.uniform(-0.1, 0.1), rng_p.uniform(-0.1, 0.1), height - 0.05), rng_p.uniform(0, 6.3), 0.8) for k in ("a", "c", "b")]:
+        src = pachira.get(key) or calathea.get(key)
+        if not src:
+            continue
+        ob = src.copy()                          # shares the mesh: three planters cost one tree
+        ob.name = f"{name}-{key}"
+        ob.location, ob.rotation_euler, ob.scale = loc, (0, 0, rz), (s, s, s)
+        parts.append(ob)
+    for ob in parts:
+        ob.parent = root
+        scene.collection.objects.link(ob)
+    return root
+
+
+if pachira:
+    for sgn in (-1, 1):                          # either side of the programme screen, the crown leaning in
+        plants.append((planter_plant(f"plant-hall-{'w' if sgn < 0 else 'e'}", SX + sgn * 2.2, SCREEN["y"] - 0.75, "d", 0.6 if sgn < 0 else 3.6),
+                       screen_corners, sgn, "cam-hall"))
+    plants.append((planter_plant("plant-totem", TOTEM["x"] + 0.75, TOTEM["y"] - 0.45, "d", 2.2), totem_corners, 1, "cam-hall-phone"))
 
 
 def schedule_board(face_x, face, yc, w=1.7, h=0.96, z0=1.35):
@@ -1556,9 +1634,43 @@ def grow(corners, by=0.01):
     return [tuple(c + (Vector(p) - c) * (1 + by / max(0.1, (Vector(p) - c).length))) for p in corners]
 
 
-shots["hall"] = {"kind": "still", "overlay": {"programme": screen_quad(grow(screen_corners), hall_cam)}, "size": {"programme": [SCREEN["w"], SCREEN["h"]]}}
+def fit_plant(root, corners, sgn, camera, wh, overlap):
+    """Slide a planter along x until its leaves cross the screen's edge (on the side it stands) by `overlap`, as a
+    fraction of the image width: a leaf or two over the margin of the glass, in front of the HTML."""
+    set_res(wh)
+    leaves = [o for o in root.children if "leaves" in o.name]
+    edge = (min if sgn < 0 else max)(world_to_camera_view(scene, camera, Vector(c)).x for c in corners)
+    zs, glass_y = sorted(c[2] for c in corners), min(c[1] for c in corners)
+    def reach():
+        bpy.context.view_layer.update()
+        ws = [o.matrix_world @ v.co for o in leaves for v in o.data.vertices]
+        us = [world_to_camera_view(scene, camera, w).x for w in ws if zs[0] < w.z < zs[-1] and w.y < glass_y - 0.03]   # in front of the glass
+        return (max if sgn < 0 else min)(us) if us else None
+    for _ in range(4):                       # u is nearly linear in x: a secant step or two lands it
+        r0 = reach()
+        if r0 is None:
+            return
+        root.location.x += 0.05
+        r1 = reach()
+        root.location.x -= 0.05
+        want = edge - sgn * overlap
+        if abs(r1 - r0) < 1e-6:
+            return
+        root.location.x += 0.05 * (want - r0) / (r1 - r0)
+    bpy.context.view_layer.update()
+    print(f"{root.name}: x {root.location.x:.2f}, leaves reach {reach():.4f}, screen edge {edge:.4f}")
+
+
+for (root, corners, sgn, cam_name) in plants:
+    hall_shot = cam_name == "cam-hall"
+    fit_plant(root, corners, sgn, hall_cam if hall_shot else phone_hall_cam, LAPTOP if hall_shot else PHONE, 0.012 if hall_shot else 0.015)
+HALL_FRONT = {"ivy"} | {o.name for (root, *_) in plants for o in [root, *root.children]}
+set_res(LAPTOP)
+shots["hall"] = {"kind": "still", "overlay": {"programme": screen_quad(grow(screen_corners), hall_cam)}, "size": {"programme": [SCREEN["w"], SCREEN["h"]]},
+                 "front": "hall-front"}
 set_res(PHONE)
-shots["hall-phone"] = {"kind": "still", "overlay": {"programme": screen_quad(grow(totem_corners), phone_hall_cam)}, "size": {"programme": [TOTEM["w"], TOTEM["h"]]}}
+shots["hall-phone"] = {"kind": "still", "overlay": {"programme": screen_quad(grow(totem_corners), phone_hall_cam)}, "size": {"programme": [TOTEM["w"], TOTEM["h"]]},
+                       "front": "hall-phone-front"}
 
 # the walk: segment A (shared per stair) from frame 1, segment B (this room) right after it
 frames_a = walk_a(west, 1)
@@ -1707,10 +1819,11 @@ def walk_settings():
     scene.camera = cam
 
 
-def front_layer(camera, wh, name):
-    """What stands in front of the cinema screen (this room's "#DEVOXX" and the seats) on a transparent background,
-    everything else held out, so the page can lay it over the HTML on the screen."""
-    keep = {o for o in scene.objects if o.name.startswith(f"word-{n}-") or o.name in ("seats", "seat-frames")}
+def front_layer(camera, wh, name, names=None):
+    """What stands in front of a screen on a transparent background, everything else held out, so the page can lay it
+    over the HTML on the screen: in the cinema this room's "#DEVOXX" and the seats, in the hall `names` (the plants
+    and the ivy)."""
+    keep = {o for o in scene.objects if (o.name in names if names else o.name.startswith(f"word-{n}-") or o.name in ("seats", "seat-frames"))}
     held = [o for o in scene.objects if o.type in ("MESH", "CURVE", "FONT") and o not in keep and not o.is_holdout]
     for o in held:
         o.is_holdout = True
@@ -1735,8 +1848,10 @@ for what in [w for w in args.render.split(",") if w]:
         render_reference(what[4:])
     elif what == "hall":
         still(hall_cam, LAPTOP, "hall")
+        front_layer(hall_cam, LAPTOP, "hall-front", HALL_FRONT)
     elif what == "hall-phone":
         still(phone_hall_cam, PHONE, "hall-phone")
+        front_layer(phone_hall_cam, PHONE, "hall-phone-front", HALL_FRONT)
     elif what == "seat":
         still(seat_cam, LAPTOP, f"seat-{n}")
         front_layer(seat_cam, LAPTOP, f"seat-{n}-front")
