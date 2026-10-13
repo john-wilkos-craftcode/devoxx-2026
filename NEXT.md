@@ -1,12 +1,16 @@
 # Where this stands (13/10, 11:00)
 
 ## Right now
-- **Render queue running** (started 13/10 10:15, ETA ~18:30): `scripts/blender/render_rooms.sh` renders
-  the hall stills, both shared walk halves (walk-a-east/-west) and, per room 3-10, the seat still + cut-out
+- **Render queue running** (restarted 13/10 10:53 after the plants and seats, ETA ~19:00): `scripts/blender/render_rooms.sh` renders
+  the hall stills (+ their cut-out layers hall-front / hall-phone-front: plants and ivy over the HTML), both shared walk halves (walk-a-east/-west) and, per room 3-10, the seat still + cut-out
   layer, the phone door still and the room's walk half (walk-b-N), into `C:\Users\wilkojo\kino-renders\final`,
   then runs `publish_renders.py` into `site/cinema/media/`. Log: `final/render_rooms.log`. Restartable: rooms
   already done are skipped. It waits for any running Blender, so never start a second Blender meanwhile
   (4 GB GPU).
+- New since the last review round: real potted plants (Poly Haven money trees, CC0, `scripts/fetch_models.py` into
+  gitignored `data/models/`) either side of the hall screen and beside the totem, slid until a leaf or two crosses
+  the screen edge and laid over the HTML by a cut-out layer; ivy over the screen capped at ~4 cm onto the glass.
+  Cinema seats remodelled after the photos (John chose modelling over a CC-BY/BlenderKit asset), instanced.
 - **Not pushed.** Pushing to main deploys GitHub Pages; ask John first.
 
 ## When the queue is done
@@ -15,8 +19,7 @@
    the totem shot; the phone walk stops at the door via `door_frame` in shots.json).
 2. Rerun `node tools/ux/shoot.mjs tools/ux/out/rN` and the two judges (see `tools/ux/RUBRIC.md`) once with
    real walks and all rooms orange.
-3. Ask John: push? And whether to try real seat/plant 3D models (CC0 or bought) to get past the art
-   plateau.
+3. Ask John: push?
 
 ## The cinema page (`site/cinema/`), status
 - Diegetic UI pinned onto Blender stills with a CSS matrix (2D when square on, so text is sharp): programme on
