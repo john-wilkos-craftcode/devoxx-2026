@@ -381,7 +381,7 @@ M = {
     "cove": emissive("cove", 0x8c9cff, 6.0),
     "panelLight": emissive("panelLight", 0xfff3e6, 8.0),       # the look of the panels; area lights below do the lighting      # about 4000 K, like the photos
     # the HTML is pinned over these in the browser: they glow the panels' navy, so their light on the room matches
-    "screen": emissive("screen", 0x22306a, 16.0),     # bright enough to light the letters and the front rows
+    "screen": emissive("screen", 0x1a265c, 1.6),      # the talk panel's own navy as seen through the camera; a light does the spill
     "masking": material("masking", 0x050507, 1.0, noise_bump=0.6),
     "programme": emissive("programme", 0x1d2c7a, 6.0),
     "schedule": emissive("schedule", 0x1c2a6b, 1.5),
@@ -854,7 +854,8 @@ for n, door in doors.items():
         y0w = min(d["bounds"]["y"] for d in blocks)
         y1w = max(d["bounds"]["y"] + d["bounds"]["h"] for d in blocks)
         xw = sum(d["bounds"]["x"] + d["bounds"]["w"] / 2 for d in blocks) / len(blocks)
-        floor_z = FH + plate_under(blocks[0])
+        floor_z = FH + plate_under(blocks[0]) + 0.45                 # on a low black stage riser, clear of the seat backs
+        B.box("masking", {"x": xw - 0.6, "y": y0w - 0.5, "w": 1.2, "h": y1w - y0w + 1.0}, floor_z - 0.45, floor_z)
         rot = (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2)
         parts = []
         for body, mat in (("#DEVOX", M["white"]), ("X", M["wordX"])):
@@ -1278,6 +1279,12 @@ if _room:
             so = bpy.data.objects.new(li.name, li)
             so.location = (hx, hy, hz)
             scene.collection.objects.link(so)
+    if args.room in screens:                                   # the projection's light on the room, from the screen (unseen)
+        scr_ = screens[args.room]
+        ob = area("screen-spill", (scr_["x"] + (0.25 if scr_["west"] else -0.25), scr_["y"], scr_["z"]), 1.0, 2600, (0.42, 0.52, 1.0),
+                  rot=(0, -math.pi / 2 if scr_["west"] else math.pi / 2, 0))     # facing into the room
+        ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", scr_["h"], scr_["w"]
+        ob.visible_camera = False
     for ((wx_, wy_, wz_), tw, rn) in word_lights:             # a front light on the wordmark, from the ceiling
         if rn == args.room:
             li = bpy.data.lights.new("word-light", "SPOT")
@@ -1563,11 +1570,11 @@ shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(full, s
 # read in portrait); the red portal and the corridor are soft behind it
 tot = doors[n]["totem"]
 dface = doors[n]["face"]
-ddist = 2.0                                   # square on (text pinned flat never wobbles); its numeral plate on top
-_dh = 2 * math.atan(tot["w"] / 2 / 0.82 / ddist)
-door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist, tot["y"], tot["z"] + 0.2), (tot["x"], tot["y"], tot["z"] + 0.2),
+ddist = 2.0                                   # square on (text pinned flat never wobbles); the whole totem and its plate in frame
+_dh = 2 * math.atan(tot["w"] / 2 / 0.74 / ddist)
+_dz = tot["z"] + 0.14                         # halfway between the screen's foot and the plate's top
+door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist, tot["y"], _dz), (tot["x"], tot["y"], _dz),
                      2 * math.degrees(math.atan(math.tan(_dh / 2) * PHONE[1] / PHONE[0])), dof=(ddist, 2.8))
-door_cam.data.shift_y = 0.05                  # the numeral plate on top in view, less floor
 bpy.context.view_layer.update()
 set_res(PHONE)
 shots[f"door-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(grow(tot["corners"]), door_cam)}, "size": {"screen": [tot["w"], tot["h"]]}}

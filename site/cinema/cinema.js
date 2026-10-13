@@ -122,7 +122,14 @@ function place() {
 function mount(panel, key, overlayName) {
   if (face) face.el.remove();
   const [mw, mh] = shots[key].size[overlayName];
-  const w = canvasFor(key), h = Math.round(w * mh / mw);
+  // laptops: a fixed canvas, like a real display; phones: laid out 1:1 for the width the totem takes on this screen
+  let w = canvasFor(key);
+  if (key.includes("phone")) {
+    const { iw, ih, s } = fit(key);
+    const [tl, tr] = ordered(shots[key].overlay[overlayName]);
+    w = Math.max(280, Math.round(Math.hypot((tr[0] - tl[0]) * iw * s, (tr[1] - tl[1]) * ih * s)));
+  }
+  const h = Math.round(w * mh / mw);
   panel.style.width = `${w}px`;
   panel.style.height = `${h}px`;
   if (shots[key].clear_bottom > 0) panel.style.paddingBottom = `${Math.round(shots[key].clear_bottom * h)}px`;   // keep clear of the letters
@@ -263,7 +270,8 @@ function programme(tall) {
         el("small", { text: "Belgium 2026, summarised" })),
       tall ? null : dayRow,
       search),
-    nav, body);
+    nav, body,
+    el("div", { class: "prog-foot" }, el("a", { class: "textlink is-foot", href: "../", text: "Text version of every talk" })));
 
   function draw() {
     dayRow.textContent = ""; timeRow.textContent = ""; body.textContent = "";
@@ -347,7 +355,7 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
     main.textContent = "";
     put(main,
       el("div", { class: "meta", text: [doorRoom && tall ? null : (!onFloor && /^BOF/.test(t.room || "") ? `${t.room} (downstairs)` : t.room),
-        whenShort(t), typeLabel(t)].filter(Boolean).join(", ") }),
+        whenShort(t), typeLabel(t)].filter(Boolean).map((x) => x.replace(/ /g, "\u00a0")).join(", ") }),
       el("h2", { text: t.title, style: `--title:${onFloor ? titleSize(t.title, 40, 30) : titleSize(t.title, 34, 26)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
       s.watchIf ? el("p", { class: "verdict", text: `Worth it if ${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.` }) : null,

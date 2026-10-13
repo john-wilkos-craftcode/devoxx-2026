@@ -10,3 +10,5 @@ data/raw/video/
 data/raw/slides/
 data/references/img/
 data/textures/
+tools/ux/node_modules/
+tools/ux/out/
