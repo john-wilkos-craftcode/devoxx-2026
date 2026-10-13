@@ -348,7 +348,7 @@ M = {
     "exitSign": emissive("exitSign", 0x18c060, 4.0),
     "downlight": emissive("downlight", 0xfff1e0, 25.0),
     "bezel": material("bezel", 0x0b0b0e, 0.28, 0.4, bevel=0.006),     # satin black, catching a highlight on its edge
-    "plate": material("plate", 0xf6921e, 0.5, emission=0xf08a1c, strength=2.2),   # backlit room-number plate
+    "plate": material("plate", 0xf6921e, 0.5, emission=0xe2701a, strength=0.8),   # backlit room-number plate, brand orange
     "plateText": material("plateText", 0x0a0f2e, 0.4),
     "foliage": material("foliage", 0x4a7a3a, 0.55, sheen=0.3),
     "tableFrame": material("tableFrame", 0x111114, 0.4, 0.6),
@@ -381,7 +381,7 @@ M = {
     "cove": emissive("cove", 0x8c9cff, 6.0),
     "panelLight": emissive("panelLight", 0xfff3e6, 8.0),       # the look of the panels; area lights below do the lighting      # about 4000 K, like the photos
     # the HTML is pinned over these in the browser: they glow the panels' navy, so their light on the room matches
-    "screen": emissive("screen", 0x1a265c, 1.6),      # the talk panel's own navy as seen through the camera; a light does the spill
+    "screen": emissive("screen", 0x24347a, 2.4),      # brighter than the room: it blooms past the masking; a light does the spill
     "masking": material("masking", 0x050507, 1.0, noise_bump=0.6),
     "programme": emissive("programme", 0x1d2c7a, 6.0),
     "schedule": emissive("schedule", 0x1c2a6b, 1.5),
@@ -708,7 +708,7 @@ for r in auditoriums:
     text_object(str(n), 2.6, (wall_x + face * 0.2, panel_y, FH + 1.85), (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2), M["white"], 0.02, 0.03)
     # the schedule totem in front of the room-number panel, facing the corridor (on phones, the talk is shown on it,
     # with the big numeral rising behind it)
-    sy = yc + side_y * 2.05          # just past the portal's jamb: the doorway on one side, the number panel on the other
+    sy = yc - side_y * 2.05          # just past the portal's jamb on the side away from the number panel
     sx = wall_x + face * 1.1
     tw, th, tz = 0.70, 1.42, FH + 1.45
     B.box("bezel", {"x": sx - 0.035, "y": sy - tw / 2 - 0.035, "w": 0.07, "h": tw + 0.07}, tz - th / 2 - 0.09, tz + th / 2 + 0.035)
@@ -751,11 +751,11 @@ for r in auditoriums:
 seat_me = bpy.data.meshes.new("seat-model")
 bm = bmesh.new()
 # a cinema seat, as in the photos: deep cushion, tall padded back with a rounded top, an armrest on one side
-for (sx, sy, sz, x, y, z, rz) in ((0.5, 0.52, 0.13, 0.02, 0, -0.06, 0), (0.14, 0.54, 0.86, -0.25, 0, 0.36, 0.13),
-                                  (0.44, 0.07, 0.06, -0.02, 0.3, 0.17, 0)):
+for (sx, sy, sz, x, y, z, rz) in ((0.5, 0.52, 0.14, 0.02, 0, -0.06, 0), (0.16, 0.54, 0.8, -0.25, 0, 0.34, 0.13),
+                                  (0.19, 0.5, 0.2, -0.31, 0, 0.7, 0.2), (0.46, 0.08, 0.07, -0.02, 0.3, 0.17, 0)):
     m = Matrix.Translation((x, y, z)) @ Matrix.Rotation(-rz, 4, "Y") @ Matrix.Diagonal((sx, sy, sz, 1))
     bmesh.ops.create_cube(bm, size=1.0, matrix=m)
-bmesh.ops.bevel(bm, geom=list(bm.edges), offset=0.045, segments=3, affect="EDGES")
+bmesh.ops.bevel(bm, geom=list(bm.edges), offset=0.06, segments=4, affect="EDGES")   # padded, not boxes
 bm.to_mesh(seat_me)
 bm.free()
 frame_me = bpy.data.meshes.new("seat-frame")
@@ -868,7 +868,7 @@ for n, door in doors.items():
             parts.append(ob)
         bpy.context.view_layer.update()
         w0, w1 = parts[0].dimensions.x, parts[1].dimensions.x
-        scale = min((y1w - y0w) / (w0 + w1 + 0.08), 1.5 / parts[0].dimensions.y)
+        scale = 0.65 * min((y1w - y0w) / (w0 + w1 + 0.08), 1.5 / parts[0].dimensions.y)   # small, at stage level, as in the photos
         total = (w0 + w1 + 0.08) * scale
         along = 1 if west else -1                # reading direction in world y, seen from the seats
         start = (y0w + y1w) / 2 - along * total / 2
@@ -1112,6 +1112,18 @@ def curtain(name, x0, x1, y, z1, pleat=0.36, amp=0.065, face=-1):
 
 
 curtain("curtain-north", hall["x"] + 0.2, hall["x"] + hall["w"] - 6.9, NORTH, HALL_CEIL + 0.05)
+# above the screen, as along the coffer: a blue LED line at the curtain head and ivy trailing from the ceiling
+B.box("cove", {"x": hall["x"] + 0.2, "y": NORTH - 0.32, "w": hall["w"] - 7.1, "h": 0.03}, HALL_CEIL - 0.035, HALL_CEIL - 0.01)
+for gx in [SX + k * 0.9 for k in range(-6, 7)]:
+    for _ in range(9):
+        x, y, z = gx + rng.uniform(-0.45, 0.45), NORTH - 0.55 + rng.uniform(-0.12, 0.12), HALL_CEIL - 0.01
+        for _ in range(int(rng.uniform(0.1, 0.55) ** 1.3 / 0.025) + 2):
+            x, y, z = x + rng.uniform(-0.02, 0.02), y + rng.uniform(-0.015, 0.015), z - 0.025
+            u = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1.6, -0.2))).normalized()
+            v = u.cross(Vector((0, 0, 1))).normalized() if abs(u.z) < 0.98 else Vector((1, 0, 0))
+            c, a_, b_ = Vector((x, y, z)), 0.045 * rng.uniform(0.7, 1.25), 0.026 * rng.uniform(0.7, 1.25)
+            fold = u.cross(v) * b_ * 0.35
+            B.mesh("foliage", [c, c + u * a_ * 0.35 + v * b_ + fold, c + u * a_, c + u * a_ * 0.35 - v * b_ + fold], [(0, 1, 2), (0, 2, 3)])
 # divider curtains drawn back against the columns away from the middle aisle
 for i, o in enumerate(venue["obstacles"]):
     b = o["bounds"]
@@ -1278,13 +1290,13 @@ if _room:
     for (hx, hy, hz, rn) in house_spots:
         if rn == args.room:
             li = bpy.data.lights.new(f"house-{hx:.1f}-{hy:.1f}", "SPOT")
-            li.energy, li.spot_size, li.spot_blend, li.color = 300, math.radians(44), 0.4, (1.0, 0.93, 0.85)   # house lights down
+            li.energy, li.spot_size, li.spot_blend, li.color = 90, math.radians(44), 0.4, (1.0, 0.93, 0.85)   # house lights down
             so = bpy.data.objects.new(li.name, li)
             so.location = (hx, hy, hz)
             scene.collection.objects.link(so)
     if args.room in screens:                                   # the projection's light on the room, from the screen (unseen)
         scr_ = screens[args.room]
-        ob = area("screen-spill", (scr_["x"] + (0.25 if scr_["west"] else -0.25), scr_["y"], scr_["z"]), 1.0, 1300, (0.42, 0.52, 1.0),
+        ob = area("screen-spill", (scr_["x"] + (0.25 if scr_["west"] else -0.25), scr_["y"], scr_["z"]), 1.0, 1100, (0.42, 0.52, 1.0),
                   rot=(0, -math.pi / 2 if scr_["west"] else math.pi / 2, 0))     # facing into the room
         ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", scr_["h"], scr_["w"]
         ob.visible_camera = False
@@ -1299,7 +1311,7 @@ if _room:
     for (lx, ly, lz, tw, rn) in truss_lamps:                 # the truss lamps glare out over the seats
         if rn == args.room:
             li = bpy.data.lights.new(f"truss-{ly:.1f}", "SPOT")
-            li.energy, li.spot_size, li.spot_blend, li.color = 3000, math.radians(50), 0.3, (0.95, 0.96, 1.0)
+            li.energy, li.spot_size, li.spot_blend, li.color = 1200, math.radians(50), 0.3, (0.95, 0.96, 1.0)
             so = bpy.data.objects.new(li.name, li)
             so.location = (lx + tw * 0.05, ly, lz)
             so.rotation_euler = Vector((tw, _room["y"] + _room["h"] / 2 - ly, -0.45)).to_track_quat("-Z", "Y").to_euler()
@@ -1348,7 +1360,7 @@ def seat_for(n, fov=52):
     # the right distance, near the middle, and eyes level with the screen's middle so the talk isn't keystoned
     best = min(seats, key=lambda s: abs(abs(s["bounds"]["x"] + s["bounds"]["w"] / 2 - scr["x"]) - want) +
                abs(s["bounds"]["y"] + s["bounds"]["h"] / 2 - scr["y"]) * 0.6 + abs(FH + s["height"] + 0.8 - (scr["z"] - scr["h"] / 2 + 2.2)) * 2.0)
-    seat = (best["bounds"]["x"] + best["bounds"]["w"] / 2, best["bounds"]["y"] + best["bounds"]["h"] / 2, FH + best["height"] + 0.8)
+    seat = (best["bounds"]["x"] + best["bounds"]["w"] / 2, best["bounds"]["y"] + best["bounds"]["h"] / 2, FH + best["height"] + 0.95)
     return seat, (scr["x"], seat[1], scr["z"]), fov, seats
 
 

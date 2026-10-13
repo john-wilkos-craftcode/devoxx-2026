@@ -219,7 +219,7 @@ const days = [...new Set(talks.filter((t) => t.start).map((t) => dayKey(t.start)
 const startsOn = (d) => [...new Set(talks.filter((t) => t.start && dayKey(t.start) === d).map((t) => t.start))].sort();
 const inSlot = (s) => talks.filter((t) => t.start === s).sort((a, b) => (roomNo(a) || 99) - (roomNo(b) || 99));
 let day = days.includes("2026-10-07") ? "2026-10-07" : days[0];
-let slot = startsOn(day).find((s) => inSlot(s).length >= 6) || startsOn(day)[0];
+let slot = startsOn(day)[0];                                   // the day from its start
 let query = "";
 const blob = (t) => [t.title, ...t.speakers.map((s) => s.name), t.room, t.track, t.s && t.s.tldr, ...((t.s && t.s.tech) || []), ...(t.keywords || [])]
   .join(" ").toLowerCase();
@@ -237,7 +237,7 @@ function why(t, terms) {
     if (name === "Mentions" || name === "Topics" || name === "Speaker") {        // lists: the matching item first, then whole items
       const items = text.split(/,\s*/), hit = items.find((x) => x.toLowerCase().includes(w));
       const more = items.length - 1;
-      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? ` +${more} more` : "");
+      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? `\u00a0+${more}\u00a0more` : "");
     }
     const word = text.slice(i).match(/^\S+/)[0].replace(/[,.;:]$/, "");    // the whole matched word, e.g. "Kotlin"
     return el("span", { class: "why" }, el("b", { text: `${name}: ` }), a > 0 ? "…" : "", el("mark", { text: word }), text.slice(i + word.length, i + word.length + 70));
@@ -308,7 +308,8 @@ function programme(tall) {
       }),
       fill.length ? el("div", { class: "later", text: "Later that day" }) : null, fill.map((t) => card(t, { when: "time" })));
     put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
-        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session. Choose it to read its summary." : "sessions. Pick one to read its summary."}` })),
+        el("span", { text: tall ? `${here.length} ${here.length === 1 ? "session" : "sessions"}, ${fShort.format(new Date(slot))} Oct`
+          : `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session. Choose it to read its summary." : "sessions. Pick one to read its summary."}` })),
       cards);
     rove(dayRow); rove(timeRow);
     requestAnimationFrame(() => { centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
@@ -377,7 +378,8 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
   fill(tabs[0][0]);
   return el("section", { class: `face talk ${onFloor && !tall ? "is-projected" : "is-lcd"}${tall ? " is-tall" : ""}`, "aria-label": t.title },
     main, el("div", { class: "talk-side" }, tabRow, pane),
-    tall ? el("div", { class: "foot", "aria-hidden": "true" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })), el("span", { text: "Belgium 2026" })) : null);
+    tall ? el("div", { class: "foot" }, el("span", { "aria-hidden": "true" }, "DEVOX", el("span", { class: "x", text: "X" })),
+      el("button", { type: "button", text: "Back to the programme", onclick: () => goHall() })) : null);
 }
 
 // ---------- moving between the hall and a seat ----------
