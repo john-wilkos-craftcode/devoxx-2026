@@ -1,4 +1,4 @@
-"""Round the venue dump to centimetres to keep site/kino/venue.json small. Reads stdin, writes stdout."""
+"""Round the venue dump to centimetres to keep data/venue/venue.json small. Reads stdin, writes stdout."""
 import json
 import sys
 

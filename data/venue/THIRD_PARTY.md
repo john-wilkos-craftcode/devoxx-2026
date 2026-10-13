@@ -33,3 +33,15 @@ SOFTWARE.
 Materials, colours and signage follow the photo-checked notes in
 [Smirne/devoxx-gauntlet-m](https://github.com/Smirne/devoxx-gauntlet-m) by Michele Giacobazzi
 (MIT) and reference photos of the venue. No photos are shipped.
+
+## Renders: textures, models and type
+
+The cinema page's stills and walks (`site/cinema/media/`) are rendered in Blender by `scripts/blender/build_scene.py`
+from the venue model above. Nothing below is shipped as a file; it only appears in the rendered images.
+
+- Textures from [ambientCG](https://ambientcg.com) (Carpet016) and [Poly Haven](https://polyhaven.com) (terlenka),
+  CC0, fetched by `scripts/fetch_textures.py`.
+- Potted plants from Poly Haven: `pachira_aquatica_01` and `calathea_orbifolia_01`, CC0, fetched by
+  `scripts/fetch_models.py`.
+- Type: Archivo Black and Big Shoulders Display, SIL Open Font License 1.1 (`scripts/blender/fonts/`, licences
+  beside them).

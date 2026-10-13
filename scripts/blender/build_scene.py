@@ -1,7 +1,7 @@
-"""Build the Kinepolis venue in Blender from site/kino/venue.json, set up the shots, optionally render.
+"""Build the Kinepolis venue in Blender from data/venue/venue.json, set up the shots, optionally render.
 
-The same rules as the browser renderer (site/kino/kino.js) turn Ghost Light's venue model into
-geometry; Blender adds real light: path tracing, soft shadows, bounce light, emissive LEDs.
+The rules of the retired WebGL page turn Ghost Light's venue model into geometry; Blender adds real light:
+path tracing, soft shadows, bounce light, emissive LEDs.
 
 Run with Blender's Python (Windows Blender, driven from WSL):
   blender.exe -b --python scripts/blender/build_scene.py -- --root C:/path/to/repo --room 8 \
@@ -49,7 +49,7 @@ ap.add_argument("--walk-samples", type=int, default=24, help="samples for walk f
 ap.add_argument("--walk-engine", default="cycles", choices=["cycles", "eevee"])
 args = ap.parse_args(argv)
 ROOT = Path(args.root)
-venue = json.loads((ROOT / "site" / "kino" / "venue.json").read_text())["venue"]
+venue = json.loads((ROOT / "data" / "venue" / "venue.json").read_text())["venue"]
 OUT = Path(args.out) if args.out else ROOT / "build" / "renders"
 
 # ---------------------------------------------------------------------------------- scene reset
@@ -711,6 +711,12 @@ for r in auditoriums:
     # with the big numeral rising behind it)
     sy = yc - side_y * 2.05          # just past the portal's jamb on the side away from the number panel
     sx = wall_x + face * 1.1
+    # unless something stands there or between it and the phone camera 2 m out (room 6: the railing round a
+    # floor opening): then in front of the number panel, the numeral rising behind it
+    lo_x, hi_x = sorted((wall_x + face * 0.4, sx + face * 2.1))
+    if any(o["floor"] == 1 and o["bounds"]["x"] < hi_x and o["bounds"]["x"] + o["bounds"]["w"] > lo_x
+           and o["bounds"]["y"] < sy + 0.6 and o["bounds"]["y"] + o["bounds"]["h"] > sy - 0.6 for o in venue["obstacles"]):
+        sy = yc + side_y * 2.05
     tw, th, tz = 0.70, 1.42, FH + 1.45
     B.box("bezel", {"x": sx - 0.035, "y": sy - tw / 2 - 0.035, "w": 0.07, "h": tw + 0.07}, tz - th / 2 - 0.09, tz + th / 2 + 0.035)
     B.box("tableFrame", {"x": sx - face * 0.07 - 0.03, "y": sy - 0.06, "w": 0.06, "h": 0.12}, FH + 0.04, tz - th / 2)
@@ -1934,4 +1940,6 @@ for what in [w for w in args.render.split(",") if w]:
         clip(1, frames_a + 1, f"walk-a-{side}")
     elif what == "walk-b":
         clip(first_b, frames_b + 1, f"walk-b-{n}")
+    elif what == "walk-b-door":     # only up to just through the door (from there on the corridor is out of sight)
+        clip(first_b, min(frames_b + 1, doors[n]["door_frame"] + 12), f"walk-b-{n}")
 print("done", json.dumps({k: v.get("frames") for k, v in shots.items()}))

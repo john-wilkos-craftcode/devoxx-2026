@@ -61,8 +61,7 @@ def main():
     (ROOT / "site" / "data.js").write_text(
         "window.DEVOXX = " + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
     stamp_assets(ROOT / "site" / "index.html", ("styles.css", "app.js", "data.js"))
-    stamp_assets(ROOT / "site" / "kino" / "kino.js", ("./experience.js",))   # before kino.js is hashed
-    stamp_assets(ROOT / "site" / "kino" / "index.html", ("kino.js", "../data.js"))
+    stamp_assets(ROOT / "site" / "cinema" / "index.html", ("cinema.css", "cinema.js", "../data.js"))
     print(f"site/data.js: {len(talks)} talks, {len(talks) - len(missing)} with summaries, "
           f"recap: {'yes' if recap else 'no'}")
     if missing:
@@ -91,19 +90,6 @@ def build_artifact():
     for name in ("styles.css", "app.js", "data.js"):
         shutil.copy(site / name, out / name)
     print(f"{out.relative_to(ROOT)}: index.html, styles.css, app.js, data.js")
-
-    # The 3D prototype, as its own artifact: same unwrapping, data.js next to the page.
-    kino, kout = site / "kino", ROOT / "build" / "kino"
-    kout.mkdir(parents=True, exist_ok=True)
-    page = re.sub(r'src="\.\./data\.js', 'src="data.js', (kino / "index.html").read_text())
-    head = page[page.index("<head>") + 6:page.index("</head>")]
-    body = page[page.index("<body>") + 6:page.index("</body>")]
-    head = "\n".join(l for l in head.splitlines() if "<meta charset" not in l and 'name="viewport"' not in l)
-    (kout / "index.html").write_text(head.strip() + "\n" + body.strip() + "\n")
-    for name in ("kino.js", "experience.js", "venue.json"):
-        shutil.copy(kino / name, kout / name)
-    shutil.copy(site / "data.js", kout / "data.js")
-    print(f"{kout.relative_to(ROOT)}: index.html, kino.js, experience.js, venue.json, data.js")
 
 
 if __name__ == "__main__":
