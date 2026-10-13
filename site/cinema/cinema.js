@@ -329,7 +329,7 @@ const toSeconds = (at) => { const [m, sec] = String(at).split(":").map(Number); 
 function talkScreen(t, tall, onFloor, doorRoom = null) {
   const s = t.s || {};
   // the short summary is in the header; the tabs are the reading, the same on every device
-  const tabs = [["points", "Key points"], ["monday", "What to try"], ["chapters", "Chapters"], ["story", "Full summary"]]
+  const tabs = [["points", "Key points"], ["monday", "What to try"], ["chapters", "Chapters"], ["story", tall ? "Summary" : "Full summary"]]
     .filter(([id]) => (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
       || (id === "chapters" && s.chapters && s.chapters.length && onFloor) || id === "story");
   const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Talk details" });
@@ -364,17 +364,16 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
     main.textContent = "";
     put(main,
       el("div", { class: "meta", text: [!onFloor && /^BOF/.test(t.room || "") ? `${t.room} (downstairs)` : t.room,
-        whenShort(t), typeLabel(t)].filter(Boolean).map((x) => x.replace(/ /g, "\u00a0").replace(/-/g, "\u2011")).join(", ") }),
+        whenShort(t), typeLabel(t), t.videoId ? null : "no recording yet"].filter(Boolean).map((x) => x.replace(/ /g, "\u00a0").replace(/-/g, "\u2011")).join(", ") }),
       el("h2", { text: t.title, style: `--title:${onFloor ? titleSize(t.title, 40, 30) : titleSize(t.title, 34, 26)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
       s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
       s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth it if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null,
-      tall ? actions() : null);
-    if (!tall) { sideHead.querySelector(".actions")?.remove(); sideHead.append(actions()); }
+      actions());
   };
   function actions() {
     return el("div", { class: "actions" }, watch(), tall ? null : el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
-      t.videoId ? null : el("span", { class: "note", text: "No recording yet." }));
+      null);
   }
   playAt = (sec) => {
     const at = tall ? main : pane;                               // laptops: the recording takes the reading area

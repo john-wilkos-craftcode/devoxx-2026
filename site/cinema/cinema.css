@@ -269,41 +269,34 @@ button, input, a { font: inherit; color: inherit; }
 .prog:not(.is-tall) .times .pill { padding: 5px 6px; font-size: 16px; }
 .talk:not(.is-tall) .tabs .pill { padding: 5px 10px; }
 
-/* round 16: the laptop talk is a compact header across the screen, the reading below it at full width */
-.talk:not(.is-tall) { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 14px; padding: 26px 46px 20px; }
-.talk:not(.is-tall) .talk-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: start; }
-.talk:not(.is-tall) .talk-main > .meta { grid-column: 1; grid-row: 1; }
-.talk:not(.is-tall) .talk-main > h2 { grid-column: 1; grid-row: 2; }
-.talk:not(.is-tall) .talk-main > .who-l { grid-column: 1; grid-row: 3; }
-.talk:not(.is-tall) .talk-main > .offnote { grid-column: 1; grid-row: 4; }
-.talk:not(.is-tall) .talk-main > .tldr { grid-column: 2; grid-row: 1 / span 3; margin-top: 2px; -webkit-line-clamp: 3; font-size: 19px; }
-.talk:not(.is-tall) .talk-main > .verdict { grid-column: 2; grid-row: 4; margin-top: 8px; font-size: 18px; }
-.talk:not(.is-tall) .side-head { display: flex; align-items: center; gap: 16px; padding-top: 12px; border-top: 1px solid var(--line); margin-bottom: 12px; }
+/* round 18: laptop talk in two full-height columns: who and why on the left, the reading on the right */
+.talk:not(.is-tall) { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); grid-template-rows: minmax(0, 1fr); gap: 40px; padding: 26px 40px 20px; }
+.talk:not(.is-tall) .talk-main { display: flex; flex-direction: column; }
+.talk:not(.is-tall) .talk-main > h2 { --title: 32px; margin-top: 8px; }
+.talk:not(.is-tall) .talk-main > .meta { font-size: 18px; }
+.talk:not(.is-tall) .talk-main > .who-l { font-size: 18px; margin-top: 8px; }
+.talk:not(.is-tall) .talk-main > .tldr { font-size: 18px; line-height: 1.4; margin-top: 12px; display: block; -webkit-line-clamp: unset; overflow: visible; }
+.talk:not(.is-tall) .talk-main > .verdict { font-size: 17px; margin-top: 10px; }
+.talk:not(.is-tall) .talk-main > .actions { margin-top: 14px; }
+.talk:not(.is-tall) .talk-side { display: flex; flex-direction: column; min-height: 0; }
+.talk:not(.is-tall) .side-head { display: block; margin-bottom: 12px; }
 .talk:not(.is-tall) .side-head .tabs { margin: 0; flex-wrap: nowrap; }
-.talk:not(.is-tall) .side-head .actions { margin: 0 0 0 auto; flex-wrap: nowrap; }
-.talk:not(.is-tall) .pane ul, .talk:not(.is-tall) .pane ol { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; row-gap: 10px; }
-.talk:not(.is-tall) .pane > div:has(> .chapter) { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; }
-.talk:not(.is-tall) .pane p { max-width: 62em; }
-.talk:not(.is-tall) .player { max-height: none; height: 100%; width: auto; aspect-ratio: 16 / 9; margin: 0; }
-.talk:not(.is-tall) .pane:has(.player) { display: flex; gap: 16px; align-items: flex-start; }
+.talk:not(.is-tall) .pane { font-size: 19px; }
+.talk:not(.is-tall) .pane ul, .talk:not(.is-tall) .pane ol { display: grid; gap: 10px; }
+.talk:not(.is-tall) .player { max-height: 100%; }
 .who-l { line-height: 1.4; }
 .talk.is-tall .tldr { display: block; -webkit-line-clamp: unset; }
 .card .where b.is-text { font-size: 22px; }
 .prog-head { min-width: 0; }
 .prog:not(.is-tall) .brand small { font-size: 15px; }
-/* laptop talk: "Worth it if" under the speakers, the short summary whole on the right */
-.talk:not(.is-tall) .talk-main > .verdict { grid-column: 1; grid-row: 4; margin-top: 12px; font-size: 18px; }
-.talk:not(.is-tall) .talk-main > .tldr { grid-row: 1 / span 4; display: block; -webkit-line-clamp: unset; overflow: visible; }
-.talk:not(.is-tall) .pane ul, .talk:not(.is-tall) .pane ol { align-items: start; }
+
 .talk.is-tall .foot::before { content: ""; position: absolute; left: 0; right: 0; top: -24px; height: 24px; background: linear-gradient(transparent, var(--night)); pointer-events: none; }
 .talk.is-tall .pane { padding-bottom: 8px; }
 /* round 17: the subtitle under the wordmark frees the header for a usable search box */
 .prog:not(.is-tall) .brand { flex-direction: column; align-items: flex-start; gap: 3px; font-size: 30px; }
 .prog:not(.is-tall) .search { width: 200px; flex: 0 1 200px; min-width: 150px; }
-/* the cinema header: title on the left, the whole short summary and the verdict on the right, both compact */
-.talk:not(.is-tall) .talk-main > .verdict { grid-column: 2; grid-row: auto; margin-top: 10px; font-size: 17px; }
-.talk:not(.is-tall) .talk-main > .tldr { grid-row: 1 / span 4; font-size: 17px; line-height: 1.38; }
-.talk:not(.is-tall) .talk-main > h2 { --title: 34px; }
-.talk:not(.is-tall) .talk-main > .meta { font-size: 19px; }
-.talk:not(.is-tall) .talk-main > .who-l { font-size: 18px; }
-.talk:not(.is-tall) .talk-main { grid-template-rows: auto auto auto 1fr; }
+
+.talk.is-tall { padding-bottom: 0; }
+.talk.is-tall .foot { bottom: 0; margin: 18px -18px 0 -22px; }
+.talk.is-tall .tabs .pill { padding: 5px 8px; }
+.talk.is-tall .talk-main > *, .talk.is-tall > * { flex-shrink: 0; }   /* in the scrolling totem nothing may shrink to fit */
