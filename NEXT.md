@@ -1,5 +1,35 @@
-# Where this stands (12/10, 17:00)
+# Where this stands (13/10, 11:00)
 
+## Right now
+- **Render queue running** (started 13/10 10:15, ETA ~18:30): `scripts/blender/render_rooms.sh` renders
+  the hall stills, both shared walk halves (walk-a-east/-west) and, per room 3-10, the seat still + cut-out
+  layer, the phone door still and the room's walk half (walk-b-N), into `C:\Users\wilkojo\kino-renders\final`,
+  then runs `publish_renders.py` into `site/cinema/media/`. Log: `final/render_rooms.log`. Restartable: rooms
+  already done are skipped. It waits for any running Blender, so never start a second Blender meanwhile
+  (4 GB GPU).
+- **Not pushed.** Pushing to main deploys GitHub Pages; ask John first.
+
+## When the queue is done
+1. Serve `python3 -m http.server 8765 -d site`, open /cinema/, check the walk videos there and back on laptop
+   and phone (known risk: on phones the landscape walk is cropped to portrait and its first frame doesn't match
+   the totem shot; the phone walk stops at the door via `door_frame` in shots.json).
+2. Rerun `node tools/ux/shoot.mjs tools/ux/out/rN` and the two judges (see `tools/ux/RUBRIC.md`) once with
+   real walks and all rooms orange.
+3. Ask John: push? And whether to try real seat/plant 3D models (CC0 or bought) to get past the art
+   plateau.
+
+## The cinema page (`site/cinema/`), status
+- Diegetic UI pinned onto Blender stills with a CSS matrix (2D when square on, so text is sharp): programme on
+  the hall screen (laptop) / hall totem (phone); talk on the cinema screen from a seat (laptop) / on the totem
+  at the room's door under a backlit room-number plate (phone).
+- 19 review rounds with a UX judge and an art-director judge (fresh agents each round, screenshots from
+  `tools/ux/shoot.mjs`): plateau at UX ~8 (laptop) / 7.5-8.5 (phone), art ~7 / 7-8. Score history in
+  `tools/ux/RUBRIC.md`. What the art judges keep asking for: real cinema seats, real foliage, the screen
+  lighting the room, more hall around the hall screen (conflicts with legibility at 1280).
+- Main site's "Enter the cinema" link points to `cinema/`. The WebGL `site/kino/` is still there; retire it
+  once the cinema page ships.
+
+## Earlier (12/10)
 Done:
 - All 205 sessions summarised (168 from Whisper transcripts, 37 from abstracts: no recording yet).
 - Flat site and the WebGL cinema (`site/kino/`) live on GitHub Pages.
