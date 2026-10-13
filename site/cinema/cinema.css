@@ -7,7 +7,7 @@
   --line: #2A377A;
   --orange: #F6921E;     /* Devoxx orange: the talk cards, as on the real 2026 screens */
   --ink: #F2F4FF;
-  --muted: #BDC5F0;
+  --muted: #CDD3F5;
   --deep: #0A0F2E;       /* text on orange */
   color-scheme: dark;
 }
@@ -300,3 +300,12 @@ button, input, a { font: inherit; color: inherit; }
 .talk.is-tall .foot { bottom: 0; margin: 18px -18px 0 -22px; }
 .talk.is-tall .tabs .pill { padding: 5px 8px; }
 .talk.is-tall .talk-main > *, .talk.is-tall > * { flex-shrink: 0; }   /* in the scrolling totem nothing may shrink to fit */
+.talk.is-tall .foot { box-shadow: 0 40px 0 0 var(--night); }   /* the footer covers everything down to the bezel */
+/* phones: secondary text at 13-14px at least */
+.prog.is-tall .brand small { font-size: 14px; }
+.prog.is-tall .card .who, .prog.is-tall .card .why { font-size: 14px; }
+.prog.is-tall .card .room, .prog.is-tall .card .where small { font-size: 13px; }
+.prog.is-tall .slot-head span, .prog.is-tall .divider, .prog.is-tall .cards .later { font-size: 14px; }
+.talk.is-tall .who-l, .talk.is-tall .verdict, .talk.is-tall .meta { font-size: 15px; }
+.talk.is-tall .tabs .pill { font-size: 14px; }
+.talk.is-tall .tldr { font-size: 16px; }

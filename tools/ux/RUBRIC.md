@@ -68,3 +68,11 @@ Real photos of the venue and its signage this year: `data/references/img/` (cont
 | 8 | 8 | 8 | 8 | 7 | round-8 fixes |
 | 9 | 7.5 | 7 | 7.5 | 7 | sharp 2D pinning, numeral plate |
 | 10 | – | – | 7 | 7.5 | backlit plate, doorway |
+| 11 | 8 | 7.5 | 7 | 6.5 | phone totem 1:1, link in the programme |
+| 12 | 8 | 7.5 | 7 | 7 | final-quality stills from here on |
+| 13 | 8 | 8.5 | 7.5 | 8 | auditorium like the photos |
+| 14 | 7.5 | 8.5 | 7 | 7.5 | taller screen, dark seats |
+| 15 | 8 | 8.5 | 7.5 | 8 | content-sized cards |
+| 16 | 7 | 8.5 | 6.5 | 6.5 | header across the cinema screen (reverted) |
+| 17 | 7.5 | 7.5 | 7 | 7 | |
+| 18 | 8 | 7.5 | 7 | 7 | two full-height columns again |
