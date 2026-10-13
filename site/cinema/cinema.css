@@ -36,11 +36,8 @@ button, input, a { font: inherit; color: inherit; }
 .face.is-lcd::after { content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(118deg, rgba(255, 255, 255, .07) 0%, rgba(255, 255, 255, .02) 34%, transparent 35%); }
 /* the cinema screen is projected: no edge, a soft falloff to the corners */
-.face.is-projected { background: radial-gradient(120% 110% at 50% 42%, #26356F 0%, #1A265C 55%, #111A48 100%);
- }
-.face.is-projected::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 80px 6px rgba(0, 0, 0, .35);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
-  opacity: .5; mix-blend-mode: soft-light; }
+.face.is-projected { background: radial-gradient(120% 110% at 50% 42%, #1E2B63 0%, #172256 60%, #111A48 100%); }
+.face.is-projected::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 70px 4px rgba(0, 0, 0, .3); }
 
 /* chrome outside the screens: small, quiet, fixed */
 .noscript { position: fixed; inset: auto 16px 16px; color: var(--ink); font-size: 16px; }
@@ -170,8 +167,9 @@ button, input, a { font: inherit; color: inherit; }
 .talk-main, .talk-side { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
 .meta { font-size: 20px; font-weight: 600; color: var(--orange); }
 .talk h2 { margin-top: 12px; font-weight: 800; font-stretch: 110%; font-size: var(--title, 46px); line-height: 1.05; letter-spacing: -.01em; text-wrap: balance; }
-.who-l { margin-top: 10px; font-size: 19px; color: var(--muted); }
-.verdict { margin-top: 10px; font-size: 19px; line-height: 1.4; color: var(--ink); max-width: 38em; }
+.who-l { margin-top: 12px; font-size: 19px; color: var(--muted); }
+.verdict { margin-top: 14px; font-size: 19px; line-height: 1.4; color: var(--ink); max-width: 38em; padding-left: 14px; border-left: 3px solid var(--orange); }
+.verdict b { color: var(--orange); font-weight: 700; }
 .talk.is-tall .verdict { font-size: 14px; margin-top: 4px; }
 .tldr { margin-top: 18px; font-size: 20px; line-height: 1.45; max-width: 36em; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
@@ -229,3 +227,18 @@ button, input, a { font: inherit; color: inherit; }
 .talk.is-tall .pane .label { font-size: 12px; }
 
 @media (prefers-reduced-motion: reduce) { .face { animation: none; } .card { transition: none; } }
+
+/* a lone talk's card grows to fit its summary; nothing is cut */
+.prog .cards.is-packed > .card.is-now-wide { height: auto; min-height: 0; }
+.prog .cards.is-packed > .card.is-now-wide .gist { -webkit-line-clamp: 2; padding-bottom: 2px; }
+
+/* phone talk: one scrolling page, actions near the top, the tabs wrap and stick */
+.talk.is-tall { overflow-y: auto; scrollbar-width: none; }
+.talk.is-tall::-webkit-scrollbar { display: none; }
+.talk.is-tall .actions { order: 1; margin-top: 12px; }
+.talk.is-tall .talk-side { order: 2; flex: none; }
+.talk.is-tall .pane { overflow: visible; flex: none; }
+.talk.is-tall .pane.more-b { mask-image: none; }
+.talk.is-tall .tabs { position: sticky; top: -22px; z-index: 1; flex-wrap: wrap; overflow: visible; background: var(--night); padding: 8px 0; margin: 0; }
+.talk.is-tall .tabs.more-r, .talk.is-tall .tabs.more-l { mask-image: none; }
+.talk.is-tall .foot { margin-top: 18px; }

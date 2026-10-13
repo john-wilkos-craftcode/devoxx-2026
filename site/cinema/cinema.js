@@ -228,13 +228,13 @@ const blob = (t) => [t.title, ...t.speakers.map((s) => s.name), t.room, t.track,
 function why(t, terms) {
   if (terms.every((w) => t.title.toLowerCase().includes(w))) return null;
   const s = t.s || {};
-  const fields = [["Speaker", speakers(t)], ["Tools", (s.tech || []).join(", ")], ["Topics", (t.keywords || []).join(", ")], ["Summary", s.tldr || ""], ["Abstract", (t.abstract || []).join(" ")]];
+  const fields = [["Speaker", speakers(t)], ["Mentions", (s.tech || []).join(", ")], ["Topics", (t.keywords || []).join(", ")], ["Summary", s.tldr || ""], ["Abstract", (t.abstract || []).join(" ")]];
   for (const [name, text] of fields) {
     const lower = text.toLowerCase(), w = terms.find((x) => lower.includes(x));
     if (!w) continue;
     const i = lower.indexOf(w);
     const a = i;                                                     // start at the match, so it's always in view
-    if (name === "Tools" || name === "Topics" || name === "Speaker") {        // lists: the matching item first, then whole items
+    if (name === "Mentions" || name === "Topics" || name === "Speaker") {        // lists: the matching item first, then whole items
       const items = text.split(/,\s*/), hit = items.find((x) => x.toLowerCase().includes(w));
       const more = items.length - 1;
       return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? ` +${more} more` : "");
@@ -297,7 +297,8 @@ function programme(tall) {
     const here = inSlot(slot);
     // a short slot leaves room for what's on next: fill the screen with the following talks, each with its time
     const later = talks.filter((t) => t.start && dayKey(t.start) === day && t.start > slot).sort((a, b) => a.start.localeCompare(b.start) || (roomNo(a) || 99) - (roomNo(b) || 99));
-    const fill = here.length < (tall ? 4 : 8) ? later.slice(0, (tall ? 6 : 8) - here.length) : [];
+    // laptops: one full row of four after the slot's own row, so nothing is cut at the bottom of the screen
+    const fill = here.length < (tall ? 4 : 4) ? later.slice(0, tall ? 6 - here.length : 4) : [];
     const cards = el("div", { class: `cards scroller${tall ? "" : fill.length ? " is-packed" : " is-exact"}`, tabindex: "-1" },
       here.map((t) => {
         const c = card(t, { when: fill.length ? "time" : null });
@@ -307,7 +308,7 @@ function programme(tall) {
       }),
       fill.length ? el("div", { class: "later", text: "Later that day" }) : null, fill.map((t) => card(t, { when: "time" })));
     put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
-        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session" : "sessions"}. Pick one to read its summary.` })),
+        el("span", { text: `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session. Choose it to read its summary." : "sessions. Pick one to read its summary."}` })),
       cards);
     rove(dayRow); rove(timeRow);
     requestAnimationFrame(() => { centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
@@ -325,7 +326,7 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
     .filter(([id]) => (id === "short" && tall && s.tldr) || (id === "points" && s.keyPoints && s.keyPoints.length) || (id === "monday" && s.takeaways && s.takeaways.length)
       || (id === "chapters" && s.chapters && s.chapters.length && onFloor) || id === "story");
   const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Talk details" });
-  const tabRow = el("div", { class: `tabs${tall ? " strip" : ""}`, role: "group", "aria-label": "Talk details" });
+  const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Talk details" });
   let playAt = null;
   const chapter = (c) => {
     const kids = [el("time", { text: c.at }), el("span", { text: c.title })];
@@ -354,11 +355,11 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
   const intro = () => {
     main.textContent = "";
     put(main,
-      el("div", { class: "meta", text: [doorRoom && tall ? null : (!onFloor && /^BOF/.test(t.room || "") ? `${t.room} (downstairs)` : t.room),
+      el("div", { class: "meta", text: [!onFloor && /^BOF/.test(t.room || "") ? `${t.room} (downstairs)` : t.room,
         whenShort(t), typeLabel(t)].filter(Boolean).map((x) => x.replace(/ /g, "\u00a0")).join(", ") }),
       el("h2", { text: t.title, style: `--title:${onFloor ? titleSize(t.title, 40, 30) : titleSize(t.title, 34, 26)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
-      s.watchIf ? el("p", { class: "verdict", text: `Worth it if ${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.` }) : null,
+      s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth it if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null,
       !tall && s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
       el("div", { class: "actions" }, watch(), el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
         t.videoId ? null : el("span", { class: "note", text: "No recording yet." })),

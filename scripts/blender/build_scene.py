@@ -348,7 +348,7 @@ M = {
     "exitSign": emissive("exitSign", 0x18c060, 4.0),
     "downlight": emissive("downlight", 0xfff1e0, 25.0),
     "bezel": material("bezel", 0x0b0b0e, 0.28, 0.4, bevel=0.006),     # satin black, catching a highlight on its edge
-    "plate": material("plate", 0xf6921e, 0.5, emission=0xd9741a, strength=0.6),   # backlit room-number plate
+    "plate": material("plate", 0xf6921e, 0.5, emission=0xf08a1c, strength=2.2),   # backlit room-number plate
     "plateText": material("plateText", 0x0a0f2e, 0.4),
     "foliage": material("foliage", 0x4a7a3a, 0.55, sheen=0.3),
     "tableFrame": material("tableFrame", 0x111114, 0.4, 0.6),
@@ -854,8 +854,8 @@ for n, door in doors.items():
         y0w = min(d["bounds"]["y"] for d in blocks)
         y1w = max(d["bounds"]["y"] + d["bounds"]["h"] for d in blocks)
         xw = sum(d["bounds"]["x"] + d["bounds"]["w"] / 2 for d in blocks) / len(blocks)
-        floor_z = FH + plate_under(blocks[0]) + 0.45                 # on a low black stage riser, clear of the seat backs
-        B.box("masking", {"x": xw - 0.6, "y": y0w - 0.5, "w": 1.2, "h": y1w - y0w + 1.0}, floor_z - 0.45, floor_z)
+        floor_z = FH + plate_under(blocks[0]) + 0.3                  # on a low black stage riser, clear of the seat backs
+        B.box("masking", {"x": xw - 0.6, "y": y0w - 0.5, "w": 1.2, "h": y1w - y0w + 1.0}, floor_z - 0.3, floor_z)
         rot = (math.pi / 2, 0, math.pi / 2 if west else -math.pi / 2)
         parts = []
         for body, mat in (("#DEVOX", M["white"]), ("X", M["wordX"])):
@@ -1249,6 +1249,9 @@ for (lx, ly, lz, _) in stair_lamps:
     so = bpy.data.objects.new(spot.name, spot)
     so.location = (lx, ly, lz)
     scene.collection.objects.link(so)
+_hs = area("hall-screen-spill", (SCREEN["x"], SCREEN["y"] - 0.2, SCREEN["z"]), 1.0, 160, (0.4, 0.5, 1.0), rot=(-math.pi / 2, 0, 0))   # facing into the room
+_hs.data.shape, _hs.data.size, _hs.data.size_y = "RECTANGLE", SCREEN["w"], SCREEN["h"]
+_hs.visible_camera = False
 # the Hollywood room: an area light under each hexagon panel, a narrow spot in each downlight (they throw the
 # pools of light on the carpet), warm track spots at the entrance end
 for (lx, ly, lz) in lights:
@@ -1275,13 +1278,13 @@ if _room:
     for (hx, hy, hz, rn) in house_spots:
         if rn == args.room:
             li = bpy.data.lights.new(f"house-{hx:.1f}-{hy:.1f}", "SPOT")
-            li.energy, li.spot_size, li.spot_blend, li.color = 750, math.radians(44), 0.4, (1.0, 0.93, 0.85)
+            li.energy, li.spot_size, li.spot_blend, li.color = 300, math.radians(44), 0.4, (1.0, 0.93, 0.85)   # house lights down
             so = bpy.data.objects.new(li.name, li)
             so.location = (hx, hy, hz)
             scene.collection.objects.link(so)
     if args.room in screens:                                   # the projection's light on the room, from the screen (unseen)
         scr_ = screens[args.room]
-        ob = area("screen-spill", (scr_["x"] + (0.25 if scr_["west"] else -0.25), scr_["y"], scr_["z"]), 1.0, 2600, (0.42, 0.52, 1.0),
+        ob = area("screen-spill", (scr_["x"] + (0.25 if scr_["west"] else -0.25), scr_["y"], scr_["z"]), 1.0, 1300, (0.42, 0.52, 1.0),
                   rot=(0, -math.pi / 2 if scr_["west"] else math.pi / 2, 0))     # facing into the room
         ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", scr_["h"], scr_["w"]
         ob.visible_camera = False
@@ -1529,8 +1532,8 @@ def still_cam(name, loc, look, fov, sensor="VERTICAL", dof=None, level_for=None)
 # laptop: the hall screen; phone: the totem, the big screen soft behind it
 pos, look, fov = hall_pose()
 hall_cam = still_cam("cam-hall", pos, look, fov)
-tdist = 1.7                           # the totem fills 90% of a phone's width; a little stand, floor and room round it
-_hfov = 2 * math.atan(TOTEM["w"] / 2 / 0.9 / tdist)
+tdist = 1.7                           # the totem fills 80% of a phone's width; its stand, the floor and the hall round it
+_hfov = 2 * math.atan(TOTEM["w"] / 2 / 0.8 / tdist)
 phone_hall_cam = still_cam("cam-hall-phone", (TOTEM["x"], TOTEM["y"] - tdist, TOTEM["z"]), (TOTEM["x"], TOTEM["y"], TOTEM["z"]),
                            2 * math.degrees(math.atan(math.tan(_hfov / 2) * PHONE[1] / PHONE[0])), dof=(tdist, 1.8))
 bpy.context.view_layer.update()       # matrix_world is stale until the depsgraph runs
