@@ -1789,9 +1789,17 @@ def widened(camera, wh, ex, eb):
 # the sides and the rows in front below it, where the laptop on your lap goes
 seat_wide_cam, SEAT_RES, seat_inner = widened(seat_cam, LAPTOP, 0.16, 0.5)
 bpy.context.view_layer.update()
+narrow_q = screen_quad(full, seat_cam)
 set_res(SEAT_RES)
-shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(full, seat_wide_cam)}, "size": {"screen": [2 * hw, zhigh - zlow]},
-                      "front": f"seat-{n}-front", "px": list(SEAT_RES), "inner": seat_inner}
+wide_q = screen_quad(full, seat_wide_cam)
+# where the walk's frame sits in the wide still, measured from where the screen lands in each (lens shift units under a
+# vertical sensor fit make the formula's guess unreliable)
+_sx = (wide_q[0][0] - wide_q[2][0]) / (narrow_q[0][0] - narrow_q[2][0])
+_sy = (wide_q[0][1] - wide_q[2][1]) / (narrow_q[0][1] - narrow_q[2][1])
+_x0, _y0 = wide_q[2][0] - narrow_q[2][0] * _sx, wide_q[2][1] - narrow_q[2][1] * _sy
+seat_inner = [round(_x0, 5), round(_y0, 5), round(_x0 + _sx, 5), round(_y0 + _sy, 5)]
+shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": wide_q}, "size": {"screen": [2 * hw, zhigh - zlow]},
+                      "front": f"seat-{n}-front", "px": list(SEAT_RES), "inner": seat_inner, "inner_measured": True}
 set_res(LAPTOP)
 
 # phones: the walk stops at the door, and the talk is on the totem beside it (a cinema screen is far too wide to

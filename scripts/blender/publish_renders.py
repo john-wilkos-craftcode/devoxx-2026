@@ -31,9 +31,26 @@ existing = OUT / "shots.json"
 shots = json.loads(existing.read_text()) if existing.exists() else {}
 srcs = [Path(p) for p in sys.argv[1:]]
 
+def place_inner(old, new):
+    """Where the walk's 16:9 frame (old: a seat shot without px) sits inside a wide seat still (new), from where the
+    same screen lands in both: same camera, so the old picture is the new one scaled and shifted."""
+    (ox0, oy0), (ox1, oy1) = old["overlay"]["screen"][2], old["overlay"]["screen"][0]
+    (nx0, ny0), (nx1, ny1) = new["overlay"]["screen"][2], new["overlay"]["screen"][0]
+    sx, sy = (nx1 - nx0) / (ox1 - ox0), (ny1 - ny0) / (oy1 - oy0)
+    x0, y0 = nx0 - ox0 * sx, ny0 - oy0 * sy
+    new["inner"] = [round(x0, 5), round(y0, 5), round(x0 + sx, 5), round(y0 + sy, 5)]
+
+
 for src in srcs:
     for f in sorted(src.glob("shots-*.json")):
-        shots.update(json.loads(f.read_text()))
+        incoming = json.loads(f.read_text())
+        for k, v in incoming.items():
+            if k.startswith("seat-") and v.get("px") and k in shots and not shots[k].get("px"):
+                place_inner(shots[k], v)
+            elif k.startswith("seat-") and v.get("px") and shots.get(k, {}).get("inner") and not v.get("inner_measured"):
+                v["inner"] = shots[k]["inner"]          # measured before; the formula's guess is off
+            v.pop("inner_measured", None)
+        shots.update(incoming)
     for png in sorted(src.glob("*.png")):
         if png.stem.endswith("-front"):         # what stands in front of the screen: keeps its transparency
             Image.open(png).save(OUT / f"{png.stem}.webp", quality=88, method=6)

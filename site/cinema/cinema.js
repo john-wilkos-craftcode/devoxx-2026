@@ -509,7 +509,7 @@ const LAP = shots.laptop ? (() => {
   const L = shots.laptop, [tl, tr, bl] = L.screen, hingeCut = (f) => Math.min(L.h, L.open_cut + (f - 0.32) * (bl[1] - tl[1]));
   return { w: L.w, h: L.h, screen: [tl[0], tl[1], tr[0], bl[1]],
     open: { src: "media/laptop-open.webp", top: L.open_top, cut: L.open_cut, cutShort: hingeCut(0.1) },
-    closed: { src: "media/laptop-closed.webp", top: L.closed_top, bottom: L.closed_bottom, box: L.closed_box },
+    closed: { src: "media/laptop-closed.webp", top: L.closed_top, bottom: L.closed_cut || L.closed_bottom, box: L.closed_box },
     frames: Array.from({ length: L.frames || 0 }, (_, i) => `media/laptop-anim-${String(i).padStart(2, "0")}.webp`) };
 })() : {   // a drawn stand-in until the render is in
   w: 1600, h: 1060, screen: [176, 26, 1424, 806],
@@ -556,7 +556,7 @@ function seatLayout(st) {
   const frame = { iw, ih, s, ox: left - sx0 * s, oy: top - sy0 * s };
   let lapBox;
   if (st.zoom) {                                            // its screen fills the window, the lid just past the edges
-    const m = H < 820 ? 0 : 12;
+    const m = H < 820 ? 8 : 14;                                    // a sliver of bezel and lid: you leaned in, it is still a laptop
     const dw = Math.min(W - 2 * m, (H - 2 * m) * ow / oh), kz = dw / ow;
     lapBox = { x: W / 2 - (LAP.screen[0] + ow / 2) * kz, y: H / 2 - (LAP.screen[1] + oh / 2) * kz, w: LAP.w * kz, h: LAP.h * kz, k: kz };
   } else if (st.open) lapBox = { x: W / 2 - (LAP.screen[0] + ow / 2) * k, y: H - cut * k, w: LAP.w * k, h: LAP.h * k, k };
@@ -663,10 +663,48 @@ function posterOn(t) {
     img, el("span", { class: "play" }, el("i", { "aria-hidden": "true" }), "Play the talk", t.duration ? el("small", { text: `${t.duration} min` }) : null)));
   tube.hidden = false;
 }
+// the recording full screen (the browser's own): the picture alone, with a slim bar of our controls that shows when
+// the mouse moves (YouTube's are off), Esc or the same button to come back
+const FS_ICON = `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 function videoFullscreen() {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else if (tube.requestFullscreen && seat && seat.player) tube.requestFullscreen().catch(() => {});
+  if (document.fullscreenElement) { document.exitFullscreen(); return; }
+  if (!seat || !seat.t.videoId || !EMBED || seat.failed || !tube.requestFullscreen) return;
+  if (!seat.player && !seat.starting) jumpTo(0);               // full screen before play: start it too
+  tube.requestFullscreen().catch(() => {});
 }
+function tubeControls() {
+  // a corner button on the picture, and the bar for full screen
+  const scrub = el("div", { class: "scrub", role: "slider", tabindex: "0", "aria-label": "Position in the talk", "aria-valuemin": "0",
+      onclick: (e) => { const L = playerLength(), r = scrub.getBoundingClientRect(); if (L) jumpTo((e.clientX - r.left) / r.width * L); },
+      onkeydown: (e) => { const d = { ArrowLeft: -10, ArrowRight: 10, PageDown: -60, PageUp: 60 }[e.key]; if (d) { e.preventDefault(); seekBy(d); } } },
+    el("div", { class: "scrub-fill" }), el("div", { class: "scrub-ticks", "aria-hidden": "true" }));
+  const bar = el("div", { class: "tube-bar", role: "group", "aria-label": "Recording" },
+    el("button", { class: "toggle", type: "button", "aria-keyshortcuts": "K", onclick: () => playPause() }, el("span", { class: "glyph" })),
+    scrub,
+    el("span", { class: "now-time" }),
+    el("span", { class: "now-text" }),
+    el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
+    el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }),
+    el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "V", "aria-label": "Leave full screen", onclick: () => videoFullscreen() }));
+  bar.querySelector(".fs").innerHTML = FS_ICON;
+  const corner = el("button", { class: "tube-fs", type: "button", "aria-keyshortcuts": "V", "aria-label": "Full-screen video", title: "Full-screen video  V", onclick: () => videoFullscreen() });
+  corner.innerHTML = FS_ICON;
+  return [corner, bar];
+}
+let barTimer = 0;
+tube.addEventListener("mousemove", () => {
+  if (document.fullscreenElement !== tube) return;
+  tube.classList.add("is-awake");
+  clearTimeout(barTimer);
+  barTimer = setTimeout(() => tube.classList.remove("is-awake"), 2500);
+});
+document.addEventListener("fullscreenchange", () => {
+  tube.classList.toggle("is-full", document.fullscreenElement === tube);
+  tube.classList.add("is-awake");
+  clearTimeout(barTimer);
+  barTimer = setTimeout(() => tube.classList.remove("is-awake"), 2500);
+  setTimeout(() => { placeTube(); tick(); }, 60);
+});
 function jumpTo(sec) {
   if (!seat || !seat.t.videoId) return;
   if (seat.failed || !EMBED) { window.open(ytUrl(seat.t, Math.floor(sec)), "_blank", "noopener"); return; }
@@ -676,7 +714,7 @@ function jumpTo(sec) {
   if (seat.starting) { seat.startAt = sec; return; }
   seat.starting = true; seat.startAt = sec;
   const t = seat.t, host = el("div", { class: "yt" });
-  tube.append(host, el("div", { class: "tube-catch", "aria-hidden": "true", onclick: () => playPause(), ondblclick: () => videoFullscreen() }),
+  tube.append(host, ...tubeControls(), el("div", { class: "tube-catch", "aria-hidden": "true", onclick: () => playPause(), ondblclick: () => videoFullscreen() }),
     el("div", { class: "tube-paused is-loading" }, el("button", { class: "resume", type: "button", tabindex: "-1", onclick: () => playPause() },
       el("i", { "aria-hidden": "true" }), el("span", { class: "resume-text", text: "Loading…" }))));
   const poster0 = tube.querySelector(".poster"); if (poster0) poster0.remove();
@@ -828,13 +866,14 @@ function notesScreen(t) {
       el("span", { class: "now-time" }),
       el("button", { class: "notes-btn retry", type: "button", text: "Try again", onclick: () => retryPlayer() }),
       el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
-      el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }))) : null;
+      el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }),
+      (() => { const b = el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "V", "aria-label": "Full-screen video", title: "Full-screen video  V", onclick: () => videoFullscreen() }); b.innerHTML = FS_ICON; return b; })())) : null;
   const keysSheet = el("div", { class: "keys-sheet", hidden: true, role: "note" },
     el("b", { text: "Keys" }),
     el("dl", {}, [["K", "Play or pause"], ["[  ]", "Previous or next chapter"], ["← →", "Back or on 10 seconds"], ["C  M", "Captions, sound"],
-      ["F", "Laptop full screen"], ["L", "Close or open the lid"], ["Esc", "Leave full screen"], ["?", "These keys"]]
+      ["V", "Full-screen video"], ["F", "Laptop full screen"], ["L", "Close or open the lid"], ["Esc", "Leave full screen"], ["?", "These keys"]]
       .filter(([k]) => live || !/^(K|\[|←|C)/.test(k)).map(([k, d]) => [el("dt", { text: k }), el("dd", { text: d })])),
-    live ? el("p", { text: "Double-click the picture for a full-screen video." }) : null);
+    live ? el("p", { text: "Or double-click the picture for a full-screen video." }) : null);
   const keysBtn = el("button", { class: "notes-btn notes-keys", type: "button", "aria-label": "Keyboard shortcuts", "aria-expanded": "false", "aria-keyshortcuts": "?",
     onclick: () => toggleKeys() }, "Keys", key("?"));
   const toggleKeys = () => { keysSheet.hidden = !keysSheet.hidden; keysBtn.setAttribute("aria-expanded", String(!keysSheet.hidden)); };
@@ -892,6 +931,29 @@ function tick() {
     paused.querySelector(".resume-text").textContent = loading ? "Loading…" : state === 0 ? "Finished. Play it again"
       : state === 2 ? (i >= 0 ? `Paused: ${ch[i].title}` : "Paused") : "Press play (K)";
     if (state === 1 || state === 2) seat.waitSince = 0;
+  }
+  const tb = tube.querySelector(".tube-bar");
+  if (tb) {
+    const Lb = playerLength(), sb = tb.querySelector(".scrub");
+    tb.querySelector(".glyph").textContent = playing ? "❚❚" : "▶";
+    tb.querySelector(".toggle").setAttribute("aria-label", playing ? "Pause" : "Play");
+    tb.querySelector(".now-time").textContent = Lb ? `${clock(sec || 0)} / ${clock(Lb)}` : "";
+    tb.querySelector(".now-text").textContent = i >= 0 ? `${i + 1}/${ch.length}  ${ch[i].title}` : "";
+    if (Lb) {
+      tb.querySelector(".scrub-fill").style.width = `${Math.min(100, (sec || 0) / Lb * 100)}%`;
+      const tk = sb.querySelector(".scrub-ticks");
+      if (tk.dataset.len !== String(Lb)) { tk.dataset.len = String(Lb); tk.textContent = ""; for (const c of ch.slice(1)) tk.append(el("i", { style: `left:${c.sec / Lb * 100}%` })); }
+      sb.setAttribute("aria-valuemax", String(Lb)); sb.setAttribute("aria-valuenow", String(Math.round(sec || 0)));
+      sb.setAttribute("aria-valuetext", `${clock(sec || 0)} of ${clock(Lb)}`);
+    }
+    const mutedB = p && p.isMuted && p.isMuted(), mb = tb.querySelector(".mute");
+    if (mb.dataset.muted !== String(!!mutedB)) {
+      mb.dataset.muted = String(!!mutedB);
+      mb.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M4 9h4l5-4v14l-5-4H4z"/>${mutedB
+        ? '<path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+        : '<path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'}</svg>`;
+    }
+    tb.querySelector(".cc").setAttribute("aria-pressed", String(!!seat.cc));
   }
   if (!lidBar.hidden && !lidPlay.hidden) { lidPlay.querySelector(".glyph").textContent = playing ? "❚❚ Pause" : "▶ Play"; lidPlay.setAttribute("aria-label", playing ? "Pause" : "Play"); }
   const n = seat.notes;
@@ -1047,9 +1109,10 @@ const lidPlay = $("lidPlay"), lidBar = $("lidBar"), lidHit = $("lidHit");
 lidHit.addEventListener("click", () => setLaptop({ open: true }));
 // the closed lid in the picture, as % of the art box: the click target, and the controls at its front
 {
-  const [x0, y0, x1, y1] = LAP.closed.box, pc = (v, of) => `${v / of * 100}%`;
+  const [x0, y0, x1, yb] = LAP.closed.box, y1 = Math.min(yb, LAP.closed.bottom), pc = (v, of) => `${v / of * 100}%`;
   Object.assign(lidHit.style, { left: pc(x0, LAP.closed.w || LAP.w), top: pc(y0, LAP.closed.h || LAP.h), width: pc(x1 - x0, LAP.closed.w || LAP.w), height: pc(y1 - y0, LAP.closed.h || LAP.h) });
-  Object.assign(lidBar.style, { left: pc(x0 + (x1 - x0) * 0.36, LAP.closed.w || LAP.w), top: pc(y0 + (y1 - y0) * 0.78, LAP.closed.h || LAP.h) });   // clear of the sticker (right)
+  // just above the lid's far edge, centred: never on the logo or the sticker
+  Object.assign(lidBar.style, { left: pc((x0 + x1) / 2, LAP.closed.w || LAP.w), top: pc(y0 - (LAP.closed.h || LAP.h) * 0.035, LAP.closed.h || LAP.h) });
 }
 lidPlay.addEventListener("click", () => playPause());
 $("toProg").addEventListener("click", () => goHall());
@@ -1065,6 +1128,7 @@ addEventListener("keydown", (e) => {
   else if (k === "c") toggleCaptions();
   else if (k === "m") toggleMute();
   else if (k === "?" && n && seat.open) n.toggleKeys();
+  else if (k === "v") videoFullscreen();
   else if (k === "f" && seat.open) setLaptop({ zoom: !seat.zoom });
   else if (k === "l") setLaptop({ open: !seat.open });
 });

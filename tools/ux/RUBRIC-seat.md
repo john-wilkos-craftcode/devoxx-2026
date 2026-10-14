@@ -30,6 +30,7 @@ review is about **the seat, on laptops and desktops**.
  R5 You can jump through the talk from the laptop while the talk plays on the movie screen: both at the same time.
  R6 You can zoom into the laptop and make it full screen, and get back.
  R7 It feels like real life (diegetic), but never at the cost of usability.
+ R8 The YouTube video itself can go full screen, and come back.
 
 ## Standing notes for reviewers
 - The laptop is a **placeholder drawing** for now. It becomes a photoreal render of a Dell Precision 5570 (silver lid,
@@ -51,6 +52,7 @@ review is about **the seat, on laptops and desktops**.
   7-back-from-fullscreen   Esc pressed
   8-no-recording           a talk that has no recording yet
   9-keyboard               three Tab presses after load (focus visibility)
+  11-video-fullscreen      the recording full screen (the browser's), with the page's own control bar
   10-player-blocked        "Play" pressed while YouTube is blocked (the console errors in log.txt are this, on purpose)
   log.txt                  console errors
 

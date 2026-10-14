@@ -46,6 +46,14 @@ for (const v of VIEWS) {
   await shot("6-fullscreen-jumped", 3000);
   await page.keyboard.press("Escape");
   await shot("7-back-from-fullscreen", 2000);
+  // the recording full screen (the browser's), from the laptop's bar
+  await page.locator(".notes .icon.fs").click();
+  await page.waitForTimeout(1500);
+  await page.mouse.move(v.viewport.width / 2, v.viewport.height / 2); await page.mouse.move(v.viewport.width / 2 + 20, v.viewport.height / 2);
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: `${out}/${v.name}-11-video-fullscreen.png` });
+  await page.keyboard.press("v");
+  await page.waitForTimeout(800);
   if (NOVIDEO) {
     await page.goto("about:blank"); await page.goto(`${base}#talk-${NOVIDEO}`, { waitUntil: "networkidle" });
     await page.waitForSelector(".face.notes", { timeout: 20000 });

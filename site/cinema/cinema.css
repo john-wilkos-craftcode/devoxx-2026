@@ -559,7 +559,6 @@ button, input, a { font: inherit; color: inherit; }
    so the 16:9 picture letterboxes inside it and those overlays land in the bars, clipped away */
 .tube { overflow: hidden; --crop: max(64px, 14%); }
 .tube .yt, .tube iframe { top: calc(-1 * var(--crop)); height: calc(100% + 2 * var(--crop)); }
-.tube:fullscreen { --crop: 0px; }
 .notes.is-zoomed .notes-watch .slot { width: 100%; max-height: none; aspect-ratio: 16 / 9; align-self: stretch; }
 /* round 4 */
 .notes.is-zoomed .now { height: auto; }
@@ -672,3 +671,53 @@ html, body { overscroll-behavior: none; }
 .notes .now.is-failed .now-text { font-weight: 500; color: #9aa1b8; }
 .notes-close { margin-left: 22px; }
 .notes-close::before { left: -12px; }
+
+/* diegesis: the notes are a lit display behind glass; the recording is projected */
+.face.notes::after { content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  background: linear-gradient(112deg, rgba(255, 255, 255, .05) 0%, rgba(255, 255, 255, .015) 38%, transparent 39%),
+              radial-gradient(140% 90% at 50% 0%, transparent 60%, rgba(0, 0, 0, .18) 100%); }
+.face.notes.is-zoomed::after { background: linear-gradient(112deg, rgba(255, 255, 255, .025) 0%, transparent 40%); }
+.face.notes { box-shadow: 0 0 40px 6px rgba(150, 165, 230, .10); }   /* the screen's own light on the bezel */
+.tube::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; box-shadow: inset 0 0 50px 6px rgba(0, 0, 0, .28); }
+.tube.is-on-laptop::after, .tube:fullscreen::after { box-shadow: none; }
+/* art round 1 */
+.face.notes { box-shadow: 0 0 34px 4px rgba(120, 140, 230, .07); }
+.face.notes::before { content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none; box-shadow: inset 0 0 36px rgba(0, 0, 0, .22); }
+/* projected: light spills onto the masking and the wall, the blacks lift a little, a faint grain of the perforated screen */
+.face.cine.is-projected { box-shadow: 0 0 160px 50px rgba(50, 70, 190, .16); }
+.face.cine.is-projected::before { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: .05; mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.tube:not(.is-on-laptop) iframe { filter: contrast(.95) brightness(.97); }
+.tube:not(.is-on-laptop) { box-shadow: 0 0 30px 4px rgba(120, 140, 255, .12); }
+/* your lap in the dark: the laptop casts a soft darkness over the seats in front, round its lower half */
+.lap::before { content: ""; position: absolute; z-index: -1; left: 4%; right: 4%; top: 38%; bottom: -30%; pointer-events: none;
+  background: radial-gradient(50% 55% at 50% 60%, rgba(2, 3, 8, .78) 0%, rgba(2, 3, 8, .5) 45%, transparent 100%); }
+.stage.is-reading .lap::before { opacity: 0; }
+
+/* the recording full screen: a corner button on the picture, and in full screen our own slim bar (YouTube's is off) */
+.tube-catch { z-index: 1; }
+.tube-paused { z-index: 2; }
+.tube-fs { position: absolute; z-index: 3; right: 10px; bottom: 10px; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border-radius: 8px;
+  border: 1px solid rgba(174, 184, 236, .35); background: rgba(8, 11, 30, .72); color: var(--ink); cursor: pointer; opacity: .55; transition: opacity .2s ease; }
+.tube:hover .tube-fs, .tube-fs:focus-visible { opacity: 1; }
+.tube-fs:hover { border-color: var(--orange); }
+.tube-fs:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.tube.is-full .tube-fs { display: none; }
+.tube-bar { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; display: none; align-items: center; gap: 14px; padding: 40px 24px 18px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, .75)); color: #e8ebf4; font-size: 15px; }
+.tube.is-full .tube-bar { display: flex; opacity: 0; transition: opacity .3s ease; }
+.tube.is-full.is-awake .tube-bar, .tube.is-full .tube-bar:focus-within, .tube.is-full:has(.tube-paused:not([hidden])) .tube-bar { opacity: 1; }
+.tube.is-full:not(.is-awake) { cursor: none; }
+.tube-bar .toggle { flex: none; width: 44px; height: 36px; border: 0; border-radius: 8px; background: var(--orange); color: var(--deep); font-size: 15px; font-weight: 800; cursor: pointer; }
+.tube-bar .scrub { position: relative; flex: 1; height: 18px; cursor: pointer; }
+.tube-bar .scrub::before { content: ""; position: absolute; left: 0; right: 0; top: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .25); }
+.tube-bar .scrub-fill { position: absolute; left: 0; top: 6px; height: 6px; width: 0; border-radius: 3px; background: var(--orange); }
+.tube-bar .scrub-ticks i { position: absolute; top: 5px; width: 3px; height: 8px; margin-left: -1px; background: rgba(0, 0, 0, .7); }
+.tube-bar .scrub:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.tube-bar .now-time { flex: none; font-variant-numeric: tabular-nums; color: #c9cee0; }
+.tube-bar .now-text { flex: 0 1 30%; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 600; }
+.tube-bar .icon { flex: none; display: grid; place-items: center; height: 36px; min-width: 42px; padding: 0 8px; border: 1px solid rgba(255, 255, 255, .25); border-radius: 8px;
+  background: rgba(20, 24, 36, .6); color: #e8ebf4; font-size: 12px; font-weight: 800; cursor: pointer; }
+.tube-bar .icon[aria-pressed="true"] { background: #e8ebf4; color: #0f1117; }
+.tube-bar button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.notes .icon.fs svg { display: block; }

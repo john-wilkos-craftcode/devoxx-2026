@@ -43,6 +43,7 @@ ap.add_argument("--anim-width", type=int, default=900)
 ap.add_argument("--only", default="open,closed,anim")
 ap.add_argument("--preview", action="store_true", help="EEVEE, quick look")
 ap.add_argument("--save")
+ap.add_argument("--cpu", action="store_true", help="Cycles on the CPU (look-dev while the GPU renders something else)")
 args = ap.parse_args(argv)
 ROOT, OUT = Path(args.root), Path(args.out)
 OUT.mkdir(parents=True, exist_ok=True)
@@ -109,7 +110,7 @@ def obj_coords(nt, scale):
 
 # "Titan Gray" anodised aluminium: satin, a faint grain; the diamond-cut chamfers bright
 M = {}
-M["alu"] = principled("alu", 0x9A9896, 0.34, metal=1.0, aniso=0.15)
+M["alu"] = principled("alu", 0x7E7B78, 0.36, metal=1.0, aniso=0.15)
 nt = M["alu"].node_tree
 noise = node(nt, "ShaderNodeTexNoise", Scale=9000.0, Detail=2.0)
 nt.links.new(obj_coords(nt, 1.0), noise.inputs["Vector"])
@@ -117,7 +118,7 @@ bump(M["alu"], noise.outputs["Fac"], 0.04)
 M["chamfer"] = principled("chamfer", 0xD2D2D2, 0.12, metal=1.0)
 M["hinge"] = principled("hinge", 0x3A3B3E, 0.4, metal=1.0)
 # the deck: black woven carbon fibre under a soft-touch coat, a 2 mm weave you only see in the sheen
-M["carbon"] = principled("carbon", 0x2E2E30, 0.55, sheen=0.25)
+M["carbon"] = principled("carbon", 0x2E2E30, 0.6, sheen=0.08)
 nt = M["carbon"].node_tree
 chk = node(nt, "ShaderNodeTexChecker", Scale=1.0)
 chk.inputs["Color1"].default_value = srgb(0x2B2B2D)
@@ -142,9 +143,9 @@ M["key"] = principled("key", 0x1C1C1E, 0.42, coat=0.15, coat_rough=0.3)
 M["legend"] = principled("legend", 0xCFCFD2, 0.6)
 M["pad"] = principled("pad", 0x202022, 0.3, coat=0.3, coat_rough=0.15)
 M["bezel"] = principled("bezel", 0x050506, 0.05, coat=1.0, coat_rough=0.02)
-M["display"] = principled("display", 0x020204, 0.04, coat=1.0, coat_rough=0.01, emission=0x101422, strength=0.0)
+M["display"] = principled("display", 0x020204, 0.04, coat=1.0, coat_rough=0.01, emission=0x1A2140, strength=0.0)   # dark-mode notes: a cool glow
 M["camera"] = principled("camera", 0x0A0A12, 0.05, coat=1.0)
-M["logo"] = principled("logo", 0xE8E8EA, 0.07, metal=1.0)
+M["logo"] = principled("logo", 0xF2F2F4, 0.16, metal=1.0)          # mirror-polished: it catches the screen
 M["led"] = principled("led", 0xFFFFFF, 0.3, emission=0xFFFFFF, strength=0.0)
 
 
@@ -171,6 +172,7 @@ def slab(name, outline, z0, z1, mats, chamfer=0.0007, parent=None):
     rims = [e for e in bm.edges if len(e.link_faces) == 2 and abs(e.link_faces[0].normal.dot(e.link_faces[1].normal)) < 0.5]
     if chamfer:
         bmesh.ops.bevel(bm, geom=rims, offset=chamfer, segments=2, profile=0.5, affect="EDGES")
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)                  # outward, whichever way the outline ran
     bm.normal_update()
     for f in bm.faces:
         nz = f.normal.z
@@ -366,14 +368,14 @@ def sticker():
     nt.links.new(t.outputs["Color"], b.inputs["Base Color"])
     nt.links.new(t.outputs["Alpha"], b.inputs["Alpha"])
     b.inputs["Roughness"].default_value = 0.35
-    b.inputs["Coat Weight"].default_value = 1.0                    # the gloss laminate, glossier than the lid
+    b.inputs["Coat Weight"].default_value = 0.6                    # the gloss laminate, glossier than the lid
     b.inputs["Coat Roughness"].default_value = 0.04
     bump(m, th.outputs["Color"], 0.6, distance=0.00015)
     m.blend_method = "HASHED" if hasattr(m, "blend_method") else None
     me.materials.append(m)
     ob = bpy.data.objects.new("sticker", me)
     ob.parent = pivot
-    ob.location = (0.082, front_y + 0.078, top_z + 0.00015)
+    ob.location = (0.082, front_y + 0.112, top_z + 0.00015)         # in the lid's back half: in view above the bottom edge
     ob.rotation_euler = (0, 0, math.radians(-9))                   # up = +y when closed: away from you, so you read it
     scene.collection.objects.link(ob)
 
@@ -412,12 +414,18 @@ area("cinema-screen", (0, 15.0, 4.2), (19.0, 7.2), 9000.0, (0.62, 0.70, 1.0), (0
 # house lights: two warm spots high on either side, for glints on the chamfers; a faint fill from the aisle
 for sx in (-1, 1):
     sp = bpy.data.lights.new(f"spot-{sx}", "SPOT")
-    sp.energy, sp.spot_size, sp.color, sp.shadow_soft_size = 60.0, math.radians(30), (1.0, 0.86, 0.7), 0.15
+    sp.energy, sp.spot_size, sp.color, sp.shadow_soft_size = 25.0, math.radians(30), (0.8, 0.86, 1.0), 0.15
     ob = bpy.data.objects.new(f"spot-{sx}", sp)
     ob.location = (sx * 2.2, 2.5, 3.2)
     ob.rotation_euler = (Vector((0, -0.05, 0)) - ob.location).to_track_quat("-Z", "Y").to_euler()
     scene.collection.objects.link(ob)
-area("aisle", (-1.5, -0.6, 0.2), (0.6, 0.3), 1.2, (1.0, 0.25, 0.2), (0, -0.1, 0.05))
+area("aisle", (-1.5, -0.6, 0.2), (0.6, 0.3), 0.6, (1.0, 0.25, 0.2), (0, -0.1, 0.05))
+# the room's own glow: the screen's light thrown back by the ceiling and the walls, a big soft source overhead and in
+# front, which is what a satin metal lid in a dark cinema mostly reflects (without it the lid reads black)
+area("ceiling-glow", (0, 7.5, 3.0), (8.0, 3.5), 110.0, (0.55, 0.62, 1.0), (0, 0.4, 0))
+area("behind", (0, -3.0, 2.6), (4.0, 2.0), 25.0, (0.6, 0.66, 1.0), (0, 0, 0.3))
+# (the lap under it is the page's: a soft darkness round its lower half, cinema/cinema.css .lap::before; modelled thighs
+# read as pillars beyond the lid)
 # whoever is sitting there: a dark body just behind the camera, so the glass reflects a shape, not the void
 body = slab("you", rounded_outline(0.5, 0.35, 0.15, -0.38), 0.0, 0.75, [principled("you", 0x0B0C10, 0.8)] * 4, chamfer=0)
 body.visible_camera = False
@@ -435,7 +443,7 @@ corners_local = {"tl": Vector((-DISP_W / 2, disp_y0, zd)), "tr": Vector((DISP_W 
 corners = {k: mw @ v for k, v in corners_local.items()}
 centre = sum(corners.values(), Vector()) / 4
 normal = (mw.to_3x3() @ Vector((0, 0, -1))).normalized()
-EYE = 0.50
+EYE = 0.56
 cam_data = bpy.data.cameras.new("eye")
 cam_data.sensor_fit = "HORIZONTAL"
 cam_data.sensor_width = 36.0
@@ -499,6 +507,11 @@ info["closed_top"] = min(px(mw @ Vector((x, -PIVOT.y, top_z)))[1] for x in (-W /
 _lid = [px(mw @ Vector((x, y, top_z))) for x in (-W / 2, W / 2) for y in (front_y, -PIVOT.y)]
 info["closed_box"] = [min(p[0] for p in _lid), min(p[1] for p in _lid), max(p[0] for p in _lid), max(p[1] for p in _lid)]   # the closed lid
 info["closed_bottom"] = round(max(px(Vector((x, -D, 0.0)))[1] for x in (-W / 2, W / 2)) + 6, 1)
+# closed, the view's bottom edge cuts the lid like it cuts the base when open: just past the sticker's front edge
+_st = bpy.data.objects["sticker"]
+_sw, _sh = _st.dimensions.x, _st.dimensions.y
+_cs = [px(_st.matrix_world @ Vector((x * _sw / 2 / _st.scale.x, y * _sh / 2 / _st.scale.y, 0))) for x in (-1, 1) for y in (-1, 1)]
+info["closed_cut"] = round(min(info["closed_bottom"], max(p[1] for p in _cs) + 0.06 * (info["closed_bottom"] - info["closed_top"])), 1)
 print("laptop frame", WPX, "x", HPX, json.dumps(info))
 
 # ------------------------------------------------------------------------------------------- render
@@ -517,7 +530,7 @@ else:
                 break
         except TypeError:
             continue
-    scene.cycles.device = "GPU"
+    scene.cycles.device = "CPU" if args.cpu else "GPU"
     scene.cycles.use_denoising = True
     scene.cycles.adaptive_threshold = 0.02
     scene.cycles.max_bounces = 8
