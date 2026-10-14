@@ -25,7 +25,7 @@
   every talk and slot.
 - WebGL page retired: `site/kino/` deleted, the venue model and credits moved to `data/venue/`.
 - Serve locally with `node tools/ux/serve.mjs` (byte ranges; Python's http.server can't seek videos).
-- Pushing to main deploys GitHub Pages; ask John first.
+- Pushing to main deploys GitHub Pages; the page is unreleased, so push every change for John to review live.
 
 ## The cinema page (`site/cinema/`), status
 - Diegetic UI pinned onto Blender stills with a CSS matrix (2D when square on, so text is sharp): programme on
