@@ -110,7 +110,7 @@ def obj_coords(nt, scale):
 
 # "Titan Gray" anodised aluminium: satin, a faint grain; the diamond-cut chamfers bright
 M = {}
-M["alu"] = principled("alu", 0x7E7B78, 0.36, metal=1.0, aniso=0.15)
+M["alu"] = principled("alu", 0x5F636B, 0.35, metal=1.0, aniso=0.3)    # Titan Gray in a dark room: it shows what's in front
 nt = M["alu"].node_tree
 noise = node(nt, "ShaderNodeTexNoise", Scale=9000.0, Detail=2.0)
 nt.links.new(obj_coords(nt, 1.0), noise.inputs["Vector"])
@@ -121,12 +121,12 @@ M["hinge"] = principled("hinge", 0x3A3B3E, 0.4, metal=1.0)
 M["carbon"] = principled("carbon", 0x2E2E30, 0.6, sheen=0.08)
 nt = M["carbon"].node_tree
 chk = node(nt, "ShaderNodeTexChecker", Scale=1.0)
-chk.inputs["Color1"].default_value = srgb(0x2B2B2D)
+chk.inputs["Color1"].default_value = srgb(0x29292B)
 chk.inputs["Color2"].default_value = srgb(0x343437)
-nt.links.new(obj_coords(nt, 500.0), chk.inputs["Vector"])
+nt.links.new(obj_coords(nt, 1000.0), chk.inputs["Vector"])
 nt.links.new(chk.outputs["Color"], nt.nodes["Principled BSDF"].inputs["Base Color"])
 wave = node(nt, "ShaderNodeTexWave", Scale=1.0, Distortion=0.0)
-nt.links.new(obj_coords(nt, 500.0), wave.inputs["Vector"])
+nt.links.new(obj_coords(nt, 1000.0), wave.inputs["Vector"])
 bump(M["carbon"], wave.outputs["Fac"], 0.08)
 # speaker grilles: the deck perforated in a fine grid of holes
 M["grille"] = principled("grille", 0x232325, 0.6)
@@ -142,10 +142,10 @@ bump(M["grille"], ramp.outputs["Color"], 0.3)
 M["key"] = principled("key", 0x1C1C1E, 0.42, coat=0.15, coat_rough=0.3)
 M["legend"] = principled("legend", 0xCFCFD2, 0.6)
 M["pad"] = principled("pad", 0x202022, 0.3, coat=0.3, coat_rough=0.15)
-M["bezel"] = principled("bezel", 0x050506, 0.05, coat=1.0, coat_rough=0.02)
-M["display"] = principled("display", 0x020204, 0.04, coat=1.0, coat_rough=0.01, emission=0x1A2140, strength=0.0)   # dark-mode notes: a cool glow
+M["bezel"] = principled("bezel", 0x050506, 0.3, coat=0.5, coat_rough=0.08)
+M["display"] = principled("display", 0x000000, 0.5, emission=0x1A2140, strength=0.0)   # pure black under the notes (the page adds the glass)
 M["camera"] = principled("camera", 0x0A0A12, 0.05, coat=1.0)
-M["logo"] = principled("logo", 0xF2F2F4, 0.16, metal=1.0)          # mirror-polished: it catches the screen
+M["logo"] = principled("logo", 0xF2F2F4, 0.05, metal=1.0)          # mirror-polished: it catches the screen
 M["led"] = principled("led", 0xFFFFFF, 0.3, emission=0xFFFFFF, strength=0.0)
 
 
@@ -313,7 +313,7 @@ def logo():
     bm.free()
     ring.data.materials.append(M["logo"])
     cy = front_y + D / 2
-    ring.location = (0, cy, top_z + 0.00003)
+    ring.location = (0, cy, top_z + 0.00005)
     ring.parent = pivot
     scene.collection.objects.link(ring)
     cu = bpy.data.curves.new("logo-text", "FONT")
@@ -367,9 +367,9 @@ def sticker():
     th.image = h_img
     nt.links.new(t.outputs["Color"], b.inputs["Base Color"])
     nt.links.new(t.outputs["Alpha"], b.inputs["Alpha"])
-    b.inputs["Roughness"].default_value = 0.35
-    b.inputs["Coat Weight"].default_value = 0.6                    # the gloss laminate, glossier than the lid
-    b.inputs["Coat Roughness"].default_value = 0.04
+    b.inputs["Roughness"].default_value = 0.25
+    b.inputs["Coat Weight"].default_value = 1.0                    # the gloss laminate, glossier than the lid
+    b.inputs["Coat Roughness"].default_value = 0.05
     bump(m, th.outputs["Color"], 0.6, distance=0.00015)
     m.blend_method = "HASHED" if hasattr(m, "blend_method") else None
     me.materials.append(m)
@@ -393,7 +393,7 @@ world = bpy.data.worlds.new("cinema")
 scene.world = world
 world.use_nodes = True
 world.node_tree.nodes["Background"].inputs["Color"].default_value = srgb(0x06070C)
-world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.6
+world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.12
 
 
 def area(name, loc, size, power, color, target, shape="RECTANGLE"):
@@ -410,19 +410,19 @@ def area(name, loc, size, power, color, target, shape="RECTANGLE"):
 
 
 # the projected screen far ahead and up (19 x 7 m, ~15 m away): the key light, and the long reflection on the lid
-area("cinema-screen", (0, 15.0, 4.2), (19.0, 7.2), 9000.0, (0.62, 0.70, 1.0), (0, 0, 0))
+area("cinema-screen", (0, 15.0, 4.2), (19.0, 7.2), 8000.0, (0.42, 0.47, 0.72), (0, 0, 0))   # the projected light: bluish, not saturated
 # house lights: two warm spots high on either side, for glints on the chamfers; a faint fill from the aisle
 for sx in (-1, 1):
     sp = bpy.data.lights.new(f"spot-{sx}", "SPOT")
-    sp.energy, sp.spot_size, sp.color, sp.shadow_soft_size = 25.0, math.radians(30), (0.8, 0.86, 1.0), 0.15
+    sp.energy, sp.spot_size, sp.color, sp.shadow_soft_size = 12.0, math.radians(30), (1.0, 0.9, 0.78), 0.15   # house lights: dim, warm
     ob = bpy.data.objects.new(f"spot-{sx}", sp)
     ob.location = (sx * 2.2, 2.5, 3.2)
     ob.rotation_euler = (Vector((0, -0.05, 0)) - ob.location).to_track_quat("-Z", "Y").to_euler()
     scene.collection.objects.link(ob)
-area("aisle", (-1.5, -0.6, 0.2), (0.6, 0.3), 0.6, (1.0, 0.25, 0.2), (0, -0.1, 0.05))
+
 # the room's own glow: the screen's light thrown back by the ceiling and the walls, a big soft source overhead and in
 # front, which is what a satin metal lid in a dark cinema mostly reflects (without it the lid reads black)
-area("ceiling-glow", (0, 7.5, 3.0), (8.0, 3.5), 110.0, (0.55, 0.62, 1.0), (0, 0.4, 0))
+area("ceiling-glow", (0, 7.5, 3.0), (8.0, 3.5), 45.0, (0.55, 0.62, 1.0), (0, 0.4, 0))
 area("behind", (0, -3.0, 2.6), (4.0, 2.0), 25.0, (0.6, 0.66, 1.0), (0, 0, 0.3))
 # (the lap under it is the page's: a soft darkness round its lower half, cinema/cinema.css .lap::before; modelled thighs
 # read as pillars beyond the lid)
@@ -545,11 +545,15 @@ for look in ("AgX - Medium High Contrast", "Medium High Contrast"):     # rename
         break
     except TypeError:
         continue
-scene.view_settings.exposure = -0.25
+scene.view_settings.exposure = -0.6
 # a real lens at half a metre: the far edge of the deck a touch soft
 cam_data.dof.use_dof = True
 cam_data.dof.focus_distance = EYE
 cam_data.dof.aperture_fstop = 5.6
+
+screen_glow = area("screen-glow", centre + normal * 0.004, (DISP_W, DISP_H), 0.0, (0.75, 0.8, 1.0), centre + normal * 0.004 + Vector((0, -0.25, -0.3)))
+screen_glow.rotation_euler = (-normal).to_track_quat("Z", "Y").to_euler()                       # emits along the display's normal
+screen_glow.data.spread = math.radians(140)
 
 if args.save:
     bpy.ops.wm.save_as_mainfile(filepath=args.save)
@@ -558,7 +562,8 @@ only = set(args.only.split(","))
 
 def shoot(angle, path, samples, width, spill):
     set_lid(angle)
-    M["display"].node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = spill
+    M["display"].node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = 0.0
+    screen_glow.data.energy = spill * 2.2                          # watts: a dark-mode screen's glow on the keys
     if not args.preview:
         scene.cycles.samples = samples
     scene.render.resolution_x, scene.render.resolution_y = width, round(width * HPX / WPX)

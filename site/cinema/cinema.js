@@ -679,15 +679,17 @@ function tubeControls() {
       onkeydown: (e) => { const d = { ArrowLeft: -10, ArrowRight: 10, PageDown: -60, PageUp: 60 }[e.key]; if (d) { e.preventDefault(); seekBy(d); } } },
     el("div", { class: "scrub-fill" }), el("div", { class: "scrub-ticks", "aria-hidden": "true" }));
   const bar = el("div", { class: "tube-bar", role: "group", "aria-label": "Recording" },
+    el("button", { class: "icon step is-prev", type: "button", "aria-keyshortcuts": "[", "aria-label": "Previous chapter", onclick: () => stepChapter(-1) }, el("span", { class: "ico", "aria-hidden": "true" })),
     el("button", { class: "toggle", type: "button", "aria-keyshortcuts": "K", onclick: () => playPause() }, el("span", { class: "glyph" })),
+    el("button", { class: "icon step is-next", type: "button", "aria-keyshortcuts": "]", "aria-label": "Next chapter", onclick: () => stepChapter(1) }, el("span", { class: "ico", "aria-hidden": "true" })),
     scrub,
     el("span", { class: "now-time" }),
     el("span", { class: "now-text" }),
     el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
     el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }),
-    el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "V", "aria-label": "Leave full screen", onclick: () => videoFullscreen() }));
+    el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Leave full screen", onclick: () => videoFullscreen() }));
   bar.querySelector(".fs").innerHTML = FS_ICON;
-  const corner = el("button", { class: "tube-fs", type: "button", "aria-keyshortcuts": "V", "aria-label": "Full-screen video", title: "Full-screen video  V", onclick: () => videoFullscreen() });
+  const corner = el("button", { class: "tube-fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Video full screen", title: "Video full screen  F", onclick: () => videoFullscreen() });
   corner.innerHTML = FS_ICON;
   return [corner, bar];
 }
@@ -867,11 +869,11 @@ function notesScreen(t) {
       el("button", { class: "notes-btn retry", type: "button", text: "Try again", onclick: () => retryPlayer() }),
       el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
       el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }),
-      (() => { const b = el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "V", "aria-label": "Full-screen video", title: "Full-screen video  V", onclick: () => videoFullscreen() }); b.innerHTML = FS_ICON; return b; })())) : null;
+      (() => { const b = el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Video full screen", title: "Video full screen  F", onclick: () => videoFullscreen() }); b.innerHTML = FS_ICON; return b; })())) : null;
   const keysSheet = el("div", { class: "keys-sheet", hidden: true, role: "note" },
     el("b", { text: "Keys" }),
     el("dl", {}, [["K", "Play or pause"], ["[  ]", "Previous or next chapter"], ["← →", "Back or on 10 seconds"], ["C  M", "Captions, sound"],
-      ["V", "Full-screen video"], ["F", "Laptop full screen"], ["L", "Close or open the lid"], ["Esc", "Leave full screen"], ["?", "These keys"]]
+      ["F", "Video full screen"], ["Z", "Zoom in on the laptop"], ["L", "Close or open the lid"], ["Esc", "Zoom out, or leave full screen"], ["?", "These keys"]]
       .filter(([k]) => live || !/^(K|\[|←|C)/.test(k)).map(([k, d]) => [el("dt", { text: k }), el("dd", { text: d })])),
     live ? el("p", { text: "Or double-click the picture for a full-screen video." }) : null);
   const keysBtn = el("button", { class: "notes-btn notes-keys", type: "button", "aria-label": "Keyboard shortcuts", "aria-expanded": "false", "aria-keyshortcuts": "?",
@@ -882,7 +884,7 @@ function notesScreen(t) {
       el("span", { class: "notes-app" }, el("i", { "aria-hidden": "true" }), "Notes"),
       el("span", { class: "notes-spacer" }),
       keysBtn,
-      el("button", { class: "notes-btn notes-zoom", type: "button", "aria-keyshortcuts": "F", onclick: () => setLaptop({ zoom: !seat.zoom }) }),
+      el("button", { class: "notes-btn notes-zoom", type: "button", "aria-keyshortcuts": "Z", onclick: () => setLaptop({ zoom: !seat.zoom }) }),
       el("button", { class: "notes-btn notes-close", type: "button", "aria-keyshortcuts": "L", onclick: () => setLaptop({ open: false }) }, "Close lid", key("L"))),
     keysSheet,
     el("div", { class: "notes-body" },
@@ -958,16 +960,19 @@ function tick() {
   if (!lidBar.hidden && !lidPlay.hidden) { lidPlay.querySelector(".glyph").textContent = playing ? "❚❚ Pause" : "▶ Play"; lidPlay.setAttribute("aria-label", playing ? "Pause" : "Play"); }
   const n = seat.notes;
   if (!n) return;
+  n.classList.toggle("is-playing", started);
   for (const c of n.querySelectorAll(".chapter")) {
     const on = Number(c.dataset.i) === i;
     c.classList.toggle("is-now", on);
     if (on) c.setAttribute("aria-current", "true"); else c.removeAttribute("aria-current");
   }
   if (i !== seat.lastChapter) {          // keep the playing chapter in view as the talk moves on
+    const wasNull = seat.lastChapter === null;
     seat.lastChapter = i;
+    if (!wasNull) seat.remounted = false;
     for (const c of n.querySelectorAll(".chapter.is-now")) {
       const box = c.closest(".scroller");
-      if (!box || !c.offsetParent) continue;
+      if (!box || !c.offsetParent || (seat.remounted && box.classList.contains("pane"))) continue;
       const top = c.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop;
       const clear = box.clientHeight * 0.78;                 // above the fade at the bottom
       if (top < box.scrollTop) box.scrollTo({ top: top - 8, behavior: reduceMotion ? "auto" : "smooth" });
@@ -1028,8 +1033,8 @@ function syncControls() {
   const n = seat.notesPanel;
   if (!n) return;
   const z = n.querySelector(".notes-zoom");
-  z.textContent = zoom ? "Exit full screen" : "Full screen";
-  z.append(el("kbd", { text: zoom ? "Esc" : "F", "aria-hidden": "true" }));
+  z.textContent = zoom ? "Zoom out" : "Zoom in";
+  z.append(el("kbd", { text: zoom ? "Esc" : "Z", "aria-hidden": "true" }));
   n.querySelector(".notes-close").hidden = zoom;
   n.classList.toggle("is-zoomed", zoom);
 }
@@ -1044,8 +1049,9 @@ function mountNotes() {
   if (!seat.open) return;
   const o = LAP, k = seat.layout.lap.k;
   const panel = seat.notesPanel || (seat.notesPanel = notesScreen(seat.t));
-  Object.assign(panel.style, { left: `${Math.round(o.screen[0] * k)}px`, top: `${Math.round(o.screen[1] * k)}px`,
-    width: `${Math.round((o.screen[2] - o.screen[0]) * k)}px`, height: `${Math.round((o.screen[3] - o.screen[1]) * k)}px` });
+  const x0 = Math.floor(o.screen[0] * k) - 1, y0 = Math.floor(o.screen[1] * k) - 1;
+  Object.assign(panel.style, { left: `${x0}px`, top: `${y0}px`,
+    width: `${Math.ceil(o.screen[2] * k) + 1 - x0}px`, height: `${Math.ceil(o.screen[3] * k) + 1 - y0}px` });
   panel.classList.remove("is-off");
   panel.classList.toggle("is-compact", !seat.zoom && (LAP.screen[3] - LAP.screen[1]) * k < 380);
   panel.classList.toggle("is-tiny", !seat.zoom && (LAP.screen[3] - LAP.screen[1]) * k < 310);
@@ -1057,6 +1063,7 @@ function mountNotes() {
   seat.notes = panel;
   syncControls();
   if (seat.zoom) fitWatch(panel);
+  seat.remounted = true;
   for (const sc of panel.querySelectorAll(".strip, .scroller")) watchScroll(sc);
   seat.lastChapter = null;
   tick();
@@ -1128,8 +1135,8 @@ addEventListener("keydown", (e) => {
   else if (k === "c") toggleCaptions();
   else if (k === "m") toggleMute();
   else if (k === "?" && n && seat.open) n.toggleKeys();
-  else if (k === "v") videoFullscreen();
-  else if (k === "f" && seat.open) setLaptop({ zoom: !seat.zoom });
+  else if (k === "f" || k === "v") videoFullscreen();
+  else if (k === "z" && seat.open) setLaptop({ zoom: !seat.zoom });
   else if (k === "l") setLaptop({ open: !seat.open });
 });
 
@@ -1164,6 +1171,7 @@ async function sitDown(t, n, key, withWalk) {
   const b = seat.layout.lap;
   moveLaptop(b, ms, ms ? { left: b.x, top: seat.layout.H + 20, width: b.w } : null);
   seatbar.hidden = false;
+  stage.classList.add("is-seated");
   if (ms) await new Promise((r) => setTimeout(r, ms));
   mountCine();
   mountNotes();
@@ -1197,6 +1205,7 @@ function leaveSeat() {
   if (seat.notes) seat.notes.remove();
   for (const h of lap.querySelectorAll(".lap-hint")) h.remove();
   seatbar.hidden = true;
+  stage.classList.remove("is-seated");
   seat = null;
   resetRoom();
 }

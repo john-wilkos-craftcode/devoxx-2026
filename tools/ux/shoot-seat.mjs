@@ -52,7 +52,7 @@ for (const v of VIEWS) {
   await page.mouse.move(v.viewport.width / 2, v.viewport.height / 2); await page.mouse.move(v.viewport.width / 2 + 20, v.viewport.height / 2);
   await page.waitForTimeout(400);
   await page.screenshot({ path: `${out}/${v.name}-11-video-fullscreen.png` });
-  await page.keyboard.press("v");
+  await page.keyboard.press("f");
   await page.waitForTimeout(800);
   if (NOVIDEO) {
     await page.goto("about:blank"); await page.goto(`${base}#talk-${NOVIDEO}`, { waitUntil: "networkidle" });
