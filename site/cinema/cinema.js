@@ -921,14 +921,26 @@ function notesScreen(t) {
   const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Notes" });
   // reading: scrolling down puts the header, the tabs and the bar away; scrolling up, the top, or the pointer at an
   // edge (or keyboard focus on them) brings them back
-  let lastY = 0, panel = null;
-  const chrome = (show) => { if (panel) panel.classList.toggle("is-immersed", !show); };
+  // Only a deliberate scroll counts: ~30 px one way. Folding changes the pane's height, and the browser then moves the
+  // scroll position by itself; those moves are ignored while the fold animates, and a pane that would fit without the
+  // chrome never folds (else it would fold, fit, unfold, overflow: a flicker).
+  let lastY = 0, run = 0, lockUntil = 0, panel = null;
+  const chrome = (show) => {
+    if (!panel || panel.classList.contains("is-immersed") === !show) return;
+    panel.classList.toggle("is-immersed", !show);
+    lockUntil = performance.now() + 450;
+    run = 0;
+  };
   pane.addEventListener("scroll", () => {
     const y = pane.scrollTop, d = y - lastY;
-    if (y < 24) chrome(true);
-    else if (d > 4 && panel && !panel.querySelector(".chapter-menu:not([hidden]), .keys-sheet:not([hidden])")) chrome(false);
-    else if (d < -4) chrome(true);
     lastY = y;
+    if (performance.now() < lockUntil) return;
+    if (y < 8) { chrome(true); return; }
+    run = Math.sign(d) === Math.sign(run) ? run + d : d;
+    const spare = pane.scrollHeight - pane.clientHeight;      // what's left to scroll with the chrome showing
+    const folds = [...panel.querySelectorAll(".chrome")].reduce((h, c) => h + c.offsetHeight, 0);   // what folding frees
+    if (run > 30 && spare > folds + 32 && !panel.querySelector(".chapter-menu:not([hidden]), .keys-sheet:not([hidden])")) chrome(false);
+    else if (run < -30) chrome(true);
   }, { passive: true });
   const chapterList = () => el("ol", { class: "chapters" }, chapters.map((c, i) => el("li", {},
     live ? el("button", { class: "chapter", type: "button", "data-i": i, onclick: () => { jumpTo(c.sec); menu.hidden = true; } }, el("time", { text: clock(c.sec) }), el("span", { text: c.title }))
