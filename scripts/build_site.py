@@ -27,6 +27,9 @@ def abstract_paragraphs(raw):
 
 def main():
     base = json.loads((DATA / "talks_base.json").read_text())
+    # the chapters YouTube shows on each recording's scrubber (scripts/fetch_chapters.py), for the cinema's laptop
+    yt_path = DATA / "raw" / "yt_chapters.json"
+    yt_chapters = json.loads(yt_path.read_text()) if yt_path.exists() else {}
     talks, missing = [], []
     for t in base:
         p = DATA / "summaries" / f"{t['id']}.json"
@@ -49,6 +52,7 @@ def main():
             "end": t["end"],
             "room": t["room"],
             "videoId": t["videoId"],
+            "ytChapters": yt_chapters.get(t["videoId"]) or None,
             "twin": t.get("twin"),
             "s": {k: v for k, v in (s or {}).items() if k != "id"} or None,
         })

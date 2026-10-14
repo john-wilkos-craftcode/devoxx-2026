@@ -35,12 +35,13 @@ for (const v of VIEWS) {
   const seatCard = page.locator(".card:not(.is-off)").first();
   if (await seatCard.count()) {
     await seatCard.click();
-    await page.waitForSelector(".face.talk", { timeout: 20000 });
+    await page.waitForSelector(".face.talk, .face.notes", { timeout: 20000 });     // laptops: the seat (shoot-seat.mjs has the rest)
     await page.waitForTimeout(1500);
     await shot("4-talk");
-    const tabs = page.locator(".face.talk .tabs .pill");
+    const tabs = page.locator(".face.talk .tabs .pill, .face.notes .tabs .pill");
     if (await tabs.count() > 2) { await tabs.nth(2).click(); await shot("5-talk-tab"); }
-    await page.locator(".face.talk button", { hasText: "Back to the programme" }).first().click();
+    if (await page.locator("#toProg").isVisible()) await page.locator("#toProg").click();
+    else await page.locator(".face.talk button", { hasText: "Back to the programme" }).first().click();
     await page.waitForSelector(".face.prog", { timeout: 20000 });
     await shot("6-back");
   } else log.push(`${v.name}: no walkable card in the first slot`);

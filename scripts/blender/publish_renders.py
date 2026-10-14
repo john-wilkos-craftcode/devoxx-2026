@@ -13,6 +13,7 @@
   room's door totem), joined the same way into walk-phone-<n>.mp4.
 - A clip newer than its frames (and this script) is not encoded again.
 - shots-<n>.json files are merged into media/shots.json, so rooms rendered on different nights add up.
+- A folder with laptop.json (build_laptop.py) gives laptop-open/-closed.webp, laptop-anim-<i>.webp and shots["laptop"].
 """
 import json
 import subprocess
@@ -151,6 +152,20 @@ for key, info in sorted(shots.items()):
         frames = dip_join([Image.open(p).convert("RGB") for p in a], [Image.open(p).convert("RGB") for p in b], out, info["fps"])
         shots[f"walk-phone-{n}"] = {"kind": "clip", "frames": frames, "fps": info["fps"]}
         print(f"walk-phone-{n}.mp4 ({len(a)} + {DIP[1]} + {len(b)} frames)")
+
+# the laptop on your lap (build_laptop.py): open and closed stills and the frames between, on transparency
+for src in srcs:
+    lj = src / "laptop.json"
+    if not lj.exists():
+        continue
+    shots["laptop"] = json.loads(lj.read_text())
+    for name in ("laptop-open", "laptop-closed"):
+        if (src / f"{name}.png").exists():
+            Image.open(src / f"{name}.png").save(OUT / f"{name}.webp", quality=90, method=6)
+            print(f"{name}.webp")
+    for i, f in enumerate(sorted((src / "anim").glob("f_*.png"))):
+        Image.open(f).save(OUT / f"laptop-anim-{i:02d}.webp", quality=80, method=6)
+    print(f"laptop: {shots['laptop'].get('frames', 0)} frames")
 
 existing.write_text(json.dumps(shots, indent=1))
 print(f"shots.json: {', '.join(sorted(shots))}")

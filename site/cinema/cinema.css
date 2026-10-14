@@ -316,3 +316,289 @@ button, input, a { font: inherit; color: inherit; }
 .talk.is-tall .who-l, .talk.is-tall .verdict, .talk.is-tall .meta { font-size: 15px; }
 .talk.is-tall .tabs .pill { font-size: 14px; }
 .talk.is-tall .tldr { font-size: 16px; }
+
+/* ---------- the seat on laptops: the recording on the cinema screen, the notes on a laptop in your lap ---------- */
+.front { z-index: 1; }
+.tube { position: absolute; left: 0; top: 0; z-index: 1; background: #000; transition: opacity .25s ease; }
+.tube[hidden] { display: none; }
+.tube .yt, .tube iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.tube.is-away { opacity: 0; pointer-events: none; }
+.tube.is-on-laptop { z-index: 4; }
+.lap { position: absolute; z-index: 2; }
+.lap[hidden] { display: none; }
+.lap-art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; pointer-events: none; }
+.fade { z-index: 6; }
+.plate, .front { transition: filter .5s ease; }
+.stage.is-reading .plate, .stage.is-reading .front, .stage.is-reading .overlay { filter: brightness(.4) blur(3px); }
+.overlay { transition: filter .5s ease; }
+
+/* the closed lid is a button: press it to open the laptop */
+.lap-lid { position: absolute; left: 12%; right: 12%; top: 6%; bottom: 14%; background: none; border: 0; border-radius: 18px; cursor: pointer;
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4%; color: var(--ink); font-size: 14px; font-weight: 700; }
+.lap-lid[hidden] { display: none; }
+.lap-lid::after { content: "Open the laptop"; background: rgba(8, 11, 30, .72); border: 1px solid rgba(174, 184, 236, .35); border-radius: 999px; padding: 7px 13px; backdrop-filter: blur(4px); }
+.lap-lid { font-size: 0; }
+.lap-lid::after { font-size: 14px; }
+.lap-lid:hover::after { border-color: var(--orange); }
+.lap-lid:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+/* chrome round the edges while seated */
+.chip { background: rgba(8, 11, 30, .78); border: 1px solid rgba(174, 184, 236, .35); border-radius: 999px; padding: 9px 15px; font-size: 14px; font-weight: 600; line-height: 1;
+  color: var(--ink); backdrop-filter: blur(6px); cursor: pointer; }
+.chip:hover { border-color: var(--orange); }
+.chip:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.chip[hidden] { display: none; }
+.seatbar { position: fixed; z-index: 7; left: 16px; top: 14px; }
+.seatbar[hidden], .lapdock[hidden] { display: none; }
+.lapdock { position: fixed; z-index: 7; right: 16px; bottom: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+/* the cinema screen: the recording at full height, and a column of who, what and why */
+.face.cine { display: flex; gap: 26px; align-items: stretch; padding: 18px 20px calc(var(--cover, 0px) + 16px) 30px; }
+.cine-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.cine .meta { font-size: 16px; }
+.cine h2 { margin-top: 10px; font-weight: 800; font-stretch: 110%; font-size: var(--title, 32px); line-height: 1.06; letter-spacing: -.01em; text-wrap: balance;
+  display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.cine .who-l { margin-top: 10px; font-size: 17px; }
+.cine .verdict { margin-top: 16px; font-size: 16px; line-height: 1.42; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+.cine .slot { flex: none; height: 100%; aspect-ratio: 16 / 9; background: #05060c; }
+.cine .slot.is-poster { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 0 12%; text-align: center; background: #0d1338; border: 2px solid var(--line); }
+.cine .slot.is-poster b { font-size: 28px; font-weight: 800; font-stretch: 110%; }
+.cine .slot.is-poster span { font-size: 16px; line-height: 1.45; color: var(--muted); }
+
+/* the laptop's screen: a notes app in dark mode (it's a cinema) */
+.face.notes { position: absolute; display: flex; flex-direction: column; background: #0f1117; color: #e8ebf4; font-size: 14px; transition: opacity .14s ease; }
+.face.notes.is-off { opacity: 0; }
+.notes-top { flex: none; display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 6px 0 12px; background: #181b24; border-bottom: 1px solid #272b38; font-size: 12.5px; }
+.notes-app { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+.notes-app i { width: 9px; height: 9px; border-radius: 50%; background: var(--orange); }
+.notes-title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #9aa1b8; }
+.notes-zoom { flex: none; background: #262a37; border: 1px solid #343a4c; border-radius: 7px; padding: 4px 9px; font-size: 12.5px; font-weight: 600; color: #e8ebf4; }
+.notes-zoom:hover { border-color: var(--orange); }
+.notes-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); }
+.notes-read { display: flex; flex-direction: column; min-height: 0; padding: 10px 12px 0; }
+.notes-watch { display: none; }
+.notes .tabs { flex: none; flex-wrap: nowrap; gap: 6px; margin-bottom: 8px; }
+.notes .tabs .pill { font-size: 13px; padding: 4px 9px; border-width: 1.5px; border-radius: 7px; border-color: #343a4c; color: #e8ebf4; }
+.notes .tabs .pill[aria-pressed="true"] { background: #e8ebf4; border-color: #e8ebf4; color: #0f1117; }
+.notes .pane { flex: 1; font-size: 14px; line-height: 1.5; padding-right: 8px; scrollbar-color: #343a4c transparent; }
+.notes .pane p { margin: 0 0 10px; }
+.notes .pane .lead { font-weight: 600; color: #fff; }
+.notes .pane ul, .notes .pane ol { gap: 7px; }
+.notes .chapters { list-style: none; margin: 0; padding: 0; display: block; }
+.notes .chapter { display: grid; grid-template-columns: 48px 1fr; gap: 8px; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid #222634;
+  padding: 6px 6px; color: inherit; text-decoration: none; cursor: pointer; border-radius: 0; }
+.notes .chapter:hover { background: #1a1e29; }
+.notes .chapter time { color: var(--orange); font-weight: 700; font-variant-numeric: tabular-nums; }
+.notes .chapter.is-now { background: rgba(246, 146, 30, .16); box-shadow: inset 3px 0 0 var(--orange); }
+.notes .chapter.is-now span::after { content: "  ◂ now"; color: var(--orange); font-weight: 700; font-size: .85em; }
+.notes .now { flex: none; display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 6px; background: #181b24; border-top: 1px solid #272b38; font-size: 12.5px; }
+.notes .now-text { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: center; color: #c9cee0; }
+.notes .step { flex: none; width: 30px; height: 24px; background: #262a37; border: 1px solid #343a4c; border-radius: 6px; font-size: 17px; line-height: 1; color: #e8ebf4; }
+.notes .step:hover { border-color: var(--orange); }
+.notes :focus-visible { outline: 2px solid #fff; outline-offset: 2px; box-shadow: none; }
+
+/* lifted to fill the window: the reading on the left, the recording and the chapters on the right */
+.notes.is-zoomed { font-size: 18px; }
+.notes.is-zoomed .notes-top { height: 44px; font-size: 15px; padding: 0 10px 0 18px; }
+.notes.is-zoomed .notes-zoom { font-size: 15px; padding: 6px 12px; }
+.notes.is-zoomed .notes-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 28px; padding: 0 22px 0 0; }
+.notes.is-zoomed .notes-read { padding: 18px 0 0 24px; }
+.notes.is-zoomed .tabs .pill { font-size: 16px; padding: 6px 12px; }
+.notes.is-zoomed .tabs [data-tab="chapters"] { display: none; }
+.notes.is-zoomed .pane { font-size: 18px; line-height: 1.55; }
+.notes.is-zoomed .notes-watch { display: flex; flex-direction: column; min-height: 0; padding-top: 18px; }
+.notes.is-zoomed .notes-watch .slot { flex: none; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 6px; }
+.notes.is-zoomed .watch-head { margin: 14px 0 6px; font-size: 14px; font-weight: 700; color: #9aa1b8; text-transform: none; }
+.notes.is-zoomed .watch-list { flex: 1; min-height: 0; font-size: 16px; }
+.notes.is-zoomed .chapter { grid-template-columns: 60px 1fr; padding: 8px 8px; }
+.notes.is-zoomed .now { height: 44px; font-size: 15px; padding: 0 10px; }
+.notes.is-zoomed .step { width: 38px; height: 30px; font-size: 20px; }
+
+/* round 1 */
+.tube .poster { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: #000; cursor: pointer; display: block; }
+.tube .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .82; transition: opacity .2s ease; }
+.tube .poster:hover img { opacity: 1; }
+.tube .poster .play { position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: flex; align-items: center; gap: 12px; padding: 14px 24px 14px 18px;
+  border-radius: 999px; background: var(--orange); color: var(--deep); font-size: 20px; font-weight: 800; box-shadow: 0 6px 30px rgba(0, 0, 0, .45); white-space: nowrap; }
+.tube .poster .play i { width: 0; height: 0; border-left: 18px solid var(--deep); border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
+.tube .poster .play small { font-size: 15px; font-weight: 600; opacity: .75; }
+.tube .poster:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
+.tube.is-on-laptop .poster .play { font-size: 17px; padding: 10px 18px 10px 14px; }
+.cine h2 { display: block; -webkit-line-clamp: unset; overflow: visible; }
+.cine .verdict { display: block; -webkit-line-clamp: unset; overflow: visible; }
+.cine-info { overflow: hidden; }
+.cine .slot.is-poster .btn { margin-top: 6px; }
+.notes-btn { flex: none; background: #262a37; border: 1px solid #343a4c; border-radius: 7px; padding: 4px 9px; font-size: 12.5px; font-weight: 600; color: #e8ebf4; }
+.notes-btn:hover { border-color: var(--orange); }
+.notes-btn[hidden] { display: none; }
+.notes-close { margin-left: 4px; }
+.notes .pane .label { font-size: 12.5px; font-weight: 600; color: #9aa1b8; margin: 0 0 6px; }
+.notes .toggle { flex: none; width: 34px; height: 24px; background: var(--orange); border: 0; border-radius: 6px; font-size: 11px; font-weight: 800; color: var(--deep); }
+.notes.is-zoomed .toggle { width: 44px; height: 30px; font-size: 13px; }
+.notes .now-text { text-align: left; padding-left: 4px; }
+.notes.is-compact .notes-top { height: 28px; }
+.notes.is-compact .notes-read { padding-top: 7px; }
+.notes.is-compact .tabs { margin-bottom: 6px; }
+.notes.is-compact .now { height: 30px; }
+.notes.is-zoomed .notes-btn { font-size: 15px; padding: 6px 12px; }
+.cine .slot { flex: none; align-self: center; height: auto; aspect-ratio: auto; }   /* sized by fitCine */
+
+/* round 2 */
+.notes kbd { display: inline-block; margin-left: 6px; padding: 0 4px; min-width: 15px; border: 1px solid #4a5068; border-bottom-width: 2px; border-radius: 4px;
+  font: 600 10.5px/14px "Archivo", system-ui, sans-serif; color: #b9bfd3; text-align: center; vertical-align: 1px; }
+.notes .toggle kbd { border-color: rgba(10, 15, 46, .45); color: var(--deep); }
+.notes .now { gap: 10px; padding: 0 8px; }
+.notes .transport { flex: none; display: flex; gap: 4px; }
+.notes .step { width: auto; height: 24px; padding: 0 7px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.notes .toggle { width: auto; height: 24px; padding: 0 8px; font-size: 12px; white-space: nowrap; }
+.notes .toggle .glyph { font-weight: 800; }
+.notes.is-compact kbd { display: none; }                 /* no room on a small laptop: the ? sheet lists them */
+.notes.is-compact .notes-btn kbd, .notes.is-compact .transport kbd { display: none; }
+.notes.is-zoomed .step, .notes.is-zoomed .toggle { height: 32px; padding: 0 12px; font-size: 15px; }
+.notes.is-zoomed kbd { font-size: 12px; line-height: 16px; }
+.notes .now-text { font-variant-numeric: tabular-nums; }
+.notes-keys { width: 26px; padding: 4px 0; text-align: center; }
+.notes.is-zoomed .notes-keys { width: 34px; }
+.keys-sheet { position: absolute; z-index: 3; right: 8px; top: 38px; padding: 10px 14px 12px; background: #1d2130; border: 1px solid #3a4054; border-radius: 9px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5); font-size: 13px; }
+.keys-sheet[hidden] { display: none; }
+.keys-sheet b { display: block; margin-bottom: 6px; font-size: 12.5px; color: #9aa1b8; }
+.keys-sheet dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
+.keys-sheet dt { font-weight: 800; color: var(--orange); }
+.keys-sheet dd { margin: 0; }
+.notes.is-zoomed .keys-sheet { top: 50px; font-size: 16px; }
+.notes .pane .label { margin-top: 2px; }
+.notes .pane .lead + .label { margin-top: 12px; }
+.notes .pane { scrollbar-width: thin; scrollbar-color: #4d546c #161922; }
+.notes .watch-list { scrollbar-width: thin; scrollbar-color: #4d546c #161922; }
+.notes .scroller.more-b { mask-image: linear-gradient(180deg, #000 88%, rgba(0, 0, 0, .25)); }
+.notes.is-zoomed .notes-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); }
+
+/* the first time: a note beside the laptop */
+.lap-hint { position: absolute; width: min(230px, 20vw); display: flex; gap: 8px; align-items: flex-start; padding: 11px 10px 11px 14px;
+  background: var(--orange); color: var(--deep); border-radius: 12px; font-size: 14px; font-weight: 600; line-height: 1.35; box-shadow: 0 8px 30px rgba(0, 0, 0, .45); }
+.lap-hint::before { content: ""; position: absolute; left: -7px; top: 22px; border: 7px solid transparent; border-left: 0; border-right-color: var(--orange); }
+.lap-hint button { flex: none; background: none; border: 0; font-size: 20px; line-height: 1; color: var(--deep); cursor: pointer; padding: 0 2px; }
+.stage.is-reading .lap-hint, .lap:has(.lap-lid:not([hidden])) .lap-hint { display: none; }
+
+/* the player couldn't load */
+.tube-error { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 0 12%;
+  text-align: center; background: #0d1338; border: 2px solid var(--line); }
+.tube-error b { font-size: 24px; font-weight: 800; }
+.tube-error span { font-size: 15px; line-height: 1.45; color: var(--muted); }
+.notes.is-zoomed .step, .notes.is-zoomed .toggle { width: auto; }
+
+/* round 3: the transport on the laptop; YouTube's chrome off on the big screen */
+.tube-catch { position: absolute; inset: 0; cursor: pointer; }
+.tube-paused { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(closest-side, rgba(0, 0, 0, .35), rgba(0, 0, 0, .65)); }
+.tube-paused[hidden] { display: none; }
+.tube-paused .resume { display: flex; align-items: center; gap: 12px; max-width: 80%; padding: 13px 22px 13px 18px; border: 0; border-radius: 999px; background: rgba(8, 11, 30, .82);
+  color: var(--ink); font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 0 0 1px rgba(174, 184, 236, .35); }
+.tube-paused .resume i { flex: none; width: 0; height: 0; border-left: 16px solid var(--orange); border-top: 10px solid transparent; border-bottom: 10px solid transparent; }
+.tube-paused .resume-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tube:fullscreen { background: #000; }
+.tube:fullscreen .tube-paused .resume { font-size: 24px; }
+
+.notes-spacer { flex: 1; }
+.notes .notes-top { gap: 6px; }
+.notes.is-compact kbd, .notes.is-compact .notes-btn kbd, .notes.is-compact .transport kbd { display: inline-block; }   /* keys stay visible */
+.notes.is-compact kbd { margin-left: 4px; font-size: 10px; line-height: 13px; padding: 0 3px; min-width: 13px; }
+.notes-keys { width: auto; padding: 4px 8px; }
+.notes.is-zoomed .notes-keys { width: auto; }
+
+.notes .pane-wrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.notes .pane-wrap > .scroller { flex: 1; min-height: 0; }
+.notes .more-below { display: none; position: absolute; left: 50%; bottom: 6px; translate: -50% 0; padding: 3px 10px; border: 1px solid #3a4054; border-radius: 999px;
+  background: #1d2130; color: #c9cee0; font-size: 11.5px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, .5); }
+.notes .pane-wrap:has(> .scroller.more-b) > .more-below { display: block; }
+.notes .pane-wrap.is-list { flex: 1; }
+.notes.is-zoomed .more-below { font-size: 14px; padding: 4px 12px; }
+
+.notes .now { flex: none; display: flex; flex-direction: column; align-items: stretch; gap: 0; height: auto; padding: 0 8px 5px; background: #181b24; border-top: 1px solid #272b38; }
+.notes .now-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.notes .scrub { position: relative; height: 14px; margin: 0 2px 2px; cursor: pointer; }
+.notes .scrub::before { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 4px; border-radius: 2px; background: #343a4c; }
+.notes .scrub-fill { position: absolute; left: 0; top: 5px; height: 4px; width: 0; border-radius: 2px; background: var(--orange); }
+.notes .scrub-ticks i { position: absolute; top: 4px; width: 2px; height: 6px; margin-left: -1px; background: #181b24; }
+.notes .scrub:not(.is-ready) { opacity: .5; }
+.notes .scrub:hover::before { top: 4px; height: 6px; }
+.notes .scrub:focus-visible { outline: 2px solid #fff; outline-offset: 1px; border-radius: 3px; }
+.notes .step { min-width: 30px; font-size: 15px; font-weight: 700; padding: 0 6px; }
+.notes .now-chapter { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; background: none; border: 1px solid transparent; border-radius: 6px;
+  color: #e8ebf4; font-size: 12.5px; font-weight: 600; text-align: left; cursor: pointer; }
+.notes .now-chapter:hover { border-color: #343a4c; }
+.notes .now-chapter.is-plain { cursor: default; }
+.notes .now-chapter .now-text { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0; color: inherit; text-align: left; }
+.notes .now-chapter .caret { color: var(--orange); font-size: 11px; }
+.notes .now-time { flex: none; font-size: 12px; color: #9aa1b8; font-variant-numeric: tabular-nums; }
+.notes .icon { flex: none; display: grid; place-items: center; height: 24px; min-width: 30px; padding: 0 5px; background: #262a37; border: 1px solid #343a4c; border-radius: 6px;
+  color: #e8ebf4; font-size: 11px; font-weight: 800; cursor: pointer; }
+.notes .icon:hover { border-color: var(--orange); }
+.notes .icon[aria-pressed="true"] { background: #e8ebf4; color: #0f1117; border-color: #e8ebf4; }
+.notes .icon:disabled { opacity: .45; cursor: default; }
+.notes .now.is-failed .scrub, .notes .now.is-failed .step, .notes .now.is-failed .icon, .notes .now.is-failed .caret { display: none; }
+.notes .now.is-failed .toggle { background: #262a37; color: #e8ebf4; }
+.notes .now.is-failed .toggle kbd { display: none; }
+.notes .chapter-menu { position: absolute; z-index: 3; left: 8px; right: 8px; bottom: 52px; max-height: 72%; padding: 4px 6px; background: #1d2130; border: 1px solid #3a4054;
+  border-radius: 9px; box-shadow: 0 -10px 30px rgba(0, 0, 0, .5); overflow-y: auto; }
+.notes .chapter-menu[hidden] { display: none; }
+.notes .chapter-menu .chapter:first-child { border-top: 0; }
+.notes.is-zoomed { font-size: clamp(17px, 1.12vw, 21px); }
+.notes.is-zoomed .pane { font-size: 1em; }
+.notes.is-zoomed .now { padding: 0 12px 8px; }
+.notes.is-zoomed .scrub { height: 18px; }
+.notes.is-zoomed .scrub::before, .notes.is-zoomed .scrub-fill { top: 6px; height: 6px; }
+.notes.is-zoomed .scrub-ticks i { top: 5px; height: 8px; }
+.notes.is-zoomed .now-chapter { height: 32px; font-size: 15px; }
+.notes.is-zoomed .now-time { font-size: 14px; }
+.notes.is-zoomed .icon { height: 32px; min-width: 38px; font-size: 13px; }
+.notes.is-zoomed .chapter-menu { bottom: 74px; left: auto; width: 50%; }
+.notes.is-zoomed .notes-watch .slot { max-height: 52%; width: auto; aspect-ratio: 16 / 9; align-self: flex-start; }
+.keys-sheet p { margin: 8px 0 0; font-size: .92em; color: #9aa1b8; }
+/* YouTube draws its title bar and "more videos" over the top and bottom of its frame: make the frame taller than the slot,
+   so the 16:9 picture letterboxes inside it and those overlays land in the bars, clipped away */
+.tube { overflow: hidden; --crop: max(64px, 14%); }
+.tube .yt, .tube iframe { top: calc(-1 * var(--crop)); height: calc(100% + 2 * var(--crop)); }
+.tube:fullscreen { --crop: 0px; }
+.notes.is-zoomed .notes-watch .slot { width: 100%; max-height: none; aspect-ratio: 16 / 9; align-self: stretch; }
+/* round 4 */
+.notes.is-zoomed .now { height: auto; }
+.notes .more-below { left: auto; right: 14px; translate: none; bottom: 8px; }
+.notes .pane-wrap > .scroller { padding-bottom: 26px; }        /* the last line can scroll clear of the cue */
+.notes.is-zoomed .chapter { padding: .45em .5em; }
+.notes.is-zoomed .watch-list { font-size: 1em; }
+.tube-paused.is-loading .resume i { width: 18px; height: 18px; border: 3px solid rgba(246, 146, 30, .3); border-top-color: var(--orange); border-radius: 50%;
+  animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+html, body { overscroll-behavior: none; }
+.stage { overflow: clip; }
+.notes.is-compact .now { height: auto; }
+/* round 5 */
+.notes .step .ico { display: block; width: 14px; height: 14px; background: currentColor;
+  -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat; }
+.notes .step.is-prev { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='3' width='2.4' height='10' rx='1'/%3E%3Cpath d='M14 3.2v9.6a.6.6 0 0 1-.9.5L5.6 8.5a.6.6 0 0 1 0-1l7.5-4.8a.6.6 0 0 1 .9.5z'/%3E%3C/svg%3E"); }
+.notes .step.is-next { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='11.6' y='3' width='2.4' height='10' rx='1'/%3E%3Cpath d='M2 3.2v9.6a.6.6 0 0 0 .9.5l7.5-4.8a.6.6 0 0 0 0-1L2.9 2.7a.6.6 0 0 0-.9.5z'/%3E%3C/svg%3E"); }
+.notes .step { display: grid; place-items: center; min-width: 32px; padding: 0 8px; }
+.notes.is-zoomed .step .ico { width: 17px; height: 17px; }
+.notes .now-chapter { flex: 0 1 auto; max-width: 62%; border-color: #343a4c; background: #1f2330; }
+.notes .now-chapter:hover { border-color: var(--orange); }
+.notes .now-num { flex: none; color: var(--orange); font-weight: 800; font-size: .92em; font-variant-numeric: tabular-nums; }
+.notes .now-time { margin-left: auto; }
+.notes-close { position: relative; margin-left: 12px; background: transparent; }
+.notes-close::before { content: ""; position: absolute; left: -8px; top: 3px; bottom: 3px; width: 1px; background: #343a4c; }
+/* the "more" cue sits in its own strip under the text, never on it */
+.notes .pane-wrap > .scroller { padding-bottom: 8px; }
+.notes .pane-wrap:has(> .scroller.more-b) { padding-bottom: 20px; }
+.notes .more-below { right: auto; left: 50%; translate: -50% 0; bottom: 0; padding: 1px 10px; font-size: 11px; box-shadow: none; }
+.notes.is-zoomed .pane-wrap:has(> .scroller.more-b) { padding-bottom: 28px; }
+.notes.is-zoomed .more-below { font-size: 13px; padding: 2px 12px; }
+/* small laptops: tighter chrome, more reading */
+.notes.is-compact .notes-top { height: 26px; }
+.notes.is-compact .notes-btn { padding: 2px 7px; font-size: 12px; }
+.notes.is-compact .notes-read { padding-top: 6px; }
+.notes.is-compact .tabs { margin-bottom: 5px; }
+.notes.is-compact .tabs .pill { padding: 3px 8px; font-size: 12.5px; }
+.notes.is-compact .pane { font-size: 13.5px; line-height: 1.45; }
+.notes.is-compact .pane .lead + .label { margin-top: 8px; }
+.notes.is-compact .chapter { padding: 4px 6px; }
+.notes.is-compact .scrub { height: 12px; }

@@ -107,18 +107,32 @@ const canvasFor = (key) => CANVAS[key.replace(/-\d+$/, "")];
 
 // How a still sits in the viewport: cropped to fill it (cover) unless that would cut more than 6% off a side and
 // risk cutting into a screen, then letterboxed (contain), black bars like a cinema.
+// A still rendered wider than the walk (the seat, where the laptop needs room below) says which part of it is the walk's
+// frame (inner, 0-1): that part is framed like this, so the walk's last frame and the still line up.
 function framing(key) {
-  const [iw, ih] = IMG[key.includes("phone") ? "phone" : "laptop"];
+  const sh = shots[key] || {};
+  const [iw, ih] = sh.px || IMG[key.includes("phone") ? "phone" : "laptop"];
+  const [x0, y0, x1, y1] = sh.inner || [0, 0, 1, 1];
+  const fw = (x1 - x0) * iw, fh = (y1 - y0) * ih;
   const W = stage.clientWidth, H = stage.clientHeight;
-  const cover = Math.max(W / iw, H / ih), crop = Math.max(1 - W / (iw * cover), 1 - H / (ih * cover)) / 2;
-  const s = crop > 0.06 ? Math.min(W / iw, H / ih) : cover;
-  return { iw, ih, s, ox: (W - iw * s) / 2, oy: (H - ih * s) / 2, contain: crop > 0.06 };
+  const cover = Math.max(W / fw, H / fh), crop = Math.max(1 - W / (fw * cover), 1 - H / (fh * cover)) / 2;
+  const s = crop > 0.06 ? Math.min(W / fw, H / fh) : cover;
+  return { iw, ih, s, ox: (W - fw * s) / 2 - x0 * iw * s, oy: (H - fh * s) / 2 - y0 * ih * s, contain: crop > 0.06 };
+}
+// where CSS object-fit puts the whole still: the base the transforms move it from
+function placed(key) {
+  const sh = shots[key] || {};
+  if (!sh.inner) return framing(key);
+  const [iw, ih] = sh.px, W = stage.clientWidth, H = stage.clientHeight;
+  const s = framing(key).contain ? Math.min(W / iw, H / ih) : Math.max(W / iw, H / ih);
+  return { iw, ih, s, ox: (W - iw * s) / 2, oy: (H - ih * s) / 2 };
 }
 // Phones, at a door: once the walk has settled, the still is zoomed by hand onto the totem until its screen nearly
 // fills the phone (a sliver of the room round the edges), and the talk is laid out for that bigger screen.
 let zoomed = false;
 const SLIVER = 8;   // css px of the render left showing past the screen's edge, at the tighter side
 function fit(key) {
+  if (seat && seat.layout && key === seat.key) return seat.layout.frame;
   const f = framing(key);
   if (!zoomed || !key.startsWith("door-phone")) return f;
   const { iw, ih } = f, W = stage.clientWidth, H = stage.clientHeight;
@@ -133,7 +147,7 @@ function fit(key) {
 const ZOOM_S = 0.75, ZOOM_LEAD = 0.3;   // its length, and how long before the walk's end it starts
 function zoomTo(key, on, animate = false) {
   zoomed = on;
-  const a = framing(key), b = fit(key), k = b.s / a.s;
+  const a = placed(key), b = fit(key), k = b.s / a.s;
   const tf = on ? `translate(${b.ox - k * a.ox}px, ${b.oy - k * a.oy}px) scale(${k})` : "";
   for (const e of [plate, front, clip]) {
     e.style.transformOrigin = "0 0";
@@ -154,7 +168,8 @@ function mount(panel, key, overlayName) {
   const [mw, mh] = shots[key].size[overlayName];
   // laptops: a fixed canvas, like a real display; phones: laid out 1:1 for the width the totem takes on this screen
   let w = canvasFor(key);
-  if (key.includes("phone")) {
+  if (seat && key === seat.key) w = Math.round(seat.layout.screen.w);   // the seat on laptops: laid out 1:1 for the screen's size
+  else if (key.includes("phone")) {
     const { iw, ih, s } = fit(key);
     const [tl, tr] = ordered(shots[key].overlay[overlayName]);
     w = Math.max(280, Math.round(Math.hypot((tr[0] - tl[0]) * iw * s, (tr[1] - tl[1]) * ih * s)));
@@ -169,14 +184,16 @@ function mount(panel, key, overlayName) {
   fitCards(panel);
   for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s);
 }
-const unmount = () => { if (face) { face.el.remove(); face = null; } front.hidden = true; if (zoomed) zoomTo("hall", false); };
+const unmount = () => { if (face) { face.el.remove(); face = null; } front.hidden = true; if (zoomed) zoomTo("hall", false); leaveSeat(); };
 let resizeTimer = 0;
 addEventListener("resize", () => {
+  if (seat) { relayoutSeat(); return; }
   place();
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     const next = form();
     if (next !== shape && !busy) { shape = next; rerender(); }
+    else if (seat) relayoutSeat();
     else if (face) {
       const mode = framing(face.key).contain ? "contain" : "cover";
       plate.style.objectFit = front.style.objectFit = mode;
@@ -476,6 +493,595 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
       el("button", { type: "button", text: "Back to the programme", onclick: () => goHall() })) : null);
 }
 
+// ---------- the seat, on laptops: the recording on the cinema screen, your notes on a laptop in your lap ----------
+// The cinema screen carries the talk's recording, as big as the screen allows, with only the title, the speakers and why
+// it's worth your time beside it. Everything else (the summary, what to try, the chapters to jump through the talk) is on
+// a laptop on your lap: a separate picture laid over the room, like a first-person game draws the hands, so it can be
+// placed for each window size without ever covering the recording. Open, it rises into the bottom of the view, the room
+// tilted up a little to make room; closed, its lid (and the sticker on it) lies low and the screen is all yours; zoomed,
+// it's lifted until its screen fills the window, the room dims behind, and the recording moves onto it.
+// Keys: K play/pause, [ and ] previous/next chapter, F full screen, L open/close the laptop, Esc back out.
+// The laptop's pictures and where things are in them, in art px (scripts/blender/build_laptop.py writes laptop.json, which
+// publish_renders.py puts in shots.json as "laptop"): every picture is the same frame from the same eye, so open, closed
+// and the frames between only move up or down. top: the lid's top edge; cut: where the view's bottom edge cuts the open
+// laptop (cutShort on short windows: fewer keys, a bigger screen); bottom: the closed laptop's front edge.
+const LAP = shots.laptop ? (() => {
+  const L = shots.laptop, [tl, tr, bl] = L.screen, hingeCut = (f) => Math.min(L.h, L.open_cut + (f - 0.32) * (bl[1] - tl[1]));
+  return { w: L.w, h: L.h, screen: [tl[0], tl[1], tr[0], bl[1]],
+    open: { src: "media/laptop-open.webp", top: L.open_top, cut: L.open_cut, cutShort: hingeCut(0.1) },
+    closed: { src: "media/laptop-closed.webp", top: L.closed_top, bottom: L.closed_bottom },
+    frames: Array.from({ length: L.frames || 0 }, (_, i) => `media/laptop-anim-${String(i).padStart(2, "0")}.webp`) };
+})() : {   // a drawn stand-in until the render is in
+  w: 1600, h: 1060, screen: [176, 26, 1424, 806],
+  open: { src: "media/mock/laptop-open.svg", top: 0, cut: 1060, cutShort: 905 },
+  closed: { src: "media/mock/laptop-closed.svg", top: 40, bottom: 560, w: 1600, h: 560 },
+  frames: [],
+};
+const $ = (id) => document.getElementById(id);
+const tube = $("tube"), lap = $("lap"), lapArt = $("lapArt"), lapLid = $("lapLid"), seatbar = $("seatbar");
+const MOVE = reduceMotion ? 0 : 650;                       // ms for the laptop and the view to move
+const EASE = "cubic-bezier(.3, 0, .2, 1)";
+let seat = null;   // { t, n, key, open, zoom, layout, cine, notes, player, timer, chapters }
+
+// the chapters YouTube shows on the player's scrubber, so the laptop and the player agree; else the summary's own
+function chaptersOf(t) {
+  if (!t.videoId) return [];
+  if (t.ytChapters && t.ytChapters.length > 1) return t.ytChapters.map(([sec, title]) => ({ sec, title }));
+  return ((t.s && t.s.chapters) || []).map((c) => ({ sec: toSeconds(c.at), title: c.title }));
+}
+const clock = (sec) => { sec = Math.max(0, Math.floor(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec / 60) % 60, x = String(sec % 60).padStart(2, "0");
+  return h ? `${h}:${String(m).padStart(2, "0")}:${x}` : `${m}:${x}`; };
+
+function seatLayout(st) {
+  const W = stage.clientWidth, H = stage.clientHeight, key = st.key;
+  const { iw, ih } = framing(key);
+  const q = shots[key].overlay.screen, xs = q.map((p) => p[0] * iw), ys = q.map((p) => p[1] * ih);
+  const sx0 = Math.min(...xs), sx1 = Math.max(...xs), sy0 = Math.min(...ys), sy1 = Math.max(...ys);
+  const aspect = (sx1 - sx0) / (sy1 - sy0);
+  const pad = Math.round(Math.min(28, Math.max(12, H * 0.03)));
+  const o = LAP.open, c = LAP.closed, ow = LAP.screen[2] - LAP.screen[0], oh = LAP.screen[3] - LAP.screen[1];
+  // the laptop's screen: about a third of the height (more on short windows, where it would be cramped), at most 60% wide
+  const short = H < 820;                                    // short windows: less keyboard, more screen
+  const cut = short ? o.cutShort : o.cut;                   // where the view's bottom edge cuts the open laptop
+  const k = Math.min(H * (short ? 0.42 : 0.36) / oh, W * 0.6 / ow);
+  const lidTop = H - (cut - o.top) * k;
+  const overlap = Math.round(H * 0.015);                    // the lid may cover a sliver of the screen's foot
+  let sh = lidTop + overlap - pad, sw = sh * aspect;
+  if (sw > W * 0.95) { sw = W * 0.95; sh = sw / aspect; }
+  const s = sw / (sx1 - sx0);
+  // open: the screen in the space above the lid; closed: you look up, the screen in the middle of what the lid leaves
+  const openTop = pad + Math.max(0, (lidTop + overlap - pad - sh) / 2);
+  const top = openTop;                                      // the screen stays put whether the lid is open or not
+  const left = (W - sw) / 2;
+  const frame = { iw, ih, s, ox: left - sx0 * s, oy: top - sy0 * s };
+  let lapBox;
+  if (st.zoom) {                                            // its screen fills the window, the lid just past the edges
+    const dw = Math.min(W - 2 * 12, (H - 2 * 12) * ow / oh), kz = dw / ow;
+    lapBox = { x: W / 2 - (LAP.screen[0] + ow / 2) * kz, y: H / 2 - (LAP.screen[1] + oh / 2) * kz, w: LAP.w * kz, h: LAP.h * kz, k: kz };
+  } else if (st.open) lapBox = { x: W / 2 - (LAP.screen[0] + ow / 2) * k, y: H - cut * k, w: LAP.w * k, h: LAP.h * k, k };
+  else if (c.w) lapBox = { x: (W - c.w * k) / 2, y: H - c.bottom * k, w: c.w * k, h: c.h * k, k };   // the stand-in's own picture
+  else lapBox = { x: W / 2 - (LAP.screen[0] + ow / 2) * k, y: H - c.bottom * k, w: LAP.w * k, h: LAP.h * k, k };
+  // the recording keeps clear of the open lid, so its controls are never under it
+  const cover = Math.max(0, Math.ceil(openTop + sh - lidTop));
+  return { frame, screen: { x: left, y: top, w: sw, h: sh }, lap: lapBox, cover, W, H };
+}
+
+// the room (still, cut-out) moved from where object-fit puts it to the seat's framing (from: start at the walk's framing)
+function frameRoom(key, ms, from = false) {
+  const a = placed(key), b = fit(key), k = b.s / a.s;
+  const tf = `translate(${b.ox - k * a.ox}px, ${b.oy - k * a.oy}px) scale(${k})`;
+  if (from) {
+    const f = framing(key), kf = f.s / a.s;
+    for (const e of [plate, front]) { e.style.transition = ""; e.style.transformOrigin = "0 0"; e.style.transform = `translate(${f.ox - kf * a.ox}px, ${f.oy - kf * a.oy}px) scale(${kf})`; }
+    plate.getBoundingClientRect();
+  }
+  for (const e of [plate, front]) {
+    e.style.transformOrigin = "0 0";
+    e.style.transition = ms ? `transform ${ms}ms ${EASE}, opacity .35s ease, filter ${ms}ms ease` : "";
+    e.style.transform = tf;
+  }
+}
+const resetRoom = () => { for (const e of [plate, front, clip]) { e.style.transition = ""; e.style.transform = ""; } stage.classList.remove("is-reading"); };
+
+// the lid opening or closing: the rendered frames in turn while the laptop moves (else a straight swap)
+const lidFrames = [];
+function preloadLid() {
+  if (lidFrames.length || !LAP.frames.length) return;
+  for (const src of [...LAP.frames, LAP.open.src, LAP.closed.src]) { const im = new Image(); im.src = src; lidFrames.push(im); }
+}
+function playLid(open, ms) {
+  const fr = LAP.frames, end = open ? LAP.open.src : LAP.closed.src;
+  if (!ms || !fr.length) { lapArt.src = end; return; }
+  const t0 = performance.now();
+  const step = (now) => {
+    const p = Math.min(1, (now - t0) / ms), e = 0.5 - 0.5 * Math.cos(Math.PI * p);
+    const i = Math.round((open ? e : 1 - e) * (fr.length - 1));
+    if (p < 1) { lapArt.src = fr[i]; requestAnimationFrame(step); } else lapArt.src = end;
+  };
+  requestAnimationFrame(step);
+}
+
+// FLIP: put the laptop where it now belongs, and animate from where it was
+function moveLaptop(box, ms, from = null) {
+  const was = from || (lap.hidden ? null : lap.getBoundingClientRect());
+  Object.assign(lap.style, { left: `${box.x}px`, top: `${box.y}px`, width: `${box.w}px`, height: `${box.h}px`, transition: "", transform: "" });
+  lap.hidden = false;
+  if (!ms || !was) return;
+  lap.style.transformOrigin = "0 0";
+  lap.style.transform = `translate(${was.left - box.x}px, ${was.top - box.y}px) scale(${was.width / box.w})`;
+  lap.getBoundingClientRect();
+  lap.style.transition = `transform ${ms}ms ${EASE}`;
+  lap.style.transform = "";
+}
+
+// ----- the recording: our own poster until you press play, then one YouTube player for the visit, moved (never reloaded)
+// between the cinema screen and the laptop. YouTube's own chrome is off (its title bar, pause overlay and "more videos"
+// made the screen busy and doubled the laptop's controls): the laptop has the transport, and a click on the picture
+// plays or pauses it, a double click makes it full screen, and pausing shows our own quiet overlay.
+let ytApi = null;
+const loadYT = () => ytApi || (ytApi = new Promise((resolve, reject) => {
+  window.onYouTubeIframeAPIReady = () => resolve(window.YT);
+  const sc = el("script", { src: "https://www.youtube.com/iframe_api" });
+  sc.onerror = () => { ytApi = null; reject(new Error("blocked")); };
+  document.head.append(sc);
+  setTimeout(() => { if (!window.YT || !window.YT.Player) { ytApi = null; reject(new Error("timeout")); } }, 7000);
+}));
+function playerFailed(t) {
+  if (!seat || seat.t !== t) return;
+  seat.starting = false; seat.failed = true;
+  clearTimeout(seat.readyTimer);
+  tube.textContent = "";
+  tube.append(el("div", { class: "tube-error", role: "alert" },
+    el("b", { text: "The recording won't play here" }),
+    el("span", { text: "Something (a content blocker, or the network) kept YouTube's player from loading. The chapters on your laptop open on YouTube instead." }),
+    el("a", { class: "btn is-main", href: ytUrl(t, Math.floor(seat.startAt || 0)), target: "_blank", rel: "noopener", text: "Watch on YouTube ↗" })));
+  if (seat.notesPanel) seat.notesPanel.classList.add("is-failed");
+  for (const l of document.querySelectorAll(".notes .jump-label")) l.textContent = "Jump to a part: it opens on YouTube";
+  tick();
+}
+function posterOn(t) {
+  if (!t.videoId || !EMBED) { tube.hidden = true; return; }
+  const img = el("img", { alt: "", src: `https://i.ytimg.com/vi/${t.videoId}/maxresdefault.jpg` });
+  img.onerror = () => { img.onerror = null; img.src = `https://i.ytimg.com/vi/${t.videoId}/hqdefault.jpg`; };
+  tube.textContent = "";
+  tube.append(el("button", { class: "poster", type: "button", "aria-label": `Play the recording of ${t.title}`, "aria-keyshortcuts": "K", onclick: () => jumpTo(0) },
+    img, el("span", { class: "play" }, el("i", { "aria-hidden": "true" }), "Play the talk", t.duration ? el("small", { text: `${t.duration} min` }) : null)));
+  tube.hidden = false;
+}
+function videoFullscreen() {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else if (tube.requestFullscreen && seat && seat.player) tube.requestFullscreen().catch(() => {});
+}
+function jumpTo(sec) {
+  if (!seat || !seat.t.videoId) return;
+  if (seat.failed || !EMBED) { window.open(ytUrl(seat.t, Math.floor(sec)), "_blank", "noopener"); return; }
+  const p = seat.player;
+  seat.waitSince = performance.now();
+  if (p && p.seekTo) { p.seekTo(sec, true); p.playVideo(); setTimeout(tick, 150); return; }
+  if (seat.starting) { seat.startAt = sec; return; }
+  seat.starting = true; seat.startAt = sec;
+  const t = seat.t, host = el("div", { class: "yt" });
+  tube.append(host, el("div", { class: "tube-catch", "aria-hidden": "true", onclick: () => playPause(), ondblclick: () => videoFullscreen() }),
+    el("div", { class: "tube-paused is-loading" }, el("button", { class: "resume", type: "button", tabindex: "-1", onclick: () => playPause() },
+      el("i", { "aria-hidden": "true" }), el("span", { class: "resume-text", text: "Loading…" }))));
+  const poster0 = tube.querySelector(".poster"); if (poster0) poster0.remove();
+  seat.readyTimer = setTimeout(() => { if (seat && seat.t === t && !seat.ready) playerFailed(t); }, 10000);
+  tick();
+  loadYT().then((YT) => {
+    if (!seat || seat.t !== t) return;
+    seat.player = new YT.Player(host, {
+      videoId: t.videoId, host: "https://www.youtube-nocookie.com",
+      playerVars: { rel: 0, playsinline: 1, autoplay: 1, controls: 0, disablekb: 1, fs: 0, iv_load_policy: 3, cc_load_policy: 0,
+        start: Math.floor(seat.startAt), origin: location.origin },
+      events: {
+        onReady: (e) => {
+          const f = tube.querySelector("iframe");
+          if (f) { f.title = `Recording: ${t.title}`; f.tabIndex = -1; }   // the laptop has the controls; the picture isn't a tab stop
+          if (seat.startAt) e.target.seekTo(seat.startAt, true);
+          e.target.playVideo();
+          seat.ready = true;
+          clearTimeout(seat.readyTimer);
+          tick();
+        },
+        onStateChange: () => tick(),
+        onError: () => playerFailed(t),
+      },
+    });
+  }).catch(() => playerFailed(t));
+}
+const playerTime = () => { const p = seat && seat.player; return p && p.getCurrentTime ? p.getCurrentTime() : null; };
+const playerLength = () => { const p = seat && seat.player; return (p && p.getDuration && p.getDuration()) || 0; };
+function playPause() {
+  const p = seat && seat.player;
+  if (!p || !p.getPlayerState) { jumpTo(0); return; }
+  if (p.getPlayerState() === 1) p.pauseVideo(); else p.playVideo();
+  setTimeout(tick, 150);
+}
+function seekBy(d) { const sec = playerTime(); if (sec != null) jumpTo(Math.max(0, Math.min(playerLength() - 1, sec + d))); }
+function toggleMute() {
+  const p = seat && seat.player;
+  if (!p || !p.isMuted) return;
+  if (p.isMuted()) p.unMute(); else p.mute();
+  setTimeout(tick, 100);
+}
+function toggleCaptions() {
+  const p = seat && seat.player;
+  if (!p || !p.loadModule) return;
+  seat.cc = !seat.cc;
+  if (seat.cc) { p.loadModule("captions"); p.setOption("captions", "track", { languageCode: "en" }); } else p.unloadModule("captions");
+  tick();
+}
+// the tube sits over whichever slot is showing: the cinema screen's, or the laptop's when zoomed
+function placeTube(ms = 0) {
+  if (!seat || tube.hidden) return;
+  const host = seat.zoom ? seat.notes : seat.cine, slot = host && host.querySelector(".slot");
+  if (!slot) { tube.classList.add("is-away"); return; }
+  const r = slot.getBoundingClientRect(), st = stage.getBoundingClientRect();
+  tube.style.transition = ms ? `transform ${ms}ms ${EASE}, opacity .25s ease` : "opacity .25s ease";
+  Object.assign(tube.style, { width: `${Math.round(r.width)}px`, height: `${Math.round(r.height)}px`, transform: `translate(${Math.round(r.left - st.left)}px, ${Math.round(r.top - st.top)}px)` });
+  tube.classList.toggle("is-on-laptop", seat.zoom);
+  tube.classList.remove("is-away");
+}
+
+// ----- the cinema screen: the recording, and beside it what the talk is, who gives it and why it's worth your time
+const nb = (x) => x.replace(/ /g, " ").replace(/-/g, "‑");
+function cineScreen(t) {
+  const s = t.s || {};
+  const slot = t.videoId && EMBED ? el("div", { class: "slot", "aria-hidden": "true" })
+    : el("div", { class: "slot is-poster" },
+      t.videoId ? el("a", { class: "btn is-main", href: ytUrl(t), target: "_blank", rel: "noopener", text: "Watch on YouTube" })
+        : [el("b", { text: "No recording yet" }), el("span", { text: "Devoxx puts the talks on YouTube in the weeks after the conference. Your laptop has the notes, from the abstract." }),
+          el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() })]);
+  return el("section", { class: "face cine is-projected", "aria-label": `${t.title}: the cinema screen` },
+    el("div", { class: "cine-info" },
+      el("div", { class: "meta", text: [t.room, whenShort(t), typeLabel(t)].filter(Boolean).map(nb).join(" · ") }),
+      el("h2", { text: t.title }),
+      el("p", { class: "who-l", text: speakers(t, true) }),
+      s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth your time if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null),
+    slot);
+}
+// the whole title and the reason always show: the type steps down until the column holds them
+function fitCine(panel) {
+  const info = panel.querySelector(".cine-info"), h2 = info.querySelector("h2"), verdict = info.querySelector(".verdict");
+  const over = () => info.scrollHeight > info.clientHeight + 1;
+  // the recording: 16:9, the full height of the screen unless that leaves the column under 290 px (or a third)
+  const cs = getComputedStyle(panel), slot = panel.querySelector(".slot");
+  const ah = panel.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const aw = panel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.columnGap || 26);
+  const sh = Math.floor(Math.min(ah, (aw - Math.max(290, aw * 0.3)) * 9 / 16));
+  Object.assign(slot.style, { height: `${sh}px`, width: `${Math.round(sh * 16 / 9)}px` });
+  let size = Math.min(36, Math.max(24, Math.round(info.clientWidth / 10.5))), v = 16;
+  h2.style.fontSize = `${size}px`;
+  if (verdict) verdict.style.fontSize = "";
+  while (over() && size > 24) h2.style.fontSize = `${--size}px`;          // the title keeps the lead...
+  while (verdict && over() && v > 14) verdict.style.fontSize = `${--v}px`;   // ...the reason gives way first
+  while (over() && size > 18) h2.style.fontSize = `${--size}px`;
+}
+
+// ----- the laptop: the notes, and below them the transport for the recording on the big screen: a scrubber with the
+// chapters marked on it, play, previous/next chapter, the chapter playing (a menu of all of them), captions and sound
+const key = (k) => el("kbd", { text: k, "aria-hidden": "true" });
+function notesScreen(t) {
+  const s = t.s || {};
+  const chapters = chaptersOf(t);
+  const live = EMBED && t.videoId;
+  // first: the gist and the chapters to jump to (when there are chapters)
+  const tabs = [["overview", "Overview"], ["summary", "Summary"], ["points", "Key points"], ["monday", "To try"]]
+    .filter(([id]) => (id === "overview" && chapters.length) || id === "summary" || (id === "points" && s.keyPoints && s.keyPoints.length)
+      || (id === "monday" && s.takeaways && s.takeaways.length));
+  const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Notes" });
+  const more = el("button", { class: "more-below", type: "button", tabindex: "-1", "aria-hidden": "true", text: "More ↓",
+    onclick: () => pane.scrollBy({ top: pane.clientHeight * 0.8, behavior: reduceMotion ? "auto" : "smooth" }) });
+  const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Notes" });
+  const chapterList = () => el("ol", { class: "chapters" }, chapters.map((c, i) => el("li", {},
+    live ? el("button", { class: "chapter", type: "button", "data-i": i, onclick: () => { jumpTo(c.sec); menu.hidden = true; } }, el("time", { text: clock(c.sec) }), el("span", { text: c.title }))
+      : el("a", { class: "chapter", href: ytUrl(t, c.sec), target: "_blank", rel: "noopener", "data-i": i }, el("time", { text: clock(c.sec) }), el("span", { text: c.title })))));
+  const fill = (id) => {
+    pane.textContent = "";
+    if (id === "overview") put(pane, s.tldr ? el("p", { class: "lead", text: s.tldr }) : null,
+      el("p", { class: "label jump-label", text: live && !(seat && seat.failed) ? "Jump to a part: it plays on the big screen" : "Jump to a part: it opens on YouTube" }), chapterList());
+    if (id === "summary") put(pane, s.tldr && !chapters.length ? el("p", { class: "lead", text: s.tldr }) : null, (s.summary || t.abstract || []).map((p) => el("p", { text: p })));
+    if (id === "points") put(pane, el("ul", {}, s.keyPoints.map((p) => el("li", { text: p }))));
+    if (id === "monday") put(pane, el("ol", {}, s.takeaways.map((p) => el("li", { text: p }))));
+    pane.scrollTop = 0;
+    for (const b of tabRow.children) b.setAttribute("aria-pressed", String(b.dataset.tab === id));
+    rove(tabRow);
+    requestAnimationFrame(() => { watchScroll(pane); if (seat) { seat.lastChapter = null; tick(); } });
+  };
+  for (const [id, label] of tabs) tabRow.append(el("button", { class: "pill", type: "button", "data-tab": id, text: label, onclick: () => fill(id) }));
+  const menu = el("div", { class: "chapter-menu scroller", hidden: true, role: "dialog", "aria-label": "Chapters" }, chapters.length ? chapterList() : null);
+  const ticks = el("div", { class: "scrub-ticks", "aria-hidden": "true" });
+  const scrub = el("div", { class: "scrub", role: "slider", tabindex: "0", "aria-label": "Position in the talk", "aria-valuemin": "0", "aria-valuemax": "0", "aria-valuenow": "0",
+      onclick: (e) => { const L = playerLength(), r = scrub.getBoundingClientRect(); if (L) jumpTo((e.clientX - r.left) / r.width * L); else jumpTo(0); },
+      onkeydown: (e) => { const d = { ArrowLeft: -10, ArrowRight: 10, PageDown: -60, PageUp: 60 }[e.key]; if (d) { e.preventDefault(); seekBy(d); } } },
+    el("div", { class: "scrub-fill" }), ticks);
+  const now = live ? el("div", { class: "now" }, scrub,
+    el("div", { class: "now-row" },
+      el("div", { class: "transport", role: "group", "aria-label": "Recording" },
+        chapters.length ? el("button", { class: "step is-prev", type: "button", "aria-keyshortcuts": "[", "aria-label": "Previous chapter", title: "Previous chapter  [", onclick: () => stepChapter(-1) }, el("span", { class: "ico", "aria-hidden": "true" })) : null,
+        el("button", { class: "toggle", type: "button", "aria-keyshortcuts": "K", onclick: () => playPause() }, el("span", { class: "glyph" }), key("K")),
+        chapters.length ? el("button", { class: "step is-next", type: "button", "aria-keyshortcuts": "]", "aria-label": "Next chapter", title: "Next chapter  ]", onclick: () => stepChapter(1) }, el("span", { class: "ico", "aria-hidden": "true" })) : null),
+      chapters.length ? el("button", { class: "now-chapter", type: "button", "aria-haspopup": "dialog", "aria-expanded": "false",
+        onclick: (e) => { menu.hidden = !menu.hidden; e.currentTarget.setAttribute("aria-expanded", String(!menu.hidden)); if (!menu.hidden) { seat.lastChapter = null; tick(); } } },
+        el("span", { class: "now-num" }), el("span", { class: "now-text" }), el("span", { class: "caret", "aria-hidden": "true", text: "▾" })) : el("span", { class: "now-chapter is-plain" }),
+      el("span", { class: "now-time" }),
+      el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
+      el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }))) : null;
+  const keysSheet = el("div", { class: "keys-sheet", hidden: true, role: "note" },
+    el("b", { text: "Keys" }),
+    el("dl", {}, [["K", "Play or pause"], ["[  ]", "Previous or next chapter"], ["← →", "Back or on 10 seconds"], ["C  M", "Captions, sound"],
+      ["F", "Laptop full screen"], ["L", "Close or open the lid"], ["Esc", "Leave full screen"], ["?", "These keys"]]
+      .filter(([k]) => live || !/^(K|\[|←|C)/.test(k)).map(([k, d]) => [el("dt", { text: k }), el("dd", { text: d })])),
+    live ? el("p", { text: "Double-click the picture for a full-screen video." }) : null);
+  const keysBtn = el("button", { class: "notes-btn notes-keys", type: "button", "aria-label": "Keyboard shortcuts", "aria-expanded": "false", "aria-keyshortcuts": "?",
+    onclick: () => toggleKeys() }, "Keys", key("?"));
+  const toggleKeys = () => { keysSheet.hidden = !keysSheet.hidden; keysBtn.setAttribute("aria-expanded", String(!keysSheet.hidden)); };
+  const panel = el("section", { class: `face notes${live ? "" : " is-offline"}`, "aria-label": "Your laptop: notes on the talk" },
+    el("header", { class: "notes-top" },
+      el("span", { class: "notes-app" }, el("i", { "aria-hidden": "true" }), "Notes"),
+      el("span", { class: "notes-spacer" }),
+      keysBtn,
+      el("button", { class: "notes-btn notes-zoom", type: "button", "aria-keyshortcuts": "F", onclick: () => setLaptop({ zoom: !seat.zoom }) }),
+      el("button", { class: "notes-btn notes-close", type: "button", "aria-keyshortcuts": "L", onclick: () => setLaptop({ open: false }) }, "Close lid", key("L"))),
+    keysSheet,
+    el("div", { class: "notes-body" },
+      el("div", { class: "notes-read" }, tabRow, el("div", { class: "pane-wrap" }, pane, more)),
+      el("aside", { class: "notes-watch" }, live ? el("div", { class: "slot", "aria-hidden": "true" }) : null,
+        chapters.length ? el("div", { class: "watch-head", text: "Chapters" }) : null,
+        chapters.length ? (() => { const list = el("div", { class: "scroller watch-list" }, chapterList());
+          return el("div", { class: "pane-wrap is-list" }, list, el("button", { class: "more-below", type: "button", tabindex: "-1", "aria-hidden": "true", text: "More ↓",
+            onclick: () => list.scrollBy({ top: list.clientHeight * 0.8, behavior: reduceMotion ? "auto" : "smooth" }) })); })() : null)),
+    menu, now);
+  panel.fill = fill;
+  panel.toggleKeys = toggleKeys;
+  panel.ticks = (L) => {                       // the chapters marked on the scrubber, once the length is known
+    if (ticks.dataset.len === String(Math.round(L)) || !L) return;
+    ticks.dataset.len = String(Math.round(L));
+    ticks.textContent = "";
+    for (const c of chapters.slice(1)) ticks.append(el("i", { style: `left:${c.sec / L * 100}%` }));
+  };
+  fill(tabs[0][0]);
+  return panel;
+}
+const chapterAt = (sec) => { let i = -1; seat.chapters.forEach((c, j) => { if (c.sec <= sec + 0.5) i = j; }); return i; };
+function stepChapter(d) {
+  const ch = seat.chapters, sec = playerTime();
+  if (!ch.length) return;
+  const i = sec == null ? -1 : chapterAt(sec);
+  // back: to the start of this chapter, unless you're just past it
+  const j = d < 0 && i >= 0 && sec - ch[i].sec > 3 ? i : Math.max(0, Math.min(ch.length - 1, i + d));
+  jumpTo(ch[j].sec);
+}
+function tick() {
+  if (!seat) return;
+  const p = seat.player, sec = playerTime(), L = playerLength();
+  const state = p && p.getPlayerState ? p.getPlayerState() : -1;
+  const playing = state === 1 || state === 3;
+  const started = sec != null && (sec > 0.5 || playing);
+  const i = started ? chapterAt(sec) : -1;
+  const ch = seat.chapters;
+  // the picture: our paused overlay instead of YouTube's
+  const paused = tube.querySelector(".tube-paused");
+  if (paused) {
+    // paused or finished: our quiet overlay; loading: say so; cued but not playing (a browser that wants a click): ask
+    const loading = state === 3 || !seat.ready;
+    const waiting = loading || (seat.waitSince && performance.now() - seat.waitSince > 1200 && (state === -1 || state === 5));
+    paused.hidden = !(state === 2 || state === 0 || waiting);
+    paused.classList.toggle("is-loading", loading);
+    paused.querySelector(".resume-text").textContent = loading ? "Loading…" : state === 0 ? "Finished. Play it again"
+      : state === 2 ? (i >= 0 ? `Paused: ${ch[i].title}` : "Paused") : "Press play (K)";
+    if (state === 1 || state === 2) seat.waitSince = 0;
+  }
+  const n = seat.notes;
+  if (!n) return;
+  for (const c of n.querySelectorAll(".chapter")) {
+    const on = Number(c.dataset.i) === i;
+    c.classList.toggle("is-now", on);
+    if (on) c.setAttribute("aria-current", "true"); else c.removeAttribute("aria-current");
+  }
+  if (i !== seat.lastChapter) {          // keep the playing chapter in view as the talk moves on
+    seat.lastChapter = i;
+    for (const c of n.querySelectorAll(".chapter.is-now")) {
+      const box = c.closest(".scroller");
+      if (!box || !c.offsetParent || box.classList.contains("pane")) continue;
+      const top = c.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop;
+      if (top < box.scrollTop || top + c.offsetHeight > box.scrollTop + box.clientHeight)
+        box.scrollTo({ top: top - box.clientHeight / 3, behavior: reduceMotion ? "auto" : "smooth" });
+    }
+  }
+  const now = n.querySelector(".now");
+  if (!now) return;
+  now.classList.toggle("is-failed", !!seat.failed);
+  const text = now.querySelector(".now-text"), toggle = now.querySelector(".toggle"), time = now.querySelector(".now-time");
+  if (seat.failed) {
+    if (text) text.textContent = "Won't play here: chapters open on YouTube";
+    toggle.querySelector(".glyph").textContent = "YouTube ↗";
+    toggle.setAttribute("aria-label", "Watch on YouTube");
+    time.textContent = "";
+    return;
+  }
+  if (text) text.textContent = i >= 0 ? ch[i].title : "All chapters";
+  const num = now.querySelector(".now-num");
+  if (num) num.textContent = i >= 0 ? `${i + 1}/${ch.length}` : String(ch.length);
+  toggle.querySelector(".glyph").textContent = seat.starting && !seat.ready ? "Loading…" : playing ? "❚❚ Pause" : "▶ Play";
+  toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
+  time.textContent = L ? `${clock(sec || 0)} / ${clock(L)}` : "";
+  const scrub = now.querySelector(".scrub");
+  scrub.classList.toggle("is-ready", !!L);
+  if (L) {
+    n.ticks(L);
+    now.querySelector(".scrub-fill").style.width = `${Math.min(100, (sec || 0) / L * 100)}%`;
+    scrub.setAttribute("aria-valuemax", String(Math.round(L)));
+    scrub.setAttribute("aria-valuenow", String(Math.round(sec || 0)));
+    scrub.setAttribute("aria-valuetext", `${clock(sec || 0)} of ${clock(L)}${i >= 0 ? `, chapter ${i + 1}: ${ch[i].title}` : ""}`);
+  }
+  const muted = p && p.isMuted && p.isMuted();
+  const mute = now.querySelector(".mute"), cc = now.querySelector(".cc");
+  if (mute.dataset.muted !== String(!!muted)) {
+    mute.dataset.muted = String(!!muted);
+    mute.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M4 9h4l5-4v14l-5-4H4z"/>${muted
+      ? '<path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+      : '<path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'}</svg>`;
+  }
+  mute.setAttribute("aria-label", muted ? "Sound off: turn it on" : "Mute");
+  cc.setAttribute("aria-pressed", String(!!seat.cc));
+  for (const b of [mute, cc]) b.disabled = !seat.ready;
+}
+
+// ----- open, close, zoom
+function syncControls() {
+  const { open, zoom } = seat;
+  lapLid.hidden = open;
+  seatbar.hidden = zoom;                                    // full screen: the laptop's own header has the way out
+  const n = seat.notesPanel;
+  if (!n) return;
+  const z = n.querySelector(".notes-zoom");
+  z.textContent = zoom ? "Exit full screen" : "Full screen";
+  z.append(el("kbd", { text: zoom ? "Esc" : "F", "aria-hidden": "true" }));
+  n.querySelector(".notes-close").hidden = zoom;
+  n.classList.toggle("is-zoomed", zoom);
+}
+function mountCine() {
+  mount(seat.cinePanel || (seat.cinePanel = cineScreen(seat.t)), seat.key, "screen");
+  seat.cine = face.el;
+  seat.cine.style.setProperty("--cover", `${seat.layout.cover}px`);
+  fitCine(seat.cine);
+}
+function mountNotes() {
+  if (seat.notes) { seat.notes.remove(); seat.notes = null; }
+  if (!seat.open) return;
+  const o = LAP, k = seat.layout.lap.k;
+  const panel = seat.notesPanel || (seat.notesPanel = notesScreen(seat.t));
+  Object.assign(panel.style, { left: `${Math.round(o.screen[0] * k)}px`, top: `${Math.round(o.screen[1] * k)}px`,
+    width: `${Math.round((o.screen[2] - o.screen[0]) * k)}px`, height: `${Math.round((o.screen[3] - o.screen[1]) * k)}px` });
+  panel.classList.remove("is-off");
+  panel.classList.toggle("is-compact", seat.layout.H < 820 && !seat.zoom);
+  lap.append(panel);
+  seat.notes = panel;
+  syncControls();
+  for (const sc of panel.querySelectorAll(".strip, .scroller")) watchScroll(sc);
+  seat.lastChapter = null;
+  tick();
+}
+let moving = false;
+async function setLaptop(change, ms = MOVE) {
+  if (!seat || moving) return;
+  const next = { ...seat, ...change };
+  if (next.zoom && !next.open) next.zoom = false;
+  if (!next.open) next.zoom = false;
+  if (next.open === seat.open && next.zoom === seat.zoom) return;
+  moving = true;
+  const opening = next.open !== seat.open;
+  if (seat.notes) seat.notes.classList.add("is-off");     // the screen goes dark first
+  if (next.zoom !== seat.zoom) tube.classList.add("is-away");
+  await new Promise((r) => setTimeout(r, ms ? 140 : 0));
+  Object.assign(seat, { open: next.open, zoom: next.zoom });
+  seat.layout = seatLayout(seat);
+  stage.classList.toggle("is-reading", seat.zoom);
+  const np = seat.notesPanel, pressed = np && np.querySelector('.tabs [aria-pressed="true"]');
+  if (seat.zoom && pressed && pressed.dataset.tab === "overview") np.fill("summary");
+  if (opening) playLid(seat.open, ms);
+  frameRoom(seat.key, ms);
+  if (face) { face.el.style.transition = ms ? `transform ${ms}ms ${EASE}` : ""; place(); }
+  moveLaptop(seat.layout.lap, ms);
+  if (!seat.zoom) placeTube(ms);
+  if (seat.notes) { seat.notes.remove(); seat.notes = null; }
+  syncControls();
+  await new Promise((r) => setTimeout(r, ms));
+  if (face) face.el.style.transition = "";
+  mountNotes();
+  placeTube();
+  moving = false;
+  // focus follows: into the laptop when it opens or zooms, onto the lid when it closes
+  if (!seat.open) lapLid.focus({ preventScroll: true });
+  else if (seat.notes && (opening || seat.zoom || change.zoom === false)) seat.notes.querySelector(seat.zoom || change.zoom === false ? ".notes-zoom" : ".tabs [aria-pressed=\"true\"]").focus({ preventScroll: true });
+}
+lapLid.addEventListener("click", () => setLaptop({ open: true }));
+$("toProg").addEventListener("click", () => goHall());
+addEventListener("keydown", (e) => {
+  if (!seat || e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+  const k = e.key.length === 1 ? e.key.toLowerCase() : e.key, n = seat.notesPanel;
+  const free = document.activeElement === document.body || document.activeElement === null;   // arrows belong to what has focus
+  if (k === "k" || (k === " " && free)) { e.preventDefault(); playPause(); }
+  else if (k === "[") stepChapter(-1);
+  else if (k === "]") stepChapter(1);
+  else if (k === "ArrowLeft" && free) seekBy(-10);
+  else if (k === "ArrowRight" && free) seekBy(10);
+  else if (k === "c") toggleCaptions();
+  else if (k === "m") toggleMute();
+  else if (k === "?" && n && seat.open) n.toggleKeys();
+  else if (k === "f" && seat.open) setLaptop({ zoom: !seat.zoom });
+  else if (k === "l") setLaptop({ open: !seat.open });
+});
+
+function relayoutSeat() {
+  if (!seat || !seat.layout) return;
+  seat.layout = seatLayout(seat);
+  frameRoom(seat.key, 0);
+  if (face) mountCine();
+  moveLaptop(seat.layout.lap, 0);
+  mountNotes();
+  syncControls();
+  placeTube();
+}
+
+// arriving: the walk ends on the still; the view tilts down a little and the laptop comes up into your lap, open
+async function sitDown(t, n, key, withWalk) {
+  if (withWalk) {
+    say(`Walking to Room ${n}`);
+    await playClip(walkClip(n));
+  }
+  await showStill(key);
+  hideClip();
+  say("");
+  room = n; current = t;
+  seat = { t, n, key, open: true, zoom: false, layout: null, cine: null, notes: null, notesPanel: null, cinePanel: null, player: null, timer: 0,
+    chapters: chaptersOf(t), lastChapter: null, starting: false, startAt: 0 };
+  seat.layout = seatLayout(seat);
+  preloadLid();
+  lapArt.src = LAP.open.src;
+  const ms = withWalk ? MOVE + 250 : 0;
+  frameRoom(key, ms, true);
+  const b = seat.layout.lap;
+  moveLaptop(b, ms, ms ? { left: b.x, top: seat.layout.H + 20, width: b.w } : null);
+  seatbar.hidden = false;
+  if (ms) await new Promise((r) => setTimeout(r, ms));
+  mountCine();
+  mountNotes();
+  posterOn(t);
+  placeTube();
+  seat.timer = setInterval(tick, 500);
+  document.fonts.ready.then(() => { if (seat && seat.t === t && seat.cine) fitCine(seat.cine); });
+  hintOnce();
+}
+// the first time: say the laptop is yours to use
+function hintOnce() {
+  let seen = false;
+  try { seen = localStorage.getItem("cinema-laptop-hint") === "1"; } catch (e) { /* private window: show it */ }
+  if (seen || !seat.notes) return;
+  const hint = el("div", { class: "lap-hint", role: "status" },
+    el("span", { text: seat.chapters.length && EMBED ? "Your laptop: the notes, and the chapters. Pick one and it plays on the big screen." : "Your laptop: the notes on this talk." }),
+    el("button", { type: "button", "aria-label": "Dismiss", text: "×", onclick: () => dismiss() }));
+  const dismiss = () => { hint.remove(); try { localStorage.setItem("cinema-laptop-hint", "1"); } catch (e) { /* fine */ } };
+  // beside the laptop's right edge, a quarter of the way down its screen
+  Object.assign(hint.style, { left: `${(LAP.screen[2] + LAP.w * 0.035) / LAP.w * 100}%`, top: `${(LAP.screen[1] + (LAP.screen[3] - LAP.screen[1]) * 0.22) / LAP.h * 100}%` });
+  lap.append(hint);
+  seat.notes.addEventListener("click", dismiss, { once: true });
+}
+function leaveSeat() {
+  if (!seat) return;
+  clearInterval(seat.timer);
+  clearTimeout(seat.readyTimer);
+  if (seat.player && seat.player.destroy) seat.player.destroy();
+  tube.textContent = ""; tube.hidden = true;
+  lap.hidden = true; lapLid.hidden = true;
+  if (seat.notes) seat.notes.remove();
+  for (const h of lap.querySelectorAll(".lap-hint")) h.remove();
+  seatbar.hidden = true;
+  seat = null;
+  resetRoom();
+}
+
 // ---------- moving between the hall and a seat ----------
 let room = null, current = null, busy = false;
 
@@ -494,6 +1100,7 @@ async function toHall(withWalk) {
 async function toSeat(t, withWalk) {
   const n = roomNo(t), key = shotKey(`seat-${n}`);
   unmount();
+  if (shape === "laptop") return sitDown(t, n, key, withWalk);
   // phones: the walk pushes in on the door totem and the zoom carries on from it until the totem's screen fills the
   // phone; the walk then fades off the still underneath, and the totem lights up
   const zoomsIn = key.startsWith("door-phone");
@@ -543,7 +1150,13 @@ addEventListener("popstate", () => {
   if (t) open(t, false); else toHall(false);
 });
 addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { if (skipWalk) skipWalk(); else if (current) goHall(); }
+  if (e.key !== "Escape") return;
+  if (skipWalk) skipWalk();
+  else if (seat && seat.notesPanel && seat.notesPanel.querySelector(".keys-sheet:not([hidden]), .chapter-menu:not([hidden])")) {
+    for (const p of seat.notesPanel.querySelectorAll(".keys-sheet, .chapter-menu")) p.hidden = true;
+  }
+  else if (seat && seat.zoom) setLaptop({ zoom: false });
+  else if (current && !seat) goHall();
 });
 
 // ---------- start ----------

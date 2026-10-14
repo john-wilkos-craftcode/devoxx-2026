@@ -1764,8 +1764,35 @@ set_res(LAPTOP)
 zlow, zhigh = scr["z"] - scr["h"] / 2 - 0.02, scr["z"] + scr["h"] / 2 + 0.02      # 2 cm under the masking: no bright edge
 hw = scr["w"] / 2 + 0.02
 full = [(scr["x"], scr["y"] - hw, zlow), (scr["x"], scr["y"] + hw, zlow), (scr["x"], scr["y"] + hw, zhigh), (scr["x"], scr["y"] - hw, zhigh)]
-shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(full, seat_cam)}, "size": {"screen": [2 * hw, zhigh - zlow]},
-                      "front": f"seat-{n}-front"}
+
+
+def widened(camera, wh, ex, eb):
+    """The same camera with a bigger sensor: ex more of the frame's width on each side, eb more of its height below.
+    The original frame sits exactly inside the new one (same position, aim and focal length), so the walk, which ends
+    on the original, lines up with the still; inner says where (0-1)."""
+    src = camera.data
+    data = src.copy()
+    ob = bpy.data.objects.new(f"{camera.name}-wide", data)
+    scene.collection.objects.link(ob)
+    ob.matrix_world = camera.matrix_world.copy()
+    ht = 2 * math.tan(src.angle_y / 2)
+    wt = ht * wh[0] / wh[1]
+    ht2, wt2 = ht * (1 + eb), wt * (1 + 2 * ex)
+    data.angle_y = 2 * math.atan(ht2 / 2)
+    data.shift_y = (src.shift_y * max(wt, ht) - ht * eb / 2) / max(wt2, ht2)    # shift is in units of the larger side
+    data.shift_x = src.shift_x * max(wt, ht) / max(wt2, ht2)
+    res = (round(wh[0] * (1 + 2 * ex) / 2) * 2, round(wh[1] * (1 + eb) / 2) * 2)
+    return ob, res, [round(ex / (1 + 2 * ex), 5), 0.0, round(1 - ex / (1 + 2 * ex), 5), round(1 / (1 + eb), 5)]
+
+
+# laptops: the seat still is wider and taller than the walk's last frame, so the page has the room round the screen to
+# the sides and the rows in front below it, where the laptop on your lap goes
+seat_wide_cam, SEAT_RES, seat_inner = widened(seat_cam, LAPTOP, 0.16, 0.5)
+bpy.context.view_layer.update()
+set_res(SEAT_RES)
+shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(full, seat_wide_cam)}, "size": {"screen": [2 * hw, zhigh - zlow]},
+                      "front": f"seat-{n}-front", "px": list(SEAT_RES), "inner": seat_inner}
+set_res(LAPTOP)
 
 # phones: the walk stops at the door, and the talk is on the totem beside it (a cinema screen is far too wide to
 # read in portrait); the red portal and the corridor are soft behind it
@@ -1988,8 +2015,8 @@ for what in [w for w in args.render.split(",") if w]:
         still(phone_hall_cam, PHONE, "hall-phone")
         front_layer(phone_hall_cam, PHONE, "hall-phone-front", HALL_FRONT)
     elif what == "seat":
-        still(seat_cam, LAPTOP, f"seat-{n}")
-        front_layer(seat_cam, LAPTOP, f"seat-{n}-front")
+        still(seat_wide_cam, SEAT_RES, f"seat-{n}")
+        front_layer(seat_wide_cam, SEAT_RES, f"seat-{n}-front")
     elif what == "door-phone":
         still(door_cam, PHONE, f"door-phone-{n}")
     elif what.startswith("walk@"):
