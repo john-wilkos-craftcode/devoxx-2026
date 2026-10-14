@@ -496,6 +496,8 @@ info["open_cut"] = round(min(HPX, hinge_y + 0.32 * disp_h_px), 1)       # the vi
 set_lid(0)
 mw = pivot.matrix_world
 info["closed_top"] = min(px(mw @ Vector((x, -PIVOT.y, top_z)))[1] for x in (-W / 2, W / 2))
+_lid = [px(mw @ Vector((x, y, top_z))) for x in (-W / 2, W / 2) for y in (front_y, -PIVOT.y)]
+info["closed_box"] = [min(p[0] for p in _lid), min(p[1] for p in _lid), max(p[0] for p in _lid), max(p[1] for p in _lid)]   # the closed lid
 info["closed_bottom"] = round(max(px(Vector((x, -D, 0.0)))[1] for x in (-W / 2, W / 2)) + 6, 1)
 print("laptop frame", WPX, "x", HPX, json.dumps(info))
 

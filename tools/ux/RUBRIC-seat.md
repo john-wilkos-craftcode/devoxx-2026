@@ -80,6 +80,11 @@ review is about **the seat, on laptops and desktops**.
 | 3 | 8 (34/40) | 8 (32/40) | 8 (34/40) | Overview tab with the chapters, key hints, keys sheet, failure state, first-run note |
 | 4 | 8 (35/40) | 8 (34/40) | 7 (33/40) | YouTube chrome off: the laptop has the transport (scrubber, chapter menu, CC, sound) |
 | 5 | 7 (30/40) | 8 (33/40) | 8 (35/40) | loading/press-play overlay, list-only scrolling, screen fixed when the lid closes (1440: YouTube frame failed to load in the run) |
+| 6 | 8 (34/40) | 8 (33/40) | 8 (35/40) | 10 s fallback, compact chapter button, prev/next icons, tighter small laptop |
+| 7 | 8 (35/40) | 8 (33/40) | 9 (36/40) | no More pills, gist in two lines, lid Play/Open, Try again, full-screen fits all chapters |
+| 8 | 8 (35/40) | 9 (36/40) | 9 (37/40) | first-run note back, no-recording panel fits, gist more/less, one clock format |
+| 9 | 9 (36/40) | 8 (35/40) | 9 (36/40) | compact laptop by its own size, all chapters in full screen, tab kept, lid controls clear of the sticker |
+| 10 | 9 (36/40) | 9 (36/40) | 9 (36/40) | playing chapter kept clear of the fade, one-line gist on small laptops, tab order: poster first. UX target met |
 
 ## Stage 2: diegesis (after the laptop and the wide room stills are rendered)
 Once UX is at 9, the stand-in laptop is replaced by the Blender render and the room by wider stills. Then two fresh

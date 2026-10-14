@@ -30,6 +30,7 @@ def main():
     # the chapters YouTube shows on each recording's scrubber (scripts/fetch_chapters.py), for the cinema's laptop
     yt_path = DATA / "raw" / "yt_chapters.json"
     yt_chapters = json.loads(yt_path.read_text()) if yt_path.exists() else {}
+    video_length = {v["id"]: v.get("duration") for v in json.loads((DATA / "raw" / "videos.json").read_text())}
     talks, missing = [], []
     for t in base:
         p = DATA / "summaries" / f"{t['id']}.json"
@@ -53,6 +54,7 @@ def main():
             "room": t["room"],
             "videoId": t["videoId"],
             "ytChapters": yt_chapters.get(t["videoId"]) or None,
+            "videoLength": video_length.get(t["videoId"]),
             "twin": t.get("twin"),
             "s": {k: v for k, v in (s or {}).items() if k != "id"} or None,
         })

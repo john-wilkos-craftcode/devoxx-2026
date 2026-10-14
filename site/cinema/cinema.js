@@ -509,12 +509,12 @@ const LAP = shots.laptop ? (() => {
   const L = shots.laptop, [tl, tr, bl] = L.screen, hingeCut = (f) => Math.min(L.h, L.open_cut + (f - 0.32) * (bl[1] - tl[1]));
   return { w: L.w, h: L.h, screen: [tl[0], tl[1], tr[0], bl[1]],
     open: { src: "media/laptop-open.webp", top: L.open_top, cut: L.open_cut, cutShort: hingeCut(0.1) },
-    closed: { src: "media/laptop-closed.webp", top: L.closed_top, bottom: L.closed_bottom },
+    closed: { src: "media/laptop-closed.webp", top: L.closed_top, bottom: L.closed_bottom, box: L.closed_box },
     frames: Array.from({ length: L.frames || 0 }, (_, i) => `media/laptop-anim-${String(i).padStart(2, "0")}.webp`) };
 })() : {   // a drawn stand-in until the render is in
   w: 1600, h: 1060, screen: [176, 26, 1424, 806],
   open: { src: "media/mock/laptop-open.svg", top: 0, cut: 1060, cutShort: 905 },
-  closed: { src: "media/mock/laptop-closed.svg", top: 40, bottom: 560, w: 1600, h: 560 },
+  closed: { src: "media/mock/laptop-closed.svg", top: 40, bottom: 560, w: 1600, h: 560, box: [70, 40, 1530, 518] },
   frames: [],
 };
 const $ = (id) => document.getElementById(id);
@@ -556,7 +556,8 @@ function seatLayout(st) {
   const frame = { iw, ih, s, ox: left - sx0 * s, oy: top - sy0 * s };
   let lapBox;
   if (st.zoom) {                                            // its screen fills the window, the lid just past the edges
-    const dw = Math.min(W - 2 * 12, (H - 2 * 12) * ow / oh), kz = dw / ow;
+    const m = H < 820 ? 0 : 12;
+    const dw = Math.min(W - 2 * m, (H - 2 * m) * ow / oh), kz = dw / ow;
     lapBox = { x: W / 2 - (LAP.screen[0] + ow / 2) * kz, y: H / 2 - (LAP.screen[1] + oh / 2) * kz, w: LAP.w * kz, h: LAP.h * kz, k: kz };
   } else if (st.open) lapBox = { x: W / 2 - (LAP.screen[0] + ow / 2) * k, y: H - cut * k, w: LAP.w * k, h: LAP.h * k, k };
   else if (c.w) lapBox = { x: (W - c.w * k) / 2, y: H - c.bottom * k, w: c.w * k, h: c.h * k, k };   // the stand-in's own picture
@@ -634,10 +635,24 @@ function playerFailed(t) {
   tube.append(el("div", { class: "tube-error", role: "alert" },
     el("b", { text: "The recording won't play here" }),
     el("span", { text: "Something (a content blocker, or the network) kept YouTube's player from loading. The chapters on your laptop open on YouTube instead." }),
-    el("a", { class: "btn is-main", href: ytUrl(t, Math.floor(seat.startAt || 0)), target: "_blank", rel: "noopener", text: "Watch on YouTube ↗" })));
+    el("div", { class: "actions" },
+      el("button", { class: "btn", type: "button", text: "Try again", onclick: () => retryPlayer() }),
+      el("a", { class: "btn is-main", href: ytUrl(t, Math.floor(seat.startAt || 0)), target: "_blank", rel: "noopener", text: "Watch on YouTube ↗" }))));
   if (seat.notesPanel) seat.notesPanel.classList.add("is-failed");
   for (const l of document.querySelectorAll(".notes .jump-label")) l.textContent = "Jump to a part: it opens on YouTube";
   tick();
+}
+function retryPlayer() {
+  if (!seat) return;
+  const at = seat.startAt || 0;
+  if (seat.player && seat.player.destroy) seat.player.destroy();
+  Object.assign(seat, { failed: false, starting: false, ready: false, player: null });
+  ytApi = null;
+  if (seat.notesPanel) seat.notesPanel.classList.remove("is-failed");
+  if (seat.notes) tick();
+  for (const l of document.querySelectorAll(".notes .jump-label")) l.textContent = "Jump to a part: it plays on the big screen";
+  tube.textContent = "";
+  jumpTo(at);
 }
 function posterOn(t) {
   if (!t.videoId || !EMBED) { tube.hidden = true; return; }
@@ -690,7 +705,7 @@ function jumpTo(sec) {
   }).catch(() => playerFailed(t));
 }
 const playerTime = () => { const p = seat && seat.player; return p && p.getCurrentTime ? p.getCurrentTime() : null; };
-const playerLength = () => { const p = seat && seat.player; return (p && p.getDuration && p.getDuration()) || 0; };
+const playerLength = () => { const p = seat && seat.player; return Math.round((p && p.getDuration && p.getDuration()) || (seat && seat.t.videoLength) || 0); };
 function playPause() {
   const p = seat && seat.player;
   if (!p || !p.getPlayerState) { jumpTo(0); return; }
@@ -749,7 +764,8 @@ function fitCine(panel) {
   const ah = panel.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   const aw = panel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.columnGap || 26);
   const sh = Math.floor(Math.min(ah, (aw - Math.max(290, aw * 0.3)) * 9 / 16));
-  Object.assign(slot.style, { height: `${sh}px`, width: `${Math.round(sh * 16 / 9)}px` });
+  if (slot.classList.contains("is-poster")) Object.assign(slot.style, { height: "auto", width: `${Math.round(Math.max(300, aw * 0.5))}px` });
+  else Object.assign(slot.style, { height: `${sh}px`, width: `${Math.round(sh * 16 / 9)}px` });
   let size = Math.min(36, Math.max(24, Math.round(info.clientWidth / 10.5))), v = 16;
   h2.style.fontSize = `${size}px`;
   if (verdict) verdict.style.fontSize = "";
@@ -761,6 +777,13 @@ function fitCine(panel) {
 // ----- the laptop: the notes, and below them the transport for the recording on the big screen: a scrubber with the
 // chapters marked on it, play, previous/next chapter, the chapter playing (a menu of all of them), captions and sound
 const key = (k) => el("kbd", { text: k, "aria-hidden": "true" });
+// the overview's gist: two lines (one on a small laptop), and a "more" that shows the rest
+function gist(text) {
+  const p = el("p", { class: "lead is-short" }, el("span", { text }));
+  const more = el("button", { class: "lead-more", type: "button", "aria-expanded": "false", text: "more ▾",
+    onclick: () => { const open = p.classList.toggle("is-short"); more.textContent = open ? "more ▾" : "less ▴"; more.setAttribute("aria-expanded", String(!open)); } });
+  return el("div", { class: "lead-wrap" }, p, more);
+}
 function notesScreen(t) {
   const s = t.s || {};
   const chapters = chaptersOf(t);
@@ -770,15 +793,13 @@ function notesScreen(t) {
     .filter(([id]) => (id === "overview" && chapters.length) || id === "summary" || (id === "points" && s.keyPoints && s.keyPoints.length)
       || (id === "monday" && s.takeaways && s.takeaways.length));
   const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Notes" });
-  const more = el("button", { class: "more-below", type: "button", tabindex: "-1", "aria-hidden": "true", text: "More ↓",
-    onclick: () => pane.scrollBy({ top: pane.clientHeight * 0.8, behavior: reduceMotion ? "auto" : "smooth" }) });
   const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Notes" });
   const chapterList = () => el("ol", { class: "chapters" }, chapters.map((c, i) => el("li", {},
     live ? el("button", { class: "chapter", type: "button", "data-i": i, onclick: () => { jumpTo(c.sec); menu.hidden = true; } }, el("time", { text: clock(c.sec) }), el("span", { text: c.title }))
       : el("a", { class: "chapter", href: ytUrl(t, c.sec), target: "_blank", rel: "noopener", "data-i": i }, el("time", { text: clock(c.sec) }), el("span", { text: c.title })))));
   const fill = (id) => {
     pane.textContent = "";
-    if (id === "overview") put(pane, s.tldr ? el("p", { class: "lead", text: s.tldr }) : null,
+    if (id === "overview") put(pane, s.tldr ? gist(s.tldr) : null,
       el("p", { class: "label jump-label", text: live && !(seat && seat.failed) ? "Jump to a part: it plays on the big screen" : "Jump to a part: it opens on YouTube" }), chapterList());
     if (id === "summary") put(pane, s.tldr && !chapters.length ? el("p", { class: "lead", text: s.tldr }) : null, (s.summary || t.abstract || []).map((p) => el("p", { text: p })));
     if (id === "points") put(pane, el("ul", {}, s.keyPoints.map((p) => el("li", { text: p }))));
@@ -805,6 +826,7 @@ function notesScreen(t) {
         onclick: (e) => { menu.hidden = !menu.hidden; e.currentTarget.setAttribute("aria-expanded", String(!menu.hidden)); if (!menu.hidden) { seat.lastChapter = null; tick(); } } },
         el("span", { class: "now-num" }), el("span", { class: "now-text" }), el("span", { class: "caret", "aria-hidden": "true", text: "▾" })) : el("span", { class: "now-chapter is-plain" }),
       el("span", { class: "now-time" }),
+      el("button", { class: "notes-btn retry", type: "button", text: "Try again", onclick: () => retryPlayer() }),
       el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
       el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }))) : null;
   const keysSheet = el("div", { class: "keys-sheet", hidden: true, role: "note" },
@@ -825,12 +847,11 @@ function notesScreen(t) {
       el("button", { class: "notes-btn notes-close", type: "button", "aria-keyshortcuts": "L", onclick: () => setLaptop({ open: false }) }, "Close lid", key("L"))),
     keysSheet,
     el("div", { class: "notes-body" },
-      el("div", { class: "notes-read" }, tabRow, el("div", { class: "pane-wrap" }, pane, more)),
-      el("aside", { class: "notes-watch" }, live ? el("div", { class: "slot", "aria-hidden": "true" }) : null,
+      el("div", { class: "notes-read" }, tabRow, el("div", { class: "pane-wrap" }, pane)),
+      el("aside", { class: "notes-watch" }, live ? el("div", { class: "watch-head is-top", text: "The talk, moved here from the big screen" }) : null,
+        live ? el("div", { class: "slot", "aria-hidden": "true" }) : null,
         chapters.length ? el("div", { class: "watch-head", text: "Chapters" }) : null,
-        chapters.length ? (() => { const list = el("div", { class: "scroller watch-list" }, chapterList());
-          return el("div", { class: "pane-wrap is-list" }, list, el("button", { class: "more-below", type: "button", tabindex: "-1", "aria-hidden": "true", text: "More ↓",
-            onclick: () => list.scrollBy({ top: list.clientHeight * 0.8, behavior: reduceMotion ? "auto" : "smooth" }) })); })() : null)),
+        chapters.length ? el("div", { class: "pane-wrap is-list" }, el("div", { class: "scroller watch-list" }, chapterList())) : null)),
     menu, now);
   panel.fill = fill;
   panel.toggleKeys = toggleKeys;
@@ -872,6 +893,7 @@ function tick() {
       : state === 2 ? (i >= 0 ? `Paused: ${ch[i].title}` : "Paused") : "Press play (K)";
     if (state === 1 || state === 2) seat.waitSince = 0;
   }
+  if (!lidBar.hidden && !lidPlay.hidden) { lidPlay.querySelector(".glyph").textContent = playing ? "❚❚ Pause" : "▶ Play"; lidPlay.setAttribute("aria-label", playing ? "Pause" : "Play"); }
   const n = seat.notes;
   if (!n) return;
   for (const c of n.querySelectorAll(".chapter")) {
@@ -883,10 +905,16 @@ function tick() {
     seat.lastChapter = i;
     for (const c of n.querySelectorAll(".chapter.is-now")) {
       const box = c.closest(".scroller");
-      if (!box || !c.offsetParent || box.classList.contains("pane")) continue;
+      if (!box || !c.offsetParent) continue;
       const top = c.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop;
-      if (top < box.scrollTop || top + c.offsetHeight > box.scrollTop + box.clientHeight)
-        box.scrollTo({ top: top - box.clientHeight / 3, behavior: reduceMotion ? "auto" : "smooth" });
+      const clear = box.clientHeight * 0.78;                 // above the fade at the bottom
+      if (top < box.scrollTop) box.scrollTo({ top: top - 8, behavior: reduceMotion ? "auto" : "smooth" });
+      else if (top + c.offsetHeight > box.scrollTop + clear) {
+        // in the overview, scroll past the whole gist (never leave half of it under the tabs)
+        const label = box.classList.contains("pane") && box.querySelector(".jump-label, .chapters");
+        const want = top + c.offsetHeight - clear;
+        box.scrollTo({ top: label ? Math.max(want, label.offsetTop - box.offsetTop - 4) : want, behavior: reduceMotion ? "auto" : "smooth" });
+      }
     }
   }
   const now = n.querySelector(".now");
@@ -894,18 +922,19 @@ function tick() {
   now.classList.toggle("is-failed", !!seat.failed);
   const text = now.querySelector(".now-text"), toggle = now.querySelector(".toggle"), time = now.querySelector(".now-time");
   if (seat.failed) {
-    if (text) text.textContent = "Won't play here: chapters open on YouTube";
-    toggle.querySelector(".glyph").textContent = "YouTube ↗";
+    if (text) text.textContent = "Chapters open on YouTube";
+    toggle.querySelector(".glyph").textContent = "Watch on YouTube ↗";
     toggle.setAttribute("aria-label", "Watch on YouTube");
     time.textContent = "";
     return;
   }
-  if (text) text.textContent = i >= 0 ? ch[i].title : "All chapters";
+  if (text) text.textContent = i >= 0 ? ch[i].title : `All ${ch.length} chapters`;
   const num = now.querySelector(".now-num");
-  if (num) num.textContent = i >= 0 ? `${i + 1}/${ch.length}` : String(ch.length);
+  if (num) num.textContent = i >= 0 ? `${i + 1}/${ch.length}` : "";
   toggle.querySelector(".glyph").textContent = seat.starting && !seat.ready ? "Loading…" : playing ? "❚❚ Pause" : "▶ Play";
   toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
-  time.textContent = L ? `${clock(sec || 0)} / ${clock(L)}` : "";
+  time.textContent = "";
+  if (L) put(time, el("span", { text: clock(sec || 0) }), el("span", { class: "t-len", text: ` / ${clock(L)}` }));
   const scrub = now.querySelector(".scrub");
   scrub.classList.toggle("is-ready", !!L);
   if (L) {
@@ -925,13 +954,14 @@ function tick() {
   }
   mute.setAttribute("aria-label", muted ? "Sound off: turn it on" : "Mute");
   cc.setAttribute("aria-pressed", String(!!seat.cc));
-  for (const b of [mute, cc]) b.disabled = !seat.ready;
+  for (const b of [mute, cc]) { b.disabled = !seat.ready; b.title = seat.ready ? "" : "Once the talk plays"; }
 }
 
 // ----- open, close, zoom
 function syncControls() {
   const { open, zoom } = seat;
-  lapLid.hidden = open;
+  lidBar.hidden = lidHit.hidden = open;
+  lidPlay.hidden = !seat.t.videoId || !EMBED;
   seatbar.hidden = zoom;                                    // full screen: the laptop's own header has the way out
   const n = seat.notesPanel;
   if (!n) return;
@@ -955,13 +985,28 @@ function mountNotes() {
   Object.assign(panel.style, { left: `${Math.round(o.screen[0] * k)}px`, top: `${Math.round(o.screen[1] * k)}px`,
     width: `${Math.round((o.screen[2] - o.screen[0]) * k)}px`, height: `${Math.round((o.screen[3] - o.screen[1]) * k)}px` });
   panel.classList.remove("is-off");
-  panel.classList.toggle("is-compact", seat.layout.H < 820 && !seat.zoom);
+  panel.classList.toggle("is-compact", !seat.zoom && (LAP.screen[3] - LAP.screen[1]) * k < 380);
+  panel.classList.toggle("is-tiny", !seat.zoom && (LAP.screen[3] - LAP.screen[1]) * k < 310);
+  let told = false;
+  try { told = localStorage.getItem("cinema-laptop-hint") === "1"; } catch (e) { /* no storage */ }
+  panel.classList.toggle("is-told", told);
+  panel.classList.toggle("is-short-zoom", seat.layout.H < 820 && seat.zoom);
   lap.append(panel);
   seat.notes = panel;
   syncControls();
+  if (seat.zoom) fitWatch(panel);
   for (const sc of panel.querySelectorAll(".strip, .scroller")) watchScroll(sc);
   seat.lastChapter = null;
   tick();
+}
+// full screen: the video as big as the column allows once every chapter row has its place
+function fitWatch(panel) {
+  const col = panel.querySelector(".notes-watch"), slot = col && col.querySelector(".slot"), list = col && col.querySelector(".watch-list");
+  if (!slot) return;
+  slot.style.width = "";
+  if (!list) return;
+  const over = list.scrollHeight - list.clientHeight;
+  if (over > 0) slot.style.width = `${Math.max(col.clientWidth * 0.5, slot.clientWidth - over * 16 / 9 - 4)}px`;
 }
 let moving = false;
 async function setLaptop(change, ms = MOVE) {
@@ -979,7 +1024,8 @@ async function setLaptop(change, ms = MOVE) {
   seat.layout = seatLayout(seat);
   stage.classList.toggle("is-reading", seat.zoom);
   const np = seat.notesPanel, pressed = np && np.querySelector('.tabs [aria-pressed="true"]');
-  if (seat.zoom && pressed && pressed.dataset.tab === "overview") np.fill("summary");
+  if (seat.zoom && pressed && pressed.dataset.tab === "overview") { seat.tabBeforeZoom = "overview"; np.fill("summary"); }
+  else if (!seat.zoom && seat.tabBeforeZoom) { if (pressed && pressed.dataset.tab === "summary") np.fill(seat.tabBeforeZoom); seat.tabBeforeZoom = null; }
   if (opening) playLid(seat.open, ms);
   frameRoom(seat.key, ms);
   if (face) { face.el.style.transition = ms ? `transform ${ms}ms ${EASE}` : ""; place(); }
@@ -997,6 +1043,15 @@ async function setLaptop(change, ms = MOVE) {
   else if (seat.notes && (opening || seat.zoom || change.zoom === false)) seat.notes.querySelector(seat.zoom || change.zoom === false ? ".notes-zoom" : ".tabs [aria-pressed=\"true\"]").focus({ preventScroll: true });
 }
 lapLid.addEventListener("click", () => setLaptop({ open: true }));
+const lidPlay = $("lidPlay"), lidBar = $("lidBar"), lidHit = $("lidHit");
+lidHit.addEventListener("click", () => setLaptop({ open: true }));
+// the closed lid in the picture, as % of the art box: the click target, and the controls at its front
+{
+  const [x0, y0, x1, y1] = LAP.closed.box, pc = (v, of) => `${v / of * 100}%`;
+  Object.assign(lidHit.style, { left: pc(x0, LAP.closed.w || LAP.w), top: pc(y0, LAP.closed.h || LAP.h), width: pc(x1 - x0, LAP.closed.w || LAP.w), height: pc(y1 - y0, LAP.closed.h || LAP.h) });
+  Object.assign(lidBar.style, { left: pc(x0 + (x1 - x0) * 0.36, LAP.closed.w || LAP.w), top: pc(y0 + (y1 - y0) * 0.78, LAP.closed.h || LAP.h) });   // clear of the sticker (right)
+}
+lidPlay.addEventListener("click", () => playPause());
 $("toProg").addEventListener("click", () => goHall());
 addEventListener("keydown", (e) => {
   if (!seat || e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
@@ -1062,7 +1117,7 @@ function hintOnce() {
   const hint = el("div", { class: "lap-hint", role: "status" },
     el("span", { text: seat.chapters.length && EMBED ? "Your laptop: the notes, and the chapters. Pick one and it plays on the big screen." : "Your laptop: the notes on this talk." }),
     el("button", { type: "button", "aria-label": "Dismiss", text: "×", onclick: () => dismiss() }));
-  const dismiss = () => { hint.remove(); try { localStorage.setItem("cinema-laptop-hint", "1"); } catch (e) { /* fine */ } };
+  const dismiss = () => { hint.remove(); try { localStorage.setItem("cinema-laptop-hint", "1"); } catch (e) { /* fine */ } };   // the label stays this visit
   // beside the laptop's right edge, a quarter of the way down its screen
   Object.assign(hint.style, { left: `${(LAP.screen[2] + LAP.w * 0.035) / LAP.w * 100}%`, top: `${(LAP.screen[1] + (LAP.screen[3] - LAP.screen[1]) * 0.22) / LAP.h * 100}%` });
   lap.append(hint);
@@ -1074,7 +1129,7 @@ function leaveSeat() {
   clearTimeout(seat.readyTimer);
   if (seat.player && seat.player.destroy) seat.player.destroy();
   tube.textContent = ""; tube.hidden = true;
-  lap.hidden = true; lapLid.hidden = true;
+  lap.hidden = true; lidBar.hidden = lidHit.hidden = true;
   if (seat.notes) seat.notes.remove();
   for (const h of lap.querySelectorAll(".lap-hint")) h.remove();
   seatbar.hidden = true;
