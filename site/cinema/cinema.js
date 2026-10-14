@@ -128,16 +128,19 @@ function fit(key) {
   const clamp = (o, size, view) => (size <= view ? (view - size) / 2 : Math.min(0, Math.max(view - size, o)));   // no black past the still
   return { iw, ih, s, ox: clamp(W / 2 - (x0 + x1) / 2 * s, iw * s, W), oy: clamp(H / 2 - (y0 + y1) / 2 * s, ih * s, H), contain: f.contain };
 }
-// the still (and its cut-out) moved from where object-fit puts it to where fit() wants it
+// the walk's last frame, the still and its cut-out moved from where object-fit puts them to where fit() wants them.
+// Animated, it starts while the walk is still settling, so it reads as the same push-in carrying on.
+const ZOOM_S = 0.75, ZOOM_LEAD = 0.3;   // its length, and how long before the walk's end it starts
 function zoomTo(key, on, animate = false) {
   zoomed = on;
   const a = framing(key), b = fit(key), k = b.s / a.s;
   const tf = on ? `translate(${b.ox - k * a.ox}px, ${b.oy - k * a.oy}px) scale(${k})` : "";
-  for (const e of [plate, front]) {
-    e.style.transition = animate ? "transform .9s cubic-bezier(.45, 0, .2, 1)" : "none";
+  for (const e of [plate, front, clip]) {
+    e.style.transformOrigin = "0 0";
+    e.style.transition = animate ? `transform ${ZOOM_S}s cubic-bezier(.3, 0, .2, 1), opacity .35s ease` : "";
     e.style.transform = tf;
   }
-  return new Promise((resolve) => setTimeout(resolve, animate ? 950 : 0));
+  return new Promise((resolve) => setTimeout(resolve, animate ? ZOOM_S * 1000 : 0));
 }
 let face = null;      // { el, key, overlayName, w, h }
 function place() {
@@ -252,10 +255,11 @@ function warm(n) {
 }
 
 let skipWalk = null;
-function playClip(name, { from = 0, until = null } = {}) {
+function playClip(name, { from = 0, until = null, nearEnd = null } = {}) {
   return new Promise((resolve) => {
     if (reduceMotion) { resolve(); return; }
-    const done = () => { clip.onended = clip.onerror = clip.ontimeupdate = null; skipWalk = null; skipBtn.hidden = true; resolve(); };
+    let watching = true;
+    const done = () => { watching = false; clip.onended = clip.onerror = clip.ontimeupdate = null; skipWalk = null; skipBtn.hidden = true; resolve(); };
     skipWalk = done;
     clip.src = `media/${name}.mp4`;
     clip.classList.remove("is-shown");
@@ -264,7 +268,13 @@ function playClip(name, { from = 0, until = null } = {}) {
     clip.onerror = done;                       // a missing clip is a cut, not a dead end
     if (until != null) clip.ontimeupdate = () => { if (clip.currentTime >= until) { clip.pause(); done(); } };
     // fade in over the still (the first frame is the still), which hides the moment the video starts
-    const go = () => { if (from) clip.currentTime = from; clip.play().then(() => { clip.classList.add("is-shown"); skipBtn.hidden = false; }).catch(done); };
+    const go = () => { if (from) clip.currentTime = from; clip.play().then(() => { clip.classList.add("is-shown"); skipBtn.hidden = false; watchEnd(); }).catch(done); };
+    // nearEnd: [seconds, fn], fn called that long before the clip ends
+    const watchEnd = () => {
+      if (!watching || !nearEnd) return;
+      if (clip.duration - clip.currentTime <= nearEnd[0]) { nearEnd[1](); return; }
+      requestAnimationFrame(watchEnd);
+    };
     if (clip.readyState >= 1) go(); else clip.addEventListener("loadedmetadata", go, { once: true });
   });
 }
@@ -482,15 +492,20 @@ async function toHall(withWalk) {
 }
 
 async function toSeat(t, withWalk) {
-  const n = roomNo(t);
+  const n = roomNo(t), key = shotKey(`seat-${n}`);
   unmount();
-  if (withWalk) { say(`Walking to Room ${n}`); await playClip(walkClip(n), { until: walkClip(n) === `walk-${n}` && shape === "phone" ? doorTime(n) : null }); }
-  await showStill(shotKey(`seat-${n}`));
-  // phones: let the walk fade off the still, then zoom onto the totem before it lights up
-  if (shape === "phone") {
-    await hideClip();
-    if (shotKey(`seat-${n}`).startsWith("door-phone")) await zoomTo(shotKey(`seat-${n}`), true, withWalk && !reduceMotion);
-  } else hideClip();
+  // phones: the walk pushes in on the door totem and the zoom carries on from it until the totem's screen fills the
+  // phone; the walk then fades off the still underneath, and the totem lights up
+  const zoomsIn = key.startsWith("door-phone");
+  let zooming = null;
+  if (withWalk) {
+    say(`Walking to Room ${n}`);
+    await playClip(walkClip(n), { until: walkClip(n) === `walk-${n}` && shape === "phone" ? doorTime(n) : null,
+      nearEnd: zoomsIn && walkClip(n) !== `walk-${n}` ? [ZOOM_LEAD, () => { zooming = zoomTo(key, true, true); }] : null });
+  }
+  await showStill(key);
+  if (zoomsIn && !zooming) zooming = zoomTo(key, true, withWalk && !reduceMotion);   // skipped, or no phone walk
+  if (shape === "phone") await Promise.all([hideClip(), zooming]); else hideClip();
   say("");
   room = n; current = t;
   mount(talkScreen(t, shape === "phone", true, n), shotKey(`seat-${n}`), "screen");
