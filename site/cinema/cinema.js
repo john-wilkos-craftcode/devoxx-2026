@@ -665,6 +665,7 @@ function posterOn(t) {
 }
 // the recording full screen (the browser's own): the picture alone, with a slim bar of our controls that shows when
 // the mouse moves (YouTube's are off), Esc or the same button to come back
+const FS_EXIT_ICON = `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 const FS_ICON = `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 function videoFullscreen() {
   if (document.fullscreenElement) { document.exitFullscreen(); return; }
@@ -688,7 +689,8 @@ function tubeControls() {
     el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
     el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }),
     el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Leave full screen", onclick: () => videoFullscreen() }));
-  bar.querySelector(".fs").innerHTML = FS_ICON;
+  bar.querySelector(".fs").innerHTML = FS_EXIT_ICON;
+  bar.querySelector(".fs").title = "Leave full screen  F or Esc";
   const corner = el("button", { class: "tube-fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Video full screen", title: "Video full screen  F", onclick: () => videoFullscreen() });
   corner.innerHTML = FS_ICON;
   return [corner, bar];
@@ -889,7 +891,7 @@ function readable(t, s, live) {
   const quotes = (s.quotes || []).filter((q) => q && q.text).slice(0, 2);
   const pull = (q) => el("figure", { class: "pull" },
     el("blockquote", { text: `“${q.text.replace(/^["“]|["”]$/g, "")}”` }),
-    q.at ? (live ? el("button", { class: "pull-at", type: "button", onclick: () => jumpTo(toSeconds(q.at)), "aria-label": `Play from ${q.at}` }, `▶ ${q.at}`)
+    q.at ? (live ? el("button", { class: "pull-at", type: "button", onclick: () => jumpTo(toSeconds(q.at)) }, `▶ Play from ${q.at}`)
       : el("span", { class: "pull-at", text: q.at })) : null);
   const slots = paras.length >= 5 ? [1, 3] : [Math.min(1, paras.length - 1), paras.length - 1];
   const out = [];
@@ -988,7 +990,9 @@ function notesScreen(t) {
         live ? el("div", { class: "slot", "aria-hidden": "true" }) : null,
         chapters.length ? el("div", { class: "watch-head", text: "Chapters" }) : null,
         chapters.length ? el("div", { class: "pane-wrap is-list" }, el("div", { class: "scroller watch-list" }, chapterList())) : null)),
-    menu, now ? el("div", { class: "chrome is-bottom" }, now) : null);
+    menu, now ? el("div", { class: "chrome is-bottom" }, now) : null,
+    el("button", { class: "peek", type: "button", tabindex: "-1", "aria-hidden": "true", onclick: () => chrome(true), onpointerenter: () => chrome(true) },
+      live ? el("i", { class: "peek-fill" }) : null, el("span", { class: "peek-handle" })));
   panel.addEventListener("mousemove", (e) => {
     if (!panel.classList.contains("is-immersed")) return;
     const r = panel.getBoundingClientRect();
@@ -1108,6 +1112,7 @@ function tick() {
   if (L) {
     n.ticks(L);
     now.querySelector(".scrub-fill").style.width = `${Math.min(100, (sec || 0) / L * 100)}%`;
+    const pf = n.querySelector(".peek-fill"); if (pf) pf.style.width = `${Math.min(100, (sec || 0) / L * 100)}%`;
     scrub.setAttribute("aria-valuemax", String(Math.round(L)));
     scrub.setAttribute("aria-valuenow", String(Math.round(sec || 0)));
     scrub.setAttribute("aria-valuetext", `${clock(sec || 0)} of ${clock(L)}${i >= 0 ? `, chapter ${i + 1}: ${ch[i].title}` : ""}`);
@@ -1289,7 +1294,7 @@ function hintOnce() {
   try { seen = localStorage.getItem("cinema-laptop-hint") === "1"; } catch (e) { /* private window: show it */ }
   if (seen || !seat.notes) return;
   const hint = el("div", { class: "lap-hint", role: "status" },
-    el("span", { text: seat.chapters.length && EMBED ? "Your laptop: the notes, and the chapters. Pick one and it plays on the big screen." : "Your laptop: the notes on this talk." }),
+    el("span", { text: seat.chapters.length && EMBED ? "Your laptop: the summary, key points and chapters. Pick a chapter and it plays on the big screen." : "Your laptop: the notes on this talk." }),
     el("button", { type: "button", "aria-label": "Dismiss", text: "×", onclick: () => dismiss() }));
   const dismiss = () => { hint.remove(); try { localStorage.setItem("cinema-laptop-hint", "1"); } catch (e) { /* fine */ } };   // the label stays this visit
   // beside the laptop's right edge, a quarter of the way down its screen

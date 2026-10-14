@@ -94,6 +94,7 @@ review is about **the seat, on laptops and desktops**.
 | 10 | 9 (36/40) | 9 (36/40) | 9 (36/40) | playing chapter kept clear of the fade, one-line gist on small laptops, tab order: poster first. UX target met |
 | r1 | 9 (36/40) | 9 (36/40) | 9 (36/40) | real renders in (laptop + wide room stills); full-screen video (R8) |
 | r2 | 9 (36/40) | 9 (36/40) | 9 (37/40) | Z zooms the laptop, F full-screens the video |
+| r3 | 9 (37/40) | 9 (36/40) | 9 (37/40) | R9: theatre while playing, chrome folds while reading, a readable summary |
 
 Art (stage 2), overall per viewport 1440 / 1280 / 1920:
 | round | art | main change |

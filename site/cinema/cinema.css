@@ -780,3 +780,21 @@ html, body { overscroll-behavior: none; }
 .notes .reading li { line-height: 1.55; color: #d8dcea; padding-left: .2em; text-wrap: pretty; }
 .notes .reading li::marker { color: var(--orange); font-weight: 700; }
 .notes.is-zoomed .reading p, .notes.is-zoomed .reading li { line-height: 1.66; }
+/* round a6 */
+.notes .peek { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; height: 16px; padding: 0; border: 0; background: none; cursor: pointer;
+  opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.notes.is-immersed .peek { opacity: 1; pointer-events: auto; }
+.notes .peek-fill { position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: var(--orange); }
+.notes .peek::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .12); }
+.notes .peek-handle { position: absolute; left: 50%; bottom: 6px; width: 34px; height: 4px; margin-left: -17px; border-radius: 2px; background: rgba(232, 235, 244, .35); }
+.notes .peek:hover .peek-handle { background: rgba(232, 235, 244, .7); }
+.notes .now-chapter { flex: 1 1 0; max-width: none; }
+.notes.is-tiny .now-chapter { max-width: none; }
+.notes .now-row > .icon, .notes .now-row > .transport, .notes .now-row > .now-time { flex: none; }
+.notes.is-immersed .notes-read { padding-top: 4px; }
+.notes.is-zoomed.is-immersed .notes-read { padding-top: 8px; }
+.notes .pull-at { display: inline-flex; align-items: center; min-height: 26px; margin-top: .55em; padding: 0 .75em; border: 1px solid rgba(246, 146, 30, .5);
+  border-radius: 999px; font-size: .8em; }
+.notes button.pull-at:hover { background: rgba(246, 146, 30, .14); text-decoration: none; }
+.notes span.pull-at { border: 0; padding: 0; }
+.notes.is-tiny .now-time { display: none; }        /* the smallest laptop: the scrubber shows where you are; every button stays */
