@@ -1,6 +1,19 @@
 # Where this stands (14/10)
 
-## Right now
+## Right now: the seat on laptops (14/10 afternoon)
+- The cinema screen carries the YouTube player (own poster, YouTube's chrome off, cropped so its overlays never show)
+  with only the title, speakers and "Worth your time if" beside it. The notes are on a Dell Precision 5570 on your lap
+  (scripts/blender/build_laptop.py, a separate transparent render laid over the room like a first-person view model):
+  Overview (gist + chapters), Summary, Key points, To try, and a transport (scrubber with chapter ticks, chapter menu,
+  CC, sound, video full screen). Lid opens/closes (14 frames, sticker on the lid, Play/Open on it), Z zooms the laptop
+  to fill the window with the recording moved onto it, F full-screens the video with the page's own bar.
+  Keys K [ ] arrows C M F Z L ? Esc. Chapters are YouTube's own where it has them (scripts/fetch_chapters.py).
+- Seat stills are wider and taller than the walk (same camera; the walk's frame measured inside them, "inner" in
+  shots.json): render with scripts/blender/render_seat_laptop.sh (~8 min a room; the laptop ~6 min).
+- UX: 9/10 on 1440, 1280 and 1920 (tools/ux/RUBRIC-seat.md, shoot-seat.mjs; 12 rounds). Art: 6-6.5/10 after 3
+  rounds; the open items are listed at the end of RUBRIC-seat.md. Phones are unchanged (door totem).
+
+## Before that
 - **All eight rooms (3-10) rendered and published** into `site/cinema/media/` (stills, cut-out layers, walks).
   Rooms 3 and 6 re-rendered up to their door after their phone totems were moved: room 3's stood over the west
   stairwell (its phone still was solid blue), room 6's against the railing round a floor opening. build_scene.py

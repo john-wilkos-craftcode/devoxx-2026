@@ -87,6 +87,19 @@ review is about **the seat, on laptops and desktops**.
 | 8 | 8 (35/40) | 9 (36/40) | 9 (37/40) | first-run note back, no-recording panel fits, gist more/less, one clock format |
 | 9 | 9 (36/40) | 8 (35/40) | 9 (36/40) | compact laptop by its own size, all chapters in full screen, tab kept, lid controls clear of the sticker |
 | 10 | 9 (36/40) | 9 (36/40) | 9 (36/40) | playing chapter kept clear of the fade, one-line gist on small laptops, tab order: poster first. UX target met |
+| r1 | 9 (36/40) | 9 (36/40) | 9 (36/40) | real renders in (laptop + wide room stills); full-screen video (R8) |
+| r2 | 9 (36/40) | 9 (36/40) | 9 (37/40) | Z zooms the laptop, F full-screens the video |
+
+Art (stage 2), overall per viewport 1440 / 1280 / 1920:
+| round | art | main change |
+|---|---|---|
+| a2 | 5 / 4 / 5 | first laptop render (lit like a product shot) |
+| a3 | 6 / 6 / 6 | lid in the room's light, wide stills, glass and projection CSS |
+| a4 | 6 / 5 / 6 | screen glow on the keys, darker world, notes overscan |
+| a5 | 6.5 / 6 / 6.5 | neutral Titan Gray, black backlit keys, carbon weave, spill on the seats |
+Still open (a5): notes read as a panel (clip to the quad with bezel showing, glass layer), info column too flat a blue,
+no glints on the chamfers, a radial (CD-like) lid highlight from anisotropy, 1280 shows one key row, 14 frames is coarse
+and the notes pop in, sticker reads grey and soft.
 
 ## Stage 2: diegesis (after the laptop and the wide room stills are rendered)
 Once UX is at 9, the stand-in laptop is replaced by the Blender render and the room by wider stills. Then two fresh
