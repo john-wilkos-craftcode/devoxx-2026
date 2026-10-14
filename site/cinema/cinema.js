@@ -738,7 +738,7 @@ function jumpTo(sec) {
           clearTimeout(seat.readyTimer);
           tick();
         },
-        onStateChange: () => tick(),
+        onStateChange: (e) => { theatreFor(e.data); tick(); },
         onError: () => playerFailed(t),
       },
     });
@@ -766,13 +766,34 @@ function toggleCaptions() {
   if (seat.cc) { p.loadModule("captions"); p.setOption("captions", "track", { languageCode: "en" }); } else p.unloadModule("captions");
   tick();
 }
+// Theatre: while the talk plays, the title column drifts off and the picture grows to the screen's full height, centred;
+// pause (for a moment) or let it finish and the column comes back
+let theatreTimer = 0;
+function theatreFor(state) {
+  if (!seat) return;
+  clearTimeout(theatreTimer);
+  if (state === 1) setTheatre(true);
+  else if (state === 2 || state === 0) theatreTimer = setTimeout(() => setTheatre(false), 1200);
+}
+function setTheatre(on) {
+  if (!seat || seat.theatre === on) return;
+  seat.theatre = on;
+  if (seat.cine) seat.cine.classList.toggle("is-theatre", on);
+  if (!seat.zoom) placeTube(reduceMotion ? 0 : 750);
+}
+function theatreRect() {
+  const fr = seat.cine.getBoundingClientRect(), padX = fr.width * 0.015, padT = 8, padB = seat.layout.cover + 8;
+  const aw = fr.width - 2 * padX, ah = fr.height - padT - padB;
+  const h = Math.min(ah, aw * 9 / 16), w = h * 16 / 9;
+  return { left: fr.left + (fr.width - w) / 2, top: fr.top + padT + (ah - h) / 2, width: w, height: h };
+}
 // the tube sits over whichever slot is showing: the cinema screen's, or the laptop's when zoomed
 function placeTube(ms = 0) {
   if (!seat || tube.hidden) return;
   const host = seat.zoom ? seat.notes : seat.cine, slot = host && host.querySelector(".slot");
   if (!slot) { tube.classList.add("is-away"); return; }
-  const r = slot.getBoundingClientRect(), st = stage.getBoundingClientRect();
-  tube.style.transition = ms ? `transform ${ms}ms ${EASE}, opacity .25s ease` : "opacity .25s ease";
+  const r = !seat.zoom && seat.theatre && seat.cine ? theatreRect() : slot.getBoundingClientRect(), st = stage.getBoundingClientRect();
+  tube.style.transition = ms ? `transform ${ms}ms ${EASE}, width ${ms}ms ${EASE}, height ${ms}ms ${EASE}, opacity .25s ease` : "opacity .25s ease";
   Object.assign(tube.style, { width: `${Math.round(r.width)}px`, height: `${Math.round(r.height)}px`, transform: `translate(${Math.round(r.left - st.left)}px, ${Math.round(r.top - st.top)}px)` });
   tube.classList.toggle("is-on-laptop", seat.zoom);
   tube.classList.remove("is-away");
@@ -817,6 +838,68 @@ function fitCine(panel) {
 // ----- the laptop: the notes, and below them the transport for the recording on the big screen: a scrubber with the
 // chapters marked on it, play, previous/next chapter, the chapter playing (a menu of all of them), captions and sound
 const key = (k) => el("kbd", { text: k, "aria-hidden": "true" });
+// The summary set for reading: paragraphs of two or three sentences (the summaries come as two long blocks), the tools
+// and products it names in bold the first time, the speaker's own words pulled out between them, with a jump to the
+// moment when there's a recording.
+const ABBR = /\b(e\.g|i\.e|vs|etc|Dr|Mr|Ms|Mrs|St|No|approx|cf|incl)\.$/i;
+function sentences(p) {
+  const out = [];
+  let cur = "";
+  for (const part of p.split(/(?<=[.!?…])\s+(?=[“"‘'(\p{Lu}\d])/u)) {
+    cur = cur ? `${cur} ${part}` : part;
+    if (!ABBR.test(cur)) { out.push(cur); cur = ""; }
+  }
+  if (cur) out.push(cur);
+  return out;
+}
+function readingParas(paras) {
+  const out = [];
+  for (const p of paras) {
+    let c = [];
+    const flush = () => { if (c.length) out.push(c.join(" ")); c = []; };
+    for (const x of sentences(p)) {
+      c.push(x);
+      if (c.length >= 3 || c.join(" ").length > 280) flush();
+    }
+    if (c.length && c.join(" ").length < 90 && out.length) { out[out.length - 1] += ` ${c.join(" ")}`; c = []; }
+    flush();
+  }
+  return out;
+}
+const escRe = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function emphasise(text, terms, used) {
+  if (!terms.length) return [text];
+  const re = new RegExp(`(?<![\\p{L}\\d])(${terms.map(escRe).join("|")})(?![\\p{L}\\d])`, "gu");
+  const out = [];
+  let at = 0;
+  for (const m of text.matchAll(re)) {
+    const key = m[1].toLowerCase();
+    if (used.has(key)) continue;
+    used.add(key);
+    out.push(text.slice(at, m.index), el("strong", { text: m[1] }));
+    at = m.index + m[1].length;
+  }
+  out.push(text.slice(at));
+  return out;
+}
+function readable(t, s, live) {
+  const terms = [...new Set(s.tech || [])].filter((x) => x.length > 2).sort((a, b) => b.length - a.length);
+  const used = new Set();
+  const paras = readingParas(s.summary || t.abstract || []);
+  const quotes = (s.quotes || []).filter((q) => q && q.text).slice(0, 2);
+  const pull = (q) => el("figure", { class: "pull" },
+    el("blockquote", { text: `“${q.text.replace(/^["“]|["”]$/g, "")}”` }),
+    q.at ? (live ? el("button", { class: "pull-at", type: "button", onclick: () => jumpTo(toSeconds(q.at)), "aria-label": `Play from ${q.at}` }, `▶ ${q.at}`)
+      : el("span", { class: "pull-at", text: q.at })) : null);
+  const slots = paras.length >= 5 ? [1, 3] : [Math.min(1, paras.length - 1), paras.length - 1];
+  const out = [];
+  paras.forEach((p, i) => {
+    out.push(el("p", {}, ...emphasise(p, terms, used)));
+    slots.forEach((at, qi) => { if (at === i && quotes[qi] && !(qi === 1 && slots[0] === slots[1])) out.push(pull(quotes[qi])); });
+  });
+  return out;
+}
+
 // the overview's gist: two lines (one on a small laptop), and a "more" that shows the rest
 function gist(text) {
   const p = el("p", { class: "lead is-short" }, el("span", { text }));
@@ -834,6 +917,17 @@ function notesScreen(t) {
       || (id === "monday" && s.takeaways && s.takeaways.length));
   const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Notes" });
   const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Notes" });
+  // reading: scrolling down puts the header, the tabs and the bar away; scrolling up, the top, or the pointer at an
+  // edge (or keyboard focus on them) brings them back
+  let lastY = 0, panel = null;
+  const chrome = (show) => { if (panel) panel.classList.toggle("is-immersed", !show); };
+  pane.addEventListener("scroll", () => {
+    const y = pane.scrollTop, d = y - lastY;
+    if (y < 24) chrome(true);
+    else if (d > 4 && panel && !panel.querySelector(".chapter-menu:not([hidden]), .keys-sheet:not([hidden])")) chrome(false);
+    else if (d < -4) chrome(true);
+    lastY = y;
+  }, { passive: true });
   const chapterList = () => el("ol", { class: "chapters" }, chapters.map((c, i) => el("li", {},
     live ? el("button", { class: "chapter", type: "button", "data-i": i, onclick: () => { jumpTo(c.sec); menu.hidden = true; } }, el("time", { text: clock(c.sec) }), el("span", { text: c.title }))
       : el("a", { class: "chapter", href: ytUrl(t, c.sec), target: "_blank", rel: "noopener", "data-i": i }, el("time", { text: clock(c.sec) }), el("span", { text: c.title })))));
@@ -841,10 +935,11 @@ function notesScreen(t) {
     pane.textContent = "";
     if (id === "overview") put(pane, s.tldr ? gist(s.tldr) : null,
       el("p", { class: "label jump-label", text: live && !(seat && seat.failed) ? "Jump to a part: it plays on the big screen" : "Jump to a part: it opens on YouTube" }), chapterList());
-    if (id === "summary") put(pane, s.tldr && !chapters.length ? el("p", { class: "lead", text: s.tldr }) : null, (s.summary || t.abstract || []).map((p) => el("p", { text: p })));
-    if (id === "points") put(pane, el("ul", {}, s.keyPoints.map((p) => el("li", { text: p }))));
-    if (id === "monday") put(pane, el("ol", {}, s.takeaways.map((p) => el("li", { text: p }))));
+    if (id === "summary") put(pane, el("div", { class: "reading" }, s.tldr ? el("p", { class: "in-short" }, el("b", { text: "In short " }), s.tldr) : null, readable(t, s, live)));
+    if (id === "points") put(pane, el("ul", { class: "reading" }, s.keyPoints.map((p) => el("li", { text: p }))));
+    if (id === "monday") put(pane, el("ol", { class: "reading" }, s.takeaways.map((p) => el("li", { text: p }))));
     pane.scrollTop = 0;
+    chrome(true);
     for (const b of tabRow.children) b.setAttribute("aria-pressed", String(b.dataset.tab === id));
     rove(tabRow);
     requestAnimationFrame(() => { watchScroll(pane); if (seat) { seat.lastChapter = null; tick(); } });
@@ -879,21 +974,27 @@ function notesScreen(t) {
   const keysBtn = el("button", { class: "notes-btn notes-keys", type: "button", "aria-label": "Keyboard shortcuts", "aria-expanded": "false", "aria-keyshortcuts": "?",
     onclick: () => toggleKeys() }, "Keys", key("?"));
   const toggleKeys = () => { keysSheet.hidden = !keysSheet.hidden; keysBtn.setAttribute("aria-expanded", String(!keysSheet.hidden)); };
-  const panel = el("section", { class: `face notes${live ? "" : " is-offline"}`, "aria-label": "Your laptop: notes on the talk" },
-    el("header", { class: "notes-top" },
+  panel = el("section", { class: `face notes${live ? "" : " is-offline"}`, "aria-label": "Your laptop: notes on the talk" },
+    el("div", { class: "chrome is-top" }, el("header", { class: "notes-top" },
       el("span", { class: "notes-app" }, el("i", { "aria-hidden": "true" }), "Notes"),
       el("span", { class: "notes-spacer" }),
       keysBtn,
       el("button", { class: "notes-btn notes-zoom", type: "button", "aria-keyshortcuts": "Z", onclick: () => setLaptop({ zoom: !seat.zoom }) }),
-      el("button", { class: "notes-btn notes-close", type: "button", "aria-keyshortcuts": "L", onclick: () => setLaptop({ open: false }) }, "Close lid", key("L"))),
+      el("button", { class: "notes-btn notes-close", type: "button", "aria-keyshortcuts": "L", onclick: () => setLaptop({ open: false }) }, "Close lid", key("L")))),
     keysSheet,
     el("div", { class: "notes-body" },
-      el("div", { class: "notes-read" }, tabRow, el("div", { class: "pane-wrap" }, pane)),
+      el("div", { class: "notes-read" }, el("div", { class: "chrome is-tabs" }, tabRow), el("div", { class: "pane-wrap" }, pane)),
       el("aside", { class: "notes-watch" }, live ? el("div", { class: "watch-head is-top", text: "The talk, moved here from the big screen" }) : null,
         live ? el("div", { class: "slot", "aria-hidden": "true" }) : null,
         chapters.length ? el("div", { class: "watch-head", text: "Chapters" }) : null,
         chapters.length ? el("div", { class: "pane-wrap is-list" }, el("div", { class: "scroller watch-list" }, chapterList())) : null)),
-    menu, now);
+    menu, now ? el("div", { class: "chrome is-bottom" }, now) : null);
+  panel.addEventListener("mousemove", (e) => {
+    if (!panel.classList.contains("is-immersed")) return;
+    const r = panel.getBoundingClientRect();
+    if (e.clientY - r.top < 44 || r.bottom - e.clientY < 56) chrome(true);
+  });
+  panel.addEventListener("focusin", (e) => { if (e.target.closest(".chrome")) chrome(true); });
   panel.fill = fill;
   panel.toggleKeys = toggleKeys;
   panel.ticks = (L) => {                       // the chapters marked on the scrubber, once the length is known
@@ -1041,6 +1142,7 @@ function syncControls() {
 function mountCine() {
   mount(seat.cinePanel || (seat.cinePanel = cineScreen(seat.t)), seat.key, "screen");
   seat.cine = face.el;
+  seat.cine.classList.toggle("is-theatre", !!seat.theatre);
   seat.cine.style.setProperty("--cover", `${seat.layout.cover}px`);
   fitCine(seat.cine);
 }
@@ -1199,6 +1301,7 @@ function leaveSeat() {
   if (!seat) return;
   clearInterval(seat.timer);
   clearTimeout(seat.readyTimer);
+  clearTimeout(theatreTimer);
   if (seat.player && seat.player.destroy) seat.player.destroy();
   tube.textContent = ""; tube.hidden = true;
   lap.hidden = true; lidBar.hidden = lidHit.hidden = true;

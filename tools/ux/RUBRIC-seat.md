@@ -31,6 +31,9 @@ review is about **the seat, on laptops and desktops**.
  R6 You can zoom into the laptop and make it full screen, and get back.
  R7 It feels like real life (diegetic), but never at the cost of usability.
  R8 The YouTube video itself can go full screen, and come back.
+ R9 While the talk plays, the text beside the video is gone (animated away) and the video takes as much of the movie
+    screen as it can; reading on the laptop, its tabs and headers get out of the way (away on scroll down, back on
+    scroll up); the UI disappears when not in use; the summary is formatted to be legible and pleasant.
 
 ## Standing notes for reviewers
 - The laptop is a **placeholder drawing** for now. It becomes a photoreal render of a Dell Precision 5570 (silver lid,
@@ -45,7 +48,9 @@ review is about **the seat, on laptops and desktops**.
 ## Screenshots, per viewport (1440x900, 1280x720, 1920x1080)
   1-seat                   just sat down: laptop open, recording not started (our poster: "Play the talk")
   2-other-tab              another tab of the notes
-  3-jumped                 after clicking a chapter: the recording plays from there on the movie screen
+  2b-summary-reading       the Summary tab, scrolled down a little: the laptop's header, tabs and bar fold away
+  3-jumped                 after clicking a chapter: the recording plays (theatre: the column beside it drifts off,
+                           the picture takes the screen's full height)
   4-closed                 the laptop closed
   5-fullscreen             the laptop zoomed to fill the window
   6-fullscreen-jumped      a chapter clicked while full screen

@@ -741,3 +741,42 @@ html, body { overscroll-behavior: none; }
 .notes .lead-wrap:has(.lead.is-short) { display: flex; align-items: baseline; gap: 6px; }       /* "more" at the end of the line, everywhere */
 .notes .lead-wrap:has(.lead.is-short) .lead { flex: 1; min-width: 0; }
 .notes .lead-wrap:has(.lead.is-short) .lead-more { flex: none; margin: 0; align-self: flex-end; }
+
+/* the laptop's chrome folds away while you read (scroll down), and back (scroll up, the top, an edge, focus) */
+.notes .chrome { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .32s cubic-bezier(.3, 0, .2, 1), opacity .25s ease; }
+.notes .chrome > * { min-height: 0; overflow: clip; overflow-clip-margin: 6px; }
+.notes.is-immersed .chrome { grid-template-rows: 0fr; opacity: 0; pointer-events: none; }
+.notes .chrome.is-tabs .tabs { margin: 0; padding-bottom: 8px; }
+.notes.is-compact .chrome.is-tabs .tabs { padding-bottom: 5px; }
+.notes .chrome.is-bottom { flex: none; }
+.notes.is-immersed .notes-read { padding-top: 8px; }
+@media (prefers-reduced-motion: reduce) { .notes .chrome { transition: none; } }
+
+/* theatre: the column beside the picture drifts off in a little cascade; the picture takes the full height */
+.cine-info > * { transition: opacity .45s ease, transform .65s cubic-bezier(.3, 0, .2, 1), filter .45s ease; }
+.cine-info > :nth-child(2) { transition-delay: 50ms; }
+.cine-info > :nth-child(3) { transition-delay: 100ms; }
+.cine-info > :nth-child(4) { transition-delay: 150ms; }
+.cine.is-theatre .cine-info { pointer-events: none; }
+.cine.is-theatre .cine-info > * { opacity: 0; transform: translateX(-40px); filter: blur(6px); }
+.cine .slot { transition: opacity .4s ease; }
+.cine.is-theatre .slot { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .cine-info > * { transition: opacity .2s ease; transform: none !important; filter: none !important; } }
+
+/* reading: a comfortable measure, air between short paragraphs, the names in bold, the speaker's words pulled out */
+.notes .pane { padding-right: 14px; }
+.notes .reading { max-width: 68ch; }
+.notes .reading p { margin: 0 0 .9em; line-height: 1.62; color: #d8dcea; text-wrap: pretty; hyphens: manual; }
+.notes .reading strong { color: #fff; font-weight: 700; }
+.notes .reading .in-short { margin: 2px 0 1.1em; padding: .65em .9em; background: #171b27; border-left: 3px solid var(--orange); border-radius: 0 7px 7px 0;
+  color: #f3f5fb; font-weight: 500; line-height: 1.5; }
+.notes .reading .in-short b { color: var(--orange); font-weight: 800; }
+.notes .pull { margin: 1.1em 0 1.3em; padding: .1em 0 .1em 1em; border-left: 2px solid #3d4459; }
+.notes .pull blockquote { margin: 0; font-size: 1.1em; font-weight: 600; font-stretch: 104%; line-height: 1.42; color: #fff; text-wrap: balance; }
+.notes .pull-at { display: inline-block; margin-top: .45em; padding: 0; background: none; border: 0; font-size: .82em; font-weight: 700; color: var(--orange);
+  font-variant-numeric: tabular-nums; cursor: pointer; }
+.notes button.pull-at:hover { text-decoration: underline; text-underline-offset: 3px; }
+.notes ul.reading, .notes ol.reading { display: grid; gap: .75em; margin: 2px 0 1em; padding-left: 1.2em; }
+.notes .reading li { line-height: 1.55; color: #d8dcea; padding-left: .2em; text-wrap: pretty; }
+.notes .reading li::marker { color: var(--orange); font-weight: 700; }
+.notes.is-zoomed .reading p, .notes.is-zoomed .reading li { line-height: 1.66; }

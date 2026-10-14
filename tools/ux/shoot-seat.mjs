@@ -32,6 +32,17 @@ for (const v of VIEWS) {
   if (await tab.count()) {
     await tab.click();
     await shot("2-other-tab");
+    // the summary, scrolled a little: the laptop's chrome folds away while you read
+    await page.locator('.notes .tabs .pill[data-tab="summary"]').click();
+    await page.waitForTimeout(300);
+    await page.locator(".notes .pane").evaluate((p) => { p.scrollTop = 40; });
+    await page.waitForTimeout(80);
+    await page.locator(".notes .pane").evaluate((p) => { p.scrollTop = 260; });
+    await page.mouse.move(v.viewport.width / 2, 4);
+    await page.waitForTimeout(700);
+    await page.screenshot({ path: `${out}/${v.name}-2b-summary-reading.png` });
+    await page.locator(".notes .pane").evaluate((p) => { p.scrollTop = 0; });
+    await page.waitForTimeout(500);
     await page.locator('.notes .tabs .pill').first().click();
     await page.locator(".notes .chapter").nth(2).click();
     await shot("3-jumped", 3500);
