@@ -107,12 +107,37 @@ const canvasFor = (key) => CANVAS[key.replace(/-\d+$/, "")];
 
 // How a still sits in the viewport: cropped to fill it (cover) unless that would cut more than 6% off a side and
 // risk cutting into a screen, then letterboxed (contain), black bars like a cinema.
-function fit(key) {
+function framing(key) {
   const [iw, ih] = IMG[key.includes("phone") ? "phone" : "laptop"];
   const W = stage.clientWidth, H = stage.clientHeight;
   const cover = Math.max(W / iw, H / ih), crop = Math.max(1 - W / (iw * cover), 1 - H / (ih * cover)) / 2;
   const s = crop > 0.06 ? Math.min(W / iw, H / ih) : cover;
   return { iw, ih, s, ox: (W - iw * s) / 2, oy: (H - ih * s) / 2, contain: crop > 0.06 };
+}
+// Phones, at a door: once the walk has settled, the still is zoomed by hand onto the totem until its screen nearly
+// fills the phone (a sliver of the room round the edges), and the talk is laid out for that bigger screen.
+let zoomed = false;
+const SLIVER = 8;   // css px of the render left showing past the screen's edge, at the tighter side
+function fit(key) {
+  const f = framing(key);
+  if (!zoomed || !key.startsWith("door-phone")) return f;
+  const { iw, ih } = f, W = stage.clientWidth, H = stage.clientHeight;
+  const q = shots[key].overlay.screen, xs = q.map((p) => p[0] * iw), ys = q.map((p) => p[1] * ih);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const s = Math.max(f.s, Math.min((W - 2 * SLIVER) / (x1 - x0), (H - 2 * SLIVER) / (y1 - y0)));
+  const clamp = (o, size, view) => (size <= view ? (view - size) / 2 : Math.min(0, Math.max(view - size, o)));   // no black past the still
+  return { iw, ih, s, ox: clamp(W / 2 - (x0 + x1) / 2 * s, iw * s, W), oy: clamp(H / 2 - (y0 + y1) / 2 * s, ih * s, H), contain: f.contain };
+}
+// the still (and its cut-out) moved from where object-fit puts it to where fit() wants it
+function zoomTo(key, on, animate = false) {
+  zoomed = on;
+  const a = framing(key), b = fit(key), k = b.s / a.s;
+  const tf = on ? `translate(${b.ox - k * a.ox}px, ${b.oy - k * a.oy}px) scale(${k})` : "";
+  for (const e of [plate, front]) {
+    e.style.transition = animate ? "transform .9s cubic-bezier(.45, 0, .2, 1)" : "none";
+    e.style.transform = tf;
+  }
+  return new Promise((resolve) => setTimeout(resolve, animate ? 950 : 0));
 }
 let face = null;      // { el, key, overlayName, w, h }
 function place() {
@@ -141,7 +166,7 @@ function mount(panel, key, overlayName) {
   fitCards(panel);
   for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s);
 }
-const unmount = () => { if (face) { face.el.remove(); face = null; } front.hidden = true; };
+const unmount = () => { if (face) { face.el.remove(); face = null; } front.hidden = true; if (zoomed) zoomTo("hall", false); };
 let resizeTimer = 0;
 addEventListener("resize", () => {
   place();
@@ -149,7 +174,11 @@ addEventListener("resize", () => {
   resizeTimer = setTimeout(() => {
     const next = form();
     if (next !== shape && !busy) { shape = next; rerender(); }
-    else if (face) { const mode = fit(face.key).contain ? "contain" : "cover"; plate.style.objectFit = front.style.objectFit = mode; place(); }
+    else if (face) {
+      const mode = framing(face.key).contain ? "contain" : "cover";
+      plate.style.objectFit = front.style.objectFit = mode;
+      if (zoomed) { zoomTo(face.key, true); mount(face.el, face.key, face.overlayName); } else place();   // relaid for the new size
+    }
   }, 180);
 });
 
@@ -203,7 +232,7 @@ const showStill = (key) => new Promise((resolve) => {
     if (fr) { front.src = `media/${fr}.webp`; front.hidden = false; } else front.hidden = true;
     resolve();
   };
-  const mode = fit(key).contain ? "contain" : "cover";
+  const mode = framing(key).contain ? "contain" : "cover";
   plate.style.objectFit = front.style.objectFit = clip.style.objectFit = mode;
   if (plate.getAttribute("src") === src) { done(); return; }
   const img = new Image();
@@ -457,8 +486,11 @@ async function toSeat(t, withWalk) {
   unmount();
   if (withWalk) { say(`Walking to Room ${n}`); await playClip(walkClip(n), { until: walkClip(n) === `walk-${n}` && shape === "phone" ? doorTime(n) : null }); }
   await showStill(shotKey(`seat-${n}`));
-  // phones: let the walk fade off the still before the totem lights up
-  if (shape === "phone") await hideClip(); else hideClip();
+  // phones: let the walk fade off the still, then zoom onto the totem before it lights up
+  if (shape === "phone") {
+    await hideClip();
+    if (shotKey(`seat-${n}`).startsWith("door-phone")) await zoomTo(shotKey(`seat-${n}`), true, withWalk && !reduceMotion);
+  } else hideClip();
   say("");
   room = n; current = t;
   mount(talkScreen(t, shape === "phone", true, n), shotKey(`seat-${n}`), "screen");

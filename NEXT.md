@@ -1,4 +1,4 @@
-# Where this stands (13/10, 22:45)
+# Where this stands (14/10)
 
 ## Right now
 - **All eight rooms (3-10) rendered and published** into `site/cinema/media/` (stills, cut-out layers, walks).
@@ -16,8 +16,10 @@
   away (left across the hall for west rooms; right for east, after first stepping clear of the stairwell glass
   beside the totem, which otherwise fills the frame as a blur), a dip to black, then a push-in on the room's door
   totem that settles on its still. 540x1170, eulers kept compatible frame to frame (no smears).
-  publish_renders.py joins them into `walk-phone-<n>.mp4`; cinema.js plays them on phones.
-- Live on Pages since 13/10 ~19:45 (laptop walks mended, fade back, text fixes); the phone walks are committed but not pushed yet.
+  publish_renders.py joins them into `walk-phone-<n>.mp4`; cinema.js plays them on phones. Once the walk settles,
+  cinema.js zooms the still by hand onto the totem until its screen nearly fills the phone (8 px of room left on
+  the tight side) and lays the talk out for that bigger screen: ~374 css px wide on a 390 px phone, was ~297.
+- Live on Pages: laptop walks mended, fade back, text fixes (13/10 ~19:45), phone walks (13/10 ~23:00).
 - **Text fixes:** the talk's summary scrolls inside the left column on laptops so the buttons stay on the cinema
   screen; programme cards shorten their title, then speakers, until they fit. `tools/ux/overflow.mjs` checks
   every talk and slot.
