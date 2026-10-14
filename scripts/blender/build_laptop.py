@@ -110,7 +110,7 @@ def obj_coords(nt, scale):
 
 # "Titan Gray" anodised aluminium: satin, a faint grain; the diamond-cut chamfers bright
 M = {}
-M["alu"] = principled("alu", 0x5F636B, 0.35, metal=1.0, aniso=0.3)    # Titan Gray in a dark room: it shows what's in front
+M["alu"] = principled("alu", 0x55565A, 0.32, metal=1.0, aniso=0.4)    # Titan Gray in a dark room: it shows what's in front
 nt = M["alu"].node_tree
 noise = node(nt, "ShaderNodeTexNoise", Scale=9000.0, Detail=2.0)
 nt.links.new(obj_coords(nt, 1.0), noise.inputs["Vector"])
@@ -121,13 +121,13 @@ M["hinge"] = principled("hinge", 0x3A3B3E, 0.4, metal=1.0)
 M["carbon"] = principled("carbon", 0x2E2E30, 0.6, sheen=0.08)
 nt = M["carbon"].node_tree
 chk = node(nt, "ShaderNodeTexChecker", Scale=1.0)
-chk.inputs["Color1"].default_value = srgb(0x29292B)
+chk.inputs["Color1"].default_value = srgb(0x232325)
 chk.inputs["Color2"].default_value = srgb(0x343437)
 nt.links.new(obj_coords(nt, 1000.0), chk.inputs["Vector"])
 nt.links.new(chk.outputs["Color"], nt.nodes["Principled BSDF"].inputs["Base Color"])
 wave = node(nt, "ShaderNodeTexWave", Scale=1.0, Distortion=0.0)
 nt.links.new(obj_coords(nt, 1000.0), wave.inputs["Vector"])
-bump(M["carbon"], wave.outputs["Fac"], 0.08)
+bump(M["carbon"], wave.outputs["Fac"], 0.3)
 # speaker grilles: the deck perforated in a fine grid of holes
 M["grille"] = principled("grille", 0x232325, 0.6)
 nt = M["grille"].node_tree
@@ -139,10 +139,10 @@ ramp.color_ramp.elements[0].color, ramp.color_ramp.elements[1].color = srgb(0x05
 nt.links.new(vor.outputs["Distance"], ramp.inputs["Fac"])
 nt.links.new(ramp.outputs["Color"], nt.nodes["Principled BSDF"].inputs["Base Color"])
 bump(M["grille"], ramp.outputs["Color"], 0.3)
-M["key"] = principled("key", 0x1C1C1E, 0.42, coat=0.15, coat_rough=0.3)
-M["legend"] = principled("legend", 0xCFCFD2, 0.6)
+M["key"] = principled("key", 0x121214, 0.5)
+M["legend"] = principled("legend", 0xDADADF, 0.6, emission=0xE8ECFF, strength=0.0)   # backlit at night
 M["pad"] = principled("pad", 0x202022, 0.3, coat=0.3, coat_rough=0.15)
-M["bezel"] = principled("bezel", 0x050506, 0.3, coat=0.5, coat_rough=0.08)
+M["bezel"] = principled("bezel", 0x0A0A0C, 0.3, coat=0.8, coat_rough=0.05)
 M["display"] = principled("display", 0x000000, 0.5, emission=0x1A2140, strength=0.0)   # pure black under the notes (the page adds the glass)
 M["camera"] = principled("camera", 0x0A0A12, 0.05, coat=1.0)
 M["logo"] = principled("logo", 0xF2F2F4, 0.05, metal=1.0)          # mirror-polished: it catches the screen
@@ -410,7 +410,7 @@ def area(name, loc, size, power, color, target, shape="RECTANGLE"):
 
 
 # the projected screen far ahead and up (19 x 7 m, ~15 m away): the key light, and the long reflection on the lid
-area("cinema-screen", (0, 15.0, 4.2), (19.0, 7.2), 8000.0, (0.42, 0.47, 0.72), (0, 0, 0))   # the projected light: bluish, not saturated
+area("cinema-screen", (0, 15.0, 4.2), (19.0, 7.2), 8000.0, (0.55, 0.58, 0.72), (0, 0, 0))   # the projected light: bluish, not saturated
 # house lights: two warm spots high on either side, for glints on the chamfers; a faint fill from the aisle
 for sx in (-1, 1):
     sp = bpy.data.lights.new(f"spot-{sx}", "SPOT")
@@ -563,7 +563,8 @@ only = set(args.only.split(","))
 def shoot(angle, path, samples, width, spill):
     set_lid(angle)
     M["display"].node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = 0.0
-    screen_glow.data.energy = spill * 2.2                          # watts: a dark-mode screen's glow on the keys
+    M["legend"].node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = 1.6 if spill else 0.0   # backlight on with the screen
+    screen_glow.data.energy = spill * 1.6                          # watts: a dark-mode screen's glow on the keys
     if not args.preview:
         scene.cycles.samples = samples
     scene.render.resolution_x, scene.render.resolution_y = width, round(width * HPX / WPX)
