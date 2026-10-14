@@ -34,6 +34,8 @@ review is about **the seat, on laptops and desktops**.
  R9 While the talk plays, the text beside the video is gone (animated away) and the video takes as much of the movie
     screen as it can; reading on the laptop, its tabs and headers get out of the way (away on scroll down, back on
     scroll up); the UI disappears when not in use; the summary is formatted to be legible and pleasant.
+ R10 Closing the laptop moves the view in on the movie screen: the recording fills the window, with just a bit of the
+    laptop and its "Open the laptop" button below; opening it pulls back to the usual view. Captions (CC) show.
 
 ## Standing notes for reviewers
 - The laptop is a **placeholder drawing** for now. It becomes a photoreal render of a Dell Precision 5570 (silver lid,
@@ -51,7 +53,7 @@ review is about **the seat, on laptops and desktops**.
   2b-summary-reading       the Summary tab, scrolled down a little: the laptop's header, tabs and bar fold away
   3-jumped                 after clicking a chapter: the recording plays (theatre: the column beside it drifts off,
                            the picture takes the screen's full height)
-  4-closed                 the laptop closed
+  4-closed                 the laptop closed: the view moved in on the film (tools/ux/closed.mjs shoots the move)
   5-fullscreen             the laptop zoomed to fill the window
   6-fullscreen-jumped      a chapter clicked while full screen
   7-back-from-fullscreen   Esc pressed
@@ -60,6 +62,7 @@ review is about **the seat, on laptops and desktops**.
   11-video-fullscreen      the recording full screen (the browser's), with the page's own control bar
   10-player-blocked        "Play" pressed while YouTube is blocked (the console errors in log.txt are this, on purpose)
   log.txt                  console errors
+  (tools/ux/closed.mjs: the lid closing and opening, mid-move too; tools/ux/cc-probe.mjs: captions land in view)
 
 ## Score each heuristic 0-4 (be strict)
  H1 Visibility of system status (what's playing, which chapter, open/closed/zoomed state, where focus is)
@@ -95,6 +98,8 @@ review is about **the seat, on laptops and desktops**.
 | r1 | 9 (36/40) | 9 (36/40) | 9 (36/40) | real renders in (laptop + wide room stills); full-screen video (R8) |
 | r2 | 9 (36/40) | 9 (36/40) | 9 (37/40) | Z zooms the laptop, F full-screens the video |
 | r3 | 9 (37/40) | 9 (36/40) | 9 (37/40) | R9: theatre while playing, chrome folds while reading, a readable summary |
+| r4 | 8 (35/40) | 8 (34/40) | 8 (35/40) | R10 first cut: closed lid moves the view onto the film; captions uncropped (sticker out of view: R3 fail) |
+| r5 | 9 (37/40) | 9 (36/40) | 9 (37/40) | sticker re-rendered near the hinge, buttons on the lid, the recording's bar in the big view, poster names the talk |
 
 Art (stage 2), overall per viewport 1440 / 1280 / 1920:
 | round | art | main change |

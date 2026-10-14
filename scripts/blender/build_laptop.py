@@ -375,7 +375,7 @@ def sticker():
     me.materials.append(m)
     ob = bpy.data.objects.new("sticker", me)
     ob.parent = pivot
-    ob.location = (0.082, front_y + 0.112, top_z + 0.00015)         # in the lid's back half: in view above the bottom edge
+    ob.location = (0.086, front_y + 0.176, top_z + 0.00015)         # near the hinge: in view when you look up at the film too
     ob.rotation_euler = (0, 0, math.radians(-9))                   # up = +y when closed: away from you, so you read it
     scene.collection.objects.link(ob)
 
@@ -511,6 +511,7 @@ info["closed_bottom"] = round(max(px(Vector((x, -D, 0.0)))[1] for x in (-W / 2, 
 _st = bpy.data.objects["sticker"]
 _sw, _sh = _st.dimensions.x, _st.dimensions.y
 _cs = [px(_st.matrix_world @ Vector((x * _sw / 2 / _st.scale.x, y * _sh / 2 / _st.scale.y, 0))) for x in (-1, 1) for y in (-1, 1)]
+info["sticker_box"] = [round(min(p[0] for p in _cs), 1), round(min(p[1] for p in _cs), 1), round(max(p[0] for p in _cs), 1), round(max(p[1] for p in _cs), 1)]
 info["closed_cut"] = round(min(info["closed_bottom"], max(p[1] for p in _cs) + 0.06 * (info["closed_bottom"] - info["closed_top"])), 1)
 print("laptop frame", WPX, "x", HPX, json.dumps(info))
 

@@ -168,7 +168,7 @@ function mount(panel, key, overlayName) {
   const [mw, mh] = shots[key].size[overlayName];
   // laptops: a fixed canvas, like a real display; phones: laid out 1:1 for the width the totem takes on this screen
   let w = canvasFor(key);
-  if (seat && key === seat.key) w = Math.round(seat.layout.screen.w);   // the seat on laptops: laid out 1:1 for the screen's size
+  if (seat && key === seat.key) w = seat.layout.panelW;   // laid out for the screen as seen with the lid open: closed, it only grows   // the seat on laptops: laid out 1:1 for the screen's size
   else if (key.includes("phone")) {
     const { iw, ih, s } = fit(key);
     const [tl, tr] = ordered(shots[key].overlay[overlayName]);
@@ -498,7 +498,8 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
 // it's worth your time beside it. Everything else (the summary, what to try, the chapters to jump through the talk) is on
 // a laptop on your lap: a separate picture laid over the room, like a first-person game draws the hands, so it can be
 // placed for each window size without ever covering the recording. Open, it rises into the bottom of the view, the room
-// tilted up a little to make room; closed, its lid (and the sticker on it) lies low and the screen is all yours; zoomed,
+// tilted up a little to make room; closed, you look up: the recording fills the window, the lid's far edge (sticker
+// peeking) and its Play / Open buttons at the foot, and opening it pulls the view back down; zoomed,
 // it's lifted until its screen fills the window, the room dims behind, and the recording moves onto it.
 // Keys: K play/pause, [ and ] previous/next chapter, F full screen, L open/close the laptop, Esc back out.
 // The laptop's pictures and where things are in them, in art px (scripts/blender/build_laptop.py writes laptop.json, which
@@ -509,7 +510,7 @@ const LAP = shots.laptop ? (() => {
   const L = shots.laptop, [tl, tr, bl] = L.screen, hingeCut = (f) => Math.min(L.h, L.open_cut + (f - 0.32) * (bl[1] - tl[1]));
   return { w: L.w, h: L.h, screen: [tl[0], tl[1], tr[0], bl[1]],
     open: { src: "media/laptop-open.webp", top: L.open_top, cut: L.open_cut, cutShort: hingeCut(0.1) },
-    closed: { src: "media/laptop-closed.webp", top: L.closed_top, bottom: L.closed_cut || L.closed_bottom, box: L.closed_box },
+    closed: { src: "media/laptop-closed.webp", top: L.closed_top, bottom: L.closed_cut || L.closed_bottom, box: L.closed_box, sticker: L.sticker_box },
     frames: Array.from({ length: L.frames || 0 }, (_, i) => `media/laptop-anim-${String(i).padStart(2, "0")}.webp`) };
 })() : {   // a drawn stand-in until the render is in
   w: 1600, h: 1060, screen: [176, 26, 1424, 806],
@@ -564,7 +565,24 @@ function seatLayout(st) {
   else lapBox = { x: W / 2 - (LAP.screen[0] + ow / 2) * k, y: H - c.bottom * k, w: LAP.w * k, h: LAP.h * k, k };
   // the recording keeps clear of the open lid, so its controls are never under it
   const cover = Math.max(0, Math.ceil(openTop + sh - lidTop));
-  return { frame, screen: { x: left, y: top, w: sw, h: sh }, lap: lapBox, cover, W, H };
+  const out = { frame, screen: { x: left, y: top, w: sw, h: sh }, panelW: Math.round(sw), lap: lapBox, cover, W, H };
+  if (!st.open && !st.zoom && st.t.videoId && EMBED) {
+    // Closed: you look up from your lap at the film. The view moves in until the recording fills the window, under the
+    // way back to the programme; at the foot, the far edge of the lid (sticker and all) and its Play / Open buttons.
+    // how much of the closed lid stays in view: its far edge down to just past the sticker (the buttons sit on it, beside)
+    const stk = c.sticker || [0, 0, 0, c.top + 230];
+    const lidShow = Math.round(Math.min(H * 0.2, Math.max(56, (stk[3] - c.top) * k + 12)));
+    const vTop = 56, vBottom = H - lidShow - 12;               // clear of "← Programme" above and the lid below
+    const vh = Math.min(vBottom - vTop, (W - 24) * 9 / 16), vw = vh * 16 / 9;
+    const video = { x: (W - vw) / 2, y: vTop + (vBottom - vTop - vh) / 2, w: vw, h: vh };
+    const zs = vh / Math.min(sy1 - sy0, (sx1 - sx0) * 9 / 16);   // the screen's scale: the picture at its full height
+    const zw = (sx1 - sx0) * zs, zh = (sy1 - sy0) * zs, zl = W / 2 - zw / 2, zt = video.y - (zh - vh) / 2;
+    Object.assign(out, { frame: { iw, ih, s: zs, ox: zl - sx0 * zs, oy: zt - sy0 * zs }, screen: { x: zl, y: zt, w: zw, h: zh }, video, cover: 0,
+      lap: { ...lapBox, y: H - lidShow - c.top * k },
+      // the Play / Open buttons on the lid, to the left of the sticker, halfway down the strip in view (css px in the laptop's box)
+      lidBar: { right: (c.sticker ? stk[0] : LAP.w * 0.6) * k - 18, mid: c.top * k + lidShow / 2 } });
+  }
+  return out;
 }
 
 // the room (still, cut-out) moved from where object-fit puts it to the seat's framing (from: start at the walk's framing)
@@ -660,7 +678,8 @@ function posterOn(t) {
   img.onerror = () => { img.onerror = null; img.src = `https://i.ytimg.com/vi/${t.videoId}/hqdefault.jpg`; };
   tube.textContent = "";
   tube.append(el("button", { class: "poster", type: "button", "aria-label": `Play the recording of ${t.title}`, "aria-keyshortcuts": "K", onclick: () => jumpTo(0) },
-    img, el("span", { class: "play" }, el("i", { "aria-hidden": "true" }), "Play the talk", t.duration ? el("small", { text: `${t.duration} min` }) : null)));
+    img, el("span", { class: "poster-title", "aria-hidden": "true" }, el("b", { text: t.title }), el("span", { text: speakers(t, true) })),
+    el("span", { class: "play" }, el("i", { "aria-hidden": "true" }), "Play the talk", t.duration ? el("small", { text: `${t.duration} min` }) : null)));
   tube.hidden = false;
 }
 // the recording full screen (the browser's own): the picture alone, with a slim bar of our controls that shows when
@@ -689,21 +708,29 @@ function tubeControls() {
     el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
     el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }),
     el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Leave full screen", onclick: () => videoFullscreen() }));
-  bar.querySelector(".fs").innerHTML = FS_EXIT_ICON;
-  bar.querySelector(".fs").title = "Leave full screen  F or Esc";
+  fsButton(bar);
   const corner = el("button", { class: "tube-fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Video full screen", title: "Video full screen  F", onclick: () => videoFullscreen() });
   corner.innerHTML = FS_ICON;
   return [corner, bar];
 }
+// the bar's last button: into full screen from the big view, out of it in full screen
+function fsButton(bar = tube.querySelector(".tube-bar")) {
+  const b = bar && bar.querySelector(".fs"), on = document.fullscreenElement === tube;
+  if (!b) return;
+  b.innerHTML = on ? FS_EXIT_ICON : FS_ICON;
+  b.title = on ? "Leave full screen  F or Esc" : "Video full screen  F";
+  b.setAttribute("aria-label", on ? "Leave full screen" : "Video full screen");
+}
 let barTimer = 0;
 tube.addEventListener("mousemove", () => {
-  if (document.fullscreenElement !== tube) return;
+  if (document.fullscreenElement !== tube && !tube.classList.contains("is-big")) return;
   tube.classList.add("is-awake");
   clearTimeout(barTimer);
   barTimer = setTimeout(() => tube.classList.remove("is-awake"), 2500);
 });
 document.addEventListener("fullscreenchange", () => {
   tube.classList.toggle("is-full", document.fullscreenElement === tube);
+  fsButton();
   tube.classList.add("is-awake");
   clearTimeout(barTimer);
   barTimer = setTimeout(() => tube.classList.remove("is-awake"), 2500);
@@ -738,6 +765,7 @@ function jumpTo(sec) {
           e.target.playVideo();
           seat.ready = true;
           clearTimeout(seat.readyTimer);
+          if (seat.cc) applyCaptions();
           tick();
         },
         onStateChange: (e) => { theatreFor(e.data); tick(); },
@@ -761,12 +789,33 @@ function toggleMute() {
   if (p.isMuted()) p.unMute(); else p.mute();
   setTimeout(tick, 100);
 }
+// Captions: YouTube draws them at the foot of its frame, which the tube crops away (see .tube's --crop in the CSS), so
+// with captions on the frame is uncropped and they sit on the picture's foot. The English track, else whatever the
+// recording has (auto-generated tracks too). Asked for before the player exists, they come on when it's ready.
 function toggleCaptions() {
-  const p = seat && seat.player;
-  if (!p || !p.loadModule) return;
+  if (!seat) return;
   seat.cc = !seat.cc;
-  if (seat.cc) { p.loadModule("captions"); p.setOption("captions", "track", { languageCode: "en" }); } else p.unloadModule("captions");
+  applyCaptions();
   tick();
+}
+function applyCaptions() {
+  const p = seat && seat.player;
+  tube.classList.toggle("is-cc", !!(seat && seat.cc));
+  if (!p || !p.loadModule || !seat.ready) return;
+  if (!seat.cc) { p.setOption("captions", "track", {}); p.unloadModule("captions"); return; }
+  p.loadModule("captions");
+  p.setOption("captions", "track", { languageCode: "en" });
+  captionSize();
+  setTimeout(() => {             // no English track: the recording's first
+    if (!seat || !seat.cc || seat.player !== p) return;
+    const now = p.getOption("captions", "track"), list = p.getOption("captions", "tracklist") || [];
+    if ((!now || !now.languageCode) && list.length) p.setOption("captions", "track", list[0]);
+  }, 1500);
+}
+// YouTube sizes captions by its frame; on the cinema screen (seen from the seat) that's small: a step up there
+function captionSize() {
+  const p = seat && seat.player;
+  if (seat && seat.cc && p && p.setOption && seat.ready) p.setOption("captions", "fontSize", tube.clientWidth < 1100 ? 2 : 1);
 }
 // Theatre: while the talk plays, the title column drifts off and the picture grows to the screen's full height, centred;
 // pause (for a moment) or let it finish and the column comes back
@@ -780,23 +829,47 @@ function theatreFor(state) {
 function setTheatre(on) {
   if (!seat || seat.theatre === on) return;
   seat.theatre = on;
-  if (seat.cine) seat.cine.classList.toggle("is-theatre", on);
+  if (seat.cine) seat.cine.classList.toggle("is-theatre", inTheatre());
   if (!seat.zoom) placeTube(reduceMotion ? 0 : 750);
 }
+// the lid closed with the view on the film: the picture stays big, playing or not
+const inTheatre = () => !!seat && (seat.theatre || !!seat.layout.video);
+// where things on the cinema screen end up once the view has moved (read from the layout: mid-move, the DOM is not there yet)
 function theatreRect() {
-  const fr = seat.cine.getBoundingClientRect(), padX = fr.width * 0.015, padT = 8, padB = seat.layout.cover + 8;
+  const st = stage.getBoundingClientRect(), L = seat.layout, v = L.video;
+  if (v) return { left: st.left + v.x, top: st.top + v.y, width: v.w, height: v.h };
+  const fr = { left: st.left + L.screen.x, top: st.top + L.screen.y, width: L.screen.w, height: L.screen.h };
+  const padX = fr.width * 0.015, padT = 8, padB = L.cover + 8;
   const aw = fr.width - 2 * padX, ah = fr.height - padT - padB;
   const h = Math.min(ah, aw * 9 / 16), w = h * 16 / 9;
   return { left: fr.left + (fr.width - w) / 2, top: fr.top + padT + (ah - h) / 2, width: w, height: h };
+}
+function onScreen(e) {
+  const pr = seat.cine.getBoundingClientRect(), r = e.getBoundingClientRect(), st = stage.getBoundingClientRect(), L = seat.layout.screen;
+  const kx = L.w / pr.width, ky = L.h / pr.height;
+  return { left: st.left + L.x + (r.left - pr.left) * kx, top: st.top + L.y + (r.top - pr.top) * ky, width: r.width * kx, height: r.height * ky };
 }
 // the tube sits over whichever slot is showing: the cinema screen's, or the laptop's when zoomed
 function placeTube(ms = 0) {
   if (!seat || tube.hidden) return;
   const host = seat.zoom ? seat.notes : seat.cine, slot = host && host.querySelector(".slot");
   if (!slot) { tube.classList.add("is-away"); return; }
-  const r = !seat.zoom && seat.theatre && seat.cine ? theatreRect() : slot.getBoundingClientRect(), st = stage.getBoundingClientRect();
-  tube.style.transition = ms ? `transform ${ms}ms ${EASE}, width ${ms}ms ${EASE}, height ${ms}ms ${EASE}, opacity .25s ease` : "opacity .25s ease";
-  Object.assign(tube.style, { width: `${Math.round(r.width)}px`, height: `${Math.round(r.height)}px`, transform: `translate(${Math.round(r.left - st.left)}px, ${Math.round(r.top - st.top)}px)` });
+  const r = seat.zoom ? slot.getBoundingClientRect() : inTheatre() ? theatreRect() : onScreen(slot), st = stage.getBoundingClientRect();
+  const was = tube.getBoundingClientRect(), w = Math.round(r.width), h = Math.round(r.height);
+  const to = `translate(${Math.round(r.left - st.left)}px, ${Math.round(r.top - st.top)}px)`;
+  // moving: the new size at once, scaled from the old box back to it (a transform alone runs in step with the room's;
+  // animating width and height relaid the player every frame and fell behind)
+  const flip = ms && was.width > 1 && !tube.classList.contains("is-away") && !tube.classList.contains("is-full");
+  tube.style.transition = "opacity .25s ease";
+  tube.style.transformOrigin = "0 0";
+  Object.assign(tube.style, { width: `${w}px`, height: `${h}px`,
+    transform: flip ? `translate(${was.left - st.left}px, ${was.top - st.top}px) scale(${was.width / w}, ${was.height / h})` : to });
+  if (flip) {
+    tube.getBoundingClientRect();
+    tube.style.transition = `transform ${ms}ms ${EASE}, opacity .25s ease`;
+    tube.style.transform = to;
+  }
+  tube.classList.toggle("is-big", !seat.zoom && !!seat.layout.video);
   tube.classList.toggle("is-on-laptop", seat.zoom);
   tube.classList.remove("is-away");
 }
@@ -1146,6 +1219,10 @@ function tick() {
 function syncControls() {
   const { open, zoom } = seat;
   lidBar.hidden = lidHit.hidden = open;
+  const lb = seat.layout && seat.layout.lidBar;
+  lidBar.classList.toggle("is-on-lid", !!lb);
+  if (lb) Object.assign(lidBar.style, { left: `${lb.right}px`, top: `${lb.mid}px` });
+  else placeLidBar();
   lidPlay.hidden = !seat.t.videoId || !EMBED;
   seatbar.hidden = zoom;                                    // full screen: the laptop's own header has the way out
   const n = seat.notesPanel;
@@ -1159,7 +1236,7 @@ function syncControls() {
 function mountCine() {
   mount(seat.cinePanel || (seat.cinePanel = cineScreen(seat.t)), seat.key, "screen");
   seat.cine = face.el;
-  seat.cine.classList.toggle("is-theatre", !!seat.theatre);
+  seat.cine.classList.toggle("is-theatre", inTheatre());
   seat.cine.style.setProperty("--cover", `${seat.layout.cover}px`);
   fitCine(seat.cine);
 }
@@ -1205,12 +1282,16 @@ async function setLaptop(change, ms = MOVE) {
   if (next.open === seat.open && next.zoom === seat.zoom) return;
   moving = true;
   const opening = next.open !== seat.open;
+  if (opening && ms) ms = Math.round(ms * 1.3);           // the view travels further: up to the film and back
   if (seat.notes) seat.notes.classList.add("is-off");     // the screen goes dark first
+  if (!next.open && seat.cine && seat.t.videoId && EMBED) seat.cine.classList.add("is-theatre");   // and the column leaves the film
+  lap.classList.add("is-moving");
   if (next.zoom !== seat.zoom) tube.classList.add("is-away");
   await new Promise((r) => setTimeout(r, ms ? 140 : 0));
   Object.assign(seat, { open: next.open, zoom: next.zoom });
   seat.layout = seatLayout(seat);
   stage.classList.toggle("is-reading", seat.zoom);
+  if (seat.cine) seat.cine.classList.toggle("is-theatre", inTheatre());
   const np = seat.notesPanel, pressed = np && np.querySelector('.tabs [aria-pressed="true"]');
   if (seat.zoom && pressed && pressed.dataset.tab === "overview") { seat.tabBeforeZoom = "overview"; np.fill("summary"); }
   else if (!seat.zoom && seat.tabBeforeZoom) { if (pressed && pressed.dataset.tab === "summary") np.fill(seat.tabBeforeZoom); seat.tabBeforeZoom = null; }
@@ -1225,6 +1306,8 @@ async function setLaptop(change, ms = MOVE) {
   if (face) face.el.style.transition = "";
   mountNotes();
   placeTube();
+  captionSize();
+  lap.classList.remove("is-moving");
   moving = false;
   // focus follows: into the laptop when it opens or zooms, onto the lid when it closes
   if (!seat.open) lapLid.focus({ preventScroll: true });
@@ -1237,9 +1320,13 @@ lidHit.addEventListener("click", () => setLaptop({ open: true }));
 {
   const [x0, y0, x1, yb] = LAP.closed.box, y1 = Math.min(yb, LAP.closed.bottom), pc = (v, of) => `${v / of * 100}%`;
   Object.assign(lidHit.style, { left: pc(x0, LAP.closed.w || LAP.w), top: pc(y0, LAP.closed.h || LAP.h), width: pc(x1 - x0, LAP.closed.w || LAP.w), height: pc(y1 - y0, LAP.closed.h || LAP.h) });
-  // just above the lid's far edge, centred: never on the logo or the sticker
+}
+// just above the lid's far edge, centred: never on the logo or the sticker
+function placeLidBar() {
+  const [x0, y0, x1] = LAP.closed.box, pc = (v, of) => `${v / of * 100}%`;
   Object.assign(lidBar.style, { left: pc((x0 + x1) / 2, LAP.closed.w || LAP.w), top: pc(y0 - (LAP.closed.h || LAP.h) * 0.035, LAP.closed.h || LAP.h) });
 }
+placeLidBar();
 lidPlay.addEventListener("click", () => playPause());
 $("toProg").addEventListener("click", () => goHall());
 addEventListener("keydown", (e) => {
@@ -1282,6 +1369,7 @@ async function sitDown(t, n, key, withWalk) {
   room = n; current = t;
   seat = { t, n, key, open: true, zoom: false, layout: null, cine: null, notes: null, notesPanel: null, cinePanel: null, player: null, timer: 0,
     chapters: chaptersOf(t), lastChapter: null, starting: false, startAt: 0 };
+  tube.classList.remove("is-cc");
   seat.layout = seatLayout(seat);
   preloadLid();
   lapArt.src = LAP.open.src;

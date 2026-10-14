@@ -559,6 +559,7 @@ button, input, a { font: inherit; color: inherit; }
    so the 16:9 picture letterboxes inside it and those overlays land in the bars, clipped away */
 .tube { overflow: hidden; --crop: max(64px, 14%); }
 .tube .yt, .tube iframe { top: calc(-1 * var(--crop)); height: calc(100% + 2 * var(--crop)); }
+.tube.is-cc { --crop: 0px; }   /* captions on: they sit at the frame's foot, so nothing is cropped */
 .notes.is-zoomed .notes-watch .slot { width: 100%; max-height: none; aspect-ratio: 16 / 9; align-self: stretch; }
 /* round 4 */
 .notes.is-zoomed .now { height: auto; }
@@ -798,3 +799,16 @@ html, body { overscroll-behavior: none; }
 .notes button.pull-at:hover { background: rgba(246, 146, 30, .14); text-decoration: none; }
 .notes span.pull-at { border: 0; padding: 0; }
 .notes.is-tiny .now-time { display: none; }        /* the smallest laptop: the scrubber shows where you are; every button stays */
+
+/* the lid closed, the view on the film: the recording's own bar (as in full screen) wakes on the mouse; the poster names
+   the talk; the lid's buttons sit on the lid, beside the sticker */
+.tube.is-big .tube-bar { display: flex; opacity: 0; transition: opacity .3s ease; }
+.tube.is-big.is-awake .tube-bar, .tube.is-big .tube-bar:focus-within, .tube.is-big:has(.tube-paused:not([hidden])) .tube-bar { opacity: 1; }
+.tube.is-big .tube-fs { display: none; }
+.tube .poster-title { display: none; }
+.tube.is-big .poster-title { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; gap: 6px; padding: 26px 32px 60px; text-align: left;
+  background: linear-gradient(rgba(0, 0, 0, .9), rgba(0, 0, 0, .6) 60%, transparent); color: #e8ebf4; font-size: 16px; text-shadow: 0 1px 3px #000; }
+.tube.is-big .poster-title b { font-size: clamp(22px, 2.4vw, 34px); line-height: 1.15; color: #fff; }
+.lid-bar.is-on-lid { translate: -100% -50%; }
+.lap.is-moving .lap-hint, .lap.is-moving .lid-bar { visibility: hidden; }
+.tube.is-big .tube-bar .now-text { flex: 0 1 auto; max-width: 26%; }   /* the scrubber takes the room, not an empty gap */

@@ -865,7 +865,13 @@
    1508.64
   ],
   "closed_bottom": 1579.2,
-  "closed_cut": 1249.5,
+  "sticker_box": [
+   1219.5,
+   802.8,
+   1412.8,
+   997.9
+  ],
+  "closed_cut": 1046.2,
   "frames": 14,
   "angles": [
    0.0,
