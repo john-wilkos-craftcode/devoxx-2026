@@ -28,9 +28,20 @@ A new modelling approach replaces build_scene.py's by-eye venue for the walk fro
   body Mask under the pack cut too big a patch (switched off, MASK_UNDER_PACK = False in crowd_wear.py, not re-rendered),
   the lanyard cord isn't visible in the close-ups (check at 1 m), the reverse check (body into pack) needs a sealed
   collision shell, crowd_place.py (placement) doesn't exist yet.
-- **Next:** crowd close-ups -> place the crowd (dense queue/booths, sparse near the screen, clear of the camera) ->
-  Cycles renders of the two fly-throughs -> the walk back from the rooms (no photos: plausible + heavy blur) -> wire
-  the new intro walk and hall still into the cinema page (the screen moved: shots.json needs the new quad).
+- **Stopped 15/10 ~17:05 (all Blender killed on purpose):** preview-laptop.mp4 on the review page is the earlier
+  16 s timing; the current 12.3 s timing with the full-frame shutter (1.0) has NOT been previewed yet, and
+  preview-phone.mp4 is the older ~24 s one. Re-run (one at a time, nothing else on the GPU; ~15-20 min each):
+  `scripts/photomatch/render.sh venue --engine eevee --walk anim --samples 16 --width 960` then
+  `ffmpeg -y -framerate 30 -i C:/Users/wilkojo/kino-renders/photomatch/venue/walk/anim/f_%04d.png -c:v libx264
+  -pix_fmt yuv420p -crf 20 -movflags +faststart .../venue/preview-laptop.mp4` (paths via /mnt/c in WSL); the same
+  with `--variant phone --width 540` and walk-phone/anim -> preview-phone.mp4. Empty the anim folders first (stale
+  frames from the killed runs are in them). Then `python3 scripts/photomatch/page.py --open`.
+- **Next, in order:** (1) the previews above; (2) crowd close-ups again with MASK_UNDER_PACK = False (the 22 in
+  crowd/check/ still show the mask hole), check the lanyard cord is visible at 1 m, then show John; (3) crowd_place.py:
+  queue west of the stair, booth fronts and the area below the steps dense, sparse towards the screen, >= 1 m clear of
+  the camera, phone path too; add "crowd" to venue.py PARTS; (4) Cycles renders of both fly-throughs (ask John first);
+  (5) the walk back from the rooms (no photos: plausible + heavy blur); (6) wire the new intro walk and hall stills into
+  the cinema page (the screen moved: new shots.json quad, front layer from hall_screen.FRONT).
 
 ## Before that: the seat on laptops (14/10 afternoon)
 - The cinema screen carries the YouTube player (own poster, YouTube's chrome off, cropped so its overlays never show)
