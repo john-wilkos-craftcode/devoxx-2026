@@ -23,6 +23,11 @@ A new modelling approach replaces build_scene.py's by-eye venue for the walk fro
   backpack (data/models/backpack_oakley, credited in THIRD_PARTY.md) being fitted with the anti-clipping recipe
   (skin to the armature, Shrinkwrap after it, Mask the body underneath). Not placed in the venue yet: John reviews
   close-ups first (C:\Users\wilkojo\kino-renders\photomatch\crowd\).
+  Crowd state at the stop (15/10): backpack decimated to 8k faces, straps removed, skinned + shrinkwrapped (6 mm);
+  lanyard skinned + shrinkwrapped (4 mm); badge rigid on Spine2; 0 mm penetration measured on the test set. Open: the
+  body Mask under the pack cut too big a patch (switched off, MASK_UNDER_PACK = False in crowd_wear.py, not re-rendered),
+  the lanyard cord isn't visible in the close-ups (check at 1 m), the reverse check (body into pack) needs a sealed
+  collision shell, crowd_place.py (placement) doesn't exist yet.
 - **Next:** crowd close-ups -> place the crowd (dense queue/booths, sparse near the screen, clear of the camera) ->
   Cycles renders of the two fly-throughs -> the walk back from the rooms (no photos: plausible + heavy blur) -> wire
   the new intro walk and hall still into the cinema page (the screen moved: shots.json needs the new quad).
