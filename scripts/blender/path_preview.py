@@ -43,6 +43,8 @@ def render_clip(scene,clip,out,walk_res,preview=False,step=1,samples=24,engine='
         scene.frame_set(clip.first+i)
         # Relative index, independent of global timeline: publish validates complete 0..N-1 sequences.
         path = directory/f'f_{i:05d}.png'
+        if not preview and single is None and path.exists() and path.stat().st_size > 0:
+            files.append((path,clip.first+i)); continue   # resume an interrupted run
         scene.render.filepath = str(path)
         bpy.ops.render.render(write_still=True)
         files.append((path,clip.first+i))
