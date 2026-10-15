@@ -1,4 +1,19 @@
 {
+ "hollywood-booths": {
+  "photo": "img/site-2026/inside_hollywood_w_booths_and_people.jpg",
+  "note": "Entrance steps looking north along the coffer; dressed booths visible.",
+  "loc": [
+    5.9,
+    -31.8,
+    2.6
+  ],
+  "look": [
+    5.9,
+    18.0,
+    2.0
+  ],
+  "fov_h": 75
+},
  "hollywood": {
   "photo": "img/hollywood-empty.png",
   "note": "Your photo of the empty Hollywood room, from just inside the entrance steps looking north along the coffer. Placed by eye; booths hidden.",
@@ -17,5 +32,63 @@
    "booth",
    "desk"
   ]
- }
+ },
+ "facade": {
+  "photo": "img/site-2026/kinepolis_outside_1.png",
+  "loc": [
+   -26,
+   -67.55,
+   3.565
+  ],
+  "look": [
+   74,
+   -78.55,
+   2.565
+  ],
+  "fov_h": 95
+ },
+ "reception-queue": {
+  "photo": "img/site-2026/entrance_line.jpg",
+  "note": "Facing south toward the sunlit glass doors from about 6 m inside.",
+  "loc": [
+   -8.8,
+   -53.5,
+   2.75
+  ],
+  "look": [
+   -6.5,
+   -60.4,
+   2.55
+  ],
+  "fov_h": 62
+ },
+ "reception-desks": {
+  "photo": "img/site-2026/entrance_line_wide_angle_with_reception.jpg",
+  "note": "Eye 1.7 m above reception floor, looking southeast slightly down.",
+  "loc": [
+   -10.5,
+   -39.5,
+   2.9
+  ],
+  "look": [
+   -2.7,
+   -48.5,
+   2.3
+  ],
+  "fov_h": 95
+ },
+ "upstairs": {
+  "note": "Upstairs corridor looking south toward the end wall.",
+  "loc": [
+    2.7,
+    -18,
+    7.8
+  ],
+  "look": [
+    2.7,
+    -60,
+    9.7
+  ],
+  "fov_h": 80
+}
 }

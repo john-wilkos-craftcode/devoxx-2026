@@ -12,8 +12,7 @@ Run with Blender's Python (Windows Blender, driven from WSL):
 Shots (per --room):
   hall      the Hollywood room (the exhibition floor downstairs), facing the screen on the curtained
             far wall that carries the programme (a still)
-  walk-<n>  hall -> side stair -> corridor -> door -> aisle -> seat (an animation, also played back
-            in reverse for the way out)
+  walk-<n> / back-<n>  independent forward-facing routes through the side stair and auditorium
   seat-<n>  the seat that frames room n's cinema screen (a still)
 Writes shots.json next to the renders: camera data per shot and, for the stills, where the programme
 screen and the cinema screen land on screen, so the browser can pin the HTML onto them.
@@ -48,6 +47,11 @@ ap.add_argument("--lookdev", action="store_true", help="Cycles at half resolutio
 ap.add_argument("--walk-samples", type=int, default=24, help="samples for walk frames (motion blur hides the rest)")
 ap.add_argument("--walk-engine", default="cycles", choices=["cycles", "eevee"])
 ap.add_argument("--step", type=int, default=1, help="render every n-th frame of a clip (look-dev)")
+ap.add_argument("--no-crowd", action="store_true", help="leave the people out (timing)")
+ap.add_argument("--check", action="store_true", help="audit all phase-1 paths for this room; no renders")
+ap.add_argument("--preview-clips", default="", help="comma-separated clip/output names or all; Workbench 480px, every third frame")
+ap.add_argument("--plans", action="store_true", help="export evaluated obstacle footprints and path samples for path_artifacts.py")
+ap.add_argument("--benchmark", default="", help="comma-separated clips: time one Cycles 24-sample motion-blurred frame each")
 args = ap.parse_args(argv)
 ROOT = Path(args.root)
 venue = json.loads((ROOT / "data" / "venue" / "venue.json").read_text())["venue"]
@@ -334,7 +338,7 @@ M = {
     "stringer": material("stringer", 0x2a2d35, 0.6, bevel=0.008),
     "carpet": textured("carpet", "carpet", 0.6, tint=0x3e3741, normal=1.0),   # dark purple-grey, speckled
     "hallFloor": material("hallFloor", 0x2a2c33, 1.0, noise_bump=0.3),
-    "hollywoodFloor": textured("hollywoodFloor", "carpet", 0.6, tint=0x9b9a98, normal=1.0, tiles=0.5),
+    "hollywoodFloor": textured("hollywoodFloor", "carpet", 0.6, tint=0x858487, normal=1.0, tiles=0.5),
     "hallColumn": material("hallColumn", 0xdedcd7, 0.6, bevel=0.012, grime=0.35),
     "hallWall": material("hallWall", 0xe4e2dd, 0.85, bevel=0.01, grime=0.25),
     "raft": material("raft", 0xf1f1ee, 0.9, bevel=0.01),
@@ -355,7 +359,10 @@ M = {
     "tableFrame": material("tableFrame", 0x111114, 0.4, 0.6),
     "audFloor": material("audFloor", 0x111218, 1.0, noise_bump=0.2),
     "ceiling": material("ceiling", 0x121318, 1.0),
-    "vault": material("vault", 0xe6e6e8, 0.85),
+    "vault": material("vault", 0xFAFAF7, 0.85),
+    "upperCarpet": textured("upperCarpet", "carpet", 0.6, tint=0x2B2522, normal=0.35),
+    "corridorSpot": material("corridorSpot", 0xBFC2C5, 0.45),
+    "corridorLens": emissive("corridorLens", 0xFFF1DC, 5.0),
     "starDot": emissive("starDot", 0xfff4e8, 30.0),
     "wordX": material("wordX", 0xff9a2a, 0.5, emission=0xff8a1e, strength=0.4),
     "trussLamp": emissive("trussLamp", 0xf2f4ff, 400.0),
@@ -379,7 +386,7 @@ M = {
     "paving": material("paving", 0x2c2d31, 0.95),
     "funnel": material("funnel", 0xf3f4f8, 0.7),
     "led": emissive("led", 0x3f74ff, 12.0),
-    "cove": emissive("cove", 0x8c9cff, 6.0),
+    "cove": emissive("cove", 0xD9D2FF, 18.0),
     "panelLight": emissive("panelLight", 0xfff3e6, 8.0),       # the look of the panels; area lights below do the lighting      # about 4000 K, like the photos
     # the HTML is pinned over these in the browser: they glow the panels' navy, so their light on the room matches
     "screen": emissive("screen", 0x24347a, 2.4),      # brighter than the room: it blooms past the masking; a light does the spill
@@ -489,20 +496,46 @@ stair_links = [l for l in venue["links"] if l["id"] in ("stair-west", "stair-eas
 stairwells = [{"x": l["bounds"]["x"] - 0.3, "y": l["bounds"]["y"], "w": l["bounds"]["w"] + 0.6, "h": 15.5} for l in stair_links]
 
 
-def box_clear_of_hall(key, b, bottom, top):
-    over = intersect(b, hall)
-    if not over or bottom >= HALL_CLEAR:
-        B.box(key, b, bottom, top)
-        return
-    for cell in subtract_rects(b, [over]):
-        B.box(key, cell, bottom, top)
-    B.box(key, over, max(bottom, HALL_CLEAR), top)
+RECEPTION_CLEAR = 1.2 + 3.2 + 0.12      # the reception's floor, its ceiling height (look/reception.py), the ceiling
+
+
+def box_clear_of_hall(key, b, bottom, top, batch=None):
+    """A box from upstairs that may reach down (walls meeting the seating rakes, the auditoriums' haze), stopped
+    above the hall's drop ceiling and the reception's ceiling where it is over them."""
+    batch = batch or B
+    reception = next(r for r in venue["rooms"] if r["id"] == "reception")["bounds"]
+    cells = [(b, bottom)]
+    for room, clear in ((hall, HALL_CLEAR), (reception, RECEPTION_CLEAR)):
+        nxt = []
+        for cell, lo in cells:
+            over = intersect(cell, room)
+            if not over or lo >= clear:
+                nxt.append((cell, lo))
+                continue
+            nxt += [(c, lo) for c in subtract_rects(cell, [over])] + [(over, max(lo, clear))]
+        cells = nxt
+    for cell, lo in cells:
+        if lo < top:
+            batch.box(key, cell, lo, top)
 
 
 hall_pad = {**hall, "x": hall["x"] - 0.5, "y": hall["y"] - 0.5, "w": hall["w"] + 1, "h": hall["h"] + 1}
+# Ghost Light's forecourt (box letters, sign pylons, square bollards, a block of a neighbour) is replaced by the
+# modelled facade and forecourt (look/facade.py): nothing of it is built
+_court = next(r for r in venue["rooms"] if r["id"] == "forecourt")["bounds"]
+_reception = next(r for r in venue["rooms"] if r["id"] == "reception")["bounds"]
+def on_forecourt(e):
+    b = e["bounds"]
+    return e.get("floor", 0) == 0 and inside(_court, b["x"] + b["w"] / 2, b["y"] + b["h"] / 2)
+
+
+sys.path.insert(0, str(ROOT / "scripts" / "blender"))
+from look.reception import replaces as reception_replaces
+from look.booths import replaces as booths_replaces
+
 # walls and columns, full height; floor-0 walls stop under the floor-1 seating rakes
 for o in venue["obstacles"]:
-    if o.get("hidden"):
+    if o.get("hidden") or on_forecourt(o) or reception_replaces(o) or booths_replaces(o):
         continue
     if o.get("linkId") and o["floor"] == 1 and o["height"] <= 0:
         continue   # floor-1 colliders hanging down a stairwell (one is a 6 m sheet across each side stair's foot)
@@ -528,7 +561,7 @@ for o in venue["obstacles"]:
             B.box("hallWall", b, HALL_CEIL, top)
             continue
         key, top = ("hallColumn" if column else "hallWall"), HALL_CEIL + 0.25     # white, up to the drop ceiling
-    if o["floor"] == 1 and tall:
+    if o["floor"] == 1:
         box_clear_of_hall(key, b, bottom, top)
         continue
     B.box(key, b, bottom, top)
@@ -536,7 +569,7 @@ for o in venue["obstacles"]:
 STAIRS = {"grand-stair", "stair-west", "stair-east", "hall-steps", "bof-1-steps", "bof-2-steps"}
 for d in venue["decor"]:
     mat = d.get("material")
-    if mat in ("floorBelow", "seat", "seatBack"):
+    if mat in ("floorBelow", "seat", "seatBack") or on_forecourt(d) or reception_replaces(d) or booths_replaces(d):
         continue
     if d.get("wordmark"):
         continue   # Ghost Light's box letters (DEVOXX and JAVAPOLIS in the same spot); real type is set below
@@ -548,6 +581,9 @@ for d in venue["decor"]:
         key = "rake"
     if key == "screen":
         continue   # screens are built below as clean emissive planes
+    if d["floor"] == 1:      # upstairs pieces that reach down (stair undersides, balustrades) stop above the ceilings
+        box_clear_of_hall(key if key in M else "concrete", d["bounds"], under + d.get("base", 0), under + d["height"])
+        continue
     B.box(key if key in M else "concrete", d["bounds"], under + d.get("base", 0), under + d["height"])
 
 # stair treads and seating terraces from the links (Ghost Light keeps them as rise/riser/direction)
@@ -577,8 +613,12 @@ for L in venue["links"]:
 FLOOR_KEY = {"corridor": "carpet", "foyer": "carpet", "landing": "carpet", "hall": "hollywoodFloor",
              "auditorium": "audFloor", "stage": "audFloor", "outside": "paving"}
 for r in rooms:
+    if r["id"] == "forecourt":
+        continue            # the road, kerbs and pavers are modelled in look/facade.py
     z = r["floor"] * FH + (r.get("elevation") or 0)
     key = "hallFloor" if (r["kind"] == "foyer" and r["floor"] == 0) else FLOOR_KEY.get(r["kind"], "concrete")
+    if r["floor"] == 1 and r["kind"] in ("corridor", "landing", "foyer"):
+        key = "upperCarpet"
     for cell in subtract_rects(r["bounds"], r.get("voids", [])):
         B.box(key, cell, z - 0.25, z)            # a slab, so it is also the ceiling of the floor below
 for e in venue["extents"]:
@@ -606,14 +646,19 @@ def bulkhead(side):
     B.box("vault", {"x": min(inner_x, inner_x - side * 0.08), "y": y0, "w": 0.08, "h": y1 - y0}, z_in - 0.45, z_in + 0.02)   # fascia
     B.box("led", {"x": inner_x + side * 0.02 - 0.02, "y": y0, "w": 0.04, "h": y1 - y0}, z_in - 0.47, z_in - 0.44)
     B.box("led", {"x": wall_x - side * 0.03 - 0.02, "y": y0, "w": 0.04, "h": y1 - y0}, z_wall - 0.05, z_wall - 0.01)
-    # track spots two thirds of the way up the slope, every 3 m
+    # Four pendant spots per cluster, on a black track along the plane.
     t = 0.62
     tx, tz = wall_x + (inner_x - wall_x) * t, z_wall + (z_in - z_wall) * t
-    y = y0 + 1.5
-    while y < y1:
-        cylinder("tableFrame", tx, y, tz - 0.3, tz, 0.06)
-        corridor_spots.append((tx, y, tz - 0.32, side))
-        y += 3.0
+    B.box("tableFrame", {"x": tx-.025, "y": y0, "w": .05, "h": y1-y0}, tz-.05, tz)
+    y = y0 + 2
+    while y < y1-1:
+        for offset in (-.9, -.3, .3, .9):
+            sy = y+offset
+            cylinder("tableFrame", tx, sy, tz-.28, tz-.05, .012)
+            cylinder("corridorSpot", tx, sy, tz-.48, tz-.28, .06)
+            cylinder("corridorLens", tx, sy, tz-.49, tz-.48, .052)
+            corridor_spots.append((tx, sy, tz-.50, side))
+        y += 8.0
 
 
 corridor_spots = []
@@ -963,10 +1008,10 @@ for side, wall_x in ((-1, corridor["x"]), (1, corridor["x"] + corridor["w"])):
         clear = all(abs(y - yc) > 4.2 for wx, yc in door_ys if abs(wx - wall_x) < 1) and not (-3 < y < 12)
         if clear:
             x0 = wall_x - side * 0.12
-            B.box("bezel", {"x": min(wall_x, x0), "y": y - 0.7, "w": 0.12, "h": 1.4}, FH + 0.6, FH + 2.75)
+            B.box("bezel", {"x": min(wall_x, x0), "y": y - 0.7, "w": 0.12, "h": 1.4}, FH + 0.9, FH + 2.75)
             key = ("posterA", "posterB", "posterC")[k % 3]
             xf = wall_x - side * 0.125
-            B.mesh(key, [(xf, y - 0.62, FH + 0.68), (xf, y + 0.62, FH + 0.68), (xf, y + 0.62, FH + 2.67), (xf, y - 0.62, FH + 2.67)],
+            B.mesh(key, [(xf, y - 0.62, FH + 0.98), (xf, y + 0.62, FH + 0.98), (xf, y + 0.62, FH + 2.67), (xf, y - 0.62, FH + 2.67)],
                    [(0, 1, 2, 3)] if side > 0 else [(0, 3, 2, 1)])
             k += 1
         y += 3.4
@@ -1225,7 +1270,7 @@ B.mesh("programme", screen_corners, [(0, 1, 2, 3)])
 
 
 # the phone's programme: a portrait schedule totem standing in front of the curtains, right of the big screen
-TOTEM = {"x": SX + 3.9, "y": NORTH - 2.6, "z": 1.5, "w": 0.70, "h": 1.42}
+TOTEM = {"x": SX + 3.2, "y": NORTH - 2.6, "z": 1.5, "w": 0.70, "h": 1.42}
 tb = 0.035
 B.box("bezel", {"x": TOTEM["x"] - TOTEM["w"] / 2 - tb, "y": TOTEM["y"] - 0.03, "w": TOTEM["w"] + 2 * tb, "h": 0.07},
       TOTEM["z"] - TOTEM["h"] / 2 - 0.09, TOTEM["z"] + TOTEM["h"] / 2 + tb)
@@ -1339,6 +1384,19 @@ for (tx, ty) in ((SX - 4.9, NORTH - 3.0), (SX + 3.4, NORTH - 7.8), (SX - 4.9, NO
         B.box("tableFrame", {"x": tx + lx, "y": ty + ly, "w": 0.03, "h": 0.03}, 0, 1.08)
     B.box("tableFrame", {"x": tx - 0.3, "y": ty - 0.3, "w": 0.6, "h": 0.6}, 1.08, 1.11)
 
+# Entrance blockout shares the normal collision/render geometry.
+sys.path.insert(0, str(ROOT / "scripts" / "blender"))
+from path_blockout import build as build_entrance
+build_entrance(globals())
+from look.reception import build as build_reception
+build_reception(globals())
+from look.booths import build as build_booths
+build_booths(globals())
+from look.foyer import build as build_foyer
+build_foyer(globals())
+from look.crowd import build as build_crowd
+if not args.no_crowd:
+    build_crowd(globals())
 B.finish()
 
 # ---------------------------------------------------------------------------------- lights
@@ -1347,6 +1405,8 @@ world.use_nodes = True
 world.node_tree.nodes["Background"].inputs["Color"].default_value = srgb(0x07060c)
 world.node_tree.nodes["Background"].inputs["Strength"].default_value = 1.0
 scene.world = world
+from look.facade import daylight
+daylight(globals())
 # a little haze in the auditoriums only (the stage spots throw visible beams there, as in the photos);
 # the Hollywood room and the corridors are clear
 haze = bpy.data.materials.new("haze")
@@ -1359,8 +1419,8 @@ vol.inputs["Anisotropy"].default_value = 0.55
 hnt.links.new(vol.outputs["Volume"], hnt.nodes["Material Output"].inputs["Volume"])
 hz = Batch()
 for r in auditoriums:
-    hz.box("haze", {k: r["bounds"][k] + d for k, d in (("x", 0.35), ("y", 0.2), ("w", -0.7), ("h", -0.4))},
-           FH - r.get("rake", 0) - 0.4, FH + CLEAR - 0.05)
+    box_clear_of_hall("haze", {k: r["bounds"][k] + d for k, d in (("x", 0.35), ("y", 0.2), ("w", -0.7), ("h", -0.4))},
+                      FH - r.get("rake", 0) - 0.4, FH + CLEAR - 0.05, hz)
 M["haze"] = haze
 hz.finish()
 
@@ -1392,7 +1452,7 @@ for side in (-1, 1):                                       # uplights at the wal
     wall_x = corridor["x"] if side < 0 else corridor["x"] + corridor["w"]
     y = corridor["y"] + 6
     while y < corridor["y"] + corridor["h"]:
-        ob = area(f"wash-{side}-{y:.0f}", (wall_x - side * 0.4, y, FH + 3.6), 1.0, 300, (0.92, 0.94, 1.0), rot=(math.pi, 0, 0))
+        ob = area(f"wash-{side}-{y:.0f}", (wall_x - side * 2.0, y, FH + 3.6), 1.0, 450, (1.0, 0.82, 0.65), rot=(math.pi, 0, 0))
         ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", 0.3, 11.5
         y += 12
 for sid in ("corridor-blue-w", "corridor-blue-e"):          # the blue LED lines wash the bulkheads
@@ -1419,8 +1479,17 @@ _hs.visible_camera = False
 # the Hollywood room: an area light under each hexagon panel, a narrow spot in each downlight (they throw the
 # pools of light on the carpet), warm track spots at the entrance end
 for (lx, ly, lz) in lights:
-    ob = area(f"panel-{lx:.1f}-{ly:.1f}", (lx, ly, lz - 0.06), 0.3, 32, (1.0, 0.94, 0.86))
+    ob = area(f"panel-{lx:.1f}-{ly:.1f}", (lx, ly, lz - 0.06), 0.3, 12.8, (0.82, 0.86, 1.0))
     ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", 0.8, 0.3
+# Hidden strips face upward, washing the inner coffer ceiling.
+for ci, (cx, cy, width, depth) in enumerate((
+        (inner["x"]+inner["w"]/2, inner["y"]-.15, inner["w"], .04),
+        (inner["x"]+inner["w"]/2, inner["y"]+inner["h"]+.15, inner["w"], .04),
+        (inner["x"]-.15, inner["y"]+inner["h"]/2, .04, inner["h"]),
+        (inner["x"]+inner["w"]+.15, inner["y"]+inner["h"]/2, .04, inner["h"]))):
+    ob = area(f"hollywood-cove-{ci}", (cx, cy, STEP_Z+.14),
+              width, 45 * max(width, depth), srgb(0xD9D2FF)[:3], rot=(math.pi, 0, 0))
+    ob.data.shape, ob.data.size, ob.data.size_y = "RECTANGLE", width, depth
 for (lx, ly) in downlights:
     spot = bpy.data.lights.new(f"down-{lx:.1f}-{ly:.1f}", "SPOT")
     spot.energy, spot.spot_size, spot.spot_blend, spot.color = 190, math.radians(34), 0.25, (1.0, 0.9, 0.78)
@@ -1516,86 +1585,6 @@ def seat_for(n, fov=52):
     return seat, (scr["x"], seat[1], scr["z"]), fov, seats
 
 
-def catmull_rom(pts, samples):
-    """Centripetal Catmull-Rom through pts, resampled to `samples` points evenly spaced along the curve."""
-    P = [Vector(p) for p in pts]
-    P = [P[0] + (P[0] - P[1])] + P + [P[-1] + (P[-1] - P[-2])]
-    dense = []
-    for i in range(1, len(P) - 2):
-        p0, p1, p2, p3 = P[i - 1], P[i], P[i + 1], P[i + 2]
-        t0 = 0.0
-        t1 = t0 + (p1 - p0).length ** 0.5 + 1e-6
-        t2 = t1 + (p2 - p1).length ** 0.5 + 1e-6
-        t3 = t2 + (p3 - p2).length ** 0.5 + 1e-6
-        for k in range(40):
-            t = t1 + (t2 - t1) * k / 40
-            a1 = (t1 - t) / (t1 - t0) * p0 + (t - t0) / (t1 - t0) * p1
-            a2 = (t2 - t) / (t2 - t1) * p1 + (t - t1) / (t2 - t1) * p2
-            a3 = (t3 - t) / (t3 - t2) * p2 + (t - t2) / (t3 - t2) * p3
-            b1 = (t2 - t) / (t2 - t0) * a1 + (t - t0) / (t2 - t0) * a2
-            b2 = (t3 - t) / (t3 - t1) * a2 + (t - t1) / (t3 - t1) * a3
-            dense.append((t2 - t) / (t2 - t1) * b1 + (t - t1) / (t2 - t1) * b2)
-    dense.append(P[-2])
-    cum = [0.0]
-    for i in range(1, len(dense)):
-        cum.append(cum[-1] + (dense[i] - dense[i - 1]).length)
-    out, j = [], 0
-    for s in range(samples):
-        target = cum[-1] * s / (samples - 1)
-        while j < len(cum) - 2 and cum[j + 1] < target:
-            j += 1
-        f = (target - cum[j]) / max(1e-9, cum[j + 1] - cum[j])
-        out.append(dense[j].lerp(dense[j + 1], f))
-    return out, cum[-1]
-
-
-def stair_rise(b, frac):
-    """Tread height a fraction of the way up a side stair (they all climb towards -y, 6.2 m)."""
-    return FH * frac + 0.18
-
-
-def ease(x):
-    return 4 * x ** 3 if x < 0.5 else 1 - (-2 * x + 2) ** 3 / 2
-
-
-def smooth(e0, e1, x):
-    t = min(1.0, max(0.0, (x - e0) / (e1 - e0)))
-    return t * t * (3 - 2 * t)
-
-
-def keyframe_segment(pts, look0, look1, fov0, fov1, first, seconds, shift1=0.0):
-    """Keyframe cam along a Catmull-Rom path through pts, from rest to rest (eased), from frame `first`.
-    It looks at look0 at the start and look1 at the end, and ahead along the path in between. Returns the
-    number of frames after `first` (the segment spans first .. first + frames)."""
-    frames = int(seconds * FPS)
-    path, _ = catmull_rom(pts, frames * 6)
-    for f in range(frames + 1):
-        t = f / frames
-        u = ease(t)
-        idx = min(len(path) - 1, int(u * (len(path) - 1)))
-        pos = path[idx]
-        ahead = path[min(len(path) - 1, idx + len(path) // 7)].copy()
-        ahead.z = pos.z + (ahead.z - pos.z) * 0.25                      # keep the horizon level
-        target = Vector(look0).lerp(ahead, smooth(0.0, 0.35, t)).lerp(Vector(look1), smooth(0.62, 1.0, t))
-        cam.location = pos
-        cam.rotation_euler = aim(pos, target)
-        cam_data.angle_y = math.radians(fov0 + (fov1 - fov0) * u)
-        cam_data.shift_y = shift1 * smooth(0.55, 1.0, t)                 # the seat shot uses lens shift, not tilt
-        cam_data.keyframe_insert("shift_y", frame=first + f)
-        cam.keyframe_insert("location", frame=first + f)
-        cam.keyframe_insert("rotation_euler", frame=first + f)
-        cam_data.keyframe_insert("lens", frame=first + f)
-    return frames
-
-
-def landing(west):
-    """Where the two walk segments meet: at rest at the top of the side stair, looking down the corridor."""
-    stair = next(l for l in venue["links"] if l["id"] == ("stair-west" if west else "stair-east"))["bounds"]
-    sx = stair["x"] + stair["w"] / 2
-    pos = (sx, stair["y"] - 1.2, FH + 1.65)
-    return stair, sx, pos, (sx, stair["y"] - 12, FH + 1.6), 50
-
-
 WALK_ASPECT = 16 / 9
 
 
@@ -1605,58 +1594,6 @@ def level_shift(loc, target, fov, aspect):
     dist = math.hypot(target[0] - loc[0], target[1] - loc[1])
     frac = (target[2] - loc[2]) / dist / (2 * math.tan(math.radians(fov) / 2))   # of the frame height
     return (target[0], target[1], loc[2]), frac * min(1.0, 1 / aspect) if aspect >= 1 else frac
-
-
-def walk_a(west, first=1):
-    """Segment A, shared by every room off that stair: from the hall shot to the top of the stair."""
-    stair, sx, jpos, jlook, jfov = landing(west)
-    lp, ll, hall_fov = hall_pose()
-    gap_y, in_x = stair["y"] + stair["h"] + 2.55, stair["x"] - 0.3 if sx > lp[0] else stair["x"] + stair["w"] + 0.3
-    pts = [lp, ((lp[0] + in_x) / 2, lp[1] - 1.2, 1.68), (in_x + (-1.6 if sx > lp[0] else 1.6), gap_y, 1.7), (sx, gap_y - 0.25, 1.7),
-           (sx, stair["y"] + stair["h"] - 0.4, 1.75), (sx, stair["y"] + stair["h"] / 2, stair_rise(stair, 0.5) + 1.65),
-           (sx, stair["y"] + 0.4, FH + 1.65), jpos]
-    return keyframe_segment(pts, ll, jlook, hall_fov, jfov, first, 3.4)
-
-
-def walk_b(n, first):
-    """Segment B for room n: from the top of the stair along the corridor, through the doors, up the aisle to the seat."""
-    door = doors[n]
-    seat, look_end, fov_end, seats = seat_for(n)
-    west, face = door["west"], door["face"]
-    stair, sx, jpos, jlook, jfov = landing(west)
-    rake = next(l for l in venue["links"] if l["id"] == f"rake-{n}")
-    steps = round(rake["rise"] / rake["riser"])
-    going = rake["bounds"]["w"] / steps
-
-    def tread(x):
-        i = min(steps - 1, max(0, int((x - rake["bounds"]["x"]) // going)))
-        return FH + rake["base"] + ((i + 1) if rake["ascending"] else (steps - i)) * rake["riser"]
-
-    aisle_y = aisle_y_for(n)
-    high_x = rake["bounds"]["x"] + rake["bounds"]["w"] if west else rake["bounds"]["x"]
-    wx, yc = door["wall_x"], door["yc"]
-    pts = [jpos, ((jpos[0] + cx) / 2, jpos[1] - 2.0, FH + 1.68), (wx + face * 3.2, yc, FH + 1.7), (wx - face * 1.2, yc, FH + 1.65),
-           ((high_x + wx) / 2, aisle_y, FH + 1.65), ((high_x + seat[0]) / 2, aisle_y, tread((high_x + seat[0]) / 2) + 1.65),
-           (seat[0], aisle_y, tread(seat[0]) + 1.6), (seat[0], (aisle_y + seat[1]) / 2, seat[2] + 0.15), seat]
-    length = sum((Vector(pts[i + 1]) - Vector(pts[i])).length for i in range(len(pts) - 1))
-    level_look, shift = level_shift(seat, (look_end[0], look_end[1], look_end[2]), fov_end, WALK_ASPECT)
-    frames = keyframe_segment(pts, jlook, level_look, jfov, fov_end, first, min(4.2, 2.6 + length / 30), shift)
-    # the frame where the walk passes the door (phones stop there, at the door's totem)
-    at = Vector((wx + face * 2.6, yc, FH + 1.7))
-    best, door_frame = 1e9, 0
-    for f in range(frames + 1):
-        scene.frame_set(first + f)
-        d = (cam.location - at).length
-        if d < best:
-            best, door_frame = d, f
-    door["door_frame"] = door_frame
-    # the doors open as you reach them and stay open
-    for hinge, side in door["leaves"]:
-        hinge.rotation_euler = (0, 0, 0)
-        hinge.keyframe_insert("rotation_euler", frame=first + int(frames * 0.22))
-        hinge.rotation_euler = (0, 0, -side * face * 1.45)
-        hinge.keyframe_insert("rotation_euler", frame=first + int(frames * 0.42))
-    return frames
 
 
 def screen_quad(corners, camera):
@@ -1746,13 +1683,6 @@ set_res(PHONE)
 shots["hall-phone"] = {"kind": "still", "overlay": {"programme": screen_quad(grow(totem_corners), phone_hall_cam)}, "size": {"programme": [TOTEM["w"], TOTEM["h"]]},
                        "front": "hall-phone-front"}
 
-# the walk: segment A (shared per stair) from frame 1, segment B (this room) right after it
-frames_a = walk_a(west, 1)
-first_b = frames_a + 2
-frames_b = walk_b(n, first_b)
-shots[f"walk-a-{side}"] = {"kind": "clip", "frames": frames_a + 1, "fps": FPS, "first": 1}
-shots[f"walk-b-{n}"] = {"kind": "clip", "frames": frames_b + 1, "fps": FPS, "first": first_b, "side": side, "door_frame": doors[n]["door_frame"]}
-
 # the seat: laptop sees the whole screen; phone sees the middle of it, and the talk goes on what it sees
 seat, look_end, fov_end, _ = seat_for(n)
 seat_cam = still_cam(f"cam-seat-{n}", seat, look_end, fov_end, level_for=WALK_ASPECT)
@@ -1785,97 +1715,50 @@ def widened(camera, wh, ex, eb):
     return ob, res, [round(ex / (1 + 2 * ex), 5), 0.0, round(1 - ex / (1 + 2 * ex), 5), round(1 / (1 + eb), 5)]
 
 
-# laptops: the seat still is wider and taller than the walk's last frame, so the page has the room round the screen to
-# the sides and the rows in front below it, where the laptop on your lap goes
+# Retain the wider seat framing, now shared exactly by the still and walk endpoint.
 seat_wide_cam, SEAT_RES, seat_inner = widened(seat_cam, LAPTOP, 0.16, 0.5)
 bpy.context.view_layer.update()
-narrow_q = screen_quad(full, seat_cam)
+# Phase 1 uses the same 16:9 projection for the clip endpoint and the seat still.
+# Keep the wider camera's framing, but remove the old implicit inner-camera contract.
+SEAT_RES = LAPTOP
 set_res(SEAT_RES)
 wide_q = screen_quad(full, seat_wide_cam)
-# where the walk's frame sits in the wide still, measured from where the screen lands in each (lens shift units under a
-# vertical sensor fit make the formula's guess unreliable)
-_sx = (wide_q[0][0] - wide_q[2][0]) / (narrow_q[0][0] - narrow_q[2][0])
-_sy = (wide_q[0][1] - wide_q[2][1]) / (narrow_q[0][1] - narrow_q[2][1])
-_x0, _y0 = wide_q[2][0] - narrow_q[2][0] * _sx, wide_q[2][1] - narrow_q[2][1] * _sy
-seat_inner = [round(_x0, 5), round(_y0, 5), round(_x0 + _sx, 5), round(_y0 + _sy, 5)]
 shots[f"seat-{n}"] = {"kind": "still", "overlay": {"screen": wide_q}, "size": {"screen": [2 * hw, zhigh - zlow]},
-                      "front": f"seat-{n}-front", "px": list(SEAT_RES), "inner": seat_inner, "inner_measured": True}
+                      "front": f"seat-{n}-front", "px": list(SEAT_RES), "inner": [0, 0, 1, 1], "inner_measured": True}
 set_res(LAPTOP)
 
-# phones: the walk stops at the door, and the talk is on the totem beside it (a cinema screen is far too wide to
-# read in portrait); the red portal and the corridor are soft behind it
+# Phones end square on to the upstairs door totem.
 tot = doors[n]["totem"]
 dface = doors[n]["face"]
-ddist = 2.0                                   # square on (text pinned flat never wobbles); the whole totem and its plate in frame
+ddist = 2.0
 _dh = 2 * math.atan(tot["w"] / 2 / 0.74 / ddist)
-_dz = tot["z"] + 0.14                         # halfway between the screen's foot and the plate's top
+_dz = tot["z"] + 0.14
 door_cam = still_cam(f"cam-door-phone-{n}", (tot["x"] + dface * ddist, tot["y"], _dz), (tot["x"], tot["y"], _dz),
                      2 * math.degrees(math.atan(math.tan(_dh / 2) * PHONE[1] / PHONE[0])), dof=(ddist, 2.8))
 bpy.context.view_layer.update()
 set_res(PHONE)
 shots[f"door-phone-{n}"] = {"kind": "still", "overlay": {"screen": screen_quad(grow(tot["corners"]), door_cam)}, "size": {"screen": [tot["w"], tot["h"]]}}
 
-# phones get their own portrait walk, so nothing is cropped: from the hall still the camera steps back and turns away
-# from the totem towards the room's side (left for the west stair), a dip to black (publish_renders.py), then it
-# comes down the corridor and settles on the room's door-totem still. Each frame's euler is made compatible with
-# the last: a wrap past ±180° is a full spin under motion blur (the smears in the laptop walks).
+# All clips use the same path builder and their own camera action.
+from walk_paths import build_routes, write_manifest, path_sample_points, HALL_FRAME
 PHONE_WALK = (540, 1170)
-
-
-def keyed_cam(name, like, poses):
-    """A camera with like's lens, keyframed from frame 1 through poses: (location, look target, focus distance)."""
-    ob = bpy.data.objects.new(name, like.data.copy())
-    scene.collection.objects.link(ob)
-    prev = None
-    for f, (loc, look, focus) in enumerate(poses):
-        q = (Vector(look) - Vector(loc)).to_track_quat("-Z", "Y")
-        prev = q.to_euler("XYZ", prev) if prev else q.to_euler("XYZ")
-        ob.location, ob.rotation_euler = loc, prev
-        ob.keyframe_insert("location", frame=1 + f)
-        ob.keyframe_insert("rotation_euler", frame=1 + f)
-        if ob.data.dof.use_dof:
-            ob.data.dof.focus_distance = focus
-            ob.data.dof.keyframe_insert("focus_distance", frame=1 + f)
-    return ob
-
-
-def leave_hall(turn, step, yaw, seconds=1.3):
-    """From the hall totem still, a step back while turning `yaw` degrees towards the stair (turn -1 left, 1 right).
-    The yaw itself is eased, not the view direction: blending directions collapses on turns past 90°."""
-    l0 = Vector(phone_hall_cam.location)                           # square on to the totem: looking along +y
-    l1 = l0 + Vector((step[0], step[1], 0.0))
-    frames, poses = int(seconds * FPS), []
-    for f in range(frames + 1):
-        u = (f / frames) ** 2                                      # from rest, gathering speed into the dip
-        loc, a = l0.lerp(l1, u), math.radians(turn * yaw * u)
-        poses.append((loc, loc + Vector((math.sin(a), math.cos(a), -0.02 * u)) * 4, tdist + (4 - tdist) * u))
-    return poses
-
-
-def reach_door(seconds=2.0):
-    """A curved push-in on the totem from the corridor, from the side the walk comes from (turning in from looking
-    down the corridor sweeps the tight lens across the door)."""
-    e = Vector(door_cam.location)
-    tc = Vector((tot["x"], tot["y"], _dz))
-    s = 1 if landing(west)[2][1] > tot["y"] else -1
-    a, c = e + Vector((dface * 3.5, s * 1.5, 0.1)), e + Vector((dface * 1.2, s * 0.3, 0.0))
-    frames, poses = int(seconds * FPS), []
-    for f in range(frames + 1):
-        u = 1 - (1 - f / frames) ** 2                             # moving as it fades in, at rest on the still
-        loc = a * (1 - u) ** 2 + c * 2 * u * (1 - u) + e * u ** 2
-        poses.append((loc, tc, (tc - loc).length))
-    return poses
-
-
-# west: left across the hall past its screen; east: the stairwell's glass is beside the totem, so away from it and
-# round to look south down the hall along the glass, the way to that stair's foot
-_pa = leave_hall(-1, (-0.9, -0.9), 75) if west else leave_hall(1, (-1.8, -0.8), 70)
-_pb = reach_door()
-phone_a = keyed_cam(f"cam-phone-a-{side}", phone_hall_cam, _pa)
-phone_b = keyed_cam(f"cam-phone-b-{n}", door_cam, _pb)
-shots[f"phone-a-{side}"] = {"kind": "clip", "frames": len(_pa), "fps": FPS}
-shots[f"phone-b-{n}"] = {"kind": "clip", "frames": len(_pb), "fps": FPS, "side": side}
+clips, path_joins, path_outputs, path_stills = build_routes(globals())
+path_payload = write_manifest(globals(), clips, path_joins, path_outputs, path_stills)
 (OUT / f"shots-{n}.json").write_text(json.dumps(shots, indent=1))
+audit_instances = []
+if args.check or args.plans:
+    from path_preview import realize_for_audit, restore_instances
+    audit_instances = realize_for_audit(scene)
+if args.plans:
+    from path_preview import export_footprints
+    export_footprints(scene, OUT, n, path_payload)
+if args.check:
+    from check_paths import audit_paths
+    failures = audit_paths(scene, FPS, OUT, n, clips, path_joins, path_outputs, path_stills, stair_links,
+                           [l for l in venue["links"] if l["id"].startswith("rake-")])
+    raise SystemExit(1 if failures else 0)
+if audit_instances:
+    restore_instances(audit_instances)
 
 # ---------------------------------------------------------------------------------- render settings
 if args.preview:
@@ -1964,8 +1847,12 @@ def render_reference(name):
     for o in hidden:
         o.hide_render = True
     scene.camera = ob
+    previous_compositing = scene.render.use_compositing
+    from look.facade import reference_settings
+    reference_settings(globals(), name)
     scene.render.filepath = str(OUT / f"ref-{name}.png")
     bpy.ops.render.render(write_still=True)
+    scene.render.use_compositing = previous_compositing
     for o in hidden:
         o.hide_render = False
     scene.camera = cam
@@ -1973,6 +1860,7 @@ def render_reference(name):
 
 def still(camera, wh, name):
     scene.camera = camera
+    scene.frame_set(path_stills.get(name.removesuffix("-front"), {}).get("frame", HALL_FRAME))
     set_res(wh)
     scene.render.filepath = str(OUT / f"{name}.png")
     bpy.ops.render.render(write_still=True)
@@ -2005,12 +1893,18 @@ def front_layer(camera, wh, name, names=None):
     scene.render.film_transparent, scene.render.use_compositing = False, use_comp
 
 
-def clip(first, frames, name):
-    walk_settings()
-    scene.frame_start, scene.frame_end = first, first + frames - 1
-    scene.render.filepath = str(OUT / name / "f_")
-    bpy.ops.render.render(animation=True)
+def render_path(name):
+    from path_preview import render_clip
+    render_clip(scene, clips[name], OUT, WALK_RES, preview=False, step=args.step,
+                samples=args.walk_samples, engine=args.walk_engine)
 
+
+if args.preview_clips or args.benchmark:
+    from path_preview import render_selected, benchmark
+    if args.preview_clips:
+        render_selected(scene, clips, path_outputs, args.preview_clips, OUT, WALK_RES)
+    if args.benchmark:
+        benchmark(scene, clips, path_outputs, args.benchmark, OUT, WALK_RES)
 
 for what in [w for w in args.render.split(",") if w]:
     if what.startswith("ref:"):
@@ -2027,25 +1921,19 @@ for what in [w for w in args.render.split(",") if w]:
         front_layer(seat_wide_cam, SEAT_RES, f"seat-{n}-front")
     elif what == "door-phone":
         still(door_cam, PHONE, f"door-phone-{n}")
-    elif what.startswith("walk@"):
-        walk_settings()
-        for fr in what[5:].split("+"):
-            scene.frame_set(int(fr))
-            scene.render.filepath = str(OUT / f"walk-{n}-f{int(fr):03d}.png")
-            bpy.ops.render.render(write_still=True)
-    elif what == "walk-a":
-        clip(1, frames_a + 1, f"walk-a-{side}")
-    elif what == "walk-b":
-        clip(first_b, frames_b + 1, f"walk-b-{n}")
-    elif what in ("phone-a", "phone-b"):
-        ob = phone_a if what == "phone-a" else phone_b
-        walk_settings()
-        set_res(PHONE_WALK)
-        scene.camera = ob
-        scene.frame_start, scene.frame_end, scene.frame_step = 1, shots[ob.name[4:]]["frames"], args.step
-        scene.render.filepath = str(OUT / ob.name[4:] / "f_")
-        bpy.ops.render.render(animation=True)
-        scene.camera, scene.frame_step = cam, 1
-    elif what == "walk-b-door":     # only up to just through the door (from there on the corridor is out of sight)
-        clip(first_b, min(frames_b + 1, doors[n]["door_frame"] + 12), f"walk-b-{n}")
+    elif what in path_stills:
+        entry = path_stills[what]
+        still(entry["camera"], PHONE if "phone" in what else LAPTOP, what)
+        if what.startswith("hall"):
+            front_layer(entry["camera"], PHONE if "phone" in what else LAPTOP, what + "-front", HALL_FRONT)
+    elif what in path_outputs:
+        for part in path_outputs[what]:
+            render_path(part)
+    elif what in clips:
+        render_path(what)
+    elif what in ("walk-a", "walk-b", "phone-a", "phone-b", "back-a", "back-b"):
+        alias = what.replace("phone-", "walk-phone-")
+        render_path(alias + "-" + (side if alias.endswith("-a") else str(n)))
+    else:
+        raise ValueError(f"Unknown render shot: {what}")
 print("done", json.dumps({k: v.get("frames") for k, v in shots.items()}))
