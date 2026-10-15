@@ -1,0 +1,38 @@
+{
+ "inside_hollywood_right": {
+  "area": "hollywood_side",
+  "photo": "img/site-2026/inside_hollywood_right.jpg",
+  "cal": "cal/inside_hollywood_right.json",
+  "C": [
+   19.01,
+   -33.98,
+   2.0
+  ],
+  "turns": 0,
+  "notes": "In the venue plan: standing at y -34 in the east aisle, looking north between the column rows x 15.59 and 22.17 to the north wall. Round satin-aluminium spiral ducts with a bright streak along the top, aluminium dome pendants, loop-pile carpet with the purple runner, columns with grime at the foot and a thin warm haze toward the end wall. Off: the plan's 0.7 m columns put the column bases higher than the photo shows, and the real duct clutter is denser."
+ },
+ "hollywood_booth_closeup_left": {
+  "area": "hollywood_side",
+  "photo": "img/site-2026/hollywood_booth_closeup_left.jpg",
+  "cal": "cal/hollywood_booth_closeup_left.json",
+  "C": [
+   -5.53,
+   -17.12,
+   1.7
+  ],
+  "turns": 0,
+  "notes": "Dark, blue and contrasty like the photo: black ceiling with round silver ducts and the white panel top right, warm oak slats plank by plank, crisp mirrored ASML letters, a neutral white booth wall and the plan column on the right. Which bay the booth is in is a guess (column -3.8, -7.77); most of the background is behind the three people."
+ },
+ "inside_hollywood_w_booths": {
+  "area": "hollywood_side",
+  "photo": "img/site-2026/inside_hollywood_w_booths.jpg",
+  "cal": "cal/inside_hollywood_w_booths.json",
+  "C": [
+   -17.616,
+   -32.416,
+   1.6
+  ],
+  "turns": 0,
+  "notes": "Three high tables (one behind the woman), the JetBrains booth front on the y -20.75 column row, a fine grey-mauve loop-pile carpet (fleck, faint rows, soft variation) and the orange bar. Shot with the 24-70 at about 55 mm, not the 85: with the 85 the camera would stand inside a wall of the plan. The robot and people are left out."
+ }
+}

@@ -43,5 +43,10 @@ from the venue model above. Nothing below is shipped as a file; it only appears 
   CC0, fetched by `scripts/fetch_textures.py`.
 - Potted plants from Poly Haven: `pachira_aquatica_01` and `calathea_orbifolia_01`, CC0, fetched by
   `scripts/fetch_models.py`.
+- People: the [Microsoft Rocketbox](https://github.com/microsoft/Microsoft-Rocketbox) avatars and their motion
+  capture, MIT licence.
+- Backpacks: "Oakley Kitchen Sink Backpack Model" by
+  [qkuslic1](https://sketchfab.com/3d-models/oakley-kitchen-sink-backpack-model-c2440ae21b14485095ba3da4d947f1ee),
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), modified (simplified, refitted to a wearer, recoloured).
 - Type: Archivo Black and Big Shoulders Display, SIL Open Font License 1.1 (`scripts/blender/fonts/`, licences
   beside them).

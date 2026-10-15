@@ -1,0 +1,52 @@
+{
+ "photo": "data/references/img/site-2026/inside_hollywood_w_booths_and_people.jpg",
+ "size": [
+  2480,
+  1654
+ ],
+ "f_px": 1653.8609227751517,
+ "fov_h": 73.7222467573441,
+ "yaw_deg": 0.5090403445557109,
+ "pitch_deg": 0.0,
+ "roll_deg": 0.5196058431814287,
+ "R_cw": [
+  [
+   0.9998293173781567,
+   -0.006691382781557509,
+   -0.017220961285592418
+  ],
+  [
+   0.017220575636049756,
+   -0.00011524913432398367,
+   0.9998517082509787
+  ],
+  [
+   -0.006692375205581851,
+   -0.9999776058063039,
+   0.0
+  ]
+ ],
+ "shift_px": [
+  0.0,
+  -19.31110512229194
+ ],
+ "level": true,
+ "lines_per_axis": [
+  86,
+  25,
+  54
+ ],
+ "masks": [],
+ "resected_from": "build/photomatch/hollywood/pts4-bp.json",
+ "C": [
+  -0.284,
+  -33.457,
+  2.523
+ ],
+ "C_photo_frame": [
+  0.268,
+  -5.35,
+  2.323
+ ],
+ "note": "photo-frame camera moved by PHOTO_TO_VENUE (x,z x1.086, y x0.977), focal scaled by 0.977/1.086 so pixels are unchanged"
+}

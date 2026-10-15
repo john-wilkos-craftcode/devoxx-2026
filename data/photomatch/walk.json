@@ -1,0 +1,153 @@
+{
+ "note": "The fly-through (John, 15/10): a curve along the forecourt from the west, in through the door pair west of the walk-in pair of before (x -8.26..-5.69), north close past the queue with the stair and the reception under it on the right, down the hall steps, along the aisle between the booth blocks, ending square on to the schedule screen on the north wall between the stairwells (the hall still's pose: 3.75 m back, 40 deg vertical).",
+ "points": [
+  [
+   -21.5,
+   -75.5
+  ],
+  [
+   -13.0,
+   -71.5
+  ],
+  [
+   -8.2,
+   -66.5
+  ],
+  [
+   -7.0,
+   -62.0
+  ],
+  [
+   -7.0,
+   -58.5
+  ],
+  [
+   -7.2,
+   -52.0
+  ],
+  [
+   -6.3,
+   -44.0
+  ],
+  [
+   -5.8,
+   -37.5
+  ],
+  [
+   -1.8,
+   -30.0
+  ],
+  [
+   -0.9,
+   -24.0
+  ],
+  [
+   -0.8,
+   -3.0
+  ],
+  [
+   -0.6,
+   6.5
+  ],
+  [
+   2.4,
+   10.0
+  ],
+  [
+   2.4,
+   14.08
+  ]
+ ],
+ "screen": [
+  2.4,
+  17.83,
+  1.7
+ ],
+ "speed": 5.5,
+ "eye": 1.65,
+ "fillet": 3.5,
+ "accel": 4.0,
+ "decel": 3.5,
+ "look_ahead": 7.0,
+ "hold": 1.0,
+ "timing_note": "A quick fly-through for the web app (John, 15/10): about 5.5 m/s on the open stretches, easing off at the door and the steps, settling on the screen and holding 1 s.",
+ "start_look": [
+  6.0,
+  -60.5,
+  6.0
+ ],
+ "start_look_m": 14.0,
+ "end_fov_v": 40.0,
+ "end_eye_z": 1.7,
+ "phone": {
+  "note": "Phones: the same path, rendered portrait, drifting right over the last stretch onto the totem, ending on the old phone still's pose (square on, 1.7 m back, shallow focus).",
+  "points_tail": [
+   [
+    5.4,
+    10.0
+   ],
+   [
+    5.6,
+    13.85
+   ]
+  ],
+  "branch_after": 11,
+  "screen": [
+   5.6,
+   15.514999999999999,
+   1.5
+  ],
+  "end_eye_z": 1.5,
+  "end_fov_v": 58.29,
+  "fov_v": 70.0,
+  "size": [
+   540,
+   1170
+  ],
+  "dof_end": [
+   1.7,
+   1.8
+  ]
+ },
+ "laptop": {
+  "fov_h": 72.0,
+  "size": [
+   16,
+   9
+  ]
+ },
+ "speed_keys": [
+  [
+   -21.5,
+   -75.5,
+   4.5
+  ],
+  [
+   -14.0,
+   -71.8,
+   8.0
+  ],
+  [
+   -5.8,
+   -37.5,
+   8.0
+  ],
+  [
+   -1.8,
+   -30.0,
+   10.0
+  ],
+  [
+   -0.9,
+   -24.0,
+   13.0
+  ],
+  [
+   -0.8,
+   -3.0,
+   13.0
+  ]
+ ],
+ "speed_note": "Speed (John, 15/10): already moving at the start while looking at the Kinepolis sign, ~8 m/s through the door and the reception, a faster whoosh (~13 m/s) through the booths and the crowd, braking only into the screen.",
+ "look_tau": 0.35
+}

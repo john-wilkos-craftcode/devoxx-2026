@@ -1,0 +1,26 @@
+{
+ "upstairs_hall": {
+  "area": "upstairs",
+  "photo": "img/site-2026/upstairs_hall.jpg",
+  "cal": "cal/upstairs_hall.json",
+  "C": [
+   3.045,
+   -21.438,
+   7.422
+  ],
+  "turns": 1,
+  "notes": "Placed on the venue plan: corridor walls and the doors of rooms 6 and 7 from venue.json, camera resected against them (4 px rms). Girders, sloped soffits with their seams, black spot cans on hanging rails, light boxes, red portals, the screen rig with its fabric funnels and the glass front beyond line up within a few pixels; colours match the photo region by region (blue soffit glow, walls, portals, floor). Still off: the white soffit is a little darker than the photo's."
+ },
+ "upstairs_w_people": {
+  "area": "upstairs",
+  "photo": "img/site-2026/upstairs_w_people.jpg",
+  "cal": "cal/upstairs_w_people.json",
+  "C": [
+   3.024,
+   -15.412,
+   7.201
+  ],
+  "turns": 2,
+  "notes": "Same model from 6 m further back, camera resected from the screen rig; the two dark columns with the signage screens are only visible here (they are not in the plan). The warm spill on the floor near the camera now matches; the screens' content is drawn, not copied."
+ }
+}

@@ -1,6 +1,33 @@
-# Where this stands (14/10)
+# Where this stands (15/10)
 
-## Right now: the seat on laptops (14/10 afternoon)
+## Right now: the photo-matched venue and the intro fly-through (15/10)
+A new modelling approach replaces build_scene.py's by-eye venue for the walk from the street to the hall screen:
+- **Photo match** (`scripts/photomatch/`, `scripts/blender/photomatch_scene.py`, `pm_lib.py`, `pm_areas/`): every
+  reference photo (C:\Users\wilkojo\Downloads\reference, copied to data/references/img/site-2026/, gitignored) has a
+  solved camera (calib.py: vanishing lines, fSpy-style; resect.py: from plan points) in data/photomatch/cameras/ and
+  cal/; each area is modelled in venue coordinates (data/venue/venue.json's frame) over its photos. Review page:
+  `python3 scripts/photomatch/page.py --open` -> C:\Users\wilkojo\kino-renders\photomatch\index.html (local only, the
+  photos are CC BY-NC-ND / Street View). Edge fit 1-2 px (facade, upstairs, Hollywood), ~4.5 px (telephoto side shots).
+- **Plan vs photos rule:** the plan decides positions on the ground; the photos decide anything vertical or finer.
+  Decisions John confirmed are listed on the review page (no columns under the coffer, facade heights, a wall of doors,
+  reception under the grand stair with the queue west of it, booth blocks 4 per side, screen on the north wall
+  between the stairwells).
+- **Unified venue + fly-through** (`render.sh venue`, `pm_areas/venue.py`, route and speeds in
+  data/photomatch/walk.json): outside -> a door west of the grand stair -> past the queue -> down the hall steps ->
+  the aisle between the booth blocks -> the schedule screen (hall_screen.py: the old screen, plants, ivy, totem; the
+  walk lands on the old hall still's pose). Phones: `--variant phone`, the same path drifting onto the totem.
+  ~12.3 s + 1 s hold; ~8 m/s, ~13 m/s through the booths (John liked the motion; asked a smidge faster). EEVEE
+  previews: `build/photomatch/preview.sh` -> venue/preview-laptop.mp4 / preview-phone.mp4; motion blur full frame.
+- **Crowd** (`pm_areas/crowd*.py`, `scripts/fetch_rocketbox_anims.py`): Rocketbox avatars with Rocketbox's own mocap
+  (MIT). John OK'd poses/models. No handheld props (three attempts failed); badges + lanyards + a CC-BY Oakley
+  backpack (data/models/backpack_oakley, credited in THIRD_PARTY.md) being fitted with the anti-clipping recipe
+  (skin to the armature, Shrinkwrap after it, Mask the body underneath). Not placed in the venue yet: John reviews
+  close-ups first (C:\Users\wilkojo\kino-renders\photomatch\crowd\).
+- **Next:** crowd close-ups -> place the crowd (dense queue/booths, sparse near the screen, clear of the camera) ->
+  Cycles renders of the two fly-throughs -> the walk back from the rooms (no photos: plausible + heavy blur) -> wire
+  the new intro walk and hall still into the cinema page (the screen moved: shots.json needs the new quad).
+
+## Before that: the seat on laptops (14/10 afternoon)
 - The cinema screen carries the YouTube player (own poster, YouTube's chrome off, cropped so its overlays never show)
   with only the title, speakers and "Worth your time if" beside it. The notes are on a Dell Precision 5570 on your lap
   (scripts/blender/build_laptop.py, a separate transparent render laid over the room like a first-person view model):

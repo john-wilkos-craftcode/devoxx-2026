@@ -1,0 +1,56 @@
+{
+ "inside_hollywood_w_booths_and_people": {
+  "area": "hollywood",
+  "photo": "img/site-2026/inside_hollywood_w_booths_and_people.jpg",
+  "cal": "cal/inside_hollywood_w_booths_and_people.json",
+  "C": [
+   -0.284,
+   -33.457,
+   2.523
+  ],
+  "turns": 0,
+  "notes": "Master view from the top of the hall steps. Coffer, cove, ceiling edge, the central columns (plan row -20.75) and the ING TV wall line up within a few pixels. Behind them the plan's booth islands, the middle aisle running past the stairwells to the schedule screen on the curtained north wall; booth graphics are simple colour panels and names. Plan error, fixed here: the plan's columns at (-3.8, -27.28) and (2.65, -27.28) are not there in reality (the coffer spans that bay), so they are left out."
+ },
+ "inside_hollywood": {
+  "area": "hollywood",
+  "photo": "img/site-2026/inside_hollywood.jpg",
+  "cal": "cal/inside_hollywood.json",
+  "C": [
+   -0.453,
+   -33.865,
+   2.065
+  ],
+  "turns": 0,
+  "notes": "Coffer, ceiling lights, columns and high tables line up; this photo was taken crouching (eye ~1 m above the step). The fridges are placed from this photo in front of the central columns. Plan error, fixed here: the plan's columns at (-3.8, -27.28) and (2.65, -27.28) are not there in reality (the coffer spans that bay), so they are left out."
+ },
+ "inside_hollywood_w_ing_orange_guys": {
+  "area": "hollywood",
+  "photo": "img/site-2026/inside_hollywood_w_ing_orange_guys.jpg",
+  "cal": "cal/inside_hollywood_w_ing_orange_guys.json",
+  "C": [
+   4.534,
+   -34.018,
+   2.287
+  ],
+  "turns": 0,
+  "notes": "Coffer corner, black acoustic cloud, lowered ceiling and the ING booth (TV on the concrete wall, orange IT tower, 'Wear it to get it' wall, red counter) line up, 3.6 px rms. Plan error, fixed here: the plan's columns at (-3.8, -27.28) and (2.65, -27.28) are not there in reality (the coffer spans that bay), so they are left out."
+ },
+ "hollywood_aisle_check": {
+  "area": "hollywood",
+  "C": [
+   -0.6,
+   -26.0,
+   1.65
+  ],
+  "look": [
+   2.4,
+   17.9,
+   2.5
+  ],
+  "fov_h": 70,
+  "size": [
+   16,
+   9
+  ]
+ }
+}

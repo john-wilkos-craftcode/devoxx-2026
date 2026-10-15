@@ -1,0 +1,35 @@
+{
+ "photo": "data/references/img/site-2026/hollywood_booth_closeup_left.jpg",
+ "size": [
+  2480,
+  1654
+ ],
+ "f_px": 5856.0,
+ "fov_h": 23.911405810417367,
+ "yaw_deg": 0,
+ "pitch_deg": 0,
+ "roll_deg": 0.3,
+ "R_cw": [
+  [
+   0.9999862922474267,
+   -0.00523596383141958,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   1.0
+  ],
+  [
+   -0.00523596383141958,
+   -0.9999862922474267,
+   0.0
+  ]
+ ],
+ "shift_px": [
+  0,
+  -47.0
+ ],
+ "level": true,
+ "solved": "level (verticals parallel); focal length from head sizes and the booth's slat wall (lines leave it open)"
+}

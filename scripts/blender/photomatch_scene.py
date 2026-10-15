@@ -1,0 +1,190 @@
+"""Photo-matched venue: build one area (scripts/blender/pm_areas/<area>.py) and render it from the cameras solved
+for its reference photos (data/photomatch/cameras/<area>.json, solved by scripts/photomatch/calib.py), so every render
+can be laid over its photo.
+
+  blender.exe -b --python scripts/blender/photomatch_scene.py -- --root <repo> --area upstairs
+      [--cams upstairs_hall,upstairs_w_people] [--out C:/Users/wilkojo/kino-renders/photomatch]
+      [--samples 64] [--width 1280] [--engine cycles|workbench|eevee] [--save area.blend]
+Run from WSL with scripts/photomatch/render.sh.
+"""
+import argparse
+import importlib
+import math
+import json
+import sys
+import time
+from pathlib import Path
+
+import bpy
+from mathutils import Matrix, Vector
+
+argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+ap = argparse.ArgumentParser()
+ap.add_argument("--root", required=True)
+ap.add_argument("--area", required=True)
+ap.add_argument("--cams", default="")
+ap.add_argument("--out", default="C:/Users/wilkojo/kino-renders/photomatch")
+ap.add_argument("--samples", type=int, default=64)
+ap.add_argument("--width", type=int, default=1280)
+ap.add_argument("--engine", default="cycles", choices=["cycles", "workbench", "eevee"])
+ap.add_argument("--save")
+ap.add_argument("--walk", default="", help="render walk frames: a comma list, every:N, or all (area venue)")
+ap.add_argument("--plan", default="", help="top-down cut below this height: x0,y0,x1,y1,cut_z[,ppm] (Workbench)")
+ap.add_argument("--variant", default="", help="area variant, e.g. phone for venue's portrait walk")
+ap.add_argument("--unified", action="store_true", help="build the area as part of the whole venue (no photo hacks)")
+args = ap.parse_args(argv)
+ROOT = Path(args.root)
+sys.path[:0] = [str(ROOT / "scripts" / "blender"), str(ROOT / "scripts" / "photomatch")]
+from pm import Cam  # noqa: E402
+
+bpy.ops.wm.read_factory_settings(use_empty=True)
+scene = bpy.context.scene
+scene.unit_settings.system = "METRIC"
+
+t0 = time.time()
+area = importlib.import_module(f"pm_areas.{args.area}")
+if args.variant:
+    area.VARIANT = args.variant
+if args.unified:
+    area.build(ROOT, unified=True)
+else:
+    area.build(ROOT)
+print(f"BUILT {args.area} in {time.time() - t0:.1f}s, {len(scene.objects)} objects")
+
+# ---------------------------------------------------------------------------------- render settings
+if args.engine == "cycles":
+    scene.render.engine = "CYCLES"
+    prefs = bpy.context.preferences.addons["cycles"].preferences
+    for backend in ("OPTIX", "CUDA"):
+        try:
+            prefs.compute_device_type = backend
+            prefs.get_devices()
+            if any(d.type == backend for d in prefs.devices):
+                for d in prefs.devices:
+                    d.use = d.type == backend
+                break
+        except TypeError:
+            continue
+    scene.cycles.device = "GPU"
+    scene.cycles.samples = args.samples
+    scene.cycles.adaptive_threshold = 0.03
+    scene.cycles.use_denoising = True
+    scene.cycles.max_bounces = 8
+    scene.cycles.caustics_reflective = scene.cycles.caustics_refractive = False
+elif args.engine == "eevee":
+    scene.render.engine = "BLENDER_EEVEE"
+    ev = scene.eevee
+    for attr, val in (("taa_render_samples", args.samples), ("use_raytracing", True), ("use_shadows", True),
+                      ("use_gtao", True), ("use_bloom", True), ("shadow_pool_size", "1024")):
+        if hasattr(ev, attr):
+            setattr(ev, attr, val)
+else:
+    scene.render.engine = "BLENDER_WORKBENCH"
+    scene.display.shading.light = "STUDIO"
+    scene.display.shading.color_type = "MATERIAL"
+    scene.display.shading.show_cavity = True
+scene.view_settings.view_transform = getattr(area, "VIEW_TRANSFORM", "AgX")   # AgX greys out saturated lights; "Khronos PBR Neutral" keeps them
+try:
+    scene.view_settings.look = getattr(area, "LOOK", "AgX - Medium High Contrast")
+except TypeError:
+    scene.view_settings.look = "None"
+scene.view_settings.exposure = getattr(area, "EXPOSURE", 0.0)
+scene.render.image_settings.file_format = "PNG"
+
+# ---------------------------------------------------------------------------------- walk frames / plan cut
+if args.walk:
+    out = Path(args.out) / args.area / ("walk" + (f"-{args.variant}" if args.variant else ""))
+    out.mkdir(parents=True, exist_ok=True)
+    cam = bpy.data.objects["cam-walk"]
+    scene.camera = cam
+    ww, wh = getattr(area, "WALK_SIZE", (16, 9))
+    scene.render.resolution_x, scene.render.resolution_y = args.width, round(args.width * wh / ww)
+    f0, f1 = scene.frame_start, scene.frame_end
+    if args.walk == "anim":                   # the whole clip as a frame sequence, with motion blur
+        scene.render.use_motion_blur, scene.render.motion_blur_shutter = True, 1.0   # a full frame: long, soft streaks (John: "the blurrier the crowd, the better")
+        if hasattr(scene.render, "motion_blur_position"):
+            scene.render.motion_blur_position = "CENTER"
+        scene.render.filepath = str(out / "anim" / "f_####")
+        t1 = time.time()
+        bpy.ops.render.render(animation=True)
+        print(f"RENDERED anim {f1 - f0 + 1} frames in {time.time() - t1:.0f}s")
+        print("done")
+        sys.exit(0)
+    if args.walk == "all":
+        frames = list(range(f0, f1 + 1))
+    elif args.walk.startswith("every:"):
+        n = int(args.walk.split(":")[1])
+        frames = list(range(f0, f1 + 1, n)) + [f1]
+    else:
+        frames = [int(f) for f in args.walk.split(",")]
+    for f in frames:
+        scene.frame_set(f)
+        scene.render.filepath = str(out / f"walk-{f:04d}.png")
+        t1 = time.time()
+        bpy.ops.render.render(write_still=True)
+        print(f"RENDERED walk {f}/{f1} in {time.time() - t1:.0f}s")
+    print("done")
+    sys.exit(0)
+if args.plan:
+    vals = [float(v) for v in args.plan.split(",")]
+    x0, y0, x1, y1, cut = vals[:5]
+    ppm = vals[5] if len(vals) > 5 else 10
+    data = bpy.data.cameras.new("cam-plan")
+    data.type, data.ortho_scale = "ORTHO", max(x1 - x0, y1 - y0)
+    data.clip_start, data.clip_end = 100 - cut, 120
+    ob = bpy.data.objects.new("cam-plan", data)
+    scene.collection.objects.link(ob)
+    ob.location, ob.rotation_euler = ((x0 + x1) / 2, (y0 + y1) / 2, 100), (0, 0, 0)
+    scene.camera = ob
+    scene.render.engine = "BLENDER_WORKBENCH"
+    scene.display.shading.light, scene.display.shading.color_type = "FLAT", "MATERIAL"
+    scene.render.resolution_x, scene.render.resolution_y = round((x1 - x0) * ppm), round((y1 - y0) * ppm)
+    if (x1 - x0) < (y1 - y0):
+        data.sensor_fit = "VERTICAL"
+    out = Path(args.out) / args.area
+    out.mkdir(parents=True, exist_ok=True)
+    scene.render.filepath = str(out / f"plan-cut{cut:g}.png")
+    bpy.ops.render.render(write_still=True)
+    print(f"RENDERED plan -> {scene.render.filepath}")
+    print("done")
+    sys.exit(0)
+
+# ---------------------------------------------------------------------------------- cameras
+cams = {k: v for f in sorted((ROOT / "data" / "photomatch" / "cameras").glob("*.json")) for k, v in json.loads(f.read_text()).items()}
+wanted = [c for c in args.cams.split(",") if c] or [k for k, v in cams.items() if v["area"] == args.area]
+out = Path(args.out) / args.area
+out.mkdir(parents=True, exist_ok=True)
+for name in wanted:
+    spec = cams[name]
+    if "cal" in spec:
+        cam = Cam(json.loads((ROOT / "data" / "photomatch" / spec["cal"]).read_text()), spec["C"], spec.get("turns", 0))
+        b = cam.blender()
+    else:
+        # a check view with no photo: "C" (eye), "look" (target), "fov_h", optional "size" [w, h]
+        fwd = (Vector(spec["look"]) - Vector(spec["C"])).normalized()
+        M = fwd.to_track_quat("-Z", "Y").to_matrix().to_4x4()
+        M.translation = Vector(spec["C"])
+        W0, H0 = spec.get("size", [16, 9])
+        b = {"matrix": [list(r) for r in M], "lens": 18 / math.tan(math.radians(spec["fov_h"]) / 2),
+             "sensor_width": 36, "shift_x": 0.0, "shift_y": 0.0, "size": [W0, H0]}
+    data = bpy.data.cameras.new(f"cam-{name}")
+    ob = bpy.data.objects.new(f"cam-{name}", data)
+    scene.collection.objects.link(ob)
+    ob.matrix_world = Matrix(b["matrix"])
+    data.sensor_fit, data.sensor_width, data.lens = "HORIZONTAL", b["sensor_width"], b["lens"]
+    data.shift_x, data.shift_y = b["shift_x"], b["shift_y"]
+    data.clip_start, data.clip_end = 0.05, 1000
+    W, H = b["size"]
+    scene.render.resolution_x = args.width
+    scene.render.resolution_y = round(args.width * H / W)
+    scene.render.resolution_percentage = 100
+    scene.camera = ob
+    if hasattr(area, "before_render"):
+        area.before_render(name)
+    scene.render.filepath = str(out / f"{name}.png")
+    t1 = time.time()
+    bpy.ops.render.render(write_still=True)
+    print(f"RENDERED {name} in {time.time() - t1:.0f}s -> {scene.render.filepath}")
+if args.save:
+    bpy.ops.wm.save_as_mainfile(filepath=args.save)
+print("done")

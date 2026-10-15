@@ -1,0 +1,137 @@
+{
+ "kinepolis_outside_1": {
+  "area": "outside",
+  "photo": "img/site-2026/kinepolis_outside_1.png",
+  "cal": "cal/kinepolis_outside_1.json",
+  "C": [
+   -11.929,
+   -75.792,
+   4.067
+  ],
+  "turns": 0,
+  "photo_w": 1445,
+  "mask": [
+   [
+    0,
+    0,
+    400,
+    160
+   ],
+   [
+    0,
+    800,
+    260,
+    921
+   ],
+   [
+    1280,
+    0,
+    1445,
+    70
+   ],
+   [
+    640,
+    820,
+    820,
+    921
+   ],
+   [
+    1390,
+    760,
+    1445,
+    900
+   ]
+  ],
+  "notes": "Looking east along the facade: the building, bollard row, road, verge trees and Decathlon line up; the near left corner is a few pixels off (Street View stitching close to the camera). The trees are a stock model tinted toward the real yellow-green; the car park has no cars."
+ },
+ "kinepolis_outside_2": {
+  "area": "outside",
+  "photo": "img/site-2026/kinepolis_outside_2.png",
+  "cal": "cal/kinepolis_outside_2.json",
+  "C": [
+   -0.77,
+   -76.084,
+   3.968
+  ],
+  "turns": 0,
+  "photo_w": 1460,
+  "mask": [
+   [
+    0,
+    0,
+    400,
+    160
+   ],
+   [
+    0,
+    800,
+    260,
+    912
+   ],
+   [
+    1280,
+    0,
+    1460,
+    70
+   ],
+   [
+    640,
+    820,
+    820,
+    912
+   ],
+   [
+    1390,
+    760,
+    1460,
+    900
+   ]
+  ],
+  "notes": "The facade, sign, star, entrance bays, poles and bollards sit on the photo within a few pixels; the glazing now reflects sky and street. The facade is flush here as in the photo (the plan's 0.4 m step at x 22.7 is left out)."
+ },
+ "kinepolis_outside_3": {
+  "area": "outside",
+  "photo": "img/site-2026/kinepolis_outside_3.png",
+  "cal": "cal/kinepolis_outside_3.json",
+  "C": [
+   9.268,
+   -77.099,
+   3.965
+  ],
+  "turns": 0,
+  "photo_w": 1414,
+  "mask": [
+   [
+    0,
+    0,
+    400,
+    160
+   ],
+   [
+    1300,
+    0,
+    1414,
+    60
+   ]
+  ],
+  "notes": "Straight-on view: bays, doors, sign, banners, bollards and even the shadows match. The paving reads slightly lighter and pinker than the photo, and the upper glazing reflects a different sky. Plan vs photos: the facade's east-west position is anchored to the grand stair (the entrance bays face it: the first bay's west edge at the stair's west edge, x -2.4). The two bins left of the entrance are moved about 1-1.5 m east of where photo 3 has them, to keep the walk's open doorway clear. For the fly-through, two grey bollards west of the entrance stand further apart and a small black bollard moved 2.3 m west."
+ },
+ "outside_door_check": {
+  "area": "outside",
+  "C": [
+   -7.0,
+   -66.0,
+   2.85
+  ],
+  "look": [
+   -7.0,
+   -55.0,
+   2.85
+  ],
+  "fov_h": 70,
+  "size": [
+   16,
+   9
+  ]
+ }
+}

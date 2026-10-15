@@ -1,0 +1,34 @@
+{
+ "photo": "data/references/img/site-2026/inside_hollywood_w_booths.jpg",
+ "size": [
+  1654,
+  2480
+ ],
+ "f_px": 3769,
+ "fov_h": 24.751609171481128,
+ "R_cw": [
+  [
+   0.7157133861132974,
+   -0.1434115546455606,
+   0.6835111373872276
+  ],
+  [
+   -0.6983624415810743,
+   -0.15628304379811725,
+   0.6984737005858678
+  ],
+  [
+   0.006652001740731899,
+   -0.9772454841109982,
+   -0.21200710992205463
+  ]
+ ],
+ "shift_px": [
+  0,
+  0
+ ],
+ "yaw_deg": -44.37969057022316,
+ "pitch_deg": -12.24,
+ "roll_deg": -0.39,
+ "solved": "RF 24-70 at ~55 mm (the 85 mm prior put the camera inside the plan's south-west wall block): pitch, roll and the 1.6 m eye height by least squares on the high table (0.62 m square, 1.10 m) and three standing people; turned into the venue frame so the JetBrains booth front faces south (as in the hollywood set) with its Kotlin/TV boundary at plan (-5.4, -20.9), on the column row y -20.75"
+}

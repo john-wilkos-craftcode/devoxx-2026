@@ -1,0 +1,52 @@
+{
+ "photo": "data/references/img/site-2026/inside_hollywood_w_ing_orange_guys.jpg",
+ "size": [
+  2480,
+  1654
+ ],
+ "f_px": 1654.5300722334737,
+ "fov_h": 73.70000000000002,
+ "yaw_deg": -0.11733398888755119,
+ "pitch_deg": -6.3178345666712445,
+ "roll_deg": 0.32001098931427807,
+ "R_cw": [
+  [
+   0.9986262708575746,
+   -0.006025479078735515,
+   -0.05205059802697527
+  ],
+  [
+   0.05119699046873122,
+   -0.09927776083657586,
+   0.9937418147437593
+  ],
+  [
+   -0.011155237336725982,
+   -0.995041516623878,
+   -0.0988328936883563
+  ]
+ ],
+ "shift_px": [
+  0.0,
+  0.0
+ ],
+ "level": false,
+ "lines_per_axis": [
+  68,
+  20,
+  61
+ ],
+ "masks": [],
+ "resected_from": "build/photomatch/hollywood/ptsW-og.json",
+ "C": [
+  4.534450285450476,
+  -34.01783206617528,
+  2.2869757979546144
+ ],
+ "C_photo_frame": [
+  4.531,
+  -5.371,
+  2.206
+ ],
+ "note": "resected in the venue frame at the 24 mm limit (73.7 deg) on the coffer corner, TV and booth corner"
+}

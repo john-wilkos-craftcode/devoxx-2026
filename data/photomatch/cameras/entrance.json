@@ -1,0 +1,44 @@
+{
+ "entrance_line_wide_angle_with_reception": {
+  "area": "entrance",
+  "photo": "img/site-2026/entrance_line_wide_angle_with_reception.jpg",
+  "cal": "cal/entrance_wide.json",
+  "C": [
+   -6.041,
+   -43.206,
+   3.206
+  ],
+  "turns": 2,
+  "notes": "Placed on the venue plan west of the grand stair, at (-6.0, -43.2), 2 m up, looking south at the doors. The mullions at -10.17 and -7.3 land within 0.3 px and the column at (-4.15, -49.19) is the white pillar. The reception (counter, wood slats, TVs, white soffit) sits under the stair's top end on the left, and the white wall on the right is the west wall. The mullions at the frame edges are 7-11 px off, and the floor and tables are hidden by the crowd, so they are guesses."
+ },
+ "entrance_line": {
+  "area": "entrance",
+  "photo": "img/site-2026/entrance_line.jpg",
+  "cal": "cal/entrance_line.json",
+  "C": [
+   -9.987,
+   -49.099,
+   2.352
+  ],
+  "turns": 1,
+  "notes": "Placed on the venue plan west of the stair, about 1.15 m up, looking into the low sun along the west wall (navy towards the doors). The glass, the bands and the wall line up within a few px. The foreground counter, table and lamp are read only from this photo, so they render only in this view. In the whole-venue model the queue is a three-lane snake between x -12.3 and -8.4."
+ },
+ "entrance_walk_check": {
+  "area": "entrance",
+  "C": [
+   -7.0,
+   -57.0,
+   2.85
+  ],
+  "look": [
+   -5.5,
+   -40.0,
+   2.5
+  ],
+  "fov_h": 70,
+  "size": [
+   16,
+   9
+  ]
+ }
+}
