@@ -26,7 +26,14 @@ camera looks). John approved the EEVEE fly-through's motion (laptop and phone) a
   re-render preview-laptop-crowd / preview-phone-crowd before the Cycles finals.
 - **Speed lessons:** clip renders take --max-spf (5 spread frames timed first); never two Blender jobs at once (OOM at
   ~4 GB with whole-venue BVHs).
-- **Next, in order:** (1) room 8 laptop EEVEE preview with the crowd -> John; (2) John's notes on the cones (fuller,
+- **17/10 ~00:30, after John's first look at the room 8 walk:** tables moved nearer the walls (start past doors 5/8),
+  laptop walks end on a crop with the screen at 88% of the width (seats.json "walk_end": lens, shift, and the 'inner'
+  box to copy into shots.json when the new walks are published), white double doors on both stairwell openings
+  (only the walk's own open), in a room walk only the destination's door is open and only its auditorium is loaded
+  (4.2 s/frame with the crowd). Room 8 laptop crowd preview re-rendering (kino-renders/photomatch/venue/
+  preview-room8-laptop.mp4, on the review page). Open question to John: the cones' cyan points sweeping over the top
+  of frame just after the stair top (s 5-7). Send him model-only stills/clips with SendUserFile when he's away.
+- **Next, in order:** (1) John's notes on the re-rendered room 8 walk; (2) John's notes on the cones (fuller,
   deeper cyan?), lengths, routes; (3) previews of a phone walk and one west room; (4) remodel the auditoriums from the
   four new photos (blue seats, red LED step lights, the big screen; John: free to change the rooms but keep each
   screen at least as large in frame as the published stills, then re-render the seat stills and their shots.json
