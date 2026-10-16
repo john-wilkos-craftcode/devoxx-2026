@@ -124,8 +124,9 @@ def camera_paths(root):
     V.WALK = pts[:ph["branch_after"] + 1] + [tuple(p) for p in ph["points_tail"]]
     phone = [(p.x, p.y) for p in V.path_points()]
     V.WALK, V.FILLET = saved
+    import pm_areas.room_walk as RW
     segs = []
-    for poly in (lap, phone):
+    for poly in [lap, phone] + RW.all_paths(root):
         segs += list(zip(poly, poly[1:]))
     return np.array([[a[0], a[1], b[0], b[1]] for a, b in segs])
 
@@ -145,10 +146,10 @@ VIS_STEP = 2                    # test every 2nd frame (the pad covers the gaps)
 
 class View:
     """the walk camera frame by frame (read from its curves): which frames see a point, past the venue's walls"""
-    def __init__(self, bvh):
+    def __init__(self, bvh, cam=None):
         import pm_areas.venue as V
         scene = bpy.context.scene
-        cam = bpy.data.objects["cam-walk"]
+        cam = cam or bpy.data.objects["cam-walk"]
         fcs = {}
         for owner in (cam, cam.data):
             ad = owner.animation_data
@@ -160,7 +161,8 @@ class View:
                                 fcs[(fc.data_path, fc.array_index)] = fc
         from mathutils import Euler
         self.bvh = bvh
-        self.f0, self.f1 = scene.frame_start, scene.frame_end
+        keys = [k.co.x for k in fcs[("location", 0)].keyframe_points]
+        self.f0, self.f1 = int(min(keys)), int(max(keys))
         self.frames = list(range(self.f0, self.f1 + 1, VIS_STEP))
         locs, axes, tans = [], [], []
         aspect = V.WALK_SIZE[0] / V.WALK_SIZE[1]
@@ -180,10 +182,10 @@ class View:
 
     def seen(self, pts_at):
         """frames (sampled) in which any of a person's points is in the widened frame and not behind the venue;
-        pts_at(i) gives the points (n x 3) at sample i"""
+        pts_at(f) gives the points (n x 3) at frame f"""
         out = []
         for i, f in enumerate(self.frames):
-            P = pts_at(i)
+            P = pts_at(f)
             v = P - self.loc[i]
             right, up, fwd = self.axes[i]
             z = v @ fwd
@@ -215,6 +217,29 @@ def _clear(bvh, o, d, dist):
     return False
 
 
+def other_views(bvh, root):
+    """every walk camera other than the active one, for placing one crowd that every clip shares: the fly-through and
+    the eight room walks of this variant (temporary cameras, removed once their views are measured)"""
+    import pm_areas.venue as V
+    import pm_areas.room_walk as RW
+    fly = bpy.data.objects.get("cam-flythrough") or bpy.data.objects.get("cam-walk")
+    keys = [k.co.x for k in fly.animation_data.action.layers[0].strips[0].channelbags[0].fcurves[0].keyframe_points]
+    fly_end = int(max(keys))
+    views, tmp = [], []
+    if fly.name == "cam-flythrough":
+        views.append(View(bvh, fly))
+    for n in (3, 4, 5, 6, 7, 8, 9, 10):
+        if V.ROOM == n:
+            continue
+        c = RW.camera(root, n, V.VARIANT, first_frame=fly_end, activate=False)
+        tmp.append(c)
+        views.append(View(bvh, c))
+    for c in tmp:
+        bpy.data.objects.remove(c)
+    print(f"CROWD views: the active camera + {len(views)} others", flush=True)
+    return views
+
+
 def body_points(x, y, zf):
     return np.array([(x, y, zf + 0.25), (x, y, zf + 1.0), (x, y, zf + 1.65), (x + 0.25, y, zf + 1.2), (x - 0.25, y, zf + 1.2)])
 
@@ -228,7 +253,8 @@ class Placer:
         self.spots = []                                  # (x, y) of everyone placed, walkers' sweeps sampled
         self.looks = []                                  # (x, y, avatar) for keeping clones apart
         self.view = View(self.bvh) if "cam-walk" in bpy.data.objects else None
-        self.unseen = 0                                  # spots skipped: the camera never sees them
+        self.others = other_views(self.bvh, root) if self.view else []
+        self.unseen = 0                                  # spots skipped: no walk camera ever sees them
         self.zone = ""
 
     def end_view(self, x, y):
@@ -253,10 +279,15 @@ class Placer:
         return tmpl, clip
 
     def seen_at(self, x, y, zf):
+        """frames the active camera sees the spot; None without a camera. A spot no walk camera sees at all comes back
+        as [] (skipped); a spot only other clips see comes back as [None] (placed, hidden in this clip)"""
         if self.view is None:
             return None
         pts = body_points(x, y, zf)
-        return self.view.seen(lambda i: pts)
+        vis = self.view.seen(lambda f: pts)
+        if vis:
+            return vis
+        return [None] if any(v.seen(lambda f: pts) for v in self.others) else []
 
     def put(self, role, x, y, zf, yaw, sex=None, force=False):
         """place someone; False (and nobody placed) when the camera never sees the spot, unless forced (a group
@@ -314,7 +345,7 @@ class Placer:
             if not self.ok(x, y, zf) or any((x - p) ** 2 + (y - q) ** 2 < GAP ** 2 for p, q, _ in spots):
                 return False
             spots.append((x, y, self.facing(cx - x, cy - y) + rng.uniform(-0.2, 0.2)))
-        if self.view is not None and not any(self.seen_at(x, y, zf) for x, y, _ in spots):
+        if self.view is not None and not any(self.seen_at(x, y, zf) for x, y, _ in spots):   # one crowd for every clip
             self.unseen += n
             return False
         talker = rng.randrange(n)
@@ -368,10 +399,12 @@ class Placer:
         vis = None
         if self.view is not None:
             ex, ey = pts[-1]
-            def at(i):
-                t = (self.view.frames[i] - 1) / max(1.0, frames - 1)
+            def at(f):
+                t = (f - 1) / max(1.0, frames - 1)
                 return body_points(x + (ex - x) * t, y + (ey - y) * t, zf)
             vis = self.view.seen(at)
+            if not vis:
+                vis = [None] if any(v.seen(at) for v in self.others) else []
             if not vis:
                 self.unseen += 1
                 return False
@@ -519,9 +552,20 @@ def far_hall(P):
     P.scatter((10.0, 6.5, 16.0, 16.5), HALL_Z, groups=1, singles=2)
 
 
+def upstairs(P):
+    """floor 1: groups along the corridor (by the tables, outside the doors), people walking both ways; the lanes the
+    room walks take stay clear (CAM_CLEAR from every walk path)"""
+    P.zone = "upstairs"
+    zf = 6.2
+    P.scatter((-6.3, -45.0, 11.7, -20.0), zf, groups=10, singles=5, tries=1200)      # round the tables, rooms 4-8
+    P.scatter((-6.3, -20.0, 11.7, 0.0), zf, groups=7, singles=4, tries=1200)         # the stair tops, rooms 4/9
+    P.scatter((-6.3, 0.0, 11.7, 30.0), zf, groups=8, singles=4, tries=1200)          # the north stretch, rooms 2/3/10/11
+    P.walkers(8, (-6.0, -44.0, 11.4, 24.0), zf, (0.0, math.pi), (-6.6, -46.5, 12.0, 32.0), tries=600)
+
+
 def place(crowd, root):
     P = Placer(crowd, root)
-    for zone in (queue, reception, foyer, below_steps, aisle, far_hall):
+    for zone in (queue, reception, foyer, below_steps, aisle, far_hall, upstairs):
         zone(P)
     print("CROWD placed: " + ", ".join(f"{k} {v}" for k, v in REPORT.items())
           + f"; {P.unseen} spots skipped (never in view)", flush=True)
@@ -547,7 +591,7 @@ def hide_unseen(crowd):
         if vis is None:
             continue
         on = np.zeros(f1 - f0 + 1, bool)
-        for f in vis:
+        for f in (f for f in vis if f is not None):
             on[max(0, f - f0 - VIS_PAD - VIS_STEP): min(len(on), f - f0 + VIS_PAD + VIS_STEP + 1)] = True
         shown += int(on.sum())
         total += len(on)

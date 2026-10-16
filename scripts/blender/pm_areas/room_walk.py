@@ -168,8 +168,9 @@ def timing(pts, step):
     return out
 
 
-def camera(root, n, variant="laptop", first_frame=402):
-    """keys the scene camera along room n's walk from first_frame; returns the camera"""
+def camera(root, n, variant="laptop", first_frame=402, activate=True):
+    """keys a camera along room n's walk from first_frame; returns it. activate: make it the scene's camera, set the
+    frame range and the visibility swaps (False: a camera only for the crowd's placement, crowd_place.py)"""
     scene = bpy.context.scene
     pts_c, door, e = waypoints(root, n, variant)
     seat = seat_pose(root, n) if variant == "laptop" else None
@@ -230,6 +231,8 @@ def camera(root, n, variant="laptop", first_frame=402):
         cam.rotation_euler = quat.to_euler("XYZ", prev)
         cam.keyframe_insert("location", frame=first_frame + nf - 1)
         cam.keyframe_insert("rotation_euler", frame=first_frame + nf - 1)
+    if not activate:
+        return cam
     scene.frame_start, scene.frame_end = first_frame, first_frame + nf - 1
     scene.camera = cam
     up = next((i for i, (tt, pp) in enumerate(zip_frames(pts, ts, nf)) if pp.z > FH + 1.0), nf)
@@ -272,6 +275,7 @@ def swap_visibility(f0, f_up, f_in, f1):
         for ob in (c.objects if c else []):
             if ob.type in ("MESH", "LIGHT", "FONT", "CURVE"):
                 keys(ob, f0 - 10, f_in)
+    bpy.context.scene.frame_set(f0)            # keying leaves each property at its last key: back to the start's state
     print(f"ROOMWALK visibility: auditoriums from frame {f_up}, the hall side until {f_in}", flush=True)
 
 

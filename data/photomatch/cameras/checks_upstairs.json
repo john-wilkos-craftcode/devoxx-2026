@@ -97,5 +97,24 @@
    9
   ],
   "notes": "the corridor by room 8's doorway"
+ },
+ "check_portals_east": {
+  "area": "venue",
+  "C": [
+   3.0,
+   -8.0,
+   7.85
+  ],
+  "look": [
+   12.55,
+   -16.0,
+   7.6
+  ],
+  "fov_h": 72,
+  "size": [
+   16,
+   9
+  ],
+  "notes": "the east portals (rooms 8, 9) from the corridor"
  }
 }
