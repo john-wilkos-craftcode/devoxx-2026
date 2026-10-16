@@ -23,7 +23,7 @@ import pm_areas.crowd as C
 CAM_CLEAR = 1.4                 # person centre to the camera's path (m)
 BODY_R = 0.36                   # nothing solid within this of a person's centre
 GAP = 0.75                      # between two people's centres (0.62 let gesturing arms overlap)
-CLONE_R = 6.0                   # the same avatar not twice within this
+CLONE_R = 12.0                  # the same avatar not twice within this (6 m still showed one model 3x in a long view)
 HORIZON = 450                   # frames the walkers must stay clear over (the fly-through is ~400)
 REPORT = {}
 
@@ -175,8 +175,11 @@ class Placer:
         return math.atan2(dx, -dy)
 
     def group(self, cx, cy, zf, n=None):
-        """2-4 people round a centre facing it (one talks, the others listen); all or nothing"""
+        """2-4 people round a centre facing it (one talks, the others listen); all or nothing. Each group keeps its
+        own distance from the camera's path (1.4-2.4 m), so the walkway's edge isn't a line of people"""
         rng = self.rng
+        if path_dist(self.paths, cx, cy) < CAM_CLEAR + rng.uniform(0.6, 1.4):
+            return False
         n = n or rng.choice((2, 2, 3, 3, 3, 4))
         rad = 0.42 + 0.09 * n
         a0 = rng.uniform(0, 2 * math.pi)
@@ -317,10 +320,10 @@ def reception(P):
 def foyer(P):
     """between the queue and the stair, and on the threshold landing: a few groups, a few heading for the hall"""
     P.zone = "foyer"
-    P.scatter((-5.6, -58.0, -3.2, -40.0), RECEPTION_Z, groups=1, singles=1)
+    P.scatter((-5.6, -58.0, -3.2, -40.0), RECEPTION_Z, groups=2, singles=2)
     P.walkers(2, (-5.2, -58.5, -3.6, -52.0), RECEPTION_Z, (0.0,), (-6.0, -59.5, -3.0, -37.6))
     P.zone = "landing"
-    P.scatter((-10.0, -37.2, 8.6, -34.8), RECEPTION_Z, groups=3, singles=2)
+    P.scatter((-10.0, -37.2, 8.6, -34.8), RECEPTION_Z, groups=5, singles=3)
 
 
 def below_steps(P):
@@ -344,7 +347,7 @@ def aisle(P):
         for b0, b1 in zip(ys, ys[1:]):
             for _ in range(rng.choice((2, 2, 3, 3))):
                 for _ in range(30):
-                    x, y = xe + rng.uniform(-0.25, 0.35) * -face, rng.uniform(b0 + 0.8, b1 - 0.8)
+                    x, y = xe + rng.uniform(-0.15, 1.05) * -face, rng.uniform(b0 + 0.6, b1 - 0.6)   # varied: not a row
                     if P.ok(x, y, HALL_Z):
                         P.put(rng.choice(("idle", "listen", "idle")), x, y, HALL_Z,
                               P.facing(face, 0) + rng.uniform(-0.5, 0.5))
@@ -370,8 +373,8 @@ def far_hall(P):
             x, y = tx + 0.75 * math.cos(a), ty + 0.75 * math.sin(a)
             if P.ok(x, y, HALL_Z):
                 P.put("talk" if k == 0 else "listen", x, y, HALL_Z, P.facing(tx - x, ty - y))
-    P.scatter((-11.0, -3.5, -2.5, 6.0), HALL_Z, groups=2, singles=1)
-    P.scatter((2.5, -3.5, 14.0, 6.0), HALL_Z, groups=2, singles=1)
+    P.scatter((-11.0, -3.5, -2.5, 6.0), HALL_Z, groups=4, singles=2)       # 2 + 2 read deserted (16/10 critic)
+    P.scatter((2.5, -3.5, 14.0, 6.0), HALL_Z, groups=4, singles=2)
     P.walkers(2, (-9.0, -3.5, -4.0, 4.0), HALL_Z, (math.pi / 2, -math.pi / 2), (-11.5, -4.0, -2.4, 9.0))
     # thinning out, not a closed hall: a few either side of the end view onto the screen and the totem
     P.scatter((-12.0, 6.5, -3.6, 16.5), HALL_Z, groups=2, singles=2)

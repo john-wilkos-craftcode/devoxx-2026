@@ -486,6 +486,8 @@ def ground(M):
     skew("road", -70, 140, -11.72, KERB0, -0.06, 0.0, M["asphalt_road"], fixed_a=True)
     for k in range(-25, 50):
         x = 0.45 + 2.9 * k
+        if x - 0.5 < -70 or x + 0.5 > 140:          # beyond the road's ends they hung in the air
+            continue
         skew("dash", x - 0.5, x + 0.5, DASH0 + 0.075, DASH0 - 0.075, 0, 0.004, M["line"])
     # the box cross on the road near camera 1
     for a in (1, -1):
@@ -733,11 +735,11 @@ def decathlon(M):
     L.box("dec-entrance", 99.9, -15.0, 0, 100.0, -3.0, 3.3, M["dec_win"])
     L.box("dec-canopy", 98.5, -18.6, 3.3, 100.0, 1.0, 3.7, M["dec_dark"])
     font = ROOT / "scripts" / "blender" / "fonts" / "ArchivoBlack.ttf"
-    t = L.text("dec-sign", "DECATHLON", 1.0, (99.8, -0.5, 9.9), (math.pi / 2, 0, -math.pi / 2), M["white_sign"],
+    t = L.text("dec-sign", "DECATHLON", 1.0, (99.95, -0.5, 9.9), (math.pi / 2, 0, -math.pi / 2), M["white_sign"],
                extrude=0.05, font=font, align="LEFT")
     bpy.context.view_layer.update()
     t.scale = (15.8 / t.dimensions.x, 1.8 / t.dimensions.y, 1)
-    L.tube("dec-logo", (99.8, 1.3, 10.8), (99.86, 1.3, 10.8), 0.85, M["white_sign"], segs=24)
+    L.tube("dec-logo", (99.9, 1.3, 10.8), (100.0, 1.3, 10.8), 0.85, M["white_sign"], segs=24)   # on the wall (was 14 cm off)
     # lattice mast and lighting columns
     L.cylinder("mast", 98, -14.5, 0, 30, 0.25, M["dec_dark"], segs=8, r_top=0.08)
     for x in range(-20, 100, 25):

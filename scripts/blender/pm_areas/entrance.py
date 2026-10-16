@@ -450,6 +450,7 @@ def reception():
     for k, (u, v) in enumerate(((48, 87), (105, 116))):
         x, y, _ = px("wide", u, v, "z", CEIL - 0.2)
         L.cylinder(f"spot{k}", x, y, CEIL - 0.28, CEIL - 0.08, 0.05, L.mat("spot-white", 0xe8e8e8, 0.4))
+        L.cylinder(f"spot{k}-stem", x, y, CEIL - 0.09, CEIL + 0.01, 0.012, black)    # it hung under the ceiling on nothing
     cam = CAMS[wide]
     cx, cy, _ = px("wide", 231, 98, "z", CEIL)
     d = cam.R[:, 2] @ ([cx, cy, CEIL] - cam.C)
@@ -539,6 +540,8 @@ def west_bay():
     a, b = px("line", 390, 221, "x", xw), px("line", 427, 262, "x", xw)
     L.quad("tv-lane", [(xw + 0.01, a[1] + 1.25, b[2]), (xw + 0.01, a[1], b[2]), (xw + 0.01, a[1], a[2]), (xw + 0.01, a[1] + 1.25, a[2])],
            screen_mat("scr-lane", 0x2a50c8, 0xb03ab8, 2.0, 0.8))
+    L.box("tv-lane-body", WEST_IN, a[1] - 0.02, min(a[2], b[2]) - 0.02, xw + 0.005, a[1] + 1.27, max(a[2], b[2]) + 0.02,
+          L.mat("black-gloss", 0, 0))                    # the panel stood 3 cm off the wall on nothing
     # palm by the glass, the trailing plants and the dark bulkhead they hang along, the lamp, the garland
     x, y, _ = px("line", 57, 300, "y", FACADE + 2.0)
     if UNIFIED[0]:
@@ -546,6 +549,8 @@ def west_bay():
     F.palm("palm-glass", x, y, height=2.3, spread=1.2, fronds=12, seed=22, pot_h=0.6, z0=FLOOR)
     g0, g1 = px("line", 120, 64, "z", CEIL - 0.1), px("line", 250, 64, "z", CEIL - 0.1)
     F.garland("garland", g0, g1, material=L.mat("garland", 0x9aa830, 0.5, emit=0xd8e060, strength=2.0))
+    for k, g in enumerate((g0, g1)):                    # hung from the ceiling at both ends (it floated 10 cm under it)
+        L.tube(f"garland-hook{k}", (g[0], g[1], g[2] - 0.01), (g[0], g[1], CEIL + 0.01), 0.003, L.mat("hook-grey", 0x8a8a8a, 0.5, 0.6))
     if UNIFIED[0]:
         return                                          # the portrait's foreground props stood in the queue
     hx, hy, _ = px("line", 68, 120, "z", FLOOR + 2.9)

@@ -539,35 +539,71 @@ def entrance():
 
 
 # ---------------------------------------------------------------------------------- hanging plants
+def _pothos_leaf(verts, faces, mats, base, out, size, cup, m):
+    """a heart-shaped pothos leaf, cupped along its midrib: base at the petiole, blade pointing along `out`"""
+    ux, uy, uz = out
+    vx, vy, vz = -uy, ux, 0.0                                   # across the blade, horizontal
+    vl = math.sqrt(vx * vx + vy * vy) or 1.0
+    vx, vy = vx / vl, vy / vl
+    nx, ny, nz = uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx     # the blade's normal
+    outline = [(1.0, 0.0), (0.82, 0.2), (0.58, 0.36), (0.32, 0.42), (0.1, 0.36), (-0.04, 0.2), (0.04, 0.0),
+               (-0.04, -0.2), (0.1, -0.36), (0.32, -0.42), (0.58, -0.36), (0.82, -0.2)]
+    def pt(a, b):
+        c = -cup * abs(b) * 2.0                                 # the edges curl back from the midrib
+        return (base[0] + (ux * a + vx * b + nx * c) * size, base[1] + (uy * a + vy * b + ny * c) * size,
+                base[2] + (uz * a + vz * b + nz * c) * size)
+    i = len(verts)
+    verts.append(pt(0.45, 0.0))
+    verts += [pt(a, b) for a, b in outline]
+    n = len(outline)
+    for k in range(n):
+        faces.append((i, i + 1 + k, i + 1 + (k + 1) % n))
+        mats.append(m)
+
+
 def hanging_plant(name, x0, y0, x1, y1, z, rng, strands=46, reach=0.85):
-    """trailing pothos from a hidden trough: leaf cards strung down vines"""
-    leaf_a = L.mat("leaf-a", 0x24401f, 0.55, bump=0.2, bump_scale=30)
-    leaf_b = L.mat("leaf-b", 0x3b5c2a, 0.5, bump=0.2, bump_scale=30)
+    """trailing pothos from a hidden trough: thin vines with heart-shaped, cupped leaves hanging out and down
+    (they were flat diamond cards at random tilts that read as confetti right above the camera, 16/10)"""
+    leaf_a = L.mat("leaf-a", 0x24401f, 0.45, bump=0.2, bump_scale=30)
+    leaf_b = L.mat("leaf-b", 0x3b5c2a, 0.4, bump=0.2, bump_scale=30)
+    vine = L.mat("vine", 0x2c3a1c, 0.7)
     verts, faces, mats = [], [], []
     for s in range(strands):
         t = rng.random()
         px, py = x0 + (x1 - x0) * t + rng.gauss(0, 0.06), y0 + (y1 - y0) * t + rng.gauss(0, 0.06)
         length = reach * (0.35 + 0.65 * rng.random())
-        n = int(length / 0.07)
         sway = rng.uniform(-0.08, 0.08)
+        pts = []
+        n = max(3, int(length / 0.045))
         for k in range(n):
-            f = k / max(n - 1, 1)
-            cx, cy, cz = px + sway * f + rng.gauss(0, 0.02), py + sway * f * 0.5 + rng.gauss(0, 0.02), z - 0.04 - f * length
-            size = rng.uniform(0.09, 0.16) * (1.2 - 0.4 * f)
-            ang = rng.uniform(0, 2 * math.pi)
-            tilt = rng.uniform(-0.9, 0.9)
-            ux, uy = math.cos(ang) * size, math.sin(ang) * size
+            f = k / (n - 1)
+            pts.append((px + sway * f, py + sway * f * 0.5, z - 0.04 - f * length))
+        for a, b in zip(pts, pts[1:]):                            # the vine: a thin three-sided stem
             i = len(verts)
-            verts += [(cx, cy, cz), (cx + ux * 0.5 - uy * 0.35, cy + uy * 0.5 + ux * 0.35, cz - size * 0.3 + tilt * 0.05),
-                      (cx + ux, cy + uy, cz - size * 0.6), (cx + ux * 0.5 + uy * 0.35, cy + uy * 0.5 - ux * 0.35,
-                                                            cz - size * 0.3 - tilt * 0.05)]
-            faces.append((i, i + 1, i + 2, i + 3))
-            mats.append(0 if rng.random() < 0.6 else 1)
+            for p in (a, b):
+                for k in range(3):
+                    ang = 2 * math.pi * k / 3
+                    verts.append((p[0] + 0.003 * math.cos(ang), p[1] + 0.003 * math.sin(ang), p[2]))
+            for k in range(3):
+                k2 = (k + 1) % 3
+                faces.append((i + k, i + k2, i + 3 + k2, i + 3 + k))
+                mats.append(2)
+        for k, p in enumerate(pts[1:], 1):                       # a leaf at every node, alternating sides
+            f = k / (n - 1)
+            ang = rng.uniform(0, 2 * math.pi) if k == 1 else ang + math.pi + rng.uniform(-0.6, 0.6)
+            droop = rng.uniform(0.6, 1.2)                        # blades hang out and down
+            ox, oy, oz = math.cos(ang), math.sin(ang), -droop
+            ol = math.sqrt(ox * ox + oy * oy + oz * oz)
+            out = (ox / ol, oy / ol, oz / ol)
+            size = rng.uniform(0.07, 0.12) * (1.15 - 0.35 * f)
+            base = (p[0] + out[0] * 0.015, p[1] + out[1] * 0.015, p[2] + out[2] * 0.015)
+            _pothos_leaf(verts, faces, mats, base, out, size, rng.uniform(0.05, 0.12), 0 if rng.random() < 0.6 else 1)
     ob = L.mesh_obj(name, verts, faces)
-    ob.data.materials.append(leaf_a)
-    ob.data.materials.append(leaf_b)
+    for m in (leaf_a, leaf_b, vine):
+        ob.data.materials.append(m)
     for p, m in zip(ob.data.polygons, mats):
         p.material_index = m
+        p.use_smooth = m != 2
     trough = L.mat("trough", 0x2a2a2a, 0.7)
     L.box(name + "-trough", min(x0, x1) - 0.12, min(y0, y1) - 0.12, z - 0.06, max(x0, x1) + 0.12, max(y0, y1) + 0.12,
           z + 0.1, trough)
@@ -669,6 +705,7 @@ def photo_booths():
     label("IT", 0.5, 8.9, y - 0.6, 1.6, L.mat("it-purple", 0x7b3fe4, 0.5))
     booth_wall("wear-it", 9.9, 11.9, y, 2.4, gwhite)
     label("Wear it to get it", 0.17, 10.9, y, 1.6, L.mat("wear-blue", 0x1f4fbf, 0.5))
+    L.box("ing-header", 5.75, y, 2.2, 6.65, y + 0.08, 2.5, concrete)   # the logo rises above the wall: on a header board
     label("ING", 0.3, 6.2, y, 2.3, L.mat("ing-orange", 0xff6200, 0.5))
     L.box("counter-red", 8.3, 4.6, 0, 11.6, 5.3, 0.95, L.mat("counter-red", 0xd31f3a, 0.5))
     L.box("counter-top", 8.25, 4.55, 0.95, 11.65, 5.35, 0.99, gwhite)

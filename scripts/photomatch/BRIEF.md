@@ -18,6 +18,13 @@ rooms and back), judged the way a person watching the clip sees it.
   "The blurrier the crowd, the better."
 - Never upload or commit the reference photos (CC BY-NC-ND / Street View) or the Slack webhook.
 
+## Priority: what the camera actually sees (John, 16/10)
+Effort goes where the fly-through and the walks are readable. Next to the camera, details matter (people, props,
+badges, edges, fixings). Far away, a thing only matters if it is obviously broken from afar (a gap of sky, a
+floating block, a missing wall); what is small on screen or there for a split second can be fudged. The sanity
+report ranks every finding by its largest size on screen and its time in view (FIX / FUDGE; no occlusion, so
+it's an upper bound); critics report near-camera problems first and drop far, fleeting nitpicks.
+
 ## The process (locked 16/10 after the forum/paper research)
 1. **Build from scripts only** (headless, factory settings, `--python-exit-code 1`); change one area at a time.
 2. **Sanity report must be clean** before anything is rendered: no floating objects, nothing interpenetrating,

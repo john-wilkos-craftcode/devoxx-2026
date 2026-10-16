@@ -32,7 +32,7 @@ ap.add_argument("--walk", default="", help="render walk frames: a comma list, ev
 ap.add_argument("--plan", default="", help="top-down cut below this height: x0,y0,x1,y1,cut_z[,ppm] (Workbench)")
 ap.add_argument("--variant", default="", help="area variant, e.g. phone for venue's portrait walk")
 ap.add_argument("--blur", action="store_true", help="walk stills: the clip's motion blur (full-frame shutter, centred)")
-ap.add_argument("--blur-steps", default="0", help="EEVEE motion blur steps (accumulation; 0 = leave as is); stills take a comma list to A/B")
+ap.add_argument("--blur-steps", default="4", help="EEVEE motion blur steps (accumulation; 4 fixed the vector blur's hard edges on near columns, 16/10 A/B; 0 = Blender's 1); stills take a comma list to A/B")
 ap.add_argument("--crowd", action="store_true", help="venue: add the crowd (pm_areas/crowd.py)")
 ap.add_argument("--unified", action="store_true", help="build the area as part of the whole venue (no photo hacks)")
 args = ap.parse_args(argv)
