@@ -1,6 +1,39 @@
-# Where this stands (15/10)
+# Where this stands (16/10)
 
-## Right now: the photo-matched venue and the intro fly-through (15/10)
+## Right now: room walks through the photo-matched venue (16/10, evening)
+Process and rules: scripts/photomatch/BRIEF.md (John's rules, the review steps, the checklist; effort goes where the
+camera looks). John approved the EEVEE fly-through's motion (laptop and phone) and its crowd ("perfect").
+- **Model added today:** both side stairs (stairs.py; the hall's ceilings cut round the stairwells), the whole floor-1
+  corridor (upstairs.py unified mode: the 2026 photo-matched stretch extended along the plan to its north end, open
+  doorways at rooms 3-10, portals with big Big Shoulders Black numbers, columns and tensile cones matched to the Street
+  View by an image-matching subagent, no cone through the ceiling), door totems for the phone walks (door_totems.py).
+- **Street View (Sep 2020):** 7 screenshots of one panorama at the corridor's north end, cleaned and calibrated
+  (data/photomatch/cal/streetview_upstairs.json: URL "y" = vertical fov, optical centre right of the side panel;
+  panorama solved at venue (2.8, 28, 8.2) after a 1.2 m west shift that puts the columns under the girders). Cameras
+  in data/photomatch/cameras/streetview_upstairs.json; comparisons on the review page.
+- **Auditoriums = the old scene's, unchanged**, so every walk ends in exactly the published seat still's chair:
+  scripts/blender/save_rooms.sh saves the old scene per room, extract_auditorium.py cuts each room out (instances,
+  text, big faces sliced, nothing under the rake) into kino-renders/rooms/aud-<n>.blend, auditoriums.py appends them.
+  Seat and door-totem cameras: data/photomatch/seats.json. The plan's rakes dip into the hall's volume: room walks
+  show the auditoriums only once upstairs and the hall only until the doorway (room_walk.swap_visibility).
+- **Room walks** (pm_areas/room_walk.py, runner --room N [--variant phone]): hall still -> the stairwell's side gap ->
+  up the flight -> corridor lanes outside the column rows (x -3.5 / 9.0) -> rooms 5/8 behind the table rows, 6/7
+  through the gate columns and down the middle -> doorway -> aisle -> the seat still exactly (phones: the door totem
+  still). Starts on the fly-through's last frame (crowd clock continues). Laptop 15.6-20.8 s, phone 8.5-15.2 s; every
+  walk >= 0.6 m from any surface (per-frame clearance report in the build log).
+- **Crowd:** one crowd for every clip (placement = union of what the fly-through and all room walks see), clear of every
+  walk path, 235 people incl. 79 upstairs. NOTE: the hall crowd moved slightly since John approved the fly-through's:
+  re-render preview-laptop-crowd / preview-phone-crowd before the Cycles finals.
+- **Speed lessons:** clip renders take --max-spf (5 spread frames timed first); never two Blender jobs at once (OOM at
+  ~4 GB with whole-venue BVHs).
+- **Next, in order:** (1) room 8 laptop EEVEE preview with the crowd -> John; (2) John's notes on the cones (fuller,
+  deeper cyan?), lengths, routes; (3) previews of a phone walk and one west room; (4) remodel the auditoriums from the
+  four new photos (blue seats, red LED step lights, the big screen; John: free to change the rooms but keep each
+  screen at least as large in frame as the published stills, then re-render the seat stills and their shots.json
+  overlays); (5) re-render the fly-through previews (crowd changed); (6) Cycles finals on John's go; (7) the walks back.
+
+## Before that: the photo-matched venue and the intro fly-through (15/10)
+
 A new modelling approach replaces build_scene.py's by-eye venue for the walk from the street to the hall screen:
 - **Photo match** (`scripts/photomatch/`, `scripts/blender/photomatch_scene.py`, `pm_lib.py`, `pm_areas/`): every
   reference photo (C:\Users\wilkojo\Downloads\reference, copied to data/references/img/site-2026/, gitignored) has a
