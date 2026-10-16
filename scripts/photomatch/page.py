@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = Path("/mnt/c/Users/wilkojo/kino-renders/photomatch")
 AREAS = [("outside", "Outside: the facade"), ("entrance", "Entrance and reception"),
          ("hollywood", "Hollywood room"), ("hollywood_side", "Hollywood room: the side aisles and booths"),
-         ("upstairs", "Upstairs foyer")]
+         ("upstairs", "Upstairs foyer"), ("venue", "Upstairs north (Street View, Sep 2020) and the side stairs")]
 
 CSS = """
 :root{--bg:#111214;--panel:#1b1d21;--line:#2c2f35;--text:#e8e6e1;--muted:#9a978f;--accent:#f2b134}
@@ -150,6 +150,12 @@ plan's columns and walls (red), booth footprints (magenta), steps (orange) and t
             continue
         nav.append(f'<a href="#{area}">{html.escape(title)}</a>')
         body.append(f'<h2 id="{area}">{html.escape(title)}</h2>')
+        if area == "venue":                       # the stair check views (no photo): the model only
+            checks = [k for k, v in cams.items() if v["area"] == area and "photo" not in v and (OUT / area / f"{k}.png").exists()]
+            if checks:
+                body.append('<div class="walk">' + "".join(
+                    f'<figure><img loading="lazy" src="{area}/{k}.png" alt="{html.escape(k)}"><figcaption>'
+                    f'{html.escape(cams[k].get("notes", k))}</figcaption></figure>' for k in checks) + "</div>")
         for n in names:
             spec = cams[n]
             d = OUT / area / "cmp"
@@ -162,7 +168,7 @@ plan's columns and walls (red), booth footprints (magenta), steps (orange) and t
             body.append(f"""
 <section class="cam" data-photo="{rel}-photo.jpg" data-render="{rel}-render.jpg" data-edges="{rel}-edges.jpg">
  <div class="head"><h3>{html.escape(Path(spec['photo']).name)}</h3>
-  <span class="meta">camera {', '.join(f'{c:.1f}' for c in spec['C'])} m</span></div>
+  <span class="meta">camera {', '.join(f'{c:.1f}' for c in (spec['C'] if 'C' in spec else [r[3] for r in spec['blender']['matrix'][:3]]))} m</span></div>
  <div class="modes" role="group" aria-label="view">
   <button data-m="wipe">Wipe</button><button data-m="blend">Blend</button><button data-m="side">Side by side</button>
   <button data-m="edges">Edges</button><button data-m="photo">Photo</button><button data-m="render">Render</button></div>
