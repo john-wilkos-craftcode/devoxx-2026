@@ -116,5 +116,43 @@
    9
   ],
   "notes": "the east portals (rooms 8, 9) from the corridor"
+ },
+ "check_cone_side": {
+  "area": "venue",
+  "C": [
+   5.4,
+   34.5,
+   7.3
+  ],
+  "look": [
+   0.3,
+   30.75,
+   11.2
+  ],
+  "fov_h": 80,
+  "size": [
+   16,
+   9
+  ],
+  "notes": "the close-up's cone (column at -0.15, 30.75 after the panorama shift) from the corridor side, low, looking up at its points"
+ },
+ "check_cone_girder": {
+  "area": "venue",
+  "C": [
+   1.4,
+   26.2,
+   7.0
+  ],
+  "look": [
+   6.0,
+   30.75,
+   10.6
+  ],
+  "fov_h": 80,
+  "size": [
+   16,
+   9
+  ],
+  "notes": "the east cone beside the panorama (column at 6.5, 30.75) under the east girder and soffit"
  }
 }

@@ -26,7 +26,7 @@ FPS = 30
 STAIR = {"west": (-7.15, -4.85), "east": (10.25, 12.55)}          # the flights' x; y 9.88 (foot) .. -1.32 (top)
 STAIR_FOOT, STAIR_TOP = 9.88, -1.32
 GAP_Y = 12.48                                                       # middle of the glass box's side gap
-LANE = {"west": -2.0, "east": 7.3}                                  # corridor lanes: ~1 m clear of the columns either side
+LANE = {"west": -3.5, "east": 9.0}                                  # corridor lanes: outside the column rows (under the girders, x ~ -1.6 / 7.2), ~1.3 m from the stair openings
 # south of the stairs the 2026 dressing has table rows along both sides (venue y -21.4 .. -37.6, chairs out to x -2.06
 # and 7.30 on the aisle side) and the gate columns at y -19.3 (x -0.36..1.11 and 4.70..6.23)
 GATE_Y, TABLES_Y = -19.3, (-37.6, -21.4)
@@ -310,8 +310,8 @@ def clearance(track, f0, up, inside):
         for cn in colls:
             c = bpy.data.collections.get(cn)
             for ob in (c.all_objects if c else []):
-                if ob.type != "MESH":
-                    continue
+                if ob.type != "MESH" or len(ob.data.polygons) > 200000:   # the street trees and plant models: far
+                    continue                                               # from every walk, and 34M triangles
                 me = ob.evaluated_get(dg).to_mesh()
                 me.calc_loop_triangles()
                 n = len(me.vertices)

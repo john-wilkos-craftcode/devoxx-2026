@@ -112,13 +112,14 @@
  },
  "venue_solve": {
   "camera_venue": [
-   4.0,
+   2.8,
    28.0,
    8.2
   ],
   "corridor_axis_south_heading_deg": 77.58,
   "horizon_bias_deg": 2.2,
   "how": "16/10, first pass: corridor vanishing points both ways (179.2 deg apart) give the axis; position by overlaying the plan (corridor walls, stair openings, door markers) for candidate cameras: room 2's wall base and door land within a few px, rooms 3/10 doors on their portals. Room 11's real door is south of the plan's 22.55 and its wall base further east: the plan's north end is a guess there. Refine during modelling (compare overlays).",
-  "to_view": "compass azimuth of venue direction (dx, dy) = axis + 180 + atan2(dx, dy); image elevation = true elevation + bias"
+  "to_view": "compass azimuth of venue direction (dx, dy) = axis + 180 + atan2(dx, dy); image elevation = true elevation + bias",
+  "shift_16_10": "second pass: camera_venue x 4.0 -> 2.8 (1.2 m west, every view's matrix x too). The columns measured from this panorama then stand under the girders (rows ~ -1.7 / 7.1, girders -1.9 / 7.2) as the photos show, and the corridor walls' bases balance: west wall in h164 and east wall (room 11's portal) in h334 both land ~50 px low (before: 22 and 83 px), a common offset that points at the camera height (~0.3 m too high) or the horizon bias, not at x."
  }
 }
