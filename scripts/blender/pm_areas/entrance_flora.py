@@ -55,6 +55,8 @@ def palm(name, x, y, height=1.6, spread=0.9, fronds=11, seed=1, pot=None, pot_h=
     ob = L.mesh_obj(name, verts, faces, leaf_mat)
     pm = pot or L.mat("pot-black", 0x1a1a1a, 0.5)
     L.cylinder(name + "-pot", x, y, z0, z0 + pot_h, pot_r, pm, r_top=pot_r * 1.1)
+    L.cylinder(name + "-trunk", x, y, z0 + pot_h - 0.03, crown[2] + 0.03, 0.045,   # the fronds start above the pot
+               L.mat("palm-trunk", 0x4a3a28, 0.8, bump=0.4))
     return ob
 
 

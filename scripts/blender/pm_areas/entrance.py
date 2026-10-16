@@ -438,6 +438,9 @@ def reception():
     for u, v in ((368, 194), (276, 193)):
         sx, sy, sz = px("wide", u, v, "y", FACADE + 0.35)
         L.box(f"exit-sign-{u}", sx - 0.2, sy - 0.03, sz - 0.1, sx + 0.2, sy, sz + 0.1, sign)
+        for k in (-1, 1):                               # hung from the ceiling on two rods (they floated)
+            L.tube(f"exit-sign-{u}-rod{k}", (sx + k * 0.15, sy - 0.015, sz + 0.1), (sx + k * 0.15, sy - 0.015, CEIL + 0.02),
+                   0.004, L.mat("rod-grey", 0x9a9a9a, 0.4, 0.8))
     # tracks and spots on the ceiling, the round pendant hung from the second track's end
     black = L.mat("black-metal", 0x141416, 0.45, 0.5)
     for name, p0, p1 in (("track-a", (0, 45), (110, 100)), ("track-b", (140, 0), (230, 97))):

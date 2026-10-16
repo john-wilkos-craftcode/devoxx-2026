@@ -19,6 +19,7 @@ The backpack is "Oakley Kitchen Sink Backpack Model" by qkuslic1 (CC BY 4.0), pr
 import math
 from pathlib import Path
 
+import bmesh
 import bpy
 import numpy as np
 from mathutils import Matrix, Vector
@@ -28,6 +29,7 @@ PACK_ALLOWED = ("Bip01 Spine2", "Bip01 Spine1", "Bip01 Spine")
 CORD_ALLOWED = ("Bip01 Neck", "Bip01 L Clavicle", "Bip01 R Clavicle", "Bip01 Spine2")
 TINTS = {"black": None, "charcoal": (0.10, 0.10, 0.11), "navy": (0.025, 0.045, 0.12), "olive": (0.07, 0.08, 0.035)}
 REPORT = []
+PACK_WIDTH = 0.9              # narrower than the model: its sides cut into hanging upper arms (16/10 critic)
 MASK_UNDER_PACK = False        # the mask's hole showed round the pack's edges in the 15/10 close-ups: off until refitted
 
 
@@ -342,7 +344,7 @@ def dress(crowd, root):
             s = p["pack_scale"]
             tint = p["pack_tint"]
             target = proxy_for(p, coll)
-            ob = wear(p, me, rest @ Matrix.Diagonal((s, s, s, 1)), "backpack", coll, wrap=target, offset=0.006,
+            ob = wear(p, me, rest @ Matrix.Diagonal((s * PACK_WIDTH, s, s, 1)), "backpack", coll, wrap=target, offset=0.006,
                       group="contact", materials=pack_mats[tint])
             p["pack_ob"] = ob
             body = p["body"][0]
@@ -378,6 +380,29 @@ def _inside(tree, pts):
     return d
 
 
+def _hull_tree(co):
+    """the closed convex hull of a point set (the decimated pack isn't watertight, its hull is)"""
+    bm = bmesh.new()
+    for c in co:
+        bm.verts.new(c)
+    res = bmesh.ops.convex_hull(bm, input=bm.verts[:])
+    doomed = list({g for g in res["geom_interior"] + res["geom_unused"] if isinstance(g, bmesh.types.BMVert)})
+    if doomed:                                  # the two lists overlap: delete each vertex once
+        bmesh.ops.delete(bm, geom=doomed, context="VERTS")
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    bm.normal_update()
+    tree = BVHTree.FromBMesh(bm)
+    bm.free()
+    return tree
+
+
+def _arm_index(ob):
+    """vertices of the arms and hands (> 0.5 weight on an upper arm, forearm, hand or finger bone)"""
+    gi = {g.index for g in ob.vertex_groups if any(k in g.name for k in ("UpperArm", "Forearm", "Hand", "Finger"))}
+    return np.array([v.index for v in ob.data.vertices if any(g.group in gi and g.weight > 0.5 for g in v.groups)],
+                    dtype=int)
+
+
 def verify(crowd, frame_end, step_frames=12):
     """per wearer, on 12 frames over their loop: penetration (mm) of pack, cord and badge into the body and of the
     body into the badge and the pack, and the share of the pack's contact panel within 2 cm of the back"""
@@ -389,7 +414,7 @@ def verify(crowd, frame_end, step_frames=12):
     for p in people:
         n = max(2, min(int(p["loop"]), frame_end))
         p["vframes"] = sorted({1 + int(i * (n - 1) / (step_frames - 1)) for i in range(step_frames)})
-        p["m"] = {"pack": 0.0, "body_in_pack": 0.0, "cord": 0.0, "badge": 0.0, "body_in_badge": 0.0, "near": [],
+        p["m"] = {"pack": 0.0, "body_in_pack": 0.0, "arm_in_pack": 0.0, "cord": 0.0, "badge": 0.0, "body_in_badge": 0.0, "near": [],
                   "badge_frames": []}
     for f in sorted({f for p in people for f in p["vframes"]}):
         scene.frame_set(f)
@@ -408,6 +433,13 @@ def verify(crowd, frame_end, step_frames=12):
                 c = pco.mean(axis=0)
                 near = bco[np.linalg.norm(bco - c, axis=1) < 0.35]
                 m["body_in_pack"] = max(m["body_in_pack"], float(_inside(ptree, near).max()) if len(near) else 0.0)
+                if "arm_idx" not in p:
+                    p["arm_idx"] = _arm_index(p["proxy"])
+                if len(p["arm_idx"]):
+                    arms = bco[p["arm_idx"]]
+                    arms = arms[np.linalg.norm(arms - c, axis=1) < 0.4]
+                    if len(arms):
+                        m["arm_in_pack"] = max(m["arm_in_pack"], float(_inside(_hull_tree(pco), arms).max()))
                 cg = p["pack_ob"].vertex_groups["contact"].index
                 ci = [v.index for v in p["pack_ob"].data.vertices if any(g.group == cg and g.weight > 0.5 for g in v.groups)]
                 for i in ci[::7]:
@@ -435,6 +467,7 @@ def verify(crowd, frame_end, step_frames=12):
         flush = float((near < 0.02).mean())
         rows.append((p["name"], p["clip"], m))
         print(f"WEAR {p['name']} {p['clip']}: pack {m['pack'] * 1000:.1f} mm, body in pack {m['body_in_pack'] * 1000:.1f} mm,"
+              f" arm in pack {m.get('arm_in_pack', 0) * 1000:.1f} mm,"
               f" panel within 2 cm {flush * 100:.0f}% (median gap {np.median(near) * 1000:.0f} mm),"
               f" lanyard {m['cord'] * 1000:.1f} mm, badge {m['badge'] * 1000:.1f} mm,"
               f" body through badge {m['body_in_badge'] * 1000:.1f} mm", flush=True)

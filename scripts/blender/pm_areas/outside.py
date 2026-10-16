@@ -461,14 +461,14 @@ def sign(M):
         dx, dy = t.dimensions.x, t.dimensions.y
         t.scale = ((xb - xa) / dx, h / dy, 1.0)
         t.location = (xa, -0.08, 5.52)
-    # the star: five points, extruded, one point up, a little proud of the wall
+    # the star: five points, extruded, one point up, standing out from the wall
     R, r = 1.27, 0.52
     pts = []
     for k in range(10):
         a = math.pi / 2 + k * math.pi / 5 - math.radians(6)
         rad = R if k % 2 == 0 else r
         pts.append((0.75 + rad * math.cos(a), 7.55 + rad * math.sin(a)))
-    verts = [(x, -0.12, z) for x, z in pts] + [(x, -0.4, z) for x, z in pts]
+    verts = [(x, 0.01, z) for x, z in pts] + [(x, -0.28, z) for x, z in pts]   # back face into the wall (it hung 12 cm off it)
     n = len(pts)
     faces = [tuple(range(n)), tuple(range(2 * n - 1, n - 1, -1))] + [(i, n + i, n + (i + 1) % n, (i + 1) % n) for i in range(n)]
     s = L.mesh_obj("star", verts, faces, M["star"])
@@ -572,7 +572,8 @@ def banner(M, name, x, y):
             star.append((cy + rad * math.cos(a), 7.65 + rad * math.sin(a)))
         L.mesh_obj(f"{name}-logostar{side}", [(x + side * 0.012, yy, zz) for yy, zz in star], [tuple(range(10))], M["banner"])
     L.tube(f"{name}-arm", (x, y, 8.3), (bx, by, 8.3), 0.03, M["pole"])
-    for s in (-1, 1):
+    L.tube(f"{name}-crossbar", (x + 0.5 * uy, y - 0.5 * ux, 8.3), (x - 0.5 * uy, y + 0.5 * ux, 8.3), 0.025, M["pole"])
+    for s in (-1, 1):                         # the two spots hang on the crossbar (they floated beside the mast)
         L.box(f"{name}-spot", x + s * 0.5 * uy - 0.08, y - s * 0.5 * ux - 0.08, 8.15, x + s * 0.5 * uy + 0.08,
               y - s * 0.5 * ux + 0.08, 8.35, M["lamp"])
 

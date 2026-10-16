@@ -31,6 +31,9 @@ ap.add_argument("--save")
 ap.add_argument("--walk", default="", help="render walk frames: a comma list, every:N, or all (area venue)")
 ap.add_argument("--plan", default="", help="top-down cut below this height: x0,y0,x1,y1,cut_z[,ppm] (Workbench)")
 ap.add_argument("--variant", default="", help="area variant, e.g. phone for venue's portrait walk")
+ap.add_argument("--blur", action="store_true", help="walk stills: the clip's motion blur (full-frame shutter, centred)")
+ap.add_argument("--blur-steps", default="0", help="EEVEE motion blur steps (accumulation; 0 = leave as is); stills take a comma list to A/B")
+ap.add_argument("--crowd", action="store_true", help="venue: add the crowd (pm_areas/crowd.py)")
 ap.add_argument("--unified", action="store_true", help="build the area as part of the whole venue (no photo hacks)")
 args = ap.parse_args(argv)
 ROOT = Path(args.root)
@@ -45,6 +48,8 @@ t0 = time.time()
 area = importlib.import_module(f"pm_areas.{args.area}")
 if args.variant:
     area.VARIANT = args.variant
+if args.crowd:
+    area.CROWD = True
 if args.unified:
     area.build(ROOT, unified=True)
 else:
@@ -92,6 +97,44 @@ scene.view_settings.exposure = getattr(area, "EXPOSURE", 0.0)
 scene.render.image_settings.file_format = "PNG"
 
 # ---------------------------------------------------------------------------------- walk frames / plan cut
+def render_plan():
+    vals = [float(v) for v in args.plan.split(",")]
+    x0, y0, x1, y1, cut = vals[:5]
+    ppm = vals[5] if len(vals) > 5 else 10
+    data = bpy.data.cameras.new("cam-plan")
+    data.type, data.ortho_scale = "ORTHO", max(x1 - x0, y1 - y0)
+    data.clip_start, data.clip_end = 100 - cut, 120
+    ob = bpy.data.objects.new("cam-plan", data)
+    scene.collection.objects.link(ob)
+    ob.location, ob.rotation_euler = ((x0 + x1) / 2, (y0 + y1) / 2, 100), (0, 0, 0)
+    keep = (scene.render.engine, scene.camera, scene.render.resolution_x, scene.render.resolution_y)
+    scene.camera = ob
+    scene.render.engine = "BLENDER_WORKBENCH"
+    scene.display.shading.light, scene.display.shading.color_type = "FLAT", "MATERIAL"
+    scene.render.resolution_x, scene.render.resolution_y = round((x1 - x0) * ppm), round((y1 - y0) * ppm)
+    if (x1 - x0) < (y1 - y0):
+        data.sensor_fit = "VERTICAL"
+    out = Path(args.out) / args.area
+    out.mkdir(parents=True, exist_ok=True)
+    scene.render.filepath = str(out / f"plan-cut{cut:g}.png")
+    bpy.ops.render.render(write_still=True)
+    print(f"RENDERED plan -> {scene.render.filepath}")
+    scene.render.engine, scene.camera, scene.render.resolution_x, scene.render.resolution_y = keep
+
+
+def set_blur_steps(n):
+    for holder in (scene.render, scene.eevee):        # EEVEE: accumulation steps fix the vector blur's edges
+        if n and hasattr(holder, "motion_blur_steps"):
+            holder.motion_blur_steps = n
+            print(f"BLUR steps {n} on {type(holder).__name__}", flush=True)
+            return
+
+
+if args.plan:
+    render_plan()
+    if not args.walk:
+        print("done")
+        sys.exit(0)
 if args.walk:
     out = Path(args.out) / args.area / ("walk" + (f"-{args.variant}" if args.variant else ""))
     out.mkdir(parents=True, exist_ok=True)
@@ -100,10 +143,12 @@ if args.walk:
     ww, wh = getattr(area, "WALK_SIZE", (16, 9))
     scene.render.resolution_x, scene.render.resolution_y = args.width, round(args.width * wh / ww)
     f0, f1 = scene.frame_start, scene.frame_end
-    if args.walk == "anim":                   # the whole clip as a frame sequence, with motion blur
+    if args.walk == "anim" or args.blur:      # the clip's motion blur
         scene.render.use_motion_blur, scene.render.motion_blur_shutter = True, 1.0   # a full frame: long, soft streaks (John: "the blurrier the crowd, the better")
         if hasattr(scene.render, "motion_blur_position"):
             scene.render.motion_blur_position = "CENTER"
+        set_blur_steps(int(args.blur_steps.split(",")[0]))
+    if args.walk == "anim":
         scene.render.filepath = str(out / "anim" / "f_####")
         t1 = time.time()
         bpy.ops.render.render(animation=True)
@@ -117,38 +162,18 @@ if args.walk:
         frames = list(range(f0, f1 + 1, n)) + [f1]
     else:
         frames = [int(f) for f in args.walk.split(",")]
-    for f in frames:
-        scene.frame_set(f)
-        scene.render.filepath = str(out / f"walk-{f:04d}.png")
-        t1 = time.time()
-        bpy.ops.render.render(write_still=True)
-        print(f"RENDERED walk {f}/{f1} in {time.time() - t1:.0f}s")
+    for steps in ([int(n) for n in args.blur_steps.split(",")] if args.blur else [0]):
+        if args.blur:
+            set_blur_steps(steps)
+        for f in frames:
+            scene.frame_set(f)
+            tag = (f"-blur{steps}" if args.blur else "")
+            scene.render.filepath = str(out / f"walk-{f:04d}{tag}.png")
+            t1 = time.time()
+            bpy.ops.render.render(write_still=True)
+            print(f"RENDERED walk {f}/{f1}{tag} in {time.time() - t1:.0f}s")
     print("done")
     sys.exit(0)
-if args.plan:
-    vals = [float(v) for v in args.plan.split(",")]
-    x0, y0, x1, y1, cut = vals[:5]
-    ppm = vals[5] if len(vals) > 5 else 10
-    data = bpy.data.cameras.new("cam-plan")
-    data.type, data.ortho_scale = "ORTHO", max(x1 - x0, y1 - y0)
-    data.clip_start, data.clip_end = 100 - cut, 120
-    ob = bpy.data.objects.new("cam-plan", data)
-    scene.collection.objects.link(ob)
-    ob.location, ob.rotation_euler = ((x0 + x1) / 2, (y0 + y1) / 2, 100), (0, 0, 0)
-    scene.camera = ob
-    scene.render.engine = "BLENDER_WORKBENCH"
-    scene.display.shading.light, scene.display.shading.color_type = "FLAT", "MATERIAL"
-    scene.render.resolution_x, scene.render.resolution_y = round((x1 - x0) * ppm), round((y1 - y0) * ppm)
-    if (x1 - x0) < (y1 - y0):
-        data.sensor_fit = "VERTICAL"
-    out = Path(args.out) / args.area
-    out.mkdir(parents=True, exist_ok=True)
-    scene.render.filepath = str(out / f"plan-cut{cut:g}.png")
-    bpy.ops.render.render(write_still=True)
-    print(f"RENDERED plan -> {scene.render.filepath}")
-    print("done")
-    sys.exit(0)
-
 # ---------------------------------------------------------------------------------- cameras
 cams = {k: v for f in sorted((ROOT / "data" / "photomatch" / "cameras").glob("*.json")) for k, v in json.loads(f.read_text()).items()}
 wanted = [c for c in args.cams.split(",") if c] or [k for k, v in cams.items() if v["area"] == args.area]

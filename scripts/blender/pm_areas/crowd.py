@@ -502,13 +502,15 @@ def build(root, unified=False):
     coll = bpy.data.collections.new("crowd")
     bpy.context.scene.collection.children.link(coll)
     crowd = Crowd(root, coll, random.Random(20261015))
+    horizon = 740
     if not unified:
         build_test(crowd)
     else:
-        import crowd_place                                          # placement lives in crowd_place.py
+        import pm_areas.crowd_place as crowd_place                  # placement lives in crowd_place.py
         crowd_place.place(crowd, ROOT)
+        horizon = crowd_place.HORIZON
     crowd_wear.dress(crowd, ROOT)
-    fix_badges(crowd, 740)
+    fix_badges(crowd, horizon)
     print(f"CROWD {crowd.n} people, {sum(1 for p in crowd.people if p.get('pack_ob'))} backpacks, "
           f"{sum(1 for p in crowd.people if p.get('cord_ob'))} badges", flush=True)
     return crowd
@@ -521,7 +523,7 @@ def fix_badges(crowd, frame_end):
     for p in [p for p in crowd.people if p.get("pack_ob")]:
         m = p["m"]
         # body_in_pack is reported but not used yet: its inside test misfires on the decimated pack (not watertight)
-        if m["pack"] > 0.003 or m["flush"] < 0.6:
+        if m["pack"] > 0.003 or m["flush"] < 0.6 or m.get("arm_in_pack", 0) > 0.005:
             body = p["body"][0]
             mk = body.modifiers.get("under_pack")
             if mk:
@@ -529,7 +531,8 @@ def fix_badges(crowd, frame_end):
             bpy.data.objects.remove(p["pack_ob"])
             p["pack_ob"] = None
             print(f"PACK {p['name']}: no backpack (pack {m['pack'] * 1000:.0f} mm into the body, body "
-                  f"{m['body_in_pack'] * 1000:.0f} mm into the pack, {m['flush'] * 100:.0f}% of the panel within 2 cm)", flush=True)
+                  f"{m['body_in_pack'] * 1000:.0f} mm into the pack, an arm {m.get('arm_in_pack', 0) * 1000:.0f} mm into it, "
+                  f"{m['flush'] * 100:.0f}% of the panel within 2 cm)", flush=True)
     moves = [Vector((0, 0, 0.02)), Vector((0, -0.006, 0.0)), Vector((0, -0.006, 0.03)), Vector((0, 0, 0.045))]
     for p in [p for p in crowd.people if p.get("cord_ob")]:
         m = p["m"]

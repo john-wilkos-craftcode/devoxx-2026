@@ -621,6 +621,9 @@ def furniture():
     L.box("trolley-top", 2.5, 3.6, 0.85, 3.45, 4.1, 0.88, steel)
     L.box("trolley-mid", 2.5, 3.6, 0.45, 3.45, 4.1, 0.48, steel)
     L.box("trolley-packs", 2.55, 3.65, 0.88, 3.4, 4.05, 1.12, L.mat("water-packs", 0xd9e6f0, 0.25))
+    for i, (x, y) in enumerate(((2.52, 3.62), (3.43, 3.62), (2.52, 4.08), (3.43, 4.08))):   # posts and castors (it floated)
+        L.cylinder(f"trolley-post-{i}", x, y, 0.08, 0.86, 0.012, steel, segs=8)
+        L.cylinder(f"trolley-castor-{i}", x, y, 0.0, 0.08, 0.035, L.mat("castor-black", 0x151515, 0.6), segs=12)
     for i, (x, y) in enumerate(((6.0, 6.0), (6.9, 5.45))):
         L.cylinder(f"stool-leg-{i}", x, y, 0, 0.72, 0.02, steel, segs=8)
         L.cylinder(f"stool-seat-{i}", x, y, 0.72, 0.78, 0.18, L.mat("stool-blue", 0x2350b8, 0.5), segs=20)

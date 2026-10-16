@@ -29,6 +29,7 @@ SLOW, ACCEL, DECEL, LOOK_AHEAD, HOLD = [], 2.5, 1.2, 5.0, 1.0
 START_LOOK, START_LOOK_M, END_FOV_V, END_EYE_Z = None, 9.0, None, None
 SPEED_KEYS, LOOK_TAU = [], 0.0
 VARIANT = "laptop"                                  # or "phone" (set by the runner's --variant)
+CROWD = False                                       # the crowd (pm_areas/crowd.py), set by the runner's --crowd
 FOV_V, WALK_SIZE, DOF_END = 44.5, (16, 9), None
 
 WALK, SCREEN, FILLET = [], (0, 0, 0), 2.5         # from data/photomatch/walk.json
@@ -70,7 +71,7 @@ def load_walk(root):
 def build(root, unified=True):
     load_walk(root)
     scene = bpy.context.scene
-    for name in PARTS:
+    for name in PARTS + (("crowd",) if CROWD else ()):
         before = set(bpy.data.objects)
         mod = importlib.import_module(f"pm_areas.{name}")
         try:
@@ -78,6 +79,8 @@ def build(root, unified=True):
         except TypeError:                      # an area without a unified mode yet: build it as it is
             print(f"VENUE {name} has no unified mode yet")
             mod.build(root)
+        if name == "crowd":                    # keeps its own collections (the avatar templates stay hidden)
+            continue
         coll = bpy.data.collections.new(name)
         scene.collection.children.link(coll)
         for ob in set(bpy.data.objects) - before:
@@ -97,6 +100,10 @@ def build(root, unified=True):
     if hasattr(out, "lighting"):
         out.lighting(root)
     walk_camera()
+    try:                                       # BRIEF.md step 2: numbers before any render
+        importlib.import_module("pm_areas.sanity").report()
+    except Exception as e:                     # a report, never a reason to lose a render
+        print(f"SANITY report failed: {e!r}", flush=True)
 
 
 def path_points():
