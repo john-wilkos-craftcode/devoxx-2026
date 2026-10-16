@@ -6,7 +6,10 @@ Who builds what (each area's build(root, unified=True) keeps to its part):
   entrance  the reception interior, y -60.4 .. -37.4
   hollywood the threshold landing, the hall steps and the Hollywood hall from y -37.4 northwards
   hall_screen the schedule screen on the north wall, its plants, ivy and the phone totem (from build_scene.py)
-Upstairs (floor 1) and the side-aisle close-up sets are not on the walk and stay out.
+  stairs    the two side stairs from the hall up to floor 1 (treads, shaft, balustrades), for the room walks
+  upstairs  the floor-1 corridor, photo-matched round rooms 6/7 (2026 photos) and extended along the plan to its north
+            end with columns and fabric cones measured from the Street View (2020), portals at every room door
+The side-aisle close-up sets are not on any walk and stay out.
 
 The walk (data/photomatch/walk.json): from the forecourt in through a ground-floor door west of the grand stair, north
 along the queue with the stair and the reception under it on the right, down the hall steps, along the Hollywood aisle
@@ -19,7 +22,7 @@ import math
 import bpy
 from mathutils import Vector
 
-PARTS = ("outside", "entrance", "hollywood", "hall_screen")
+PARTS = ("outside", "entrance", "hollywood", "hall_screen", "stairs", "upstairs")
 VIEW_TRANSFORM = "AgX"
 LOOK = "AgX - Medium High Contrast"
 EXPOSURE = 0.0

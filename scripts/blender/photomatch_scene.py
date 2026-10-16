@@ -203,6 +203,8 @@ for name in wanted:
     if "cal" in spec:
         cam = Cam(json.loads((ROOT / "data" / "photomatch" / spec["cal"]).read_text()), spec["C"], spec.get("turns", 0))
         b = cam.blender()
+    elif "blender" in spec:                   # a ready camera (e.g. a Street View crop with its off-centre optical axis)
+        b = spec["blender"]
     else:
         # a check view with no photo: "C" (eye), "look" (target), "fov_h", optional "size" [w, h]
         fwd = (Vector(spec["look"]) - Vector(spec["C"])).normalized()

@@ -1,0 +1,40 @@
+{
+ "check_stair_w_climb": {
+  "area": "venue",
+  "C": [
+   -6.0,
+   9.4,
+   1.95
+  ],
+  "look": [
+   -6.0,
+   -1.32,
+   7.6
+  ],
+  "fov_h": 72,
+  "size": [
+   16,
+   9
+  ],
+  "notes": "on the west flight, looking up it"
+ },
+ "check_stair_w_top": {
+  "area": "venue",
+  "C": [
+   -2.2,
+   -3.6,
+   7.85
+  ],
+  "look": [
+   -6.0,
+   6.0,
+   3.0
+  ],
+  "fov_h": 72,
+  "size": [
+   16,
+   9
+  ],
+  "notes": "floor 1 by the west opening, looking down into it"
+ }
+}

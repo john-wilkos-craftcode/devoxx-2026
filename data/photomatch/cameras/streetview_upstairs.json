@@ -1,0 +1,289 @@
+{
+ "sv_201704_h80": {
+  "area": "venue",
+  "photo": "img/site-2026/streetview-upstairs/clean/sv_201704_h80.jpg",
+  "blender": {
+   "matrix": [
+    [
+     -0.9993283937786562,
+     0.003397537074640818,
+     0.03648586205090167,
+     4.0
+    ],
+    [
+     0.03664370870655678,
+     0.09265588521056872,
+     0.9950236808981358,
+     28.0
+    ],
+    [
+     0.0,
+     0.9956923941045611,
+     -0.09271815530050005,
+     8.2
+    ],
+    [
+     0,
+     0,
+     0,
+     1
+    ]
+   ],
+   "lens": 22.479999999999997,
+   "sensor_width": 36.0,
+   "shift_x": 0.08333333333333333,
+   "shift_y": 0.02175925925925926,
+   "size": [
+    2160,
+    1705
+   ]
+  },
+  "notes": "Street View (Sep 2020) crop, camera from data/photomatch/cal/streetview_upstairs.json (venue_solve)"
+ },
+ "sv_201820_h164": {
+  "area": "venue",
+  "photo": "img/site-2026/streetview-upstairs/clean/sv_201820_h164.jpg",
+  "blender": {
+   "matrix": [
+    [
+     -0.06923414089062764,
+     0.015495533748435701,
+     0.997480086101466,
+     4.0
+    ],
+    [
+     0.9976004379184769,
+     0.001075400456873439,
+     0.0692257883936372,
+     28.0
+    ],
+    [
+     0.0,
+     0.9998793586966923,
+     -0.015532805679965013,
+     8.2
+    ],
+    [
+     0,
+     0,
+     0,
+     1
+    ]
+   ],
+   "lens": 22.479999999999997,
+   "sensor_width": 36.0,
+   "shift_x": 0.08333333333333333,
+   "shift_y": 0.02175925925925926,
+   "size": [
+    2160,
+    1705
+   ]
+  },
+  "notes": "Street View (Sep 2020) crop, camera from data/photomatch/cal/streetview_upstairs.json (venue_solve)"
+ },
+ "sv_201920_h262": {
+  "area": "venue",
+  "photo": "img/site-2026/streetview-upstairs/clean/sv_201920_h262.jpg",
+  "blender": {
+   "matrix": [
+    [
+     0.9972501850994857,
+     0.004988891600542308,
+     -0.07394037651810831,
+     4.0
+    ],
+    [
+     -0.07410849019539924,
+     0.06713364499754647,
+     -0.9949879423341279,
+     28.0
+    ],
+    [
+     0.0,
+     0.9977315193327018,
+     0.06731875912447108,
+     8.2
+    ],
+    [
+     0,
+     0,
+     0,
+     1
+    ]
+   ],
+   "lens": 22.479999999999997,
+   "sensor_width": 36.0,
+   "shift_x": 0.08333333333333333,
+   "shift_y": 0.02175925925925926,
+   "size": [
+    2160,
+    1705
+   ]
+  },
+  "notes": "Street View (Sep 2020) crop, camera from data/photomatch/cal/streetview_upstairs.json (venue_solve)"
+ },
+ "sv_202006_h334": {
+  "area": "venue",
+  "photo": "img/site-2026/streetview-upstairs/clean/sv_202006_h334.jpg",
+  "blender": {
+   "matrix": [
+    [
+     0.22682129485853775,
+     0.051141642750548444,
+     -0.9725927372623505,
+     4.0
+    ],
+    [
+     -0.9739363943290631,
+     0.011910442712086248,
+     -0.2265083688425349,
+     28.0
+    ],
+    [
+     0.0,
+     0.9986203851970865,
+     0.05251024917882806,
+     8.2
+    ],
+    [
+     0,
+     0,
+     0,
+     1
+    ]
+   ],
+   "lens": 22.479999999999997,
+   "sensor_width": 36.0,
+   "shift_x": 0.08333333333333333,
+   "shift_y": 0.02175925925925926,
+   "size": [
+    2160,
+    1705
+   ]
+  },
+  "notes": "Street View (Sep 2020) crop, camera from data/photomatch/cal/streetview_upstairs.json (venue_solve)"
+ },
+ "sv_left_stair_detail_h65": {
+  "area": "venue",
+  "photo": "img/site-2026/streetview-upstairs/clean/sv_left_stair_detail_h65.jpg",
+  "blender": {
+   "matrix": [
+    [
+     -0.9750719598829122,
+     -0.0018588701521464128,
+     -0.2218810889910491,
+     4.0
+    ],
+    [
+     -0.22188887545367478,
+     0.008168648197055126,
+     0.9750377429292346,
+     28.0
+    ],
+    [
+     0.0,
+     0.9999649082784805,
+     -0.008377482414770729,
+     8.2
+    ],
+    [
+     0,
+     0,
+     0,
+     1
+    ]
+   ],
+   "lens": 94.23333333333333,
+   "sensor_width": 36.0,
+   "shift_x": 0.08333333333333333,
+   "shift_y": 0.02175925925925926,
+   "size": [
+    2160,
+    1705
+   ]
+  },
+  "notes": "Street View (Sep 2020) crop, camera from data/photomatch/cal/streetview_upstairs.json (venue_solve)"
+ },
+ "sv_right_stair_detail_h89": {
+  "area": "venue",
+  "photo": "img/site-2026/streetview-upstairs/clean/sv_right_stair_detail_h89.jpg",
+  "blender": {
+   "matrix": [
+    [
+     -0.9806488426645602,
+     0.003929192099059755,
+     0.19573555842030158,
+     4.0
+    ],
+    [
+     0.19577499171410687,
+     0.019681562240475056,
+     0.9804513188971269,
+     28.0
+    ],
+    [
+     0.0,
+     0.9997985784932997,
+     -0.020069938783588932,
+     8.2
+    ],
+    [
+     0,
+     0,
+     0,
+     1
+    ]
+   ],
+   "lens": 94.23333333333333,
+   "sensor_width": 36.0,
+   "shift_x": 0.08333333333333333,
+   "shift_y": 0.02175925925925926,
+   "size": [
+    2160,
+    1705
+   ]
+  },
+  "notes": "Street View (Sep 2020) crop, camera from data/photomatch/cal/streetview_upstairs.json (venue_solve)"
+ },
+ "sv_closeup_cloth_cone_detail_h216": {
+  "area": "venue",
+  "photo": "img/site-2026/streetview-upstairs/clean/sv_closeup_cloth_cone_detail_h216.jpg",
+  "blender": {
+   "matrix": [
+    [
+     0.746522066314302,
+     0.2874928579053022,
+     0.6000438826946465,
+     4.0
+    ],
+    [
+     0.6653606574676811,
+     -0.3225615460206182,
+     -0.6732378810813928,
+     28.0
+    ],
+    [
+     0.0,
+     0.9018325264051138,
+     -0.43208574880198225,
+     8.2
+    ],
+    [
+     0,
+     0,
+     0,
+     1
+    ]
+   ],
+   "lens": 17.246666666666666,
+   "sensor_width": 36.0,
+   "shift_x": 0.08333333333333333,
+   "shift_y": 0.02175925925925926,
+   "size": [
+    2160,
+    1705
+   ]
+  },
+  "notes": "Street View (Sep 2020) crop, camera from data/photomatch/cal/streetview_upstairs.json (venue_solve)"
+ }
+}

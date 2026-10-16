@@ -38,6 +38,21 @@ BEAM_R = dict(xi0=4.35, xi1=4.35, xo=4.9, z0=5.24, z1=7.65)
 Z_CEIL = 8.6
 # local -> venue: venue = (VX - S*x, VY - S*y, FH + S*z), i.e. turned half round, scaled by S, moved
 FH, S, VX, VY = 6.2, 1.222 / 1.15, 3.045, -21.438
+UNIFIED = [False]
+NORTH_Y = 65.7                   # unified: the corridor runs north to the plan's end (venue y), past the panorama at 28
+# unified: every auditorium door off this corridor (venue y of the door centre, from venue.json's doorSide/doorMargin
+# like build_scene.py; rooms 6/7 keep their photo-matched portals). West wall = this frame's XR, east = XL
+DOORS = {"west": {1: 39.95, 2: 15.15, 3: 11.35, 4: -17.45, 5: -22.35},
+         "east": {8: -22.35, 9: -4.55, 10: 11.35, 11: 22.55, 12: 27.45, 13: 50.75, 14: 55.65}}
+STAIR_VOIDS = ((-7.15, -4.85), (10.25, 12.55))   # venue x of the side stair openings, y -1.32 .. 9.88
+
+
+def loc_y(yv):
+    return (VY - yv) / S
+
+
+def loc_x(xv):
+    return (VX - xv) / S
 
 
 def E(x, z):
@@ -144,7 +159,12 @@ def carpet(root):
     return m
 
 
-def build(root):
+def build(root, unified=False):
+    global Y_NEAR
+    UNIFIED[0] = unified
+    before = set(bpy.data.objects)
+    if unified:
+        Y_NEAR = loc_y(NORTH_Y)
     M = {
         "carpet": carpet(root),
         "blue": L.mat("up-wall-blue", 0x00185c, 0.75),
@@ -169,10 +189,28 @@ def build(root):
         "spotlens": L.emissive("up-spot-lens", 0xfff2dc, 14.0),
         "poster": L.mat("up-poster", 0x8fa4c8, 0.6, emit=0x8fa4c8, strength=0.5),
     }
-    L.box("floor", XL - 0.3, Y_NEAR, -0.1, XR + 0.3, Y_VOID, 0, M["carpet"])
+    if unified:
+        floor_with_holes(M)
+    else:
+        L.box("floor", XL - 0.3, Y_NEAR, -0.1, XR + 0.3, Y_VOID, 0, M["carpet"])
     # beyond the void edge: the grand stair going down, floor 0, and the two-storey glass front in daylight
     zf0 = -FH / S
     L.box("void-edge", XL, Y_VOID - 0.05, -0.25, XR, Y_VOID, 0, M["dark"])
+    if not unified:
+        photo_backdrop(root, M, zf0)
+    walls_and_portals(M)
+    rest_of_build(root, M, unified)
+    if unified:
+        north_lights()
+        cones(M)
+        y = Y_NEAR                                     # the corridor's north end: a closed wall (background only)
+        L.box("north-end", XL - 0.3, y - 0.3, 0, XR + 0.3, y, Z_CEIL, M["blue"])
+        L.box("north-end-band", XL, y + 0.01, 2.2, XR, y + 0.03, 2.35, L.emissive("up-north-band", 0xfff0dc, 3.0))
+    to_venue(None if not unified else set(bpy.data.objects) - before)
+
+
+def photo_backdrop(root, M, zf0):
+    """photo mode only: what the photos see past the void (the entrance and outside areas build it for real)"""
     L.mesh_obj("grand-stair", [(XL, Y_VOID, -0.25), (XR, Y_VOID, -0.25), (XR, Y_FACADE - 0.5, zf0 + 0.2), (XL, Y_FACADE - 0.5, zf0 + 0.2)],
                [(0, 1, 2, 3)], L.mat("up-stair", 0x2a2a30, 0.8))
     L.box("floor-0", XL - 3, Y_VOID, zf0 - 0.1, XR + 3, Y_FACADE, zf0, L.mat("up-floor0", 0x6a6a70, 0.6))
@@ -187,9 +225,15 @@ def build(root):
     L.quad("exterior", [(XR + 30, Y_FACADE + 25, zf0 - 2), (XL - 30, Y_FACADE + 25, zf0 - 2), (XL - 30, Y_FACADE + 25, zf0 + 22),
                         (XR + 30, Y_FACADE + 25, zf0 + 22)], L.image_mat("up-exterior", tex(root, "exterior"), strength=1.6, emit_only=True))
 
+
+def walls_and_portals(M):
     # ------------------------------------------------------------------ side walls, light boxes, portals
     L.box("wall-l", XL - 0.3, Y_NEAR, 0, XL, Y_END, Z_WALL, M["blue"])
     L.box("wall-r", XR, Y_NEAR, 0, XR + 0.3, Y_END, Z_WALL, M["blue"])
+    if UNIFIED[0]:
+        for side, x, face, doors in (("r", XR, -1, DOORS["west"]), ("l", XL, 1, DOORS["east"])):
+            for num, yv in doors.items():
+                portal(M, f"{side}{num}", x, face, loc_y(yv), str(num))
     # quote light boxes, set 4 cm proud of the wall
     for name, x, face, y0, y1, mat in (("quote-l", XL, 1, 12.38, 16.94, M["panel_l"]),
                                       ("quote-r", XR, -1, 11.98, 16.77, M["panel_r"])):
@@ -215,9 +259,11 @@ def build(root):
                      rot=(0, math.radians(-50) * face, 0), size_y=y1 - y0)
         L.box(f"portal-{side}-door", xf - 0.01 * face, gap0, 0, xf + 0.01 * face, gap1, 2.05, M["black"])
         L.box(f"portal-{side}-leaf", xf, gap0 + 0.08, 0.05, xf + 0.02 * face, gap1 - 0.08, 2.0, M["dark"])
-        L.text(f"portal-{side}-num", num, 0.9, (xf + 0.03 * face, y1 - 0.5 if face > 0 else y0 + 0.5, 0.9),
+        L.text(f"portal-{side}-num", num, 0.9, (xf + 0.004 * face, y1 - 0.5 if face > 0 else y0 + 0.5, 0.9),
                (math.pi / 2, 0, math.pi / 2 * face), L.mat("up-num", 0xffffff, 0.5), extrude=0.005)
 
+
+def rest_of_build(root, M, unified):
     # ------------------------------------------------------------------ soffits and beams
     for side, xw, b in (("l", XL, BEAM_L), ("r", XR, BEAM_R)):
         s = 1 if b["xo"] > 0 else -1
@@ -337,7 +383,8 @@ def build(root):
     build_rails(M)
 
     # ------------------------------------------------------------------ light
-    L.world_color(0x000000, 0.0)
+    if not unified:                                   # the venue's own daylight world stays
+        L.world_color(0x000000, 0.0)
     L.area_light("hall-fill", (0.35, 8, 7.0), 5, 120, color=(1.0, 0.92, 0.88), rot=(0, 0, 0), size_y=26)
     # blue uplight over the screen: the dark ceiling's navy glow
     L.area_light("ceiling-blue", (0.35, 17.0, 6.9), 3.0, 300, color=(0.15, 0.25, 1.0), rot=(math.pi, 0, 0), size_y=8)
@@ -347,20 +394,132 @@ def build(root):
     L.area_light("funnel-wash", (0.4, Y_END - 4.0, 0.6), 3.0, 600, color=(0.05, 0.18, 1.0),
                  rot=(math.radians(110), 0, 0), size_y=1.0, spread=math.radians(28))
     L.area_light("near-warm", (0.35, -3.5, 5.0), 4, 650, color=(1.0, 0.82, 0.66), rot=(0, 0, 0), size_y=5, spread=math.radians(70))
-    L.area_light("window-day", (0, Y_END + 1.5, 2.0), 4, 1500, color=(0.85, 0.95, 1.0), rot=(math.pi / 2, 0, 0))
+    if not unified:                                   # the real glass front lets the venue's daylight in
+        L.area_light("window-day", (0, Y_END + 1.5, 2.0), 4, 1500, color=(0.85, 0.95, 1.0), rot=(math.pi / 2, 0, 0))
 
-    to_venue()
+
+def floor_with_holes(M):
+    """unified: the corridor floor with the two side stair openings left open (stairs.py builds what's in them)"""
+    y_open0, y_open1 = loc_y(9.88), loc_y(-1.32)          # local y grows southwards: north end first
+    xs = sorted([XL - 0.3, XR + 0.3] + [loc_x(v) for xv in STAIR_VOIDS for v in xv])
+    # strips across x between the openings' edges: full length where no opening, split around them where there is
+    for xa, xb in zip(xs, xs[1:]):
+        cx = (xa + xb) / 2
+        in_void = any(min(loc_x(a), loc_x(b)) < cx < max(loc_x(a), loc_x(b)) for a, b in STAIR_VOIDS)
+        if not in_void:
+            L.box("floor", xa, Y_NEAR, -0.1, xb, Y_VOID, 0, M["carpet"])
+        else:
+            L.box("floor", xa, Y_NEAR, -0.1, xb, y_open0, 0, M["carpet"])
+            L.box("floor", xa, y_open1, -0.1, xb, Y_VOID, 0, M["carpet"])
 
 
-def to_venue():
-    """everything was built in the photo frame; place it in the venue frame (build_scene.py's), floor 1 at FH"""
+def portal(M, tag, x, face, yc, num, half=2.85, gap=2.6 / S):
+    """a red portal proud of the wall round a door (as rooms 6/7 in the photos), door recess, leaf, number, light"""
+    y0, y1 = yc - half, yc + half
+    xf = x + 0.18 * face
+    L.box(f"portal-{tag}", x, y0, 0, xf, y1, 2.6, M["red"])
+    L.area_light(f"portal-light-{tag}", (x + 1.5 * face, yc, 3.2), 1.0, 250, color=(1.0, 0.85, 0.75),
+                 rot=(0, math.radians(-50) * face, 0), size_y=y1 - y0)
+    g0, g1 = yc - gap / 2, yc + gap / 2
+    L.box(f"portal-{tag}-door", xf - 0.01 * face, g0, 0, xf + 0.01 * face, g1, 2.05, M["black"])
+    L.box(f"portal-{tag}-leaf", xf, g0 + 0.08, 0.05, xf + 0.02 * face, g1 - 0.08, 2.0, M["dark"])
+    L.text(f"portal-{tag}-num", num, 0.9, (xf + 0.004 * face, y1 - 0.5 if face > 0 else y0 + 0.5, 0.9),
+           (math.pi / 2, 0, math.pi / 2 * face), L.mat("up-num", 0xffffff, 0.5), extrude=0.005)
+
+
+def north_lights():
+    """unified: the photos' warm aisle light repeated up the corridor north of the photo-matched stretch"""
+    y = -8.0
+    while y > Y_NEAR + 4:
+        L.area_light(f"aisle-warm-n{int(-y)}", (0.35, y, 8.4), 5, 1300, color=(1.0, 0.86, 0.78), rot=(0, 0, 0), size_y=12,
+                     spread=math.radians(60))
+        y -= 13.0
+
+
+# unified: the corridor's columns north of the 2026 gate columns (y -19.3), measured from the Street View feet
+# (the wide and zoomed views, 16/10; rows at x ~ -0.4 and ~8.3, not a regular grid: the panorama stands in a gap)
+COLUMNS = [(-0.5, 12.1), (-0.4, 4.3), (8.3, 12.1), (8.4, 6.5), (8.9, -12.3), (0.3, 38.2), (7.8, 38.2), (0.5, 52.0),
+           (7.9, 52.0)]
+COL_W = 0.55
+# the tensile cones (Street View close-up): pinched round the column at 2.6 m, flaring to four points stretched up
+# to the ceiling ~2.6 m out, the fabric dipping between the points
+# a tall cone: the column stops at the pinch (~2.9 m), the fabric widens steadily up to the dark ceiling (9 m)
+CONE_PINCH, CONE_TOP, CONE_POINT_R, CONE_MID_R, CONE_DIP = 2.9, 9.0, 3.0, 1.7, 1.3
+
+
+def cone_mesh(name, cx, cy, mat):
+    """a four-pointed tensile funnel round a column, in metres in the venue's units (scaled into the photo frame)"""
+    nt, nr = 18, 64
+    verts, faces = [], []
+    for i in range(nt + 1):
+        t = i / nt
+        for j in range(nr):
+            th = 2 * math.pi * j / nr
+            star = abs(math.cos(2 * th)) ** 3                         # 1 at the four points, 0 between them
+            r_top = CONE_MID_R + (CONE_POINT_R - CONE_MID_R) * star
+            z_top = CONE_TOP - CONE_DIP * (1 - star)
+            r = COL_W * 0.62 + (r_top - COL_W * 0.62) * t ** 1.35
+            z = CONE_PINCH + (z_top - CONE_PINCH) * t
+            verts.append((cx + r * math.cos(th + math.pi / 4) / S, cy + r * math.sin(th + math.pi / 4) / S, z / S))
+    for i in range(nt):
+        for j in range(nr):
+            a, b = i * nr + j, i * nr + (j + 1) % nr
+            faces.append((a, b, b + nr, a + nr))
+    ob = L.mesh_obj(name, verts, faces, mat)
+    for poly in ob.data.polygons:
+        poly.use_smooth = True
+    return ob
+
+
+def cones(M):
+    """unified: the dark columns up to the ceiling, each with its tensile fabric cone"""
+    dark = L.mat("up-gate", 0x050508, 0.9)
+    sail = cone_fabric()
+    for k, (xv, yv) in enumerate(COLUMNS):
+        x, y, hw = loc_x(xv), loc_y(yv), COL_W / 2 / S
+        L.box(f"column-{k}", x - hw, y - hw, 0, x + hw, y + hw, (CONE_PINCH + 0.25) / S, dark)
+        cone_mesh(f"cone-{k}", x, y, sail)
+
+
+def cone_fabric():
+    """white tensile fabric lit cyan from inside (Street View close-up): brighter towards the open top"""
+    import bpy as _b
+    m = _b.data.materials.new("up-cone-fabric")
+    m.use_nodes = True
+    nt = m.node_tree
+    b = nt.nodes["Principled BSDF"]
+    b.inputs["Base Color"].default_value = (0.86, 0.9, 0.92, 1)
+    b.inputs["Roughness"].default_value = 0.7
+    if "Transmission Weight" in b.inputs:
+        b.inputs["Transmission Weight"].default_value = 0.0
+    # cyan glow rising with height: object-space z through a ramp into emission
+    tc = nt.nodes.new("ShaderNodeTexCoord")
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    nt.links.new(tc.outputs["Object"], sep.inputs["Vector"])
+    mr = nt.nodes.new("ShaderNodeMapRange")
+    mr.inputs["From Min"].default_value = CONE_PINCH / S
+    mr.inputs["From Max"].default_value = CONE_TOP / S
+    nt.links.new(sep.outputs["Z"], mr.inputs["Value"])
+    ramp = nt.nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].color = (0.55, 0.85, 1.0, 1)
+    ramp.color_ramp.elements[1].color = (0.05, 0.75, 0.95, 1)
+    nt.links.new(mr.outputs["Result"], ramp.inputs["Fac"])
+    nt.links.new(ramp.outputs["Color"], b.inputs["Emission Color"])
+    b.inputs["Emission Strength"].default_value = 1.6
+    return m
+
+
+def to_venue(objs=None):
+    """everything was built in the photo frame; place it in the venue frame (build_scene.py's), floor 1 at FH.
+    objs: only these (unified: the other areas are already in the venue frame)"""
     from mathutils import Matrix
     M = Matrix.Translation((VX, VY, FH)) @ Matrix.Rotation(math.pi, 4, "Z") @ Matrix.Scale(S, 4)
     bpy.context.view_layer.update()              # objects placed by location/rotation: bring matrix_world up to date
-    for ob in bpy.context.scene.objects:
+    obs = list(bpy.context.scene.objects) if objs is None else [o for o in objs if o.users_collection]
+    for ob in obs:
         if ob.type == "LIGHT":
             ob.visible_camera = False                # a lamp's own disc reads as a white ring
-    for ob in bpy.context.scene.objects:
+    for ob in obs:
         if ob.parent is None:
             ob.matrix_world = M @ ob.matrix_world
 

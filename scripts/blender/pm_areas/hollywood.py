@@ -157,6 +157,34 @@ BLOCK_L = (-13.9, -10.5, -6.0)           # outer edge, spine, aisle edge
 BLOCK_R = (12.6, 9.0, 4.7)
 BLOCK_Y = (-24.7, -19.7, -14.7, -9.6, -4.5)   # south end, three cross walls, north end
 SCREEN_KEEP_OUT = 4.0                    # unified: the screen module owns everything this close to the screen
+STAIR_Y = (-1.62, 10.2)                  # the stairwells' glass boxes along y (front panel to the open hall end)
+
+
+def box_cut(name, x0, y0, z0, x1, y1, z1, mat, holes):
+    """a box with rectangular holes (x0, y0, x1, y1) through it: split into pieces round each hole"""
+    pieces = [(x0, y0, x1, y1)]
+    for hx0, hy0, hx1, hy1 in holes:
+        nxt = []
+        for a0, b0, a1, b1 in pieces:
+            if hx1 <= a0 or hx0 >= a1 or hy1 <= b0 or hy0 >= b1:
+                nxt.append((a0, b0, a1, b1))
+                continue
+            cx0, cx1, cy0, cy1 = max(a0, hx0), min(a1, hx1), max(b0, hy0), min(b1, hy1)
+            for p in ((a0, b0, cx0, b1), (cx1, b0, a1, b1), (cx0, b0, cx1, cy0), (cx0, cy1, cx1, b1)):
+                if p[2] - p[0] > 1e-4 and p[3] - p[1] > 1e-4:
+                    nxt.append(p)
+        pieces = nxt
+    for i, (a0, b0, a1, b1) in enumerate(pieces):
+        L.box(f"{name}-{i}", a0, b0, z0, a1, b1, z1, mat)
+
+
+def in_stair_hole(x, y, margin):
+    return any(a - margin < x < c + margin and b - margin < y < d + margin for a, b, c, d in stair_holes())
+
+
+def stair_holes():
+    """unified: the stairwells rise through the hall's ceilings to floor 1 (stairs.py builds what's inside)"""
+    return [(xa, STAIR_Y[0], xb, STAIR_Y[1]) for xa, xb in (STAIR_W, STAIR_E)] if UNIFIED else []
 
 
 def plan():
@@ -208,17 +236,17 @@ def architecture(unified):
         bx(f"wall-{i}", o["bounds"], 0, WALL_TOP, wall)
     L.box("lintel", -10.46, hy0 - 0.3, HIGH, 9.13, hy0, WALL_TOP, black)
     # the black structural ceiling over the whole hall: the side zones are open up to it
-    L.box("ceiling-top", hx0 - 0.3, hy0 - 0.3, TOP, hx1 + 0.3, hy1 + 0.3, TOP + 0.1, black)
+    box_cut("ceiling-top", hx0 - 0.3, hy0 - 0.3, TOP, hx1 + 0.3, hy1 + 0.3, TOP + 0.1, black, stair_holes())
     # the middle zone: dark entrance ceiling over the landing and the steps, then the white lowered ceiling with the
     # coffer opening, from the coffer's front edge to the curtain line
     c0, c1 = CENTRE_X0, CENTRE_X1
     L.box("ceiling-entrance", c0, hy0, HIGH, c1, COF_Y0, HIGH + 0.1, dark)
-    L.box("slab-l", c0, COF_Y0, LOW, CX - OPEN_HW, NORTH_Y, SLAB_TOP, white)
-    L.box("slab-r", CX + OPEN_HW, COF_Y0, LOW, c1, NORTH_Y, SLAB_TOP, white)
+    box_cut("slab-l", c0, COF_Y0, LOW, CX - OPEN_HW, NORTH_Y, SLAB_TOP, white, stair_holes())
+    box_cut("slab-r", CX + OPEN_HW, COF_Y0, LOW, c1, NORTH_Y, SLAB_TOP, white, stair_holes())
     L.box("slab-b", CX - OPEN_HW, OPEN_Y1, LOW, CX + OPEN_HW, NORTH_Y, SLAB_TOP, white)
     fascia = L.mat("fascia", 0xd8d8dc, 0.85)
-    L.box("fill-l", c0, COF_Y0, SLAB_TOP, CX - POCKET_HW, NORTH_Y, HIGH, fascia)
-    L.box("fill-r", CX + POCKET_HW, COF_Y0, SLAB_TOP, c1, NORTH_Y, HIGH, fascia)
+    box_cut("fill-l", c0, COF_Y0, SLAB_TOP, CX - POCKET_HW, NORTH_Y, HIGH, fascia, stair_holes())
+    box_cut("fill-r", CX + POCKET_HW, COF_Y0, SLAB_TOP, c1, NORTH_Y, HIGH, fascia, stair_holes())
     L.box("fill-b", CX - POCKET_HW, POCKET_Y1, SLAB_TOP, CX + POCKET_HW, NORTH_Y, HIGH, cove)
     L.box("pocket-front", CX - POCKET_HW, COF_Y0, SLAB_TOP, CX + POCKET_HW, COF_Y0 + 0.09, HIGH,
           L.mat("band", 0xf4f5ff, 0.6, emit=0xc4c8ff, strength=2.2))
@@ -304,11 +332,14 @@ def fixtures():
                 continue
             if any(abs(x - cx) < 1.0 and abs(y - cy) < 0.7 for cx, cy in centres):
                 continue
+            if in_stair_hole(x, y, 1.0):                  # the ceiling is cut there for the stairwells
+                continue
             L.box(f"lin-rim-{j}-{x:.1f}", x - 0.84, y - 0.11, LOW - 0.01, x + 0.84, y + 0.11, LOW + 0.02, rim)
             L.box(f"lin-{j}-{x:.1f}", x - 0.8, y - 0.075, LOW - 0.012, x + 0.8, y + 0.075, LOW - 0.008, panel)
             L.area_light(f"linL-{j}-{x:.1f}", (x, y, LOW - 0.03), 1.55, 85, color=(1.0, 0.97, 0.93), size_y=0.13)
             dx, dy = x + 1.6, y + 1.3
-            if not (abs(dx - CX) < POCKET_HW + 0.3 and dy < POCKET_Y1 + 0.3) and dx < CENTRE_X1 - 0.3 and dy < NORTH_Y - 0.3:
+            if not (abs(dx - CX) < POCKET_HW + 0.3 and dy < POCKET_Y1 + 0.3) and dx < CENTRE_X1 - 0.3 and dy < NORTH_Y - 0.3 \
+                    and not in_stair_hole(dx, dy, 0.2):
                 L.cylinder(f"dl-{j}-{x:.1f}", dx, dy, LOW - 0.012, LOW - 0.002, 0.09, down, segs=16)
 
 

@@ -109,5 +109,16 @@
    "focal_from": "measured from 172 matches with 'Screenshot 2026-10-16 201920.png' (orthogonality error 0.0072); URL said fov 90",
    "screenshot": "closeup cloth cone detail.png"
   }
+ },
+ "venue_solve": {
+  "camera_venue": [
+   4.0,
+   28.0,
+   8.2
+  ],
+  "corridor_axis_south_heading_deg": 77.58,
+  "horizon_bias_deg": 2.2,
+  "how": "16/10, first pass: corridor vanishing points both ways (179.2 deg apart) give the axis; position by overlaying the plan (corridor walls, stair openings, door markers) for candidate cameras: room 2's wall base and door land within a few px, rooms 3/10 doors on their portals. Room 11's real door is south of the plan's 22.55 and its wall base further east: the plan's north end is a guess there. Refine during modelling (compare overlays).",
+  "to_view": "compass azimuth of venue direction (dx, dy) = axis + 180 + atan2(dx, dy); image elevation = true elevation + bias"
  }
 }
