@@ -30,6 +30,8 @@ CORD_ALLOWED = ("Bip01 Neck", "Bip01 L Clavicle", "Bip01 R Clavicle", "Bip01 Spi
 TINTS = {"black": None, "charcoal": (0.10, 0.10, 0.11), "navy": (0.025, 0.045, 0.12), "olive": (0.07, 0.08, 0.035)}
 REPORT = []
 PACK_WIDTH = 0.9              # narrower than the model: its sides cut into hanging upper arms (16/10 critic)
+NEAR_WRAP = 6.0               # m from the camera path: nearer people's accessories hug the body (Shrinkwrap), others
+                              # just follow the skeleton (camera-priority rule; each Shrinkwrap re-runs every blur step)
 MASK_UNDER_PACK = False        # the mask's hole showed round the pack's edges in the 15/10 close-ups: off until refitted
 
 
@@ -245,8 +247,12 @@ def pack_mesh_for(tmpl, base, crowd):
 
 # ---------------------------------------------------------------------------------- dressing people
 def proxy_for(p, coll):
-    """an invisible, unmasked copy of the person's body, the Shrinkwrap target"""
+    """the Shrinkwrap target: the body itself while nothing masks it, else an invisible, unmasked copy (a second
+    skinned body per person made a crowd clip render at ~1 min a frame, 16/10)"""
     if p.get("proxy"):
+        return p["proxy"]
+    if not MASK_UNDER_PACK:
+        p["proxy"] = p["body"][0]
         return p["proxy"]
     src = p["body"][0]
     ob = src.copy()
@@ -328,7 +334,7 @@ def dress(crowd, root):
                 set_groups(tmp, w)
                 bpy.data.objects.remove(tmp)
                 tmpl[key] = me
-            target = proxy_for(p, coll)
+            target = proxy_for(p, coll) if p.get("near_cam", 0.0) < NEAR_WRAP else None
             p["cord_ob"] = wear(p, tmpl[key], Matrix.Identity(4), "lanyard", coll, wrap=target, offset=0.004)
             for k, me in enumerate((crowd.badge_mesh, p["band_mesh"])):
                 if "Bip01 Spine2" not in [g for g in me.get("groups", [])]:
@@ -343,7 +349,7 @@ def dress(crowd, root):
             me, rest = pack_mesh_for(tmpl, base, crowd)
             s = p["pack_scale"]
             tint = p["pack_tint"]
-            target = proxy_for(p, coll)
+            target = proxy_for(p, coll) if p.get("near_cam", 0.0) < NEAR_WRAP else None
             ob = wear(p, me, rest @ Matrix.Diagonal((s * PACK_WIDTH, s, s, 1)), "backpack", coll, wrap=target, offset=0.006,
                       group="contact", materials=pack_mats[tint])
             p["pack_ob"] = ob
@@ -411,9 +417,9 @@ def verify(crowd, frame_end, step_frames=12):
     for p in people:
         if not p.get("proxy"):
             proxy_for(p, crowd.coll if hasattr(crowd, "coll") else p["rig"].users_collection[0])
-    for p in people:
-        n = max(2, min(int(p["loop"]), frame_end))
-        p["vframes"] = sorted({1 + int(i * (n - 1) / (step_frames - 1)) for i in range(step_frames)})
+    shared = sorted({1 + int(i * (frame_end - 1) / (step_frames - 1)) for i in range(step_frames)})
+    for p in people:                  # one shared set of frames: per-person loop grids made hundreds of whole-crowd
+        p["vframes"] = shared         # evaluations (16/10: a 170-person build sat 30+ min in this check)
         p["m"] = {"pack": 0.0, "body_in_pack": 0.0, "arm_in_pack": 0.0, "cord": 0.0, "badge": 0.0, "body_in_badge": 0.0, "near": [],
                   "badge_frames": []}
     for f in sorted({f for p in people for f in p["vframes"]}):

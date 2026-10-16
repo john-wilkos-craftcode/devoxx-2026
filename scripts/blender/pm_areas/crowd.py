@@ -511,6 +511,8 @@ def build(root, unified=False):
         horizon = crowd_place.HORIZON
     crowd_wear.dress(crowd, ROOT)
     fix_badges(crowd, horizon)
+    if unified:
+        crowd_place.hide_unseen(crowd)
     print(f"CROWD {crowd.n} people, {sum(1 for p in crowd.people if p.get('pack_ob'))} backpacks, "
           f"{sum(1 for p in crowd.people if p.get('cord_ob'))} badges", flush=True)
     return crowd
@@ -534,27 +536,35 @@ def fix_badges(crowd, frame_end):
                   f"{m['body_in_pack'] * 1000:.0f} mm into the pack, an arm {m.get('arm_in_pack', 0) * 1000:.0f} mm into it, "
                   f"{m['flush'] * 100:.0f}% of the panel within 2 cm)", flush=True)
     moves = [Vector((0, 0, 0.02)), Vector((0, -0.006, 0.0)), Vector((0, -0.006, 0.03)), Vector((0, 0, 0.045))]
-    for p in [p for p in crowd.people if p.get("cord_ob")]:
-        m = p["m"]
-        if m["badge"] <= 0.0005 and m["body_in_badge"] <= 0.0005:
-            continue
-        cleared = False
-        for mv in moves:
+    failing = [p for p in crowd.people if p.get("cord_ob")
+               and (p["m"]["badge"] > 0.0005 or p["m"]["body_in_badge"] > 0.0005)]
+    for mv in moves:                  # each move tried on all failing badges at once (one check per move, not per person)
+        if not failing:
+            break
+        for p in failing:
             for ob in p["badge_obs"]:
                 ob.matrix_basis = p["tmpl"]["rig"].matrix_world.inverted() @ Matrix.Translation(mv) @ p["card_rest"]
-            crowd_wear.REPORT.clear()
-            crowd_wear.verify(_Only(crowd, p), frame_end)
+        crowd_wear.REPORT.clear()
+        crowd_wear.verify(_Some(failing), frame_end)
+        still = []
+        for p in failing:
             if p["m"]["badge"] <= 0.0005 and p["m"]["body_in_badge"] <= 0.0005:
                 print(f"BADGE {p['name']}: moved {tuple(round(c, 3) for c in mv)} to clear the arms", flush=True)
-                cleared = True
-                break
-        if not cleared:
-            for ob in p["badge_obs"] + [p["cord_ob"]]:
-                bpy.data.objects.remove(ob)
-            p["badge_obs"], p["cord_ob"] = [], None
-            print(f"BADGE {p['name']}: no badge (an arm passes through it whatever the small move)", flush=True)
+            else:
+                still.append(p)
+        failing = still
+    for p in failing:
+        for ob in p["badge_obs"] + [p["cord_ob"]]:
+            bpy.data.objects.remove(ob)
+        p["badge_obs"], p["cord_ob"] = [], None
+        print(f"BADGE {p['name']}: no badge (an arm passes through it whatever the small move)", flush=True)
 
 
 class _Only:
     def __init__(self, crowd, p):
         self.people = [p]
+
+
+class _Some:
+    def __init__(self, people):
+        self.people = people

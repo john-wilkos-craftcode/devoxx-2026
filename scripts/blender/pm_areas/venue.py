@@ -71,7 +71,7 @@ def load_walk(root):
 def build(root, unified=True):
     load_walk(root)
     scene = bpy.context.scene
-    for name in PARTS + (("crowd",) if CROWD else ()):
+    for name in PARTS:
         before = set(bpy.data.objects)
         mod = importlib.import_module(f"pm_areas.{name}")
         try:
@@ -79,8 +79,6 @@ def build(root, unified=True):
         except TypeError:                      # an area without a unified mode yet: build it as it is
             print(f"VENUE {name} has no unified mode yet")
             mod.build(root)
-        if name == "crowd":                    # keeps its own collections (the avatar templates stay hidden)
-            continue
         coll = bpy.data.collections.new(name)
         scene.collection.children.link(coll)
         for ob in set(bpy.data.objects) - before:
@@ -100,6 +98,8 @@ def build(root, unified=True):
     if hasattr(out, "lighting"):
         out.lighting(root)
     walk_camera()
+    if CROWD:                                  # last: placement looks through the walk camera (who is ever seen)
+        importlib.import_module("pm_areas.crowd").build(root, unified=True)
     try:                                       # BRIEF.md step 2: numbers before any render
         importlib.import_module("pm_areas.sanity").report()
     except Exception as e:                     # a report, never a reason to lose a render

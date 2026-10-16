@@ -29,9 +29,31 @@ REPORT = {}
 
 
 # ---------------------------------------------------------------------------------- the venue as one BVH
+def _see_through(ob):
+    """glass and other transmissive or transparent materials: the camera sees people through them"""
+    for slot in ob.material_slots:
+        m = slot.material
+        if not (m and m.use_nodes):
+            continue
+        for n in m.node_tree.nodes:
+            if n.type == "BSDF_PRINCIPLED":
+                tw = n.inputs.get("Transmission Weight")
+                al = n.inputs.get("Alpha")
+                if (tw and tw.default_value > 0.01) or (al and al.default_value < 0.99):
+                    return True
+            if n.type in ("BSDF_GLASS", "BSDF_TRANSPARENT", "BSDF_REFRACTION"):
+                return True
+    return False
+
+
+SEE_THROUGH = None               # per triangle of the venue BVH: True where it's glass
+
+
 def venue_bvh():
+    global SEE_THROUGH
     dg = bpy.context.evaluated_depsgraph_get()
     verts, polys, off = [], [], 0
+    glass = []
     for ob in bpy.context.scene.objects:
         if ob.type != "MESH" or ob.hide_render or ob.name.startswith("crowd"):
             continue
@@ -51,10 +73,12 @@ def venue_bvh():
             me.loop_triangles.foreach_get("vertices", tri)
             verts.append(co)
             polys.append(tri.reshape(-1, 3) + off)
+            glass.append(np.full(nt, _see_through(ob)))
             off += n
         ev.to_mesh_clear()
     V = np.concatenate(verts)
     P = np.concatenate(polys)
+    SEE_THROUGH = np.concatenate(glass)
     print(f"CROWD venue BVH: {len(P)} triangles", flush=True)
     return BVHTree.FromPolygons(V.tolist(), P.tolist(), all_triangles=True)
 
@@ -113,6 +137,88 @@ def path_dist(S, x, y):
     return float(np.min(np.hypot(ax + t * dx - x, ay + t * dy - y)))
 
 
+# ---------------------------------------------------------------------------------- what the camera sees
+VIS_MARGIN = math.radians(10)   # past the frame edges: shadows and blur of people just outside still show
+VIS_PAD = 6                     # frames kept on either side of a visible stretch (blur samples, no pop-in)
+VIS_STEP = 2                    # test every 2nd frame (the pad covers the gaps)
+
+
+class View:
+    """the walk camera frame by frame (read from its curves): which frames see a point, past the venue's walls"""
+    def __init__(self, bvh):
+        import pm_areas.venue as V
+        scene = bpy.context.scene
+        cam = bpy.data.objects["cam-walk"]
+        fcs = {}
+        for owner in (cam, cam.data):
+            ad = owner.animation_data
+            if ad and ad.action:
+                for l in ad.action.layers:
+                    for st in l.strips:
+                        for cb in st.channelbags:
+                            for fc in cb.fcurves:
+                                fcs[(fc.data_path, fc.array_index)] = fc
+        from mathutils import Euler
+        self.bvh = bvh
+        self.f0, self.f1 = scene.frame_start, scene.frame_end
+        self.frames = list(range(self.f0, self.f1 + 1, VIS_STEP))
+        locs, axes, tans = [], [], []
+        aspect = V.WALK_SIZE[0] / V.WALK_SIZE[1]
+        for f in self.frames:
+            loc = [fcs[("location", i)].evaluate(f) for i in range(3)]
+            R = Euler([fcs[("rotation_euler", i)].evaluate(f) for i in range(3)], "XYZ").to_matrix()
+            lens = fcs[("lens", 0)].evaluate(f) if ("lens", 0) in fcs else cam.data.lens
+            tv = math.tan(math.atan(12 / lens) + VIS_MARGIN)                 # vertical sensor fit, 24 mm
+            th = math.tan(math.atan(12 / lens * aspect) + VIS_MARGIN)
+            locs.append(loc)
+            axes.append([list(R.col[0]), list(R.col[1]), list(-R.col[2])])  # right, up, forward
+            tans.append((th, tv))
+        self.loc, self.axes, self.tans = np.array(locs), np.array(axes), np.array(tans)
+
+    def clear(self, o, d, dist):
+        return _clear(self.bvh, o, d, dist)
+
+    def seen(self, pts_at):
+        """frames (sampled) in which any of a person's points is in the widened frame and not behind the venue;
+        pts_at(i) gives the points (n x 3) at sample i"""
+        out = []
+        for i, f in enumerate(self.frames):
+            P = pts_at(i)
+            v = P - self.loc[i]
+            right, up, fwd = self.axes[i]
+            z = v @ fwd
+            ok = z > 0.2
+            if not ok.any():
+                continue
+            th, tv = self.tans[i]
+            inside = ok & (np.abs(v @ right) < th * z) & (np.abs(v @ up) < tv * z)
+            for k in np.nonzero(inside)[0]:
+                d = float(np.linalg.norm(v[k]))
+                dirv = Vector(v[k] / d)
+                if self.clear(Vector(self.loc[i]), dirv, d - 0.25):
+                    out.append(f)
+                    break
+        return out
+
+
+def _clear(bvh, o, d, dist):
+    """nothing opaque on the ray (glass doesn't count: people show through the facade)"""
+    for _ in range(8):
+        loc, _n, idx, hd = bvh.ray_cast(o, d, dist)
+        if loc is None:
+            return True
+        if SEE_THROUGH is None or not SEE_THROUGH[idx]:
+            return False
+        o, dist = loc + d * 0.01, dist - hd - 0.01
+        if dist <= 0:
+            return True
+    return False
+
+
+def body_points(x, y, zf):
+    return np.array([(x, y, zf + 0.25), (x, y, zf + 1.0), (x, y, zf + 1.65), (x + 0.25, y, zf + 1.2), (x - 0.25, y, zf + 1.2)])
+
+
 # ---------------------------------------------------------------------------------- placing
 class Placer:
     def __init__(self, crowd, root):
@@ -121,6 +227,8 @@ class Placer:
         self.paths = camera_paths(root)
         self.spots = []                                  # (x, y) of everyone placed, walkers' sweeps sampled
         self.looks = []                                  # (x, y, avatar) for keeping clones apart
+        self.view = View(self.bvh) if "cam-walk" in bpy.data.objects else None
+        self.unseen = 0                                  # spots skipped: the camera never sees them
         self.zone = ""
 
     def end_view(self, x, y):
@@ -144,14 +252,29 @@ class Placer:
         self.looks.append((x, y, tmpl["name"]))
         return tmpl, clip
 
-    def put(self, role, x, y, zf, yaw, sex=None):
+    def seen_at(self, x, y, zf):
+        if self.view is None:
+            return None
+        pts = body_points(x, y, zf)
+        return self.view.seen(lambda i: pts)
+
+    def put(self, role, x, y, zf, yaw, sex=None, force=False):
+        """place someone; False (and nobody placed) when the camera never sees the spot, unless forced (a group
+        member whose group is seen)"""
         crowd, rng = self.crowd, self.rng
+        vis = self.seen_at(x, y, zf)
+        if vis is not None and not vis and not force:
+            self.unseen += 1
+            return False
         tmpl, clip = self.pick(role, x, y, sex)
         crowd.person(tmpl, clip, x, y, zf, yaw, offset=rng.randrange(0, 600), speed=rng.uniform(0.9, 1.1),
                      height=rng.uniform(0.96, 1.04), badge=rng.random() < 0.85, role=role,
                      backpack=rng.random() < C.BACKPACK_SHARE)
+        crowd.people[-1]["near_cam"] = path_dist(self.paths, x, y)
+        crowd.people[-1]["vis"] = vis
         self.spots.append((x, y))
         REPORT[self.zone] = REPORT.get(self.zone, 0) + 1
+        return True
 
     def face_something(self, x, y):
         """someone on their own faces the nearest person within 3.5 m, else the walkway"""
@@ -191,9 +314,12 @@ class Placer:
             if not self.ok(x, y, zf) or any((x - p) ** 2 + (y - q) ** 2 < GAP ** 2 for p, q, _ in spots):
                 return False
             spots.append((x, y, self.facing(cx - x, cy - y) + rng.uniform(-0.2, 0.2)))
+        if self.view is not None and not any(self.seen_at(x, y, zf) for x, y, _ in spots):
+            self.unseen += n
+            return False
         talker = rng.randrange(n)
         for k, (x, y, yaw) in enumerate(spots):
-            self.put("talk" if k == talker or (n == 2 and rng.random() < 0.5) else "listen", x, y, zf, yaw)
+            self.put("talk" if k == talker or (n == 2 and rng.random() < 0.5) else "listen", x, y, zf, yaw, force=True)
         return True
 
     def scatter(self, box, zf, groups, singles=0, single_role="idle", face=None, tries=400):
@@ -213,8 +339,8 @@ class Placer:
             x, y = rng.uniform(x0, x1), rng.uniform(y0, y1)
             if self.ok(x, y, zf, gap=0.9):
                 yaw = face(x, y) if face else self.face_something(x, y)
-                self.put(single_role, x, y, zf, yaw + rng.uniform(-0.3, 0.3))
-                s += 1
+                if self.put(single_role, x, y, zf, yaw + rng.uniform(-0.3, 0.3)):
+                    s += 1
 
     def walker(self, x, y, zf, heading, bounds):
         """someone walking along heading (radians, 0 = +y) from (x, y); the whole sweep over HORIZON frames stays
@@ -239,9 +365,21 @@ class Placer:
             if not self.ok(px, py, zf, gap=0.8):
                 return False
         frames = 1 + L / v * C.FPS
+        vis = None
+        if self.view is not None:
+            ex, ey = pts[-1]
+            def at(i):
+                t = (self.view.frames[i] - 1) / max(1.0, frames - 1)
+                return body_points(x + (ex - x) * t, y + (ey - y) * t, zf)
+            vis = self.view.seen(at)
+            if not vis:
+                self.unseen += 1
+                return False
         crowd.person(tmpl, clip, x, y, zf, self.facing(dx, dy), offset=rng.randrange(0, 600), speed=speed,
                      height=rng.uniform(0.96, 1.04), walk=((x, y), pts[-1], frames), badge=rng.random() < 0.85,
                      role="walk", backpack=rng.random() < C.BACKPACK_SHARE)
+        crowd.people[-1]["near_cam"] = min(path_dist(self.paths, px, py) for px, py in pts)
+        crowd.people[-1]["vis"] = vis
         self.spots += pts
         self.looks.append((x, y, tmpl["name"]))
         REPORT[self.zone] = REPORT.get(self.zone, 0) + 1
@@ -385,5 +523,38 @@ def place(crowd, root):
     P = Placer(crowd, root)
     for zone in (queue, reception, foyer, below_steps, aisle, far_hall):
         zone(P)
-    print("CROWD placed: " + ", ".join(f"{k} {v}" for k, v in REPORT.items()), flush=True)
+    print("CROWD placed: " + ", ".join(f"{k} {v}" for k, v in REPORT.items())
+          + f"; {P.unseen} spots skipped (never in view)", flush=True)
     return P
+
+
+def _tree(ob):
+    out = [ob]
+    for c in ob.children:
+        out += _tree(c)
+    return out
+
+
+def hide_unseen(crowd):
+    """each person renders only in the frames the camera can see them (+ VIS_PAD): out of render otherwise, so
+    their skeleton and the accessories' wrap aren't evaluated for frames nobody sees (John, 16/10: "anything the
+    camera isn't looking at isn't important")"""
+    scene = bpy.context.scene
+    f0, f1 = scene.frame_start, scene.frame_end
+    shown = total = 0
+    for p in crowd.people:
+        vis = p.get("vis")
+        if vis is None:
+            continue
+        on = np.zeros(f1 - f0 + 1, bool)
+        for f in vis:
+            on[max(0, f - f0 - VIS_PAD - VIS_STEP): min(len(on), f - f0 + VIS_PAD + VIS_STEP + 1)] = True
+        shown += int(on.sum())
+        total += len(on)
+        keys = [(f0, not on[0])] + [(f0 + i, not on[i]) for i in range(1, len(on)) if on[i] != on[i - 1]]
+        for ob in _tree(p["rig"]):
+            for f, hidden in keys:
+                ob.hide_render = hidden
+                ob.keyframe_insert("hide_render", frame=f)
+    if total:
+        print(f"CROWD visibility: people render {100 * shown / total:.0f}% of the frames on average", flush=True)

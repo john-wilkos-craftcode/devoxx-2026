@@ -33,6 +33,8 @@ ap.add_argument("--plan", default="", help="top-down cut below this height: x0,y
 ap.add_argument("--variant", default="", help="area variant, e.g. phone for venue's portrait walk")
 ap.add_argument("--blur", action="store_true", help="walk stills: the clip's motion blur (full-frame shutter, centred)")
 ap.add_argument("--blur-steps", default="4", help="EEVEE motion blur steps (accumulation; 4 fixed the vector blur's hard edges on near columns, 16/10 A/B; 0 = Blender's 1); stills take a comma list to A/B")
+ap.add_argument("--max-spf", type=float, default=0, help="walk anim: render 5 frames, stop if they average more seconds a frame than this")
+ap.add_argument("--anim-range", default="", help="walk anim: only frames a-b (time a clip before rendering it all)")
 ap.add_argument("--crowd", action="store_true", help="venue: add the crowd (pm_areas/crowd.py)")
 ap.add_argument("--unified", action="store_true", help="build the area as part of the whole venue (no photo hacks)")
 args = ap.parse_args(argv)
@@ -149,10 +151,27 @@ if args.walk:
             scene.render.motion_blur_position = "CENTER"
         set_blur_steps(int(args.blur_steps.split(",")[0]))
     if args.walk == "anim":
+        if args.anim_range:
+            a, b = (int(v) for v in args.anim_range.split("-"))
+            scene.frame_start, scene.frame_end = a, b
+            f0, f1 = a, b
         scene.render.filepath = str(out / "anim" / "f_####")
         t1 = time.time()
+        if args.max_spf and f1 - f0 > 5:                 # time the clip before committing to it
+            # 5 frames spread over the whole clip: the first 5 (the street) ran 7.6 s, the hall averaged 11.4 (16/10)
+            for f in [f0 + round(i * (f1 - f0) / 4) for i in range(5)]:
+                scene.frame_set(f)
+                scene.render.filepath = str(out / "anim" / f"f_{f:04d}")
+                bpy.ops.render.render(write_still=True)
+            spf = (time.time() - t1) / 5
+            print(f"TIMING {spf:.1f} s a frame over 5 spread frames: the clip would take {spf * (f1 - f0 + 1) / 60:.0f} min", flush=True)
+            if spf > args.max_spf:
+                print(f"STOPPED: over the {args.max_spf:.0f} s a frame limit", flush=True)
+                sys.exit(3)
+            scene.render.filepath = str(out / "anim" / "f_####")
+            t1 = time.time()
         bpy.ops.render.render(animation=True)
-        print(f"RENDERED anim {f1 - f0 + 1} frames in {time.time() - t1:.0f}s")
+        print(f"RENDERED anim {f1 - f0 + 1} frames in {time.time() - t1:.0f}s ({(time.time() - t1) / (f1 - f0 + 1):.1f} s a frame)")
         print("done")
         sys.exit(0)
     if args.walk == "all":

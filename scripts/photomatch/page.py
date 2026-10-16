@@ -115,12 +115,12 @@ def main():
     for f in sorted((ROOT / "data" / "photomatch" / "cameras").glob("*.json")):
         cams.update(json.loads(f.read_text()))
     nav, body = [], []
-    walk = sorted((OUT / "venue" / "walk").glob("walk-*.png"))
+    walk = sorted(w for w in (OUT / "venue" / "walk").glob("walk-*.png") if w.stem[5:].isdigit())   # not A/B stills
     if walk:
         nav.append('<a href="#flythrough">Fly-through</a>')
         tiles = "".join(f'<figure><img loading="lazy" src="venue/walk/{w.name}" alt="walk frame"><figcaption>'
                         f'{(int(w.stem[5:]) - 1) / 30:.1f} s</figcaption></figure>' for w in walk)
-        phone = sorted((OUT / "venue" / "walk-phone").glob("walk-*.png"))
+        phone = sorted(w for w in (OUT / "venue" / "walk-phone").glob("walk-*.png") if w.stem[5:].isdigit())
         phone_tiles = ""
         if phone:
             phone_tiles = ('<h3 style="font-size:15px;margin:18px 0 6px">Phones: the same flight in portrait, drifting onto the totem at the end</h3>'
