@@ -33,8 +33,8 @@ GATE_Y, TABLES_Y = -19.3, (-37.6, -24.2)                            # (tables mo
 SIDE_AISLE = {"west": -5.2, "east": 10.3}                          # behind the tables, along the walls (rooms 5, 8)
 CENTRE_X = 2.9                                                       # through the gate, down the central aisle (6, 7)
 ACCEL, DECEL, LOOK_AHEAD, LOOK_TAU = 2.2, 1.8, 4.0, 0.3
-HALL = {"laptop": {"pos": (2.4, 14.08, 1.7), "look": (2.4, 17.83, 1.7), "fov_v": 40.0},
-        "phone": {"pos": (5.6, 13.85, 1.5), "look": (5.6, 15.515, 1.5), "fov_v": 58.29}}
+HALL = {"laptop": {"pos": (2.4, 9.81, 1.7), "look": (2.4, 13.56, 1.7), "fov_v": 40.0},       # the fly-through's end
+        "phone": {"pos": (5.6, 9.58, 1.5), "look": (5.6, 11.245, 1.5), "fov_v": 58.29}}   # (screen on the divider, 17/10)
 
 
 def venue_json(root):
@@ -98,8 +98,15 @@ def waypoints(root, n, variant="laptop"):
     h = HALL[variant]["pos"]
     inner = xb + 1.4 if door["west"] else xa - 1.4              # in the hall, level with the glass box's gap
     toward = -1 if door["west"] else 1
-    first = (h[0] + 0.9 * toward, h[1] - 0.9) if variant == "laptop" else (h[0] - 0.4, h[1] - 1.0)
-    pts = [(h[0], h[1], h[2]), (first[0], first[1], EYE), (inner, GAP_Y, EYE), (sx, GAP_Y, EYE),
+    # first step: turning off the screen towards the stairwell's gap (since the screen moved onto the divider, 17/10,
+    # the gap is ahead of the start, no longer behind it)
+    # the gap is ahead of the start, no longer behind it); east of the screen the phone totem and its plant (hall_screen,
+    # ~(5.6, 11.3) and (6.35, 10.8)) stand level with the gap, so the east walks pass south of them
+    if door["west"]:
+        first = [(h[0] - 1.0, h[1] + 0.4)] if variant == "laptop" else [(h[0] - 0.6, h[1] + 0.3)]
+    else:
+        first = [(h[0] + 1.6, h[1] - 0.5), (7.6, h[1] - 0.2)] if variant == "laptop" else [(6.9, h[1] - 0.1)]
+    pts = [(h[0], h[1], h[2])] + [(x, y, EYE) for x, y in first] + [(inner, GAP_Y, EYE), (sx, GAP_Y, EYE),
            (sx, STAIR_FOOT, EYE), (sx, STAIR_TOP, FH + EYE), (sx, STAIR_TOP - 1.8, FH + EYE),
            (lane, STAIR_TOP - 3.6, FH + EYE)]
     north = yc > STAIR_TOP                                       # rooms 3 and 10: back north past the opening

@@ -21,7 +21,10 @@ from mathutils import Matrix, Vector
 import pm_lib as L
 
 SX = 2.4                                         # centred between the stairwells (x -4.85 .. 9.65)
-NORTH = 18.3 - 0.15                              # inner face of the north wall's curtains
+# John (17/10): the screen hangs on a divider wall between the stairwells, flush with their glass boxes' north end
+# walls (venue.json: y 13.88..14.18), not on the north wall 4.3 m further back
+DIVIDER = (-4.55, 13.88, 9.95, 14.18)             # x0, y0 (its hall face), x1, y1
+NORTH = DIVIDER[1]                               # the wall face the curtains hang on
 SCREEN = {"x": SX, "y": NORTH - 0.32, "z": 1.7, "w": 3.6, "h": 2.25}
 BEZEL, CHIN = 0.05, 0.05
 TOTEM = {"x": SX + 3.2, "y": NORTH - 2.6, "z": 1.5, "w": 0.70, "h": 1.42}
@@ -130,6 +133,12 @@ def build(root, unified=True):
     totem_corners = [(T["x"] - T["w"] / 2, ty_, T["z"] - T["h"] / 2), (T["x"] + T["w"] / 2, ty_, T["z"] - T["h"] / 2),
                      (T["x"] + T["w"] / 2, ty_, T["z"] + T["h"] / 2), (T["x"] - T["w"] / 2, ty_, T["z"] + T["h"] / 2)]
     L.mesh_obj("programme-totem", totem_corners, [(0, 1, 2, 3)], M["programme"], uvs=[(0, 0), (1, 0), (1, 1), (0, 1)])
+    # the divider wall up to the structural ceiling, the beige curtains along its hall face (hollywood's, as on the
+    # north wall behind it)
+    import pm_areas.hollywood as H
+    x0, y0, x1, y1 = DIVIDER
+    L.box("hs-divider", x0, y0, 0.0, x1, y1, H.TOP, L.mat("hs-divider", 0xdcdcde, 0.85))
+    H.curtain(x0 + 0.02, x1 - 0.02, NORTH - 0.15, CEIL)
     # a pelmet over the curtains between the stairwells, down to the old hall's ceiling height, with a blue-white LED
     # line under its front edge (the ivy hangs from it, as it did from the old ceiling)
     L.box("hs-pelmet", -4.6, NORTH - 0.62, HEAD, 9.4, NORTH + 0.15, CEIL + 0.02, L.mat("hs-pelmet", 0xe9e9ec, 0.85))

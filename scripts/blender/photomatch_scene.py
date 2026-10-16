@@ -27,6 +27,7 @@ ap.add_argument("--out", default="C:/Users/wilkojo/kino-renders/photomatch")
 ap.add_argument("--samples", type=int, default=64)
 ap.add_argument("--width", type=int, default=1280)
 ap.add_argument("--engine", default="cycles", choices=["cycles", "workbench", "eevee"])
+ap.add_argument("--final", action="store_true", help="EEVEE final quality: ray tracing at full resolution, more shadow rays")
 ap.add_argument("--save")
 ap.add_argument("--walk", default="", help="render walk frames: a comma list, every:N, or all (area venue)")
 ap.add_argument("--plan", default="", help="top-down cut below this height: x0,y0,x1,y1,cut_z[,ppm] (Workbench)")
@@ -93,6 +94,14 @@ elif args.engine == "eevee":
                       ("use_gtao", True), ("use_bloom", True), ("shadow_pool_size", "1024")):
         if hasattr(ev, attr):
             setattr(ev, attr, val)
+    if args.final:                                   # BRIEF.md's rubric: the preview passed at half-res tracing
+        rt = getattr(ev, "ray_tracing_options", None)
+        for holder, attr, val in ((rt, "resolution_scale", "1"), (ev, "shadow_ray_count", 2), (ev, "shadow_step_count", 8),
+                                  (ev, "shadow_resolution_scale", 1.0)):
+            if holder is not None and hasattr(holder, attr):
+                setattr(holder, attr, val)
+        print(f"FINAL quality: ray tracing x{getattr(rt, 'resolution_scale', '?')}, shadow rays {getattr(ev, 'shadow_ray_count', '?')}",
+              flush=True)
 else:
     scene.render.engine = "BLENDER_WORKBENCH"
     scene.display.shading.light = "STUDIO"

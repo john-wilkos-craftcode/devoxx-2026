@@ -1,5 +1,5 @@
 {
- "note": "The fly-through (John, 15/10): a curve along the forecourt from the west, in through the door pair west of the walk-in pair of before (x -8.26..-5.69), north close past the queue with the stair and the reception under it on the right, down the hall steps, along the aisle between the booth blocks, ending square on to the schedule screen on the north wall between the stairwells (the hall still's pose: 3.75 m back, 40 deg vertical).",
+ "note": "The fly-through (John, 15/10): a curve along the forecourt from the west, in through the door pair west of the walk-in pair of before (x -8.26..-5.69), north close past the queue with the stair and the reception under it on the right, down the hall steps, along the aisle between the booth blocks, ending square on to the schedule screen on the divider wall between the stairwells (flush with their glass boxes' north ends, John 17/10: the last stretch moved 4.27 m south with it) (the hall still's pose: 3.75 m back, 40 deg vertical).",
  "points": [
   [
    -21.5,
@@ -47,20 +47,20 @@
   ],
   [
    -0.6,
-   6.5
+   2.23
   ],
   [
    2.4,
-   10.0
+   5.73
   ],
   [
    2.4,
-   14.08
+   9.81
   ]
  ],
  "screen": [
   2.4,
-  17.83,
+  13.56,
   1.7
  ],
  "speed": 5.5,
@@ -84,17 +84,17 @@
   "points_tail": [
    [
     5.4,
-    10.0
+    5.73
    ],
    [
     5.6,
-    13.85
+    9.58
    ]
   ],
   "branch_after": 11,
   "screen": [
    5.6,
-   15.514999999999999,
+   11.245,
    1.5
   ],
   "end_eye_z": 1.5,
