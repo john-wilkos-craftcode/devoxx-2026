@@ -229,15 +229,15 @@ def photo_backdrop(root, M, zf0):
 def walls_and_portals(M):
     # ------------------------------------------------------------------ side walls, light boxes, portals
     if UNIFIED[0]:
-        open_wall("wall-l", XL - 0.3, XL, [loc_y(y) for n, y in DOORS["east"].items() if n in WALK_ROOMS] + [loc_y(-44.55)], M)
-        open_wall("wall-r", XR, XR + 0.3, [loc_y(y) for n, y in DOORS["west"].items() if n in WALK_ROOMS] + [loc_y(-44.55)], M)
+        open_wall("wall-l", XL - 0.3, XL, [loc_y(y) for n, y in DOORS["east"].items() if n in walk_rooms()] + ([loc_y(-44.55)] if 7 in walk_rooms() else []), M)
+        open_wall("wall-r", XR, XR + 0.3, [loc_y(y) for n, y in DOORS["west"].items() if n in walk_rooms()] + ([loc_y(-44.55)] if 6 in walk_rooms() else []), M)
     else:
         L.box("wall-l", XL - 0.3, Y_NEAR, 0, XL, Y_END, Z_WALL, M["blue"])
         L.box("wall-r", XR, Y_NEAR, 0, XR + 0.3, Y_END, Z_WALL, M["blue"])
     if UNIFIED[0]:
         for side, x, face, doors in (("r", XR, -1, DOORS["west"]), ("l", XL, 1, DOORS["east"])):
             for num, yv in doors.items():
-                portal(M, f"{side}{num}", x, face, loc_y(yv), str(num), open_door=num in WALK_ROOMS)
+                portal(M, f"{side}{num}", x, face, loc_y(yv), str(num), open_door=num in walk_rooms())
     # quote light boxes, set 4 cm proud of the wall
     for name, x, face, y0, y1, mat in (("quote-l", XL, 1, 12.38, 16.94, M["panel_l"]),
                                       ("quote-r", XR, -1, 11.98, 16.77, M["panel_r"])):
@@ -260,7 +260,7 @@ def walls_and_portals(M):
         xf = x + 0.18 * face
         L.area_light(f"portal-light-{side}", (x + 1.5 * face, (y0 + y1) / 2, 3.2), 1.0, 250, color=(1.0, 0.85, 0.75),
                      rot=(0, math.radians(-50) * face, 0), size_y=y1 - y0)
-        if UNIFIED[0]:                            # the walks to rooms 6 and 7 go through: an open doorway
+        if UNIFIED[0] and int(num) in walk_rooms():   # the walk to this room goes through: an open doorway
             L.box(f"portal-{side}", x, y0, 0, xf, gap0, 2.6, M["red"])
             L.box(f"portal-{side}", x, gap1, 0, xf, y1, 2.6, M["red"])
             L.box(f"portal-{side}-head", x, gap0, DOOR_H, xf, gap1, 2.6, M["red"])
@@ -439,7 +439,11 @@ def room_number(name, num, xf, face, ya, yb):
     return t
 
 
-WALK_ROOMS = (3, 4, 5, 6, 7, 8, 9, 10)
+def walk_rooms():
+    """the room whose doorway is open: only the room walk's own (venue.ROOM); every other portal keeps its closed door
+    (cinema doors are shut, and only that auditorium is loaded: auditoriums.py)"""
+    import pm_areas.venue as V
+    return (V.ROOM,) if V.ROOM else ()
 DOOR_W, DOOR_H = 2.6 / S, 2.25 / S             # the walks' doorways: open, the auditorium beyond (auditoriums.py)
 
 

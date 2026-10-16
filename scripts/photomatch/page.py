@@ -127,7 +127,7 @@ def main():
                            '<div class="walk phone">' + "".join(
                                f'<figure><img loading="lazy" src="venue/walk-phone/{w.name}" alt="phone walk frame"><figcaption>'
                                f'{(int(w.stem[5:]) - 1) / 30:.1f} s</figcaption></figure>' for w in phone) + "</div>")
-        vids = [(n, t) for n, t in (("preview-laptop-crowd.mp4", "Laptop, with the crowd (new)"), ("preview-phone-crowd.mp4", "Phone, with the crowd (new)"), ("preview-laptop.mp4", "Laptop"), ("preview-phone.mp4", "Phone"))
+        vids = [(n, t) for n, t in (("preview-room8-laptop.mp4", "Walk to room 8, laptop (new)"), ("preview-laptop-crowd.mp4", "Laptop, with the crowd"), ("preview-phone-crowd.mp4", "Phone, with the crowd"), ("preview-laptop.mp4", "Laptop"), ("preview-phone.mp4", "Phone"))
                 if (OUT / "venue" / n).exists()]
         videos = ""
         if vids:

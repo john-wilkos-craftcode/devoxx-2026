@@ -14,8 +14,9 @@ SRC = Path("C:/Users/wilkojo/kino-renders/rooms")
 def build(root, unified=True):
     coll = bpy.data.collections.new("auditoriums")
     bpy.context.scene.collection.children.link(coll)
+    import pm_areas.venue as V
     got = []
-    for n in ROOMS:
+    for n in ((V.ROOM,) if V.ROOM else ()):        # only the room walk's own room: every other door is shut
         f = SRC / f"aud-{n}.blend"
         if not f.exists():
             continue
