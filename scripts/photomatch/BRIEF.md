@@ -57,6 +57,29 @@ and thin LED strips near the camera (sparkle/shimmer); the camera not brushing a
 Motion (clips): no jolt, lurch or tumble; nothing whips through the frame within 1 m of the lens; no flicker on
 glass, metal or thin highlights; motion blur without hard edges round foreground objects.
 
+## EEVEE final rubric (17/10; a clip must pass before a full-quality render)
+Drawn from the IRPR render-quality checklist (3d.irpr.agency/guides/3d-render-quality-checklist), the Blender
+manual's EEVEE shadow/light-probe notes (light leaks, shadow pool, jitter) and the V-Ray/CGArchitect animation
+flicker notes. Judged on the EEVEE preview of the same walk; the automatic half is `scripts/photomatch/qc.py
+<frames>`, its thresholds calibrated on the fly-through John approved (16/10), so "passes" means "at least as
+clean as that".
+Automatic (qc.py, all must pass):
+- no pops: no frame whose change is > 3x the change around it (crowd or rooms switching visibility in view,
+  lights popping)
+- noise: Immerkaer sigma <= 1.5 grey levels on every frame
+- breathing: the frame-wide median brightness shift <= 1.0 grey level (GI/shadows re-solving, flicker)
+- blown highlights <= 2 % of a frame; crushed blacks <= 25 %
+- frame count complete; the log has no "Shadow buffer full" or Python errors
+Visual (contact sheet every ~0.5 s + the critical frames, judged by a fresh-eyes critic and by me):
+- lighting reads as intended (not flat, not muddy), contact shadows ground people and furniture
+- materials read as the real substance; no stretched, seamed or visibly tiled textures near the camera
+- no light leaks in room corners, under the girders or through the stair shafts
+- nothing floating, intersecting or clipping (sanity report clean; crowd clearance; the camera >= 0.45 m from
+  everything)
+- crowd: no foot sliding near the camera, nobody walking through anything
+- camera motion smooth, no jolts; the end frame matches the published still (screen size >= the still's)
+- the checklist above for every area in view
+
 ## Render notes (from the Blender forums and the manual)
 - EEVEE motion blur with one step is a post-process vector blur that breaks at object borders on fast camera
   moves; more Steps (each a full scene re-evaluation, samples round up to a multiple) fix it.
