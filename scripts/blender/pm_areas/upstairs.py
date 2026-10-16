@@ -228,12 +228,16 @@ def photo_backdrop(root, M, zf0):
 
 def walls_and_portals(M):
     # ------------------------------------------------------------------ side walls, light boxes, portals
-    L.box("wall-l", XL - 0.3, Y_NEAR, 0, XL, Y_END, Z_WALL, M["blue"])
-    L.box("wall-r", XR, Y_NEAR, 0, XR + 0.3, Y_END, Z_WALL, M["blue"])
+    if UNIFIED[0]:
+        open_wall("wall-l", XL - 0.3, XL, [loc_y(y) for n, y in DOORS["east"].items() if n in WALK_ROOMS] + [loc_y(-44.55)], M)
+        open_wall("wall-r", XR, XR + 0.3, [loc_y(y) for n, y in DOORS["west"].items() if n in WALK_ROOMS] + [loc_y(-44.55)], M)
+    else:
+        L.box("wall-l", XL - 0.3, Y_NEAR, 0, XL, Y_END, Z_WALL, M["blue"])
+        L.box("wall-r", XR, Y_NEAR, 0, XR + 0.3, Y_END, Z_WALL, M["blue"])
     if UNIFIED[0]:
         for side, x, face, doors in (("r", XR, -1, DOORS["west"]), ("l", XL, 1, DOORS["east"])):
             for num, yv in doors.items():
-                portal(M, f"{side}{num}", x, face, loc_y(yv), str(num))
+                portal(M, f"{side}{num}", x, face, loc_y(yv), str(num), open_door=num in WALK_ROOMS)
     # quote light boxes, set 4 cm proud of the wall
     for name, x, face, y0, y1, mat in (("quote-l", XL, 1, 12.38, 16.94, M["panel_l"]),
                                       ("quote-r", XR, -1, 11.98, 16.77, M["panel_r"])):
@@ -254,11 +258,16 @@ def walls_and_portals(M):
         # the blue wall stops a metre before the portal: dark wall between
         L.box(f"wall-gap-{side}", x - 0.01 * face, 17.7, 0, x + 0.01 * face, y0, Z_WALL, M["dark"])
         xf = x + 0.18 * face
-        L.box(f"portal-{side}", x, y0, 0, xf, y1, 2.6, M["red"])
         L.area_light(f"portal-light-{side}", (x + 1.5 * face, (y0 + y1) / 2, 3.2), 1.0, 250, color=(1.0, 0.85, 0.75),
                      rot=(0, math.radians(-50) * face, 0), size_y=y1 - y0)
-        L.box(f"portal-{side}-door", xf - 0.01 * face, gap0, 0, xf + 0.01 * face, gap1, 2.05, M["black"])
-        L.box(f"portal-{side}-leaf", xf, gap0 + 0.08, 0.05, xf + 0.02 * face, gap1 - 0.08, 2.0, M["dark"])
+        if UNIFIED[0]:                            # the walks to rooms 6 and 7 go through: an open doorway
+            L.box(f"portal-{side}", x, y0, 0, xf, gap0, 2.6, M["red"])
+            L.box(f"portal-{side}", x, gap1, 0, xf, y1, 2.6, M["red"])
+            L.box(f"portal-{side}-head", x, gap0, DOOR_H, xf, gap1, 2.6, M["red"])
+        else:
+            L.box(f"portal-{side}", x, y0, 0, xf, y1, 2.6, M["red"])
+            L.box(f"portal-{side}-door", xf - 0.01 * face, gap0, 0, xf + 0.01 * face, gap1, 2.05, M["black"])
+            L.box(f"portal-{side}-leaf", xf, gap0 + 0.08, 0.05, xf + 0.02 * face, gap1 - 0.08, 2.0, M["dark"])
         L.text(f"portal-{side}-num", num, 0.9, (xf + 0.004 * face, y1 - 0.5 if face > 0 else y0 + 0.5, 0.9),
                (math.pi / 2, 0, math.pi / 2 * face), L.mat("up-num", 0xffffff, 0.5), extrude=0.005)
 
@@ -413,16 +422,36 @@ def floor_with_holes(M):
             L.box("floor", xa, y_open1, -0.1, xb, Y_VOID, 0, M["carpet"])
 
 
-def portal(M, tag, x, face, yc, num, half=2.85, gap=2.6 / S):
+WALK_ROOMS = (3, 4, 5, 6, 7, 8, 9, 10)
+DOOR_W, DOOR_H = 2.6 / S, 2.25 / S             # the walks' doorways: open, the auditorium beyond (auditoriums.py)
+
+
+def open_wall(name, xa, xb, door_ys, M):
+    """a corridor wall with open doorways (DOOR_W x DOOR_H) at the given local y centres"""
+    ys = sorted(door_ys)
+    y = Y_NEAR
+    for yc in ys:
+        L.box(name, xa, y, 0, xb, yc - DOOR_W / 2, Z_WALL, M["blue"])
+        L.box(f"{name}-lintel", xa, yc - DOOR_W / 2, DOOR_H, xb, yc + DOOR_W / 2, Z_WALL, M["blue"])
+        y = yc + DOOR_W / 2
+    L.box(name, xa, y, 0, xb, Y_END, Z_WALL, M["blue"])
+
+
+def portal(M, tag, x, face, yc, num, half=2.85, gap=2.6 / S, open_door=False):
     """a red portal proud of the wall round a door (as rooms 6/7 in the photos), door recess, leaf, number, light"""
     y0, y1 = yc - half, yc + half
     xf = x + 0.18 * face
-    L.box(f"portal-{tag}", x, y0, 0, xf, y1, 2.6, M["red"])
     L.area_light(f"portal-light-{tag}", (x + 1.5 * face, yc, 3.2), 1.0, 250, color=(1.0, 0.85, 0.75),
                  rot=(0, math.radians(-50) * face, 0), size_y=y1 - y0)
     g0, g1 = yc - gap / 2, yc + gap / 2
-    L.box(f"portal-{tag}-door", xf - 0.01 * face, g0, 0, xf + 0.01 * face, g1, 2.05, M["black"])
-    L.box(f"portal-{tag}-leaf", xf, g0 + 0.08, 0.05, xf + 0.02 * face, g1 - 0.08, 2.0, M["dark"])
+    if open_door:                                 # a doorway through the portal's frame: the walk goes in here
+        L.box(f"portal-{tag}", x, y0, 0, xf, g0, 2.6, M["red"])
+        L.box(f"portal-{tag}", x, g1, 0, xf, y1, 2.6, M["red"])
+        L.box(f"portal-{tag}-head", x, g0, DOOR_H, xf, g1, 2.6, M["red"])
+    else:
+        L.box(f"portal-{tag}", x, y0, 0, xf, y1, 2.6, M["red"])
+        L.box(f"portal-{tag}-door", xf - 0.01 * face, g0, 0, xf + 0.01 * face, g1, 2.05, M["black"])
+        L.box(f"portal-{tag}-leaf", xf, g0 + 0.08, 0.05, xf + 0.02 * face, g1 - 0.08, 2.0, M["dark"])
     L.text(f"portal-{tag}-num", num, 0.9, (xf + 0.004 * face, y1 - 0.5 if face > 0 else y0 + 0.5, 0.9),
            (math.pi / 2, 0, math.pi / 2 * face), L.mat("up-num", 0xffffff, 0.5), extrude=0.005)
 

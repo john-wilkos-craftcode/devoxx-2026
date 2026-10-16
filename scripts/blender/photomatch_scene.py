@@ -35,6 +35,8 @@ ap.add_argument("--blur", action="store_true", help="walk stills: the clip's mot
 ap.add_argument("--blur-steps", default="4", help="EEVEE motion blur steps (accumulation; 4 fixed the vector blur's hard edges on near columns, 16/10 A/B; 0 = Blender's 1); stills take a comma list to A/B")
 ap.add_argument("--max-spf", type=float, default=0, help="walk anim: render 5 frames, stop if they average more seconds a frame than this")
 ap.add_argument("--anim-range", default="", help="walk anim: only frames a-b (time a clip before rendering it all)")
+ap.add_argument("--hide", default="", help="collections to leave out of the render, comma list (checks)")
+ap.add_argument("--room", type=int, default=0, help="venue: the walk to this room (3-10) instead of the fly-through")
 ap.add_argument("--crowd", action="store_true", help="venue: add the crowd (pm_areas/crowd.py)")
 ap.add_argument("--unified", action="store_true", help="build the area as part of the whole venue (no photo hacks)")
 args = ap.parse_args(argv)
@@ -52,11 +54,17 @@ if args.variant:
     area.VARIANT = args.variant
 if args.crowd:
     area.CROWD = True
+if args.room:
+    area.ROOM = args.room
 if args.unified:
     area.build(ROOT, unified=True)
 else:
     area.build(ROOT)
 print(f"BUILT {args.area} in {time.time() - t0:.1f}s, {len(scene.objects)} objects")
+for cn in [c for c in args.hide.split(",") if c]:
+    if cn in bpy.data.collections:
+        bpy.data.collections[cn].hide_render = True
+        print(f"HIDDEN collection {cn}")
 
 # ---------------------------------------------------------------------------------- render settings
 if args.engine == "cycles":
@@ -138,7 +146,7 @@ if args.plan:
         print("done")
         sys.exit(0)
 if args.walk:
-    out = Path(args.out) / args.area / ("walk" + (f"-{args.variant}" if args.variant else ""))
+    out = Path(args.out) / args.area / ("walk" + (f"-{args.variant}" if args.variant else "") + (f"-room{args.room}" if args.room else ""))
     out.mkdir(parents=True, exist_ok=True)
     cam = bpy.data.objects["cam-walk"]
     scene.camera = cam
@@ -217,7 +225,9 @@ for name in wanted:
     ob = bpy.data.objects.new(f"cam-{name}", data)
     scene.collection.objects.link(ob)
     ob.matrix_world = Matrix(b["matrix"])
-    data.sensor_fit, data.sensor_width, data.lens = "HORIZONTAL", b["sensor_width"], b["lens"]
+    data.sensor_fit, data.sensor_width, data.lens = b.get("sensor_fit", "HORIZONTAL"), b["sensor_width"], b["lens"]
+    if "sensor_height" in b:
+        data.sensor_height = b["sensor_height"]
     data.shift_x, data.shift_y = b["shift_x"], b["shift_y"]
     data.clip_start, data.clip_end = 0.05, 1000
     W, H = b["size"]

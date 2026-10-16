@@ -22,7 +22,7 @@ import math
 import bpy
 from mathutils import Vector
 
-PARTS = ("outside", "entrance", "hollywood", "hall_screen", "stairs", "upstairs")
+PARTS = ("outside", "entrance", "hollywood", "hall_screen", "stairs", "upstairs", "auditoriums")
 VIEW_TRANSFORM = "AgX"
 LOOK = "AgX - Medium High Contrast"
 EXPOSURE = 0.0
@@ -33,6 +33,7 @@ START_LOOK, START_LOOK_M, END_FOV_V, END_EYE_Z = None, 9.0, None, None
 SPEED_KEYS, LOOK_TAU = [], 0.0
 VARIANT = "laptop"                                  # or "phone" (set by the runner's --variant)
 CROWD = False                                       # the crowd (pm_areas/crowd.py), set by the runner's --crowd
+ROOM = None                                         # a room walk (pm_areas/room_walk.py) instead of the fly-through: --room
 FOV_V, WALK_SIZE, DOF_END = 44.5, (16, 9), None
 
 WALK, SCREEN, FILLET = [], (0, 0, 0), 2.5         # from data/photomatch/walk.json
@@ -100,7 +101,12 @@ def build(root, unified=True):
     out = importlib.import_module("pm_areas.outside")
     if hasattr(out, "lighting"):
         out.lighting(root)
-    walk_camera()
+    cam = walk_camera()
+    if ROOM:                                   # the room walk starts where the fly-through ends (the hall still)
+        start = bpy.context.scene.frame_end
+        cam.name = "cam-flythrough"
+        rw = importlib.import_module("pm_areas.room_walk").camera(root, ROOM, VARIANT, first_frame=start)
+        rw.name = "cam-walk"
     if CROWD:                                  # last: placement looks through the walk camera (who is ever seen)
         importlib.import_module("pm_areas.crowd").build(root, unified=True)
     try:                                       # BRIEF.md step 2: numbers before any render

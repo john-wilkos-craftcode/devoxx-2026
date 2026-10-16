@@ -36,5 +36,66 @@
    9
   ],
   "notes": "floor 1 by the west opening, looking down into it"
+ },
+ "check_seat_8": {
+  "area": "venue",
+  "blender": {
+   "matrix": [
+    [
+     -4.371138828673793e-08,
+     -4.371138828673793e-08,
+     -1.0,
+     28.165000915527344
+    ],
+    [
+     -1.0,
+     1.910685676922942e-15,
+     4.371138828673793e-08,
+     -31.219999313354492
+    ],
+    [
+     0.0,
+     1.0,
+     -4.371138828673793e-08,
+     5.409999847412109
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens": 16.40243148803711,
+   "sensor_fit": "VERTICAL",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "shift_x": 0.0,
+   "shift_y": -0.04888084903359413,
+   "size": [
+    2534,
+    1620
+   ]
+  },
+  "notes": "room 8's seat: the published still's camera"
+ },
+ "check_door_8": {
+  "area": "venue",
+  "C": [
+   9.0,
+   -19.5,
+   7.85
+  ],
+  "look": [
+   14.0,
+   -22.35,
+   7.3
+  ],
+  "fov_h": 72,
+  "size": [
+   16,
+   9
+  ],
+  "notes": "the corridor by room 8's doorway"
  }
 }
