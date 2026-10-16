@@ -27,9 +27,14 @@ STAIR = {"west": (-7.15, -4.85), "east": (10.25, 12.55)}          # the flights'
 STAIR_FOOT, STAIR_TOP = 9.88, -1.32
 GAP_Y = 12.48                                                       # middle of the glass box's side gap
 LANE = {"west": -2.0, "east": 7.3}                                  # corridor lanes: ~1 m clear of the columns either side
+# south of the stairs the 2026 dressing has table rows along both sides (venue y -21.4 .. -37.6, chairs out to x -2.06
+# and 7.30 on the aisle side) and the gate columns at y -19.3 (x -0.36..1.11 and 4.70..6.23)
+GATE_Y, TABLES_Y = -19.3, (-37.6, -21.4)
+SIDE_AISLE = {"west": -5.2, "east": 10.3}                          # behind the tables, along the walls (rooms 5, 8)
+CENTRE_X = 2.9                                                       # through the gate, down the central aisle (6, 7)
 ACCEL, DECEL, LOOK_AHEAD, LOOK_TAU = 2.2, 1.8, 4.0, 0.3
 HALL = {"laptop": {"pos": (2.4, 14.08, 1.7), "look": (2.4, 17.83, 1.7), "fov_v": 40.0},
-        "phone": {"pos": (5.6, 13.85, 1.5), "look": (5.6, 15.515, 1.5), "fov_v": None}}
+        "phone": {"pos": (5.6, 13.85, 1.5), "look": (5.6, 15.515, 1.5), "fov_v": 58.29}}
 
 
 def venue_json(root):
@@ -68,8 +73,9 @@ def rake_floor(v, n):
     return z, rb
 
 
-def seat_pose(root, n):
-    s = json.loads((Path(root) / "data" / "photomatch" / "seats.json").read_text())["seats"][str(n)]
+def seat_pose(root, n, key="seats"):
+    """the end still's camera: the seat (laptops) or the door totem (phones, key "doors_phone")"""
+    s = json.loads((Path(root) / "data" / "photomatch" / "seats.json").read_text())[key][str(n)]
     M = Matrix(s["matrix"])
     return {"pos": M.translation.copy(), "fwd": -(M.to_3x3() @ Vector((0, 0, 1))), "lens": s["lens"],
             "shift_x": s["shift_x"], "shift_y": s["shift_y"], "fit": s["sensor_fit"]}
@@ -92,9 +98,17 @@ def waypoints(root, n, variant="laptop"):
            (sx, STAIR_FOOT, EYE), (sx, STAIR_TOP, FH + EYE), (sx, STAIR_TOP - 1.8, FH + EYE),
            (lane, STAIR_TOP - 3.6, FH + EYE)]
     north = yc > STAIR_TOP                                       # rooms 3 and 10: back north past the opening
-    pts.append((lane, yc - (-1 if north else 1) * 3.0, FH + EYE))
-    if variant == "phone":
-        return pts, door, None
+    side_x = SIDE_AISLE[side]
+    if north or yc > GATE_Y + 1.0:                               # rooms 3, 4, 9, 10: the lane runs to the door
+        pts.append((lane, yc - (-1 if north else 1) * 3.0, FH + EYE))
+    elif yc > TABLES_Y[0]:                                       # rooms 5, 8: behind the tables, along the wall
+        pts += [(lane, GATE_Y + 2.5, FH + EYE), (side_x, GATE_Y - 0.6, FH + EYE), (side_x, yc + 1.5, FH + EYE)]
+    else:                                                        # rooms 6, 7: through the gate, down the middle
+        pts += [(lane, GATE_Y + 5.0, FH + EYE), (CENTRE_X, GATE_Y + 1.5, FH + EYE), (CENTRE_X, yc + 3.0, FH + EYE)]
+    if variant == "phone":                                    # on to the door totem's still
+        e = seat_pose(root, n, "doors_phone")["pos"]
+        pts.append((e.x, e.y, e.z))
+        return pts, door, e
     zf, rb = rake_floor(v, n)
     high = rb["x"] + rb["w"] if door["west"] else rb["x"]
     ay = aisle_y(v, n, door)
@@ -144,13 +158,13 @@ def speeds(pts, n_pts_marks):
         in_room = p.x < -7.4 or p.x > 12.8
         upstairs = p.z > FH + 0.5
         if in_room:
-            v.append(3.0)
+            v.append(3.5)
         elif on_stairs:
-            v.append(3.2)
-        elif upstairs:
-            v.append(7.0)
-        else:
             v.append(4.5)
+        elif upstairs:
+            v.append(9.0)
+        else:
+            v.append(5.5)
     return v
 
 
@@ -173,7 +187,7 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True):
     frame range and the visibility swaps (False: a camera only for the crowd's placement, crowd_place.py)"""
     scene = bpy.context.scene
     pts_c, door, e = waypoints(root, n, variant)
-    seat = seat_pose(root, n) if variant == "laptop" else None
+    seat = seat_pose(root, n) if variant == "laptop" else seat_pose(root, n, "doors_phone")
     hall = HALL[variant]
     data = bpy.data.cameras.new(f"cam-room-{n}")
     data.sensor_fit, data.sensor_height, data.sensor_width = "VERTICAL", 24, 36
@@ -239,6 +253,7 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True):
     inside = next((i for i, (tt, pp) in enumerate(zip_frames(pts, ts, nf))
                    if (door["west"] and pp.x < door["x"] - 0.6) or (not door["west"] and pp.x > door["x"] + 0.6)), nf)
     swap_visibility(first_frame, first_frame + max(0, up - 8), first_frame + max(0, inside - 2), first_frame + nf - 1)
+    clearance(zip_frames(pts, ts, nf), first_frame, up, inside)
     print(f"ROOMWALK {n} {variant}: {L:.0f} m in {T:.1f} s, frames {scene.frame_start}..{scene.frame_end}", flush=True)
     return cam
 
@@ -277,6 +292,47 @@ def swap_visibility(f0, f_up, f_in, f1):
                 keys(ob, f0 - 10, f_in)
     bpy.context.scene.frame_set(f0)            # keying leaves each property at its last key: back to the start's state
     print(f"ROOMWALK visibility: auditoriums from frame {f_up}, the hall side until {f_in}", flush=True)
+
+
+CLEAR_MIN = 0.45                 # m from the camera to the nearest surface: closer is a brush the eye catches
+
+
+def clearance(track, f0, up, inside):
+    """the camera's distance to the nearest surface each frame, against what it can actually be near: the hall side,
+    stairs and upstairs before the doorway, the stairs, upstairs and the auditorium after the stair top (the plan's
+    rakes overlap the hall, so one model would report false brushes). Prints the tightest frames."""
+    import numpy as np
+    from mathutils.bvhtree import BVHTree
+    dg = bpy.context.evaluated_depsgraph_get()
+
+    def bvh(colls):
+        verts, polys, off = [], [], 0
+        for cn in colls:
+            c = bpy.data.collections.get(cn)
+            for ob in (c.all_objects if c else []):
+                if ob.type != "MESH":
+                    continue
+                me = ob.evaluated_get(dg).to_mesh()
+                me.calc_loop_triangles()
+                n = len(me.vertices)
+                if n and me.loop_triangles:
+                    co = np.empty(n * 3); me.vertices.foreach_get("co", co); co = co.reshape(-1, 3)
+                    M = np.array(ob.matrix_world); co = co @ M[:3, :3].T + M[:3, 3]
+                    tri = np.empty(len(me.loop_triangles) * 3, np.int32); me.loop_triangles.foreach_get("vertices", tri)
+                    verts.append(co); polys.append(tri.reshape(-1, 3) + off); off += n
+                ob.evaluated_get(dg).to_mesh_clear()
+        return BVHTree.FromPolygons(np.concatenate(verts).tolist(), np.concatenate(polys).tolist(), all_triangles=True)
+    below = bvh(HALL_SIDE + ("stairs", "upstairs", "door_totems"))
+    above = bvh(("stairs", "upstairs", "auditoriums", "door_totems"))
+    worst = []
+    for i, (t, p) in enumerate(track):
+        d = min(tree.find_nearest(p)[3] for tree in ([below] if i < up else []) + ([above] if i >= up - 30 else []) +
+                ([below] if up - 30 <= i < inside else []))
+        worst.append((d, f0 + i))
+    worst.sort()
+    tight = [(round(d, 2), f) for d, f in worst if d < CLEAR_MIN]
+    print(f"ROOMWALK clearance: min {worst[0][0]:.2f} m at frame {worst[0][1]}; {len(tight)} frames under {CLEAR_MIN} m"
+          + (f": {tight[:8]}" if tight else ""), flush=True)
 
 
 def all_paths(root, variants=("laptop", "phone")):

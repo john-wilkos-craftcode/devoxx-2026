@@ -22,7 +22,7 @@ import math
 import bpy
 from mathutils import Vector
 
-PARTS = ("outside", "entrance", "hollywood", "hall_screen", "stairs", "upstairs", "auditoriums")
+PARTS = ("outside", "entrance", "hollywood", "hall_screen", "stairs", "upstairs", "auditoriums", "door_totems")
 VIEW_TRANSFORM = "AgX"
 LOOK = "AgX - Medium High Contrast"
 EXPOSURE = 0.0
