@@ -1,0 +1,113 @@
+{
+ "source": "Google Street View panorama (Sep 2020), one point: 51.2459082, 4.4162091 (all views share the camera centre)",
+ "projection": "ideal pinhole, no distortion; x right, y down in pixels; focal and principal point are for the clean crop",
+ "heading_deg": "compass bearing of the view direction (Street View URL 'h'); tilt_deg: 90 = level, > 90 looks up ('t')",
+ "fov_note": "URL 'y' = vertical field of view over the 2070 px canvas: focal = 1035 / tan(y / 2), principal point at the canvas centre (the canvas starts right of the side panel, x 1000..3840 of the screenshot). Checked 16/10: the zoomed and the cone views' focals measured from their overlap with the wide views agree within 0.3%, and detail-to-wide shifts within 2 px",
+ "views": {
+  "sv_201704_h80.jpg": {
+   "heading_deg": 79.68,
+   "tilt_deg": 97.52,
+   "focal_px": 1348.8,
+   "principal_px": [
+    900.0,
+    899.5
+   ],
+   "size_px": [
+    2160,
+    1705
+   ],
+   "focal_from": "URL fov 75 (vertical over the 2070 px canvas)",
+   "screenshot": "Screenshot 2026-10-16 201704.png"
+  },
+  "sv_201820_h164.jpg": {
+   "heading_deg": 163.61,
+   "tilt_deg": 93.09,
+   "focal_px": 1348.8,
+   "principal_px": [
+    900.0,
+    899.5
+   ],
+   "size_px": [
+    2160,
+    1705
+   ],
+   "focal_from": "URL fov 75 (vertical over the 2070 px canvas)",
+   "screenshot": "Screenshot 2026-10-16 201820.png"
+  },
+  "sv_201920_h262.jpg": {
+   "heading_deg": 261.83,
+   "tilt_deg": 88.34,
+   "focal_px": 1348.8,
+   "principal_px": [
+    900.0,
+    899.5
+   ],
+   "size_px": [
+    2160,
+    1705
+   ],
+   "focal_from": "URL fov 75 (vertical over the 2070 px canvas)",
+   "screenshot": "Screenshot 2026-10-16 201920.png"
+  },
+  "sv_202006_h334.jpg": {
+   "heading_deg": 334.47,
+   "tilt_deg": 89.19,
+   "focal_px": 1348.8,
+   "principal_px": [
+    900.0,
+    899.5
+   ],
+   "size_px": [
+    2160,
+    1705
+   ],
+   "focal_from": "URL fov 75 (vertical over the 2070 px canvas)",
+   "screenshot": "Screenshot 2026-10-16 202006.png"
+  },
+  "sv_left_stair_detail_h65.jpg": {
+   "heading_deg": 64.76,
+   "tilt_deg": 92.68,
+   "focal_px": 5654.0,
+   "principal_px": [
+    900.0,
+    899.5
+   ],
+   "size_px": [
+    2160,
+    1705
+   ],
+   "focal_from": "measured from 209 matches with 'Screenshot 2026-10-16 201704.png' (orthogonality error 0.0038); URL said fov 20.8",
+   "screenshot": "left stair detail.png"
+  },
+  "sv_right_stair_detail_h89.jpg": {
+   "heading_deg": 88.87,
+   "tilt_deg": 93.35,
+   "focal_px": 5654.0,
+   "principal_px": [
+    900.0,
+    899.5
+   ],
+   "size_px": [
+    2160,
+    1705
+   ],
+   "focal_from": "measured from 156 matches with 'Screenshot 2026-10-16 201704.png' (orthogonality error 0.0017); URL said fov 20.8",
+   "screenshot": "right stair detail.png"
+  },
+  "sv_closeup_cloth_cone_detail_h216.jpg": {
+   "heading_deg": 215.87,
+   "tilt_deg": 117.8,
+   "focal_px": 1034.8,
+   "principal_px": [
+    900.0,
+    899.5
+   ],
+   "size_px": [
+    2160,
+    1705
+   ],
+   "focal_from": "measured from 172 matches with 'Screenshot 2026-10-16 201920.png' (orthogonality error 0.0072); URL said fov 90",
+   "screenshot": "closeup cloth cone detail.png"
+  }
+ }
+}
