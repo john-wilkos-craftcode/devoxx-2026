@@ -33,6 +33,19 @@ camera looks). John approved the EEVEE fly-through's motion (laptop and phone) a
   (4.2 s/frame with the crowd). Room 8 laptop crowd preview re-rendering (kino-renders/photomatch/venue/
   preview-room8-laptop.mp4, on the review page). Open question to John: the cones' cyan points sweeping over the top
   of frame just after the stair top (s 5-7). Send him model-only stills/clips with SendUserFile when he's away.
+- **17/10 night (John asleep; his go: "if room 8 and the cones look good, do the full-quality room 8 walk"):**
+  - Cones rebuilt (pm_areas/cone_form.py: force-density form-finding; upstairs.cone_mesh): six corners 3 m out up to
+    7 m, corners that would land past a girder tied to its face at 6.2 m (so nothing can clip), wires to the ceiling,
+    cyan glow (0, 0.3, 0.4) x1.3 and a 6 kW shadowless cyan uplight per cone washing the ceiling (AgX pales brighter
+    cyan; A/B of five in scratch). Fitted by projecting the solved net over the close-up and h80.
+  - The schedule screen now hangs on a divider between the stairwells, flush with their glass boxes' north ends
+    (hall_screen.DIVIDER, y 13.88..14.18; John 17/10). The fly-through's last three points, its screen and the phone
+    tail moved 4.27 m south with it (walk.json; motion otherwise unchanged); room walks start from the new end poses,
+    east walks detour south of the phone totem and its plant (room 8 laptop 0.54 m, phone 0.61 m clear; the other 14
+    walks not re-checked yet). The published hall stills (cam-hall, cam-hall-phone) and their shots.json overlays
+    move too: re-render and re-pin when publishing.
+  - EEVEE final rubric in BRIEF.md + scripts/photomatch/qc.py (pops, noise, breathing, clipping; calibrated on the
+    approved fly-through). Runner --final: full-res ray tracing, 2 shadow rays.
 - **Next, in order:** (1) John's notes on the re-rendered room 8 walk; (2) John's notes on the cones (fuller,
   deeper cyan?), lengths, routes; (3) previews of a phone walk and one west room; (4) remodel the auditoriums from the
   four new photos (blue seats, red LED step lights, the big screen; John: free to change the rooms but keep each
