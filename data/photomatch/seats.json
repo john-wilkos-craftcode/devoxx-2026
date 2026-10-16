@@ -564,5 +564,104 @@
    "source": "cam-plan-door-9"
   }
  },
- "note_doors": "the phone walks end on the door totem stills (build_scene.py's door-phone cameras), saved 16/10"
+ "note_doors": "the phone walks end on the door totem stills (build_scene.py's door-phone cameras), saved 16/10",
+ "walk_end": {
+  "10": {
+   "lens": 27.563124876975557,
+   "shift_x": -0.016633623441647857,
+   "shift_y": 0.08180974269114828,
+   "inner": [
+    0.15058,
+    0.05704,
+    0.82692,
+    0.65212
+   ],
+   "screen_fill": 0.88
+  },
+  "3": {
+   "lens": 28.53096691121291,
+   "shift_x": 0.016628463103706158,
+   "shift_y": 0.06130147081941283,
+   "inner": [
+    0.18417,
+    0.07347,
+    0.83756,
+    0.64836
+   ],
+   "screen_fill": 0.88
+  },
+  "4": {
+   "lens": 26.582763217277257,
+   "shift_x": 0.002402735242169483,
+   "shift_y": 0.07246666930149824,
+   "inner": [
+    0.15104,
+    0.04793,
+    0.85233,
+    0.66497
+   ],
+   "screen_fill": 0.88
+  },
+  "5": {
+   "lens": 27.597901627236705,
+   "shift_x": 0.010163013306865372,
+   "shift_y": 0.05942619118886793,
+   "inner": [
+    0.16912,
+    0.06371,
+    0.84461,
+    0.65805
+   ],
+   "screen_fill": 0.88
+  },
+  "6": {
+   "lens": 26.351330277533233,
+   "shift_x": 0.0131388643482452,
+   "shift_y": 0.07362030640651179,
+   "inner": [
+    0.15557,
+    0.0447,
+    0.86302,
+    0.66715
+   ],
+   "screen_fill": 0.88
+  },
+  "7": {
+   "lens": 26.325957898224043,
+   "shift_x": -0.013140335392762575,
+   "shift_y": 0.0736718943207422,
+   "inner": [
+    0.13663,
+    0.04436,
+    0.84476,
+    0.66742
+   ],
+   "screen_fill": 0.88
+  },
+  "9": {
+   "lens": 26.787643350497728,
+   "shift_x": 0.002406884276873224,
+   "shift_y": 0.07204159671606784,
+   "inner": [
+    0.15371,
+    0.05058,
+    0.84964,
+    0.66289
+   ],
+   "screen_fill": 0.88
+  },
+  "8": {
+   "lens": 27.637421517366345,
+   "shift_x": -0.010170153980929289,
+   "shift_y": 0.059346489363981875,
+   "inner": [
+    0.15588,
+    0.06418,
+    0.8304,
+    0.65767
+   ],
+   "screen_fill": 0.88
+  }
+ },
+ "note_walk_end": "the laptop walks end on a crop of the seat still where the screen spans 88% of the width (John 16/10: the screen should take most of the frame): same position and direction, this lens and shift; 'inner' is that crop in the still's normalised coords, for shots.json when the new walks are published"
 }

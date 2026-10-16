@@ -71,6 +71,32 @@ def balustrade(name, a, b, M, out):
     L.mesh_obj(f"{name}-glass", v, [(0, 1, 2, 3)], M["glass"])
 
 
+GAP_Y = (11.58, 13.38)            # the openings in both long sides of each stairwell's glass box (plan walls)
+BOX_SIDES = {"stair-west": ((-7.45, -7.15), (-4.85, -4.55)), "stair-east": ((9.95, 10.25), (12.55, 12.85))}
+DOOR_H = 2.4
+
+
+def double_doors(name, xa, xb, M, open_out=0):
+    """white double doors in a glass box's side opening (xa..xb is the wall's thickness), a frosted panel above them to
+    the ceiling; open_out = +1/-1 swings both leaves 90 deg out towards +x/-x (the side the walk comes from)"""
+    y0, y1 = GAP_Y
+    xm = (xa + xb) / 2
+    w = (y1 - y0) / 2
+    L.box(f"{name}-transom", xa, y0, DOOR_H + 0.08, xb, y1, TOP, M["frosted"])
+    L.box(f"{name}-head", xa - 0.01, y0, DOOR_H, xb + 0.01, y1, DOOR_H + 0.08, M["door_frame"])
+    for k, (h0, sgn) in enumerate(((y0, 1), (y1, -1))):           # hinge at each end, leaves meet in the middle
+        if open_out:                                            # swung out flat against nothing: perpendicular to the wall
+            xs, xe = sorted((xm, xm + open_out * w))
+            L.box(f"{name}-leaf{k}", xs, h0 + sgn * 0.02 - 0.025, 0.01, xe, h0 + sgn * 0.02 + 0.025, DOOR_H - 0.01, M["door"])
+        else:
+            ys, ye = sorted((h0, h0 + sgn * (w - 0.005)))
+            L.box(f"{name}-leaf{k}", xm - 0.025, ys, 0.01, xm + 0.025, ye, DOOR_H - 0.01, M["door"])
+            yb = h0 + sgn * (w - 0.18)                          # a steel push bar on each face
+            for f in (-1, 1):
+                L.box(f"{name}-bar{k}{f}", xm + f * 0.03, min(yb, yb - sgn * 0.6), 1.0, xm + f * 0.05, max(yb, yb - sgn * 0.6), 1.05,
+                      M["bar"])
+
+
 def build(root, unified=True):
     M = {
         "tread": L.mat("stair-tread-dark", 0x2b2d33, 0.8, bump=0.2, bump_scale=200),
@@ -79,7 +105,20 @@ def build(root, unified=True):
         "slab": L.mat("stair-slab-edge", 0x121318, 0.9),
         "rail": L.mat("stair-rail", 0x1a1a1c, 0.4, metal=0.6),
         "glass": L.mat("stair-rail-glass", 0xdfe8ee, 0.05, alpha=0.18),
+        "door": L.mat("stair-door-white", 0xf2f2ee, 0.45),
+        "door_frame": L.mat("stair-door-frame", 0xdcdcd8, 0.5),
+        "bar": L.mat("stair-door-bar", 0xb9bcc2, 0.25, metal=1.0),
+        "frosted": L.mat("frosted-glass", 0x8fb5b0, 0.35, transmission=0.6),
     }
+    import pm_areas.venue as V
+    walk_side = None if not V.ROOM else ("stair-west" if V.ROOM in (3, 4, 5, 6) else "stair-east")
+    for sid, ((oa, ob), (ia, ib)) in BOX_SIDES.items():
+        # the hall-facing side (towards the middle of the hall) is the way in; only the room walk's own opens
+        inner = (ia, ib) if sid == "stair-west" else (oa, ob)
+        outer = (oa, ob) if sid == "stair-west" else (ia, ib)
+        out_dir = 1 if sid == "stair-west" else -1
+        double_doors(f"{sid}-door-in", *inner, M, open_out=out_dir if sid == walk_side else 0)
+        double_doors(f"{sid}-door-out", *outer, M)
     for ln in links(root):
         name = ln["id"]
         x0, x1, y0, y1 = flight(name, ln, M)

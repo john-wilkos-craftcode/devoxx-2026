@@ -29,7 +29,7 @@ GAP_Y = 12.48                                                       # middle of 
 LANE = {"west": -3.5, "east": 9.0}                                  # corridor lanes: outside the column rows (under the girders, x ~ -1.6 / 7.2), ~1.3 m from the stair openings
 # south of the stairs the 2026 dressing has table rows along both sides (venue y -21.4 .. -37.6, chairs out to x -2.06
 # and 7.30 on the aisle side) and the gate columns at y -19.3 (x -0.36..1.11 and 4.70..6.23)
-GATE_Y, TABLES_Y = -19.3, (-37.6, -21.4)
+GATE_Y, TABLES_Y = -19.3, (-37.6, -24.2)                            # (tables moved nearer the walls, past doors 5/8)
 SIDE_AISLE = {"west": -5.2, "east": 10.3}                          # behind the tables, along the walls (rooms 5, 8)
 CENTRE_X = 2.9                                                       # through the gate, down the central aisle (6, 7)
 ACCEL, DECEL, LOOK_AHEAD, LOOK_TAU = 2.2, 1.8, 4.0, 0.3
@@ -75,10 +75,15 @@ def rake_floor(v, n):
 
 def seat_pose(root, n, key="seats"):
     """the end still's camera: the seat (laptops) or the door totem (phones, key "doors_phone")"""
-    s = json.loads((Path(root) / "data" / "photomatch" / "seats.json").read_text())[key][str(n)]
+    d = json.loads((Path(root) / "data" / "photomatch" / "seats.json").read_text())
+    s = d[key][str(n)]
     M = Matrix(s["matrix"])
-    return {"pos": M.translation.copy(), "fwd": -(M.to_3x3() @ Vector((0, 0, 1))), "lens": s["lens"],
+    pose = {"pos": M.translation.copy(), "fwd": -(M.to_3x3() @ Vector((0, 0, 1))), "lens": s["lens"],
             "shift_x": s["shift_x"], "shift_y": s["shift_y"], "fit": s["sensor_fit"]}
+    if key == "seats" and str(n) in d.get("walk_end", {}):      # the walk ends on the tighter crop of the still
+        e = d["walk_end"][str(n)]
+        pose.update(lens=e["lens"], shift_x=e["shift_x"], shift_y=e["shift_y"])
+    return pose
 
 
 def waypoints(root, n, variant="laptop"):
@@ -99,10 +104,8 @@ def waypoints(root, n, variant="laptop"):
            (lane, STAIR_TOP - 3.6, FH + EYE)]
     north = yc > STAIR_TOP                                       # rooms 3 and 10: back north past the opening
     side_x = SIDE_AISLE[side]
-    if north or yc > GATE_Y + 1.0:                               # rooms 3, 4, 9, 10: the lane runs to the door
+    if north or yc > TABLES_Y[1]:                                # rooms 3, 4, 5, 8, 9, 10: the lane runs to the door
         pts.append((lane, yc - (-1 if north else 1) * 3.0, FH + EYE))
-    elif yc > TABLES_Y[0]:                                       # rooms 5, 8: behind the tables, along the wall
-        pts += [(lane, GATE_Y + 2.5, FH + EYE), (side_x, GATE_Y - 0.6, FH + EYE), (side_x, yc + 1.5, FH + EYE)]
     else:                                                        # rooms 6, 7: through the gate, down the middle
         pts += [(lane, GATE_Y + 5.0, FH + EYE), (CENTRE_X, GATE_Y + 1.5, FH + EYE), (CENTRE_X, yc + 3.0, FH + EYE)]
     if variant == "phone":                                    # on to the door totem's still

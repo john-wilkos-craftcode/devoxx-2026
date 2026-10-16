@@ -713,6 +713,10 @@ def to_venue(objs=None):
 def build_seating(M):
     """long table rows down both sides, folding chairs on both long sides, backs to the aisle and to the wall"""
     rows = [(-4.2, -1, 0.0, 15.2), (5.0, 1, 0.0, 15.0)]          # aisle edge x, outward sign, y from, y to
+    if UNIFIED[0]:
+        # John (16/10): the rows stand about half as far from the walls as the photo match put them (3.8 -> 1.9 m from
+        # the wall to the outer chairs), and start just past the doors of rooms 5 and 8 (venue y -24.2), not across them
+        rows = [(-6.02, -1, 2.6, 15.2), (6.75, 1, 2.6, 15.0)]
     chair = make_chair(M)
     for xa, s, y0, y1 in rows:
         xb = xa + 0.76 * s
