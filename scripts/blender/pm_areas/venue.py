@@ -30,10 +30,11 @@ FPS = 30
 SPEED, EYE = 4.5, 1.65
 SLOW, ACCEL, DECEL, LOOK_AHEAD, HOLD = [], 2.5, 1.2, 5.0, 1.0
 START_LOOK, START_LOOK_M, END_FOV_V, END_EYE_Z = None, 9.0, None, None
-SPEED_KEYS, LOOK_TAU = [], 0.0
+SPEED_KEYS, LOOK_TAU, DURATION = [], 0.0, None
 VARIANT = "laptop"                                  # or "phone" (set by the runner's --variant)
 CROWD = False                                       # the crowd (pm_areas/crowd.py), set by the runner's --crowd
 ROOM = None                                         # a room walk (pm_areas/room_walk.py) instead of the fly-through: --room
+BACK = False                                        # with ROOM: the walk back from the room to the hall still: --back
 FOV_V, WALK_SIZE, DOF_END = 44.5, (16, 9), None
 
 WALK, SCREEN, FILLET = [], (0, 0, 0), 2.5         # from data/photomatch/walk.json
@@ -59,8 +60,9 @@ def load_walk(root):
     LOOK_AHEAD, HOLD = w.get("look_ahead", LOOK_AHEAD), w.get("hold", HOLD)
     START_LOOK, START_LOOK_M = w.get("start_look"), w.get("start_look_m", START_LOOK_M)
     END_FOV_V, END_EYE_Z = w.get("end_fov_v"), w.get("end_eye_z")
-    global SPEED_KEYS, LOOK_TAU
+    global SPEED_KEYS, LOOK_TAU, DURATION
     SPEED_KEYS, LOOK_TAU = w.get("speed_keys", []), w.get("look_tau", 0.0)
+    DURATION = w.get("duration")
     global FOV_V, WALK_SIZE, DOF_END
     lap = w.get("laptop", {})
     WALK_SIZE = tuple(lap.get("size", WALK_SIZE))
@@ -105,7 +107,14 @@ def build(root, unified=True):
     if ROOM:                                   # the room walk starts where the fly-through ends (the hall still)
         start = bpy.context.scene.frame_end
         cam.name = "cam-flythrough"
-        rw = importlib.import_module("pm_areas.room_walk").camera(root, ROOM, VARIANT, first_frame=start)
+        RW = importlib.import_module("pm_areas.room_walk")
+        if BACK:                               # the walk back starts on the forward walk's last frame
+            fw = RW.camera(root, ROOM, VARIANT, first_frame=start, activate=False)
+            start = RW.last_frame(fw)
+            bpy.data.objects.remove(fw)
+            rw = RW.camera_back(root, ROOM, VARIANT, first_frame=start)
+        else:
+            rw = RW.camera(root, ROOM, VARIANT, first_frame=start)
         rw.name = "cam-walk"
     if CROWD:                                  # last: placement looks through the walk camera (who is ever seen)
         importlib.import_module("pm_areas.crowd").build(root, unified=True)
@@ -173,16 +182,30 @@ def timing(pts, step):
                     break
     else:
         vt = [SPEED] * n
-    vt[-1] = 0.05                                          # settle to a stop; the start speed is the first key
-    for i in range(1, n):                                  # acceleration limit
-        vt[i] = min(vt[i], math.sqrt(vt[i - 1] ** 2 + 2 * ACCEL * step))
-    for i in range(n - 2, -1, -1):                         # braking limit
-        vt[i] = min(vt[i], math.sqrt(vt[i + 1] ** 2 + 2 * DECEL * step))
-    t, out = 0.0, [0.0]
-    for i in range(1, n):
-        t += step / max(0.05, 0.5 * (vt[i] + vt[i - 1]))
-        out.append(t)
-    return out
+    base = vt
+
+    def run(k):
+        vt = [v * k for v in base]
+        vt[-1] = 0.05                                      # settle to a stop; the start speed is the first key
+        for i in range(1, n):                              # acceleration limit
+            vt[i] = min(vt[i], math.sqrt(vt[i - 1] ** 2 + 2 * ACCEL * step))
+        for i in range(n - 2, -1, -1):                     # braking limit
+            vt[i] = min(vt[i], math.sqrt(vt[i + 1] ** 2 + 2 * DECEL * step))
+        t, out = 0.0, [0.0]
+        for i in range(1, n):
+            t += step / max(0.05, 0.5 * (vt[i] + vt[i - 1]))
+            out.append(t)
+        return out
+    if not DURATION:
+        return run(1.0)
+    lo, hi = 0.2, 4.0                                      # walk.json "duration" (John, 17/10: ~10 s): scale the
+    for _ in range(40):                                    # speed keys until the move (before the hold) takes that
+        k = (lo + hi) / 2
+        if run(k)[-1] > DURATION - HOLD:
+            lo = k
+        else:
+            hi = k
+    return run(hi)
 
 
 def walk_camera():

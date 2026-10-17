@@ -219,7 +219,7 @@ def _clear(bvh, o, d, dist):
 
 def other_views(bvh, root):
     """every walk camera other than the active one, for placing one crowd that every clip shares: the fly-through and
-    the eight room walks of this variant (temporary cameras, removed once their views are measured)"""
+    the eight room walks there and back of this variant (temporary cameras, removed once their views are measured)"""
     import pm_areas.venue as V
     import pm_areas.room_walk as RW
     fly = bpy.data.objects.get("cam-flythrough") or bpy.data.objects.get("cam-walk")
@@ -228,12 +228,15 @@ def other_views(bvh, root):
     views, tmp = [], []
     if fly.name == "cam-flythrough":
         views.append(View(bvh, fly))
-    for n in (3, 4, 5, 6, 7, 8, 9, 10):
-        if V.ROOM == n:
-            continue
+    for n in (3, 4, 5, 6, 7, 8, 9, 10):              # each room's walk there and its walk back (17/10)
         c = RW.camera(root, n, V.VARIANT, first_frame=fly_end, activate=False)
         tmp.append(c)
-        views.append(View(bvh, c))
+        if not (V.ROOM == n and not V.BACK):
+            views.append(View(bvh, c))
+        b = RW.camera_back(root, n, V.VARIANT, first_frame=RW.last_frame(c), activate=False)
+        tmp.append(b)
+        if not (V.ROOM == n and V.BACK):
+            views.append(View(bvh, b))
     for c in tmp:
         bpy.data.objects.remove(c)
     print(f"CROWD views: the active camera + {len(views)} others", flush=True)

@@ -70,10 +70,10 @@
  "speed": 5.5,
  "eye": 1.65,
  "fillet": 3.5,
- "accel": 4.0,
- "decel": 3.5,
+ "accel": 6.0,
+ "decel": 5.0,
  "look_ahead": 7.0,
- "hold": 1.0,
+ "hold": 0.5,
  "timing_note": "A quick fly-through for the web app (John, 15/10): about 5.5 m/s on the open stretches, easing off at the door and the steps, settling on the screen and holding 1 s.",
  "start_look": [
   6.0,
@@ -128,12 +128,12 @@
   [
    -21.5,
    -75.5,
-   4.5
+   9.0
   ],
   [
    -14.0,
    -71.8,
-   8.0
+   12.0
   ],
   [
    -5.8,
@@ -156,6 +156,7 @@
    13.0
   ]
  ],
- "speed_note": "Speed (John, 15/10): already moving at the start while looking at the Kinepolis sign, ~8 m/s through the door and the reception, a faster whoosh (~13 m/s) through the booths and the crowd, braking only into the screen.",
- "look_tau": 0.35
+ "speed_note": "Speed (John, 15/10): already moving at the start while looking at the Kinepolis sign, ~8 m/s through the door and the reception, a faster whoosh (~13 m/s) through the booths and the crowd, braking only into the screen. John (17/10): about 10 s in all with ease in and out, the time cut from the start and the end: 'duration' 10 s (hold 0.5 s) scales the keys; the forecourt runs relatively faster (9-12) and the braking into the screen is firmer (decel 5).",
+ "look_tau": 0.35,
+ "duration": 10.0
 }
