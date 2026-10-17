@@ -90,6 +90,9 @@ Visual (contact sheet every ~0.5 s + the critical frames, judged by a fresh-eyes
 - Weak GPU (4 GB here; 17/10 research, forums + manual + bug tracker). A 1920 px frame at 64 samples with full-res
   ray tracing and 4 blur steps took ~3 min and then stalled the card (3.7 of 4 GB used, 0 % load, 7 h): never run
   a full clip without a watcher that flags a stall.
+  - Measured 17/10 (room 8, 1600 px, 48 samples, 4 blur steps, crowd): --tex-limit 1024 --shadow-scale 0.5 took the
+    hall/corridor frames from 20-72 s to 13-32 s, cleared every "shadow buffer full" warning, same look, noise 0.70.
+    Full-quality clips use these two flags.
   - Cap texture size: EEVEE has no per-render texture limit, but the GPU texture limit preference
     (preferences.system.gl_texture_limit) caps every image uploaded; 1024 or 2048 keeps the crowd's 2K Rocketbox
     textures from filling VRAM (bug reports: 4K textures + EEVEE = out of memory where Cycles copes).
