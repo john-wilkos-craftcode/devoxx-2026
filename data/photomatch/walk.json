@@ -1,5 +1,5 @@
 {
- "note": "The fly-through (John, 15/10): a curve along the forecourt from the west, in through the door pair west of the walk-in pair of before (x -8.26..-5.69), north close past the queue with the stair and the reception under it on the right, down the hall steps, along the aisle between the booth blocks, ending square on to the schedule screen on the divider wall between the stairwells (flush with their glass boxes' north ends, John 17/10: the last stretch moved 4.27 m south with it) (the hall still's pose: 3.75 m back, 40 deg vertical).",
+ "note": "The fly-through (John, 15/10): a curve along the forecourt from the west, in through the door pair west of the walk-in pair of before (x -8.26..-5.69), north close past the queue with the stair and the reception under it on the right, down the hall steps, along the aisle between the booth blocks, ending square on to the schedule screen on the divider wall between the stairwells (flush with their glass boxes' north ends, John 17/10: the last stretch moved 4.27 m south with it, swinging onto the screen's axis west of the hall column at (2.65, 5.17), >= 1.9 m clear) (the hall still's pose: 3.75 m back, 40 deg vertical).",
  "points": [
   [
    -21.5,
@@ -47,11 +47,15 @@
   ],
   [
    -0.6,
-   2.23
+   3.0
+  ],
+  [
+   0.0,
+   6.0
   ],
   [
    2.4,
-   5.73
+   7.8
   ],
   [
    2.4,
@@ -83,8 +87,12 @@
   "note": "Phones: the same path, rendered portrait, drifting right over the last stretch onto the totem, ending on the old phone still's pose (square on, 1.7 m back, shallow focus).",
   "points_tail": [
    [
-    5.4,
-    5.73
+    0.4,
+    6.4
+   ],
+   [
+    4.2,
+    7.6
    ],
    [
     5.6,
