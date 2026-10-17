@@ -35,6 +35,8 @@ VARIANT = "laptop"                                  # or "phone" (set by the run
 CROWD = False                                       # the crowd (pm_areas/crowd.py), set by the runner's --crowd
 ROOM = None                                         # a room walk (pm_areas/room_walk.py) instead of the fly-through: --room
 BACK = False                                        # with ROOM: the walk back from the room to the hall still: --back
+TOTEM = None                                        # with ROOM, laptops: "to" the door totem, "in" from it to the seat,
+#                                                     "back" from it to the hall still: --totem
 FOV_V, WALK_SIZE, DOF_END = 44.5, (16, 9), None
 
 WALK, SCREEN, FILLET = [], (0, 0, 0), 2.5         # from data/photomatch/walk.json
@@ -108,7 +110,16 @@ def build(root, unified=True):
         start = bpy.context.scene.frame_end
         cam.name = "cam-flythrough"
         RW = importlib.import_module("pm_areas.room_walk")
-        if BACK:                               # the walk back starts on the forward walk's last frame
+        if TOTEM:                              # the totem walks: "in" and "back" start on "to"'s last frame
+            to = RW.camera(root, ROOM, VARIANT, first_frame=start, activate=TOTEM == "to", end="totem")
+            if TOTEM == "to":
+                rw = to
+            else:
+                start = RW.last_frame(to)
+                bpy.data.objects.remove(to)
+                rw = RW.camera(root, ROOM, VARIANT, first_frame=start, start="totem") if TOTEM == "in" else \
+                    RW.camera_back(root, ROOM, VARIANT, first_frame=start, start="totem")
+        elif BACK:                             # the walk back starts on the forward walk's last frame
             fw = RW.camera(root, ROOM, VARIANT, first_frame=start, activate=False)
             start = RW.last_frame(fw)
             bpy.data.objects.remove(fw)

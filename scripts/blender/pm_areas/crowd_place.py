@@ -241,11 +241,11 @@ def other_views(bvh, root):
     for n in (3, 4, 5, 6, 7, 8, 9, 10):              # each room's walk there and its walk back (17/10)
         c = RW.camera(root, n, V.VARIANT, first_frame=fly_end, activate=False)
         tmp.append(c)
-        if not (V.ROOM == n and not V.BACK):
+        if not (V.ROOM == n and not V.BACK and not V.TOTEM):
             views.append(View(bvh, c))
         b = RW.camera_back(root, n, V.VARIANT, first_frame=RW.last_frame(c), activate=False)
         tmp.append(b)
-        if not (V.ROOM == n and V.BACK):
+        if not (V.ROOM == n and V.BACK and not V.TOTEM):
             views.append(View(bvh, b))
     for c in tmp:
         bpy.data.objects.remove(c)

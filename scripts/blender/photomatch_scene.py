@@ -38,6 +38,8 @@ ap.add_argument("--blur", action="store_true", help="walk stills: the clip's mot
 ap.add_argument("--blur-steps", default="4", help="EEVEE motion blur steps (accumulation; 4 fixed the vector blur's hard edges on near columns, 16/10 A/B; 0 = Blender's 1); stills take a comma list to A/B")
 ap.add_argument("--max-spf", type=float, default=0, help="walk anim: render 5 frames, stop if they average more seconds a frame than this")
 ap.add_argument("--back", action="store_true", help="with --room: the walk back from the room to the hall still")
+ap.add_argument("--totem", choices=("to", "in", "back"), help="with --room, laptops: the walk to the door totem, "
+                "from it into the theatre, or from it back to the hall still")
 ap.add_argument("--anim-range", default="", help="walk anim: only frames a-b (time a clip before rendering it all)")
 ap.add_argument("--hide", default="", help="collections to leave out of the render, comma list (checks)")
 ap.add_argument("--room", type=int, default=0, help="venue: the walk to this room (3-10) instead of the fly-through")
@@ -61,6 +63,9 @@ if args.crowd:
 if args.room:
     area.ROOM = args.room
     area.BACK = args.back
+    if args.totem:
+        assert args.variant != "phone", "--totem is for laptops (the phone walks already end on the totem)"
+        area.TOTEM = args.totem
 if args.unified:
     area.build(ROOT, unified=True)
 else:
@@ -166,7 +171,7 @@ if args.plan:
         print("done")
         sys.exit(0)
 if args.walk:
-    out = Path(args.out) / args.area / ("walk" + (f"-{args.variant}" if args.variant else "") + (f"-room{args.room}" if args.room else "") + ("-back" if args.back else ""))
+    out = Path(args.out) / args.area / ("walk" + (f"-{args.variant}" if args.variant else "") + (f"-room{args.room}" if args.room else "") + ("-back" if args.back else "") + (f"-totem-{args.totem}" if args.totem else ""))
     out.mkdir(parents=True, exist_ok=True)
     cam = bpy.data.objects["cam-walk"]
     scene.camera = cam
