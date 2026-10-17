@@ -30,7 +30,8 @@ import numpy as np
 
 import pm_areas.crowd_wear as crowd_wear
 
-FPS = 30
+FPS = 24                         # the render (John 17/10)
+BAKE_FPS = 30                    # the mocap clips are baked on 30 fps frames (the cache stays valid); played back scaled
 FACE = ("Eye", "Jaw", "Lip", "lip", "Mouth", "Masseter", "Caninus", "Cheek", "brow", "Nose", "Tongue", "Blink")
 STEP = 2                                      # bake a key every 2 frames (15 per second)
 BAKE_VERSION = 3                              # bump when bake_library changes
@@ -82,7 +83,7 @@ def bake_library(root):
     if out.exists() and out.stat().st_mtime > max(c.stat().st_mtime for c in clips):
         return out
     scene = bpy.context.scene
-    scene.render.fps = FPS
+    scene.render.fps = BAKE_FPS
     refs = {}
     for sex, avatar in (("f", "Female_Adult_01"), ("m", "Male_Adult_01")):
         objs = _import(Path(root) / "data" / "models" / "rocketbox" / avatar / f"{avatar}.fbx", False)
@@ -149,7 +150,7 @@ def bake_library(root):
         if len(travel) > 1:
             d = (travel[-1] - travel[0])
             d.z = 0
-            speed = d.length / ((frames[-1] - frames[0]) / FPS)
+            speed = d.length / ((frames[-1] - frames[0]) / BAKE_FPS)
         act["speed"] = speed                                # walks: metres per second the feet travel
         avg = {k: sum(v) / len(v) for k, v in hands.items() if v}
         act["hand"] = max(avg, key=avg.get) if avg else "R"   # the hand held higher: the one with the phone/cup
@@ -407,7 +408,7 @@ class Crowd:
         ad = rig.animation_data_create()
         track = ad.nla_tracks.new()
         length = act["length"]
-        scale = 1.0 / speed
+        scale = FPS / BAKE_FPS / speed                 # 30 fps clip frames onto the render's frames
         strip = track.strips.new(clip, int(1 - offset), act)
         if hasattr(strip, "action_slot") and act.slots:
             strip.action_slot = act.slots[0]

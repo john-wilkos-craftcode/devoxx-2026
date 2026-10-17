@@ -23,7 +23,7 @@ import bpy
 from mathutils import Matrix, Vector
 
 FH, EYE = 6.2, 1.65
-FPS = 30
+FPS = 24
 STAIR = {"west": (-7.15, -4.85), "east": (10.25, 12.55)}          # the flights' x; y 9.88 (foot) .. -1.32 (top)
 STAIR_FOOT, STAIR_TOP = 9.88, -1.32
 GAP_Y = 12.48                                                       # middle of the glass box's side gap
@@ -115,7 +115,11 @@ def waypoints(root, n, variant="laptop"):
     north = yc > STAIR_TOP                                       # rooms 3 and 10: back north past the opening
     side_x = SIDE_AISLE[side]
     if north or yc > TABLES_Y[1]:                                # rooms 3, 4, 5, 8, 9, 10: the lane runs to the door
-        pts.append((lane, yc - (-1 if north else 1) * 3.0, FH + EYE))
+        # and turns in 2.5 m short of it (it ran 3 m past, beside the door totem, and doubled back: John 17/10, "it goes
+        # to the right to the totem before going back left and in through the door")
+        y_turn = yc + (-1 if north else 1) * 2.5
+        if north or y_turn < STAIR_TOP - 3.6 - 1.0:
+            pts.append((lane, y_turn, FH + EYE))
     else:                                                        # rooms 6, 7: through the gate, down the middle
         pts += [(lane, GATE_Y + 5.0, FH + EYE), (CENTRE_X, GATE_Y + 1.5, FH + EYE), (CENTRE_X, yc + 3.0, FH + EYE)]
     if variant == "phone":                                    # on to the door totem's still
@@ -164,6 +168,9 @@ def resample(poly, step):
 
 WALK_T = 10.0                    # s: John (17/10): "much faster, ease in ease out, about 10 s"
 EASE_IN, EASE_OUT = 5.0, 4.0     # m/s^2: the acceleration from the start and the braking into the end pose
+OMEGA_MAX = math.radians(90.0)   # rad/s: the view never swings faster (at 10 s the turns off the screen and into the
+#                                  room's door whipped, 17/10); the straights take up the time
+STRAIGHT_UP = 1.25               # ... at most this much faster than without the turn limit (else the limit gives)
 
 
 def speeds(pts):
@@ -189,13 +196,42 @@ def speeds(pts):
     return v
 
 
-def timing(pts, step, target=WALK_T):
+def smooth(w):
+    return w * w * (3 - 2 * w)
+
+
+def turn_caps(pts, step, look, blend):
+    """absolute speed caps (m/s) per sample so the view turns at most OMEGA_MAX: the look direction by distance (the
+    point `look` samples ahead, then blend(s, d) mixes in the start and end views) differenced every 0.2 m; each cap
+    also holds over the metre before, so the camera has braked by the time it turns"""
+    n = len(pts)
+    stride = max(1, int(0.2 / step))
+    idx = list(range(0, n, stride))
+    if idx[-1] != n - 1:
+        idx.append(n - 1)
+    D = []
+    for i in idx:
+        d = pts[min(n - 1, i + look)] - pts[i]
+        D.append(blend(i * step, d.normalized() if d.length > 1e-4 else None))
+    caps, pre = [1e9] * n, int(1.0 / step)
+    for a in range(len(idx) - 1):
+        ang = D[a].angle(D[a + 1], 0.0)
+        if ang > 1e-6:
+            c = OMEGA_MAX * (idx[a + 1] - idx[a]) * step / ang
+            for i in range(max(0, idx[a] - pre), idx[a + 1] + 1):
+                caps[i] = min(caps[i], c)
+    return caps
+
+
+def timing(pts, step, target=WALK_T, caps=None):
     """seconds at each sample: the relative speeds scaled so the walk takes `target` s, starting from rest and
-    settling to rest (ease in and out at EASE_IN / EASE_OUT)"""
+    settling to rest (ease in and out at EASE_IN / EASE_OUT). With caps (turn_caps): the turns slow down and the
+    straights make the time up, at most STRAIGHT_UP faster than without caps; where that isn't enough the caps rise
+    (the duration wins: John wants ~10 s)"""
     base = speeds(pts)
 
-    def run(k):
-        vt = [b * k for b in base]
+    def run(k, c=None):
+        vt = [b * k for b in base] if c is None else [min(b * k, c * cp) for b, cp in zip(base, caps)]
         vt[0], vt[-1] = 0.3, 0.05
         for i in range(1, len(vt)):
             vt[i] = min(vt[i], math.sqrt(vt[i - 1] ** 2 + 2 * EASE_IN * step))
@@ -206,14 +242,21 @@ def timing(pts, step, target=WALK_T):
             t += step / max(0.05, 0.5 * (vt[i] + vt[i - 1]))
             out.append(t)
         return out
-    lo, hi = 0.2, 4.0                                  # bisection on the speed scale (time falls as k rises)
-    for _ in range(40):
-        k = (lo + hi) / 2
-        if run(k)[-1] > target:
-            lo = k
-        else:
-            hi = k
-    return run(hi)
+
+    def bisect_on(f, lo, hi):                          # the smallest x in lo..hi with f(x) <= target (f falls)
+        for _ in range(40):
+            m = (lo + hi) / 2
+            lo, hi = (m, hi) if f(m) > target else (lo, m)
+        return hi
+    k = bisect_on(lambda k: run(k)[-1], 0.2, 4.0)
+    if caps is None:
+        return run(k)
+    k_max = k * STRAIGHT_UP
+    if run(k_max, 1.0)[-1] <= target:
+        return run(bisect_on(lambda kk: run(kk, 1.0)[-1], 0.2, k_max), 1.0)
+    c = bisect_on(lambda cc: run(k_max, cc)[-1], 1.0, 20.0)
+    print(f"ROOMWALK timing: turns up to {math.degrees(OMEGA_MAX) * c:.0f} deg/s to fit {target:.1f} s", flush=True)
+    return run(k_max, c)
 
 
 def camera(root, n, variant="laptop", first_frame=402, activate=True):
@@ -235,14 +278,21 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True):
     if variant == "phone":                         # the shorter phone walks in proportion (sqrt: not crawling)
         lap = resample(polyline(waypoints(root, n, "laptop")[0]), 0.1)
         target = WALK_T * min(1.0, math.sqrt(step * (len(pts) - 1) / (0.1 * (len(lap) - 1))))
-    ts = timing(pts, step, target)
-    T = ts[-1]
-    nf = int(math.ceil(T * FPS)) + 1
     L = step * (len(pts) - 1)
     look = int(LOOK_AHEAD / step)
     screen_dir = (Vector(hall["look"]) - Vector(hall["pos"])).normalized()
     end_dir = seat["fwd"].normalized() if seat else None
+
+    def blend(s, d):                                               # the start and end views, as in the loop below
+        d = (d or screen_dir).lerp(screen_dir, smooth(max(0.0, 1.0 - s / 3.0))).normalized()
+        if end_dir is not None:
+            d = d.lerp(end_dir, smooth(max(0.0, min(1.0, (s - (L - 5.0)) / 5.0)))).normalized()
+        return d
+    ts = timing(pts, step, target, turn_caps(pts, step, look, blend))
+    T = ts[-1]
+    nf = int(math.ceil(T * FPS)) + 1
     prev, prev_d, j = None, None, 0
+    swing = (0.0, first_frame)                                     # the fastest the view turns (deg/s, frame)
     for f in range(nf):
         t = min(T, f / FPS)
         while j < len(pts) - 2 and ts[j + 1] < t:
@@ -263,6 +313,8 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True):
             k = 1 - math.exp(-(1 / FPS) / LOOK_TAU)
             k = k + (1 - k) * max(we, w0)
             d = prev_d.lerp(d, k).normalized()
+        if prev_d is not None:
+            swing = max(swing, (math.degrees(prev_d.angle(d, 0.0)) * FPS, first_frame + f))
         prev_d = d
         quat = d.to_track_quat("-Z", "Y")
         rot = quat.to_euler("XYZ", prev) if prev else quat.to_euler("XYZ")
@@ -293,6 +345,7 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True):
     swap_visibility(first_frame, first_frame + max(0, up - 8), first_frame + max(0, inside - 2), first_frame + nf - 1)
     clearance(zip_frames(pts, ts, nf), first_frame, up, inside)
     print(f"ROOMWALK {n} {variant}: {L:.0f} m in {T:.1f} s, frames {scene.frame_start}..{scene.frame_end}", flush=True)
+    print(f"ROOMWALK view: turns at most {swing[0]:.0f} deg/s (frame {swing[1]})", flush=True)
     return cam
 
 
@@ -339,14 +392,19 @@ def camera_back(root, n, variant="laptop", first_frame=600, activate=True):
     if variant == "phone":
         lap = resample(polyline(back_waypoints(root, n, "laptop")[0]), 0.1)
         target = WALK_T * min(1.0, math.sqrt(step * (len(pts) - 1) / (0.1 * (len(lap) - 1))))
-    ts = timing(pts, step, target)
-    T = ts[-1]
-    nf = int(math.ceil(T * FPS)) + 1
     L = step * (len(pts) - 1)
     look = int(LOOK_AHEAD / step)
     screen_dir = (Vector(hall["look"]) - Vector(hall["pos"])).normalized()
     start_dir = seat["fwd"].normalized()
+
+    def blend(s, d):                                               # the start and end views, as in the loop below
+        d = (d or screen_dir).lerp(start_dir, smooth(max(0.0, 1.0 - s / 4.0))).normalized()
+        return d.lerp(screen_dir, smooth(max(0.0, min(1.0, (s - (L - 4.0)) / 4.0)))).normalized()
+    ts = timing(pts, step, target, turn_caps(pts, step, look, blend))
+    T = ts[-1]
+    nf = int(math.ceil(T * FPS)) + 1
     prev, prev_d, j = None, None, 0
+    swing = (0.0, first_frame)                                     # the fastest the view turns (deg/s, frame)
     for f in range(nf):
         t = min(T, f / FPS)
         while j < len(pts) - 2 and ts[j + 1] < t:
@@ -366,6 +424,8 @@ def camera_back(root, n, variant="laptop", first_frame=600, activate=True):
             k = 1 - math.exp(-(1 / FPS) / LOOK_TAU)
             k = k + (1 - k) * max(we, w0)
             d = prev_d.lerp(d, k).normalized()
+        if prev_d is not None:
+            swing = max(swing, (math.degrees(prev_d.angle(d, 0.0)) * FPS, first_frame + f))
         prev_d = d
         quat = d.to_track_quat("-Z", "Y")
         rot = quat.to_euler("XYZ", prev) if prev else quat.to_euler("XYZ")
@@ -400,6 +460,7 @@ def camera_back(root, n, variant="laptop", first_frame=600, activate=True):
     in_r = nf - out
     clearance(rev, first_frame, up_r, in_r, back=True)
     print(f"ROOMWALK back {n} {variant}: {L:.0f} m in {T:.1f} s, frames {scene.frame_start}..{scene.frame_end}", flush=True)
+    print(f"ROOMWALK back view: turns at most {swing[0]:.0f} deg/s (frame {swing[1]})", flush=True)
     return cam
 
 
