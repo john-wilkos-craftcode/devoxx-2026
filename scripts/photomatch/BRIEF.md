@@ -87,3 +87,21 @@ Visual (contact sheet every ~0.5 s + the critical frames, judged by a fresh-eyes
   filter, rougher materials; in Cycles, set min samples by hand and prefer 2x resolution with fewer samples then
   downscale. Cycles' temporal denoiser doesn't work with Cycles motion blur: don't use it here.
 - EEVEE glass: Blended renders smoother than Dithered.
+- Weak GPU (4 GB here; 17/10 research, forums + manual + bug tracker). A 1920 px frame at 64 samples with full-res
+  ray tracing and 4 blur steps took ~3 min and then stalled the card (3.7 of 4 GB used, 0 % load, 7 h): never run
+  a full clip without a watcher that flags a stall.
+  - Cap texture size: EEVEE has no per-render texture limit, but the GPU texture limit preference
+    (preferences.system.gl_texture_limit) caps every image uploaded; 1024 or 2048 keeps the crowd's 2K Rocketbox
+    textures from filling VRAM (bug reports: 4K textures + EEVEE = out of memory where Cycles copes).
+  - Build once, save the .blend (--save), render the clip in chunks of ~100 frames in fresh Blender processes:
+    EEVEE's per-frame GPU memory growth is a recurring bug-tracker pattern, and a fresh process also resets a stall.
+  - Motion-blur steps multiply the cost (each step re-evaluates the scene): samples are split across steps, so 4
+    steps x 12 samples ~ 48 samples' quality at the price of 4 evaluations.
+  - Shadows: shadow_resolution_scale below 1 is faster and soft shadows hide it; shadow steps up to 16 are cheap and
+    stop light leaks. Ray tracing at half resolution (the default) is fine for rough surfaces.
+  - Render small, upscale (Real-ESRGAN, e.g. realesr-animevideov3): big savings claimed by add-on authors, but the
+    known risk is frame-to-frame detail shimmer: test on a short stretch with qc.py before using it.
+  - Render every other frame and interpolate (RIFE/Flowframes): users report trouble with fast motion, edges and
+    frame-precise events; our crowd limbs and whip turns near the lens make it risky.
+  - Cycles + OpenImageDenoise for animation needs stable noise (fixed seed is not the answer: it smears) and
+    hundreds of samples indoors on a weak GPU: not quicker than EEVEE here.

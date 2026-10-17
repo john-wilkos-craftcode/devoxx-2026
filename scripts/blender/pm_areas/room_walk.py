@@ -101,11 +101,11 @@ def waypoints(root, n, variant="laptop"):
     # first step: turning off the screen towards the stairwell's gap (since the screen moved onto the divider, 17/10,
     # the gap is ahead of the start, no longer behind it)
     # the gap is ahead of the start, no longer behind it); east of the screen the phone totem and its plant (hall_screen,
-    # ~(5.6, 11.3) and (6.35, 10.8)) stand level with the gap, so the east walks pass south of them
+    # ~(5.6, 11.3) and (6.35, 10.8)) stand level with the gap, so the east walks pass south of them, the leaves >= 1 m from the lens (BRIEF checklist)
     if door["west"]:
         first = [(h[0] - 1.0, h[1] + 0.4)] if variant == "laptop" else [(h[0] - 0.6, h[1] + 0.3)]
     else:
-        first = [(h[0] + 1.6, h[1] - 0.5), (7.6, h[1] - 0.2)] if variant == "laptop" else [(6.9, h[1] - 0.1)]
+        first = [(h[0] + 1.6, h[1] - 0.9), (7.9, h[1] - 0.5)] if variant == "laptop" else [(7.0, h[1] - 0.3), (7.9, h[1])]
     pts = [(h[0], h[1], h[2])] + [(x, y, EYE) for x, y in first] + [(inner, GAP_Y, EYE), (sx, GAP_Y, EYE),
            (sx, STAIR_FOOT, EYE), (sx, STAIR_TOP, FH + EYE), (sx, STAIR_TOP - 1.8, FH + EYE),
            (lane, STAIR_TOP - 3.6, FH + EYE)]

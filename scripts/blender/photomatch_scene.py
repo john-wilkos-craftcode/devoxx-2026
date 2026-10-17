@@ -27,6 +27,8 @@ ap.add_argument("--out", default="C:/Users/wilkojo/kino-renders/photomatch")
 ap.add_argument("--samples", type=int, default=64)
 ap.add_argument("--width", type=int, default=1280)
 ap.add_argument("--engine", default="cycles", choices=["cycles", "workbench", "eevee"])
+ap.add_argument("--shadow-scale", type=float, default=0.0, help="EEVEE shadow map resolution scale (< 1: fewer pages, no 'shadow buffer full' at 1600 px)")
+ap.add_argument("--tex-limit", default="", help="cap every GPU texture at this size (1024, 2048): EEVEE on a 4 GB card")
 ap.add_argument("--final", action="store_true", help="EEVEE final quality: ray tracing at full resolution, more shadow rays")
 ap.add_argument("--save")
 ap.add_argument("--walk", default="", help="render walk frames: a comma list, every:N, or all (area venue)")
@@ -94,6 +96,13 @@ elif args.engine == "eevee":
                       ("use_gtao", True), ("use_bloom", True), ("shadow_pool_size", "1024")):
         if hasattr(ev, attr):
             setattr(ev, attr, val)
+    if args.shadow_scale:
+        ev.shadow_resolution_scale = args.shadow_scale
+        ev.shadow_step_count = 16                    # cheap, and stops light leaks from the coarser maps
+        print(f"FINAL shadows at {args.shadow_scale:g} resolution, 16 steps", flush=True)
+    if args.tex_limit:                               # BRIEF.md render notes: the crowd's 2K textures fill a 4 GB card
+        bpy.context.preferences.system.gl_texture_limit = f"CLAMP_{args.tex_limit}"
+        print(f"FINAL textures capped at {args.tex_limit} px", flush=True)
     if args.final:                                   # BRIEF.md's rubric: the preview passed at half-res tracing
         rt = getattr(ev, "ray_tracing_options", None)
         for holder, attr, val in ((rt, "resolution_scale", "1"), (ev, "shadow_ray_count", 2), (ev, "shadow_step_count", 8),
