@@ -137,9 +137,10 @@ def waypoints(root, n, variant="laptop", end="seat"):
 
 def totem_in_waypoints(root, n):
     """from the door totem's still into the theatre: the totem's pose, then the seat route from its first point at the
-    door (x short of the doorway, at the door's y) on"""
+    door (2.4 m short of the doorway) on"""
     pts, door, e = waypoints(root, n, "laptop")
-    k = next(i for i, p in enumerate(pts) if abs(p[1] - door["y"]) < 1e-6)
+    k = next(i for i, p in enumerate(pts) if abs(p[0] - (door["x"] + door["face"] * 2.4)) < 1e-6)   # (by x: room 3's
+    # door point sits 0.4 m off the door's y)
     t = seat_pose(root, n, "doors_phone")["pos"]
     return [(t.x, t.y, t.z)] + pts[k:], door, e
 
