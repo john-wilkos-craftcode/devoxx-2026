@@ -46,7 +46,14 @@ camera looks). John approved the EEVEE fly-through's motion (laptop and phone) a
     move too: re-render and re-pin when publishing.
   - EEVEE final rubric in BRIEF.md + scripts/photomatch/qc.py (pops, noise, breathing, clipping; calibrated on the
     approved fly-through). Runner --final: full-res ray tracing, 2 shadow rays.
-- **Next, in order:** (1) John's notes on the re-rendered room 8 walk; (2) John's notes on the cones (fuller,
+- **17/10 evening:** walks and fly-through at ~10 s (John: "much faster", fly-through preview approved); the walks
+  back (--back) from each seat to the hall still. Crowd switches on by the camera's frame within 60 m (no pop-in);
+  the walk back places its crowd on its last frame (the hall is out of render on its first). Stairwell doorways: the
+  south leaf opens flat on the wall, the doorway and box turn run at stair speed; room 8 there and back 0.60 m clear.
+  Friday's 15 talks transcribed, summarised, in the recap; the 22 unrecorded are labs/BOFs/overflow/documentary.
+  Full quality: --samples 48 --width 1600 --tex-limit 1024 --shadow-scale 0.5, with a stall Monitor.
+- **Next, in order:** (0) the other 14 walks there and back: clearance re-check after the 10 s timing and door change;
+  (1) John's notes on the re-rendered room 8 walk; (2) John's notes on the cones (fuller,
   deeper cyan?), lengths, routes; (3) previews of a phone walk and one west room; (4) remodel the auditoriums from the
   four new photos (blue seats, red LED step lights, the big screen; John: free to change the rooms but keep each
   screen at least as large in frame as the published stills, then re-render the seat stills and their shots.json
