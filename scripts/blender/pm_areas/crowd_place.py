@@ -140,7 +140,11 @@ def path_dist(S, x, y):
 
 # ---------------------------------------------------------------------------------- what the camera sees
 VIS_MARGIN = math.radians(10)   # past the frame edges: shadows and blur of people just outside still show
-VIS_PAD = 6                     # frames kept on either side of a visible stretch (blur samples, no pop-in)
+VIS_PAD = 10                    # frames kept on either side of a visible stretch (blur samples, no pop-in at whips)
+VIS_RANGE = 60.0                # m: past this a person in the frame is a few pixels; nearer, the render switch-on goes
+                                # by the frame alone, not by line of sight (John 17/10: people popped in on the walk
+                                # back where a wrong occlusion verdict switched them on late: "make sure the crowd
+                                # loads before the camera points their way")
 VIS_STEP = 2                    # test every 2nd frame (the pad covers the gaps)
 
 
@@ -180,9 +184,10 @@ class View:
     def clear(self, o, d, dist):
         return _clear(self.bvh, o, d, dist)
 
-    def seen(self, pts_at):
+    def seen(self, pts_at, occlusion=True):
         """frames (sampled) in which any of a person's points is in the widened frame and not behind the venue;
-        pts_at(f) gives the points (n x 3) at frame f"""
+        pts_at(f) gives the points (n x 3) at frame f. occlusion=False: in the widened frame within VIS_RANGE, walls
+        or not (the render switch-on: being on early costs render time, being on late is a pop)"""
         out = []
         for i, f in enumerate(self.frames):
             P = pts_at(f)
@@ -196,6 +201,11 @@ class View:
             inside = ok & (np.abs(v @ right) < th * z) & (np.abs(v @ up) < tv * z)
             for k in np.nonzero(inside)[0]:
                 d = float(np.linalg.norm(v[k]))
+                if not occlusion:
+                    if d < VIS_RANGE:
+                        out.append(f)
+                        break
+                    continue
                 dirv = Vector(v[k] / d)
                 if self.clear(Vector(self.loc[i]), dirv, d - 0.25):
                     out.append(f)
@@ -287,10 +297,11 @@ class Placer:
         if self.view is None:
             return None
         pts = body_points(x, y, zf)
-        vis = self.view.seen(lambda f: pts)
-        if vis:
-            return vis
-        return [None] if any(v.seen(lambda f: pts) for v in self.others) else []
+        if self.view.seen(lambda f: pts):                          # placed where some clip has a line of sight,
+            return self.view.seen(lambda f: pts, occlusion=False)   # switched on whenever this clip's frame holds it
+        if any(v.seen(lambda f: pts) for v in self.others):
+            return self.view.seen(lambda f: pts, occlusion=False) or [None]
+        return []
 
     def put(self, role, x, y, zf, yaw, sex=None, force=False):
         """place someone; False (and nobody placed) when the camera never sees the spot, unless forced (a group
@@ -405,12 +416,10 @@ class Placer:
             def at(f):
                 t = (f - 1) / max(1.0, frames - 1)
                 return body_points(x + (ex - x) * t, y + (ey - y) * t, zf)
-            vis = self.view.seen(at)
-            if not vis:
-                vis = [None] if any(v.seen(at) for v in self.others) else []
-            if not vis:
+            if not (self.view.seen(at) or any(v.seen(at) for v in self.others)):
                 self.unseen += 1
                 return False
+            vis = self.view.seen(at, occlusion=False) or [None]
         crowd.person(tmpl, clip, x, y, zf, self.facing(dx, dy), offset=rng.randrange(0, 600), speed=speed,
                      height=rng.uniform(0.96, 1.04), walk=((x, y), pts[-1], frames), badge=rng.random() < 0.85,
                      role="walk", backpack=rng.random() < C.BACKPACK_SHARE)
@@ -553,6 +562,9 @@ def far_hall(P):
     # thinning out, not a closed hall: a few either side of the end view onto the screen and the totem
     P.scatter((-12.0, 6.5, -3.6, 16.5), HALL_Z, groups=2, singles=2)
     P.scatter((10.0, 6.5, 16.0, 16.5), HALL_Z, groups=1, singles=2)
+    # between the stairwells, west of the screen's axis: the walks back cross the hall here looking west (it read empty,
+    # 17/10); kept south of the hall still's camera (y 9.81) so nobody stands between it and the screen
+    P.scatter((-4.2, 3.5, 1.0, 9.3), HALL_Z, groups=2, singles=2)
 
 
 def upstairs(P):

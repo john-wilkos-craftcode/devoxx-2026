@@ -14,6 +14,7 @@ Motion (the fly-through's grammar John approved): no pauses, speeds blended betw
 limits, the view eased from the screen to the way ahead and onto the seat's view, eulers kept continuous (motion blur
 never tumbles). The clip starts on the fly-through's last frame, so the crowd's clock carries on from the hall still.
 """
+import bisect
 import json
 import math
 from pathlib import Path
@@ -33,6 +34,8 @@ GATE_Y, TABLES_Y = -19.3, (-37.6, -24.2)                            # (tables mo
 SIDE_AISLE = {"west": -5.2, "east": 10.3}                          # behind the tables, along the walls (rooms 5, 8)
 CENTRE_X = 2.9                                                       # through the gate, down the central aisle (6, 7)
 LOOK_AHEAD, LOOK_TAU = 4.0, 0.3
+LOOK_S = 0.8                     # s: the camera looks where it will be this much later (at least LOOK_AHEAD m), so at
+                                 # the ~10 s walks' speeds it starts turning into a corner early instead of whipping
 HALL = {"laptop": {"pos": (2.4, 9.81, 1.7), "look": (2.4, 13.56, 1.7), "fov_v": 40.0},       # the fly-through's end
         "phone": {"pos": (5.6, 9.58, 1.5), "look": (5.6, 11.245, 1.5), "fov_v": 58.29}}   # (screen on the divider, 17/10)
 
@@ -244,7 +247,7 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True):
         a = (t - ts[j]) / max(1e-9, ts[j + 1] - ts[j])
         p = pts[j].lerp(pts[j + 1], max(0.0, min(1.0, a)))
         s = (j + a) * step
-        q = pts[min(len(pts) - 1, j + look)]
+        q = pts[min(len(pts) - 1, max(j + look, bisect.bisect_left(ts, t + LOOK_S)))]
         d = (q - p).normalized() if (q - p).length > 1e-4 else (prev_d or screen_dir)
         w0 = max(0.0, 1.0 - s / 3.0)                               # leave the screen's view over the first 3 m
         d = d.lerp(screen_dir, w0 * w0 * (3 - 2 * w0)).normalized()
@@ -348,7 +351,7 @@ def camera_back(root, n, variant="laptop", first_frame=600, activate=True):
         a = (t - ts[j]) / max(1e-9, ts[j + 1] - ts[j])
         p = pts[j].lerp(pts[j + 1], max(0.0, min(1.0, a)))
         s = (j + a) * step
-        q = pts[min(len(pts) - 1, j + look)]
+        q = pts[min(len(pts) - 1, max(j + look, bisect.bisect_left(ts, t + LOOK_S)))]
         d = (q - p).normalized() if (q - p).length > 1e-4 else (prev_d or screen_dir)
         w0 = max(0.0, 1.0 - s / 4.0)                               # leave the seat's view over the first 4 m
         w0 = w0 * w0 * (3 - 2 * w0)
