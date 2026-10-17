@@ -1,24 +1,108 @@
 {
   "id": 17763,
-  "source": "abstract",
-  "tldr": "A deep dive using multimodal and long-context LLM capabilities to build four solutions: video transcription with speakers, knowledge graphs from 1M tokens, image bank automation and object editing.",
+  "source": "transcript",
+  "tldr": "Picard solves four problems live with Gemini, each with one precise prompt and no thinking tokens: video transcription with speakers, book-scale knowledge graphs, consistent image series and illustration restoration.",
   "summary": [
-    "Laurent Picard's session architects four solutions step by step with multimodal and long-context models. The first transcribes videos and identifies speakers in a single prompt; the second extracts entities and relationships from massive inputs of 1M tokens with a single request to generate a knowledge graph.",
-    "The remaining two cover an image bank automation pipeline for consistent image generation that revives visual archives, and visual object detection and editing, identifying, restoring and transforming elements within images."
+    "Working live in Colab notebooks with the Google Gen AI Python SDK, Picard deliberately starts each problem on the smallest Gemini model with thinking disabled to build intuition. Video transcription with named speakers would traditionally need speech-to-text, OCR, person detection, entity extraction and diarization. On a one-minute podcast teaser with Hannah Fry and Demis Hassabis, separate prompts handle transcript and speaker names, but an eight-minute, heavily edited AlphaFold documentary breaks the combined prompt. Picard then explains tokens: about 25 per second of audio and video frames sampled once per second at 66 tokens by default, all in one semantic space, with generation order steering what follows.",
+    "The prompt method is precision and concision: ask the model for a field's terminology ('strict verbatim', 'timestamp') and reuse it, and split the problem into two tables, voice IDs with timestamped text, then voice-to-name mapping, inside one prompt, finally expressed as Pydantic classes for structured output. Extended to all audio sources (laughter, barking, applause), it handled Jane Goodall's narration, a noisy French street report, 14 voices in the AlphaFold film, and a 99-minute event video with over 40 voices in about seven minutes. In Q&A Picard said YouTube input gives only the audio and video streams, and that an MP4 from a bucket gave the same results.",
+    "The second notebook builds knowledge graphs from documents. An invented Indiana Jones-style test text checks implied entities (Henry Jones Sr.), every stage of a changing relationship, and both directions of each relation. Output switches from JSON to TSV, which a live token count showed using 30-40% fewer tokens than compact JSON and 60-70% fewer than formatted JSON. Thérèse Raquin (over 100k tokens) took five seconds on Flash-Lite; Les Misérables (about 800k tokens) took 46 seconds; the four volumes of The Count of Monte Cristo surfaced the hero's aliases. A 100-page pharmaceutical agreement showed that vague prompts yield summaries, while asking for obligations or document structure yields useful graphs.",
+    "The second half uses Nano Banana image models. From a robot Picard generated with Imagen years ago and could never reproduce, one prompt creates a front and back character sheet, which then anchors a felt-diorama story: mountains, a valley with a map, a golden-hour forest, ice picks, a summit, a bridge and a hammock. Prompts and source images are saved in PNG metadata to rebuild the lineage. The last problem detects illustrations with bounding boxes, captions and labels in Library of Congress scans, tilted photos and a curved page, plus components on a circuit board, then restores, straightens, colorizes and restyles them."
   ],
   "keyPoints": [
-    "Video transcription with speaker identification in a single prompt.",
-    "Knowledge graph generation from 1M-token inputs with one request.",
-    "Image bank pipeline for consistent image generation.",
-    "Object detection and editing within images."
+    "Start prototyping on the smallest model without thinking tokens; write the chain of reasoning into the prompt instead, and use a fixed seed for more repeatable output.",
+    "Ask the LLM for the terminology of your problem domain and reuse those exact words: precise, concise prompts reduce variability when no thinking tokens are used.",
+    "Decompose a hard task into related tables (transcript segments by voice ID, then voice ID to speaker name) and ask for them in order within one request.",
+    "Picard quoted Gemini tokenization as about 25 tokens per second of audio and one sampled video frame per second at 66 tokens by default, with frame rate and media resolution adjustable.",
+    "For tabular extraction, TSV output cost 30-40% fewer tokens than compact JSON and 60-70% fewer than formatted JSON in Picard's measurement; output tokens dominate latency and cost.",
+    "Long context let one Flash request turn Les Misérables, about 800k of the 1M-token input limit, into 64 entities in 46 seconds.",
+    "For consistent image series, first generate a character reference sheet, then prompt each new scene from that sheet plus the previous scene, describing only what changes.",
+    "Multimodal models detect objects that fixed-class detectors such as YOLO miss: illustrations in old books, tilted or curved photos, labelled circuit-board components."
   ],
   "takeaways": [
-    "Test whether a single long-context request can replace a multi-step extraction pipeline in your own project."
+    "Before writing a complex prompt, ask the model which terms practitioners use for the task and put those terms in your prompt.",
+    "Replace JSON with TSV for large tabular LLM output and measure the token savings on your own data.",
+    "Generate structured output from your data classes (Pydantic in Python, records in Java) instead of describing the format in the prompt.",
+    "Add an LLM-as-a-judge review step before extracted data reaches your database.",
+    "Store the prompt and source image IDs in each generated PNG's metadata so you can trace and regenerate assets."
   ],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Multimodal LLMs", "Long-context LLMs", "Knowledge graphs"],
-  "watchIf": "You want to see what multimodal and long-context models can do beyond chat.",
-  "themes": ["LLMs in Java apps"],
-  "demo": false
+  "quotes": [
+    {
+      "text": "An image is worth a thousand tokens.",
+      "at": "30:15"
+    },
+    {
+      "text": "We solved our problem with one prompt, zero thinking tokens.",
+      "at": "63:13"
+    },
+    {
+      "text": "You have to forget about the image tools and think as an art director.",
+      "at": "130:12"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Introduction and agenda"
+    },
+    {
+      "at": "05:45",
+      "title": "Defining video transcription"
+    },
+    {
+      "at": "16:43",
+      "title": "Prototyping with a small model"
+    },
+    {
+      "at": "27:34",
+      "title": "How tokens work"
+    },
+    {
+      "at": "35:31",
+      "title": "Crafting the transcription prompt"
+    },
+    {
+      "at": "51:27",
+      "title": "Long and messy videos"
+    },
+    {
+      "at": "69:16",
+      "title": "Knowledge graphs from documents"
+    },
+    {
+      "at": "100:33",
+      "title": "Novels and contracts"
+    },
+    {
+      "at": "125:04",
+      "title": "Consistent image generation"
+    },
+    {
+      "at": "157:08",
+      "title": "Detecting and restoring illustrations"
+    }
+  ],
+  "tech": [
+    "Gemini",
+    "Gemini Flash-Lite",
+    "Gemini Flash",
+    "Nano Banana",
+    "Imagen",
+    "Google Gen AI SDK",
+    "Google Colab",
+    "Jupyter",
+    "Pydantic",
+    "Tenacity",
+    "pandas",
+    "NetworkX",
+    "TSV",
+    "TOON",
+    "JSON Schema",
+    "YOLO"
+  ],
+  "watchIf": "You want concrete prompt techniques for extracting structured data from long video, documents or images with one LLM request, and do not mind Python notebooks.",
+  "themes": [
+    "LLMs in Java apps",
+    "Data & databases"
+  ],
+  "demo": true
 }

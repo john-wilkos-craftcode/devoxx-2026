@@ -1295,9 +1295,9 @@
   "start": "2026-10-09T09:50:00Z",
   "end": "2026-10-09T10:40:00Z",
   "room": "Room 5",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "Qg7Uu_XBvpI",
+  "videoTitle": "10 boring reasons why Java is the best ecosystem for agentic development By Ed Burns",
+  "matchScore": 1.1,
   "twin": null
  },
  {
@@ -1638,9 +1638,9 @@
   "start": "2026-10-09T09:50:00Z",
   "end": "2026-10-09T10:40:00Z",
   "room": "Room 8",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "AmL_OCs5F4E",
+  "videoTitle": "Strangling the dragon: modernizing legacy systems with the Strangler Fig pattern   by Daniel Ranela",
+  "matchScore": 0.985,
   "twin": null
  },
  {
@@ -2048,9 +2048,9 @@
   "start": "2026-10-09T09:50:00Z",
   "end": "2026-10-09T10:40:00Z",
   "room": "Room 9",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "niBYuCuViGw",
+  "videoTitle": "We created our own AI orchestrator and it became so much more!  by Ricky van Rijn",
+  "matchScore": 1.098,
   "twin": null
  },
  {
@@ -2485,9 +2485,9 @@
   "start": "2026-10-09T09:50:00Z",
   "end": "2026-10-09T10:40:00Z",
   "room": "Room 4",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "LIGVpEuIrrY",
+  "videoTitle": "My old trains have a second life, with TinyGo! By Florian FORESTIER, Justine Bachelard",
+  "matchScore": 1.09,
   "twin": null
  },
  {
@@ -2616,9 +2616,9 @@
   "start": "2026-10-09T08:40:00Z",
   "end": "2026-10-09T09:30:00Z",
   "room": "Room 8",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "SoWgxHeAPGU",
+  "videoTitle": "You thought technical debt was bad? Meet design debt!  by Julien Topçu, Josian Chevalier",
+  "matchScore": 1.1,
   "twin": null
  },
  {
@@ -2737,9 +2737,9 @@
   "start": "2026-10-09T08:40:00Z",
   "end": "2026-10-09T09:30:00Z",
   "room": "Room 9",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "TB45qqp-OxM",
+  "videoTitle": "10 Billion Records vs  The Regulator: An Architectural Post Mortem of an 11TB Exadata Failure  by Ma",
+  "matchScore": 0.999,
   "twin": null
  },
  {
@@ -3117,9 +3117,9 @@
   "start": "2026-10-09T08:40:00Z",
   "end": "2026-10-09T09:30:00Z",
   "room": "Room 4",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "DniA37kVfvI",
+  "videoTitle": "Embabel Agent v1 5 By Rod Johnson",
+  "matchScore": 1.099,
   "twin": null
  },
  {
@@ -3154,9 +3154,9 @@
   "start": "2026-10-09T07:30:00Z",
   "end": "2026-10-09T08:20:00Z",
   "room": "Room 6",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "D_AmK8-UnZg",
+  "videoTitle": "Why it takes 3000 commits to bring Valhalla's value objects to the JDK by David Simms",
+  "matchScore": 1.099,
   "twin": null
  },
  {
@@ -3540,9 +3540,9 @@
   "start": "2026-10-09T07:30:00Z",
   "end": "2026-10-09T08:20:00Z",
   "room": "Room 8",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "TgkY2UmWtBo",
+  "videoTitle": "All you need to know about Maven 4!  by Matthias Bünger",
+  "matchScore": 1.097,
   "twin": null
  },
  {
@@ -4414,9 +4414,9 @@
   "start": "2026-10-09T07:30:00Z",
   "end": "2026-10-09T08:20:00Z",
   "room": "Room 5",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "lUB15M3mMLs",
+  "videoTitle": "Escaping Java's Allocation Gravity with Value Classes By Clément de Tastes, Remi Forax",
+  "matchScore": 1.099,
   "twin": null
  },
  {
@@ -4673,9 +4673,9 @@
   "start": "2026-10-09T07:30:00Z",
   "end": "2026-10-09T08:20:00Z",
   "room": "Room 4",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "jhvT8hVYSvQ",
+  "videoTitle": "In the loop , not in the dark: Staying in controlling the era dark software factories   By Alex Gavr",
+  "matchScore": 0.959,
   "twin": 25652
  },
  {
@@ -5083,9 +5083,9 @@
   "start": "2026-10-09T09:50:00Z",
   "end": "2026-10-09T10:40:00Z",
   "room": "Room 6",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "ufhs9THbYZI",
+  "videoTitle": "Java Next   From Valhalla to Leyden, from Babylon to Panama, from Amber to Detroit By Nicolai Parlog",
+  "matchScore": 1.098,
   "twin": null
  },
  {
@@ -5342,9 +5342,9 @@
   "start": "2026-10-09T08:40:00Z",
   "end": "2026-10-09T09:30:00Z",
   "room": "Room 5",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "wrV4f83UMWI",
+  "videoTitle": "Is AI killing XP practices? Or are we letting it? By Nacho Cougil",
+  "matchScore": 1.099,
   "twin": null
  },
  {
@@ -6357,9 +6357,9 @@
   "start": "2026-10-09T08:40:00Z",
   "end": "2026-10-09T09:30:00Z",
   "room": "Room 6",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "Go76-9Q51wU",
+  "videoTitle": "What’s happening with Project Amber? By Gavin Bierman",
+  "matchScore": 1.098,
   "twin": null
  },
  {
@@ -7066,9 +7066,9 @@
   "start": "2026-10-05T07:30:00Z",
   "end": "2026-10-05T10:30:00Z",
   "room": "Room 4",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "VTxhxCy_2lE",
+  "videoTitle": "Solving Multimodal and Long Context Challenges by Laurent Picard",
+  "matchScore": 1.1,
   "twin": null
  },
  {
@@ -7718,9 +7718,9 @@
   "start": "2026-10-09T07:30:00Z",
   "end": "2026-10-09T08:20:00Z",
   "room": "Room 9",
-  "videoId": null,
-  "videoTitle": null,
-  "matchScore": 0.0,
+  "videoId": "Spxl1eDQJKs",
+  "videoTitle": "The Quantum Tech Lead: Hands On and Abstract at the Same Time  by Cristian Schuszter",
+  "matchScore": 1.097,
   "twin": null
  },
  {

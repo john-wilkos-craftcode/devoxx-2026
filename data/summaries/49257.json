@@ -1,14 +1,107 @@
 {
   "id": 49257,
-  "source": "abstract",
-  "tldr": "Rod Johnson presents Embabel, a JVM agent framework on Spring AI that uses a deterministic GOAP planner instead of an LLM to choose the next action.",
-  "summary": ["Rod Johnson introduces Embabel, a JVM-native agent framework built on Spring AI and Spring Boot. It takes the opposite approach to frameworks that ask a language model to decide what to do next, which can leave non-reproducible traces that are hard to explain.", "Its core is Goal-Oriented Action Planning (GOAP), borrowed from game AI: developers declare goals and annotate actions with @Action and @AchievesGoal, and a deterministic non-LLM planner chains them by pre- and post-conditions. The plan is inspectable before it runs and explainable afterwards. The listing notes that full session details were still pending."],
-  "keyPoints": ["Embabel is built on Spring AI and Spring Boot.", "Planning uses GOAP, a deterministic algorithm rather than an LLM.", "Actions are annotated with @Action and @AchievesGoal.", "Plans can be inspected before execution and explained after."],
-  "takeaways": ["Consider deterministic planning where you need reproducible, explainable agent behaviour."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Embabel", "Spring AI", "Spring Boot", "GOAP"],
-  "watchIf": "You build agents on the JVM and need reproducible, explainable behaviour.",
-  "themes": ["AI agents & agentic coding", "Spring & frameworks"],
+  "source": "transcript",
+  "tldr": "Rod Johnson introduces Embabel: typed action steps chained by a deterministic GOAP planner, per-call model selection, agentic RAG with chunk expansion, skills and code mode on Spring.",
+  "summary": [
+    "Johnson describes Embabel as an open source JVM agent framework on Spring and Spring AI that can also use LangChain4j or custom LLMs underneath. The 1.0 stream targets Spring Boot 3.5 and Spring AI 1.0; the 1.5 stream targets Spring Boot 4, with the same programming model. New features land in the core marked as experimental, plus a separate experimental repository. The framework is written in Kotlin but designed to feel idiomatic from Java. A year in, Johnson cites over 4,500 GitHub stars, 67 contributors and production use at large companies, including a global bank's payments infrastructure.",
+    "The core argument is to use structure: decompose flows into steps, replace steps with plain code where possible, and pass strongly typed objects between them so each can be unit tested and run on a smaller model. A horoscope example extracts a Person with an LLM, fetches the horoscope through an API and writes it up with an LLM. Embabel orders the steps with goal-oriented action planning (GOAP), a non-LLM algorithm from game AI. It replans against a blackboard after every action, can report that no path to the goal exists, and avoids the brittleness Johnson sees in LangGraph-style state machines.",
+    "In a Sherlock Holmes case agent run from Spring Shell, an @Agent class is a Spring bean whose @Action method signatures define preconditions and postconditions from Java types, often records. The injected Ai interface covers LLMs, embedding and other models. Johnson urges choosing a model per call, preferably by role in configuration rather than by name, so cheaper or open-weight models handle simple steps, for cost, confidentiality and energy reasons. The fluent API returns typed objects, takes typed few-shot examples and adds tools via references; prompts live in Jinja templates.",
+    "For RAG, Embabel uses agentic RAG through tools rather than a fixed pipeline: the model chooses vector or full-text search, retries queries and fetches the next or previous chunk to cross chunk boundaries. Any SearchOperations implementation plugs in, with Neo4j, pgvector and Lucene out of the box, wrapped in ToolishRag. He closes with chat sessions modelled as agent processes, agent skills loaded with progressive disclosure, code mode with sandbox support in the experimental repository, flow persistence via JDBC, and the DICE agent memory project."
+  ],
+  "keyPoints": [
+    "Embabel 1.0 targets Spring Boot 3.5 and Spring AI 1.0; 1.5 targets Spring Boot 4 with the same programming model.",
+    "Steps take and return typed objects, so they can be unit tested and some can be plain code or API calls instead of LLM calls.",
+    "A GOAP planner, not an LLM, chains actions by preconditions (required) and postconditions (promises verified after each step), replanning against a blackboard.",
+    "The planner can say no path to the goal exists instead of improvising; Johnson contrasts this with brittle state machines as in LangGraph.",
+    "Select the model on every AI call, ideally by role in configuration, so cheap or open-weight models handle simple steps.",
+    "Agentic RAG lets the model pick vector or full-text search, retry queries and expand to neighbouring chunks; Neo4j, pgvector and Lucene are supported.",
+    "Skills are supplied with progressive disclosure, and the experimental repository adds Docker sandboxes for code mode."
+  ],
+  "takeaways": [
+    "Break an LLM workflow into typed steps and replace any step you can with deterministic code.",
+    "Use Java records for the domain objects passed between agent steps.",
+    "Refer to models by role (for example a cheap chat or input-parser role) in configuration rather than hard-coding model names.",
+    "Give RAG to the model as search tools, including chunk-expansion tools, instead of stuffing retrieved chunks into the prompt.",
+    "Move long prompts out of Java strings into templates such as Jinja."
+  ],
+  "quotes": [
+    {
+      "text": "If you write something in code compared to use an LLM call, it's effectively free.",
+      "at": "09:53"
+    },
+    {
+      "text": "It's not kind of guessing or improvising, it's saying, sorry, you just can't do this.",
+      "at": "18:06"
+    },
+    {
+      "text": "As we embrace Gen AI, we should try to stay normal.",
+      "at": "24:34"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "What Embabel is"
+    },
+    {
+      "at": "01:58",
+      "title": "Release streams 1.0 and 1.5"
+    },
+    {
+      "at": "04:34",
+      "title": "Kotlin inside, Java outside"
+    },
+    {
+      "at": "08:31",
+      "title": "Typed steps over text"
+    },
+    {
+      "at": "15:27",
+      "title": "Goal-oriented action planning"
+    },
+    {
+      "at": "20:45",
+      "title": "Case agent walkthrough"
+    },
+    {
+      "at": "27:26",
+      "title": "Choosing a model per call"
+    },
+    {
+      "at": "34:32",
+      "title": "Agentic RAG"
+    },
+    {
+      "at": "43:34",
+      "title": "Chat, skills and code mode"
+    },
+    {
+      "at": "48:34",
+      "title": "What is new"
+    }
+  ],
+  "tech": [
+    "Embabel",
+    "Spring AI",
+    "Spring Boot",
+    "Spring Shell",
+    "Kotlin",
+    "LangChain4j",
+    "GOAP",
+    "Java records",
+    "Jinja",
+    "Lucene",
+    "Neo4j",
+    "pgvector",
+    "LangGraph",
+    "Agent skills",
+    "Docker"
+  ],
+  "watchIf": "You build LLM features on Spring and want predictable, testable agent flows with typed steps rather than letting the model drive.",
+  "themes": [
+    "AI agents & agentic coding",
+    "LLMs in Java apps",
+    "Spring & frameworks"
+  ],
   "demo": false
 }

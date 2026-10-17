@@ -2798,5 +2798,2633 @@
 2746,
 "Tooling and conclusion"
 ]
+],
+"-LMWT5OCneA": [
+[
+0,
+"Introduction and context"
+],
+[
+124,
+"Vulnerability acceleration"
+],
+[
+289,
+"Defense strategies"
+],
+[
+458,
+"The impact on Spring"
+],
+[
+634,
+"Security collaboration"
+],
+[
+810,
+"Enterprise support model"
+],
+[
+1069,
+"Automated upgrades"
+],
+[
+1212,
+"Demo and conclusion"
+]
+],
+"0-1IGpVrFLQ": [
+[
+0,
+"Introduction and motivation"
+],
+[
+173,
+"LLM inference demonstration"
+],
+[
+335,
+"GPU programming approaches"
+],
+[
+558,
+"Project Babylon and reflection"
+],
+[
+742,
+"Design goals and trade-offs"
+],
+[
+1035,
+"HAT architecture overview"
+],
+[
+1366,
+"Thread-based programming model"
+],
+[
+1764,
+"Performance analysis of SIMT"
+],
+[
+2039,
+"Tensor programming API"
+],
+[
+2379,
+"Tile programming model"
+],
+[
+2668,
+"Refining performance results"
+],
+[
+2802,
+"Future work and conclusion"
+]
+],
+"0A2jqCqSIjg": [
+[
+0,
+"Introduction"
+],
+[
+31,
+"The BootUI experiment"
+],
+[
+580,
+"Ingredients for agentic engineering"
+],
+[
+2687,
+"Demo and workflow"
+],
+[
+2954,
+"Conclusion"
+]
+],
+"2pSyF44THEc": [],
+"3bIiAoYtAPs": [
+[
+0,
+"Introduction to substrate"
+],
+[
+137,
+"The case for a new runtime"
+],
+[
+351,
+"Agent substrate architecture"
+],
+[
+557,
+"Core platform components"
+],
+[
+791,
+"Demonstrations and features"
+],
+[
+1545,
+"Multi-tenancy and organization"
+],
+[
+1739,
+"Architectural takeaways"
+],
+[
+2012,
+"Use cases and Q&A"
+]
+],
+"4ck-T2gaMQ4": [
+[
+0,
+"Introduction to handles"
+],
+[
+147,
+"Reflection vs. JVM linkage"
+],
+[
+455,
+"Method handle fundamentals"
+],
+[
+787,
+"The 'link once' pattern"
+],
+[
+921,
+"String concatenation optimization"
+],
+[
+1297,
+"Foreign function and memory"
+],
+[
+1689,
+"Marshalling and specialization"
+],
+[
+2245,
+"Conclusion and Q&A"
+]
+],
+"4hXQoN8co80": [
+[
+0,
+"Introduction to Hey Belfius"
+],
+[
+104,
+"The architecture of trust"
+],
+[
+230,
+"Creating personalized insights"
+],
+[
+437,
+"Orchestration and security"
+],
+[
+657,
+"Continuous evaluation and monitoring"
+],
+[
+879,
+"AI for security challenges"
+],
+[
+991,
+"Development and vulnerability management"
+],
+[
+1325,
+"Strategic partnership with Aikido"
+],
+[
+1396,
+"Responsible AI development guidelines"
+],
+[
+1667,
+"Live demo of prompt injection"
+],
+[
+2226,
+"Key takeaways and conclusion"
+]
+],
+"4qeUklTLyTs": [],
+"5AaJ3H9fG6M": [],
+"5y_82lCevHg": [
+[
+0,
+"Introduction to everyday JSON"
+],
+[
+365,
+"Use cases and motivation"
+],
+[
+483,
+"API overview and core features"
+],
+[
+758,
+"Config and file processing"
+],
+[
+951,
+"HTTP integration examples"
+],
+[
+1240,
+"Data-oriented design"
+],
+[
+1408,
+"The robustness principle"
+],
+[
+1667,
+"JDK integration and tools"
+],
+[
+1913,
+"Advanced thread dump analysis"
+],
+[
+2300,
+"Properties and JSON"
+],
+[
+2427,
+"Future potential and Q&A"
+]
+],
+"6N6qFqn1_Uo": [
+[
+0,
+"Introduction and context"
+],
+[
+118,
+"Understanding coding agents"
+],
+[
+190,
+"The case for governance"
+],
+[
+450,
+"Defining the harness"
+],
+[
+613,
+"Inner vs outer loops"
+],
+[
+854,
+"Harness engineering design"
+],
+[
+1178,
+"Spec-driven development"
+],
+[
+1395,
+"Repair budget and logic"
+],
+[
+1751,
+"Acceptance and verification"
+],
+[
+1833,
+"Architectural boundary control"
+],
+[
+1953,
+"Current industry landscape"
+],
+[
+2048,
+"Conclusion and takeaways"
+]
+],
+"6mzvcPr30kg": [
+[
+0,
+"Introduction to Hardwood"
+],
+[
+146,
+"Apache Parquet architecture"
+],
+[
+365,
+"Nested data and format complexity"
+],
+[
+506,
+"Motivations for Hardwood"
+],
+[
+695,
+"Hardwood API and capabilities"
+],
+[
+936,
+"Implementation and performance"
+],
+[
+1211,
+"Performance benchmarks"
+],
+[
+1348,
+"Predicate pushdown techniques"
+],
+[
+1549,
+"Fixed-length list optimization"
+],
+[
+1877,
+"The Hardwood CLI"
+],
+[
+2131,
+"AI-assisted library development"
+],
+[
+2232,
+"AI for performance optimization"
+],
+[
+2383,
+"Dependency management and AI"
+],
+[
+2510,
+"Code review and project philosophy"
+],
+[
+2809,
+"Roadmap and conclusion"
+]
+],
+"8JuQaWFKk4w": [],
+"8NURE3I4AJQ": [
+[
+0,
+"Introduction to Deep Netts"
+],
+[
+117,
+"Technical barriers for AI"
+],
+[
+249,
+"Modern Java solutions"
+],
+[
+604,
+"GPU programming with CUDA"
+],
+[
+880,
+"Java and GPU integration"
+],
+[
+1167,
+"FFM API for native interop"
+],
+[
+1450,
+"Vector API and SIMD"
+],
+[
+1754,
+"Deep Netts architecture"
+],
+[
+2041,
+"Fraud detection use case"
+],
+[
+2134,
+"Data and model structure"
+],
+[
+2228,
+"Training and testing process"
+],
+[
+2290,
+"Enabling hardware acceleration"
+],
+[
+2411,
+"Performance benchmarks"
+],
+[
+2584,
+"Spring Boot deployment"
+],
+[
+2753,
+"Community and next steps"
+]
+],
+"9vtYvAI2Dtk": [],
+"A7ZIf8LkSvE": [],
+"A8TBUalnfdc": [],
+"AmL_OCs5F4E": [],
+"AsVt_dzTmN4": [],
+"C10mZ3pCnGo": [],
+"CuvV3Aud3Q0": [],
+"D_AmK8-UnZg": [],
+"DniA37kVfvI": [],
+"DseVLPC4Qjs": [],
+"E--oDq3X74E": [
+[
+0,
+"Introduction and context"
+],
+[
+174,
+"Legacy application demo"
+],
+[
+354,
+"Vibe coding challenges"
+],
+[
+586,
+"Introducing database layers"
+],
+[
+718,
+"OCR integration and AI logic"
+],
+[
+1045,
+"Clean architecture concept"
+],
+[
+1290,
+"Architectural sovereignty"
+],
+[
+1583,
+"Multi-agent orchestration"
+],
+[
+2000,
+"Chatbot and guardrails"
+],
+[
+2246,
+"Validation and final summary"
+]
+],
+"FvVe9J0Abjg": [
+[
+0,
+"Introduction and context"
+],
+[
+178,
+"Agentic and harness design"
+],
+[
+479,
+"Working with legacy code"
+],
+[
+714,
+"Case studies and findings"
+],
+[
+1113,
+"Lessons learned in migration"
+],
+[
+1374,
+"Java EE to Jakarta migration"
+],
+[
+2406,
+"Alternative AI approaches"
+],
+[
+2865,
+"Future outlook and conclusions"
+]
+],
+"GGEmc6eR8c4": [],
+"Go76-9Q51wU": [],
+"IXcQYp51PLM": [],
+"JWFZY0aJTjg": [
+[
+0,
+"Introduction to Detroit"
+],
+[
+312,
+"The Nashorn experience"
+],
+[
+640,
+"FFM and the pragmatic path"
+],
+[
+889,
+"Architecture of Detroit"
+],
+[
+1032,
+"Detroit in practice"
+],
+[
+1428,
+"Managing native integration"
+],
+[
+2066,
+"Maintainability and FFM"
+],
+[
+2445,
+"Conclusion and Q&A"
+]
+],
+"KwQ76IvU59M": [
+[
+0,
+"Introduction to agent control"
+],
+[
+146,
+"Methodology and evaluation"
+],
+[
+351,
+"PetClinic case study"
+],
+[
+662,
+"Implementing agent evaluation"
+],
+[
+989,
+"Ensuring code quality"
+],
+[
+1276,
+"Workflow engineering"
+],
+[
+1584,
+"Tooling and instrumentation"
+],
+[
+1871,
+"Optimization and graduation"
+],
+[
+2097,
+"Advanced stewardship and conclusion"
+]
+],
+"LD2tKMpToYg": [
+[
+0,
+"The challenge concept"
+],
+[
+114,
+"Defining the rules"
+],
+[
+225,
+"Describing the game mechanics"
+],
+[
+394,
+"Initial implementation"
+],
+[
+511,
+"Adding user interaction"
+],
+[
+840,
+"Movement and eating logic"
+],
+[
+1052,
+"Handling game state"
+],
+[
+1346,
+"Refactoring to 1D array"
+],
+[
+1603,
+"Reaching the 10-line limit"
+],
+[
+2116,
+"Bug fixes and features"
+],
+[
+2570,
+"Takeaways and experiments"
+],
+[
+2840,
+"Q&A and conclusion"
+]
+],
+"LIGVpEuIrrY": [],
+"LPhGSgO5eKE": [
+[
+0,
+"Introduction"
+],
+[
+186,
+"Command line and environment"
+],
+[
+373,
+"Container foundations"
+],
+[
+576,
+"Optimizing image builds"
+],
+[
+744,
+"Tailoring the runtime"
+],
+[
+1033,
+"Optimizing OS image size"
+],
+[
+1215,
+"Multi-architecture images"
+],
+[
+1355,
+"CDS and AOT caching"
+],
+[
+1764,
+"Compact object headers"
+],
+[
+1991,
+"Resource limits"
+],
+[
+2192,
+"Memory failure modes"
+],
+[
+2490,
+"Application lifecycle"
+],
+[
+2562,
+"Security and hardening"
+],
+[
+2716,
+"Summary and conclusion"
+]
+],
+"Mdu5_gndYn0": [],
+"NT0wyPM58G8": [
+[
+0,
+"Competition kickoff"
+],
+[
+88,
+"First game demo: Robot helpers"
+],
+[
+278,
+"Second game demo: Heisenbug"
+],
+[
+491,
+"Third game demo: Devoxx Reboot"
+],
+[
+728,
+"Fourth game demo: Overclocked"
+],
+[
+964,
+"Fifth game demo: Agent visualization"
+],
+[
+1203,
+"Sixth game demo: Retro text adventure"
+],
+[
+1492,
+"Seventh game demo: Mobile robot challenge"
+],
+[
+1753,
+"Eighth game demo: Runtime Rumble"
+],
+[
+2024,
+"Final game demo: Ghost Light"
+]
+],
+"OCCOIgkCnjE": [
+[
+0,
+"Introduction and challenges"
+],
+[
+217,
+"Agent risks and inefficiencies"
+],
+[
+491,
+"Solo.io agentic ecosystem"
+],
+[
+615,
+"Gateway and MCP architecture"
+],
+[
+889,
+"Optimization and code mode"
+],
+[
+1052,
+"Semantic routing and security"
+],
+[
+1242,
+"Building and shipping agents"
+],
+[
+1613,
+"Observability and evaluation"
+],
+[
+1849,
+"Security policies and token management"
+],
+[
+2159,
+"Infrastructure and device management"
+],
+[
+2770,
+"Summary and conclusion"
+]
+],
+"PGpKfdXZrpc": [],
+"Pg5kS8l9CpI": [],
+"Q91obeWeWNQ": [],
+"QBQ11aL2aZc": [],
+"QbA-rs7XLEk": [],
+"Qg7Uu_XBvpI": [],
+"S7x4DxwRnk4": [
+[
+0,
+"Introduction and mission"
+],
+[
+172,
+"Architecture of AI in a jar"
+],
+[
+299,
+"CLI demos and functionality"
+],
+[
+568,
+"Supported models and ecosystem"
+],
+[
+809,
+"Small model capabilities"
+],
+[
+946,
+"Anatomy of LLM performance"
+],
+[
+1043,
+"Performance benchmarking"
+],
+[
+1299,
+"Why prefill is faster"
+],
+[
+1491,
+"Optimizing JVM performance"
+],
+[
+1606,
+"Comparative benchmarks"
+],
+[
+1876,
+"Advanced modalities and tools"
+],
+[
+2129,
+"Framework integrations"
+],
+[
+2279,
+"Prompt caching and compiler"
+],
+[
+2384,
+"Server and agent demos"
+],
+[
+2565,
+"Future outlook and conclusion"
+]
+],
+"SC5nO6iadsU": [],
+"SQUrHzMie3o": [
+[
+0,
+"Introduction and context"
+],
+[
+215,
+"Cognition and coding"
+],
+[
+476,
+"AI code pitfalls"
+],
+[
+649,
+"Learning through coding"
+],
+[
+910,
+"The trap of validation"
+],
+[
+967,
+"Guiding the AI models"
+],
+[
+1096,
+"The automation paradox"
+],
+[
+1190,
+"Strategy for the new era"
+],
+[
+1317,
+"Tools for human-AI work"
+],
+[
+1485,
+"Writing rules and clarity"
+],
+[
+1805,
+"Controlling the context"
+],
+[
+1902,
+"Chat limitations"
+],
+[
+2000,
+"Integrating the workflow"
+],
+[
+2087,
+"Code review workflows"
+],
+[
+2181,
+"Logical understanding"
+],
+[
+2252,
+"Phased delivery approach"
+],
+[
+2533,
+"Future of knowledge work"
+],
+[
+2614,
+"Conclusion and advice"
+],
+[
+2883,
+"Resources and closing"
+]
+],
+"SgK0zMNayq0": [],
+"SoWgxHeAPGU": [],
+"Spxl1eDQJKs": [],
+"TB45qqp-OxM": [],
+"TgkY2UmWtBo": [],
+"Upd5ZqUn1qY": [],
+"VTxhxCy_2lE": [],
+"VaT7DgmVSms": [
+[
+0,
+"Introduction and background"
+],
+[
+130,
+"The challenges of PDF parsing"
+],
+[
+247,
+"Understanding PDF architecture"
+],
+[
+448,
+"Engineering and adoption lessons"
+],
+[
+646,
+"The economics of PDF adoption"
+],
+[
+883,
+"Standardization and evolution"
+],
+[
+1109,
+"The difficulty of technical change"
+],
+[
+1296,
+"Case study: reducing PDF size"
+],
+[
+1614,
+"Creating noise for adoption"
+],
+[
+1679,
+"Community reaction and feedback"
+],
+[
+1737,
+"Influencing industry viewers"
+],
+[
+1801,
+"Implementing the feature"
+],
+[
+1909,
+"Finalizing the standard"
+],
+[
+1978,
+"Conclusion and final takeaways"
+]
+],
+"VmPMUGImB-M": [],
+"W-OKVLMtPAw": [
+[
+0,
+"Introduction"
+],
+[
+146,
+"Basic authentication setup"
+],
+[
+445,
+"Password security practices"
+],
+[
+775,
+"Beyond passwords: tokens and passkeys"
+],
+[
+1331,
+"Multi-factor authentication"
+],
+[
+1635,
+"OAuth2 and central identity"
+],
+[
+2400,
+"Gateway and frontend patterns"
+],
+[
+2740,
+"AI integration and conclusion"
+]
+],
+"Ycdt7IT7Kdw": [],
+"Z64CjgCO5gk": [
+[
+0,
+"The role of AI agents"
+],
+[
+160,
+"Agentic development workflow"
+],
+[
+384,
+"Measuring productivity"
+],
+[
+605,
+"Loop engineering and controls"
+],
+[
+866,
+"Verification and guardrails"
+],
+[
+1025,
+"Security and boundaries"
+],
+[
+1379,
+"Prompt injection and worms"
+],
+[
+1600,
+"Scaling and bottlenecks"
+],
+[
+1852,
+"Trust and accountability"
+],
+[
+2080,
+"Organizational and future impacts"
+],
+[
+2383,
+"Conclusion and call to action"
+]
+],
+"_VZg6dxlGaM": [],
+"a5cQAl0g2AM": [
+[
+0,
+"The legacy challenge"
+],
+[
+234,
+"Bridging legacy to AI with MCP"
+],
+[
+379,
+"Implementing GraphQL layers"
+],
+[
+607,
+"Building the integration tool"
+],
+[
+882,
+"Testing with LLMs"
+],
+[
+1293,
+"Automation and quality control"
+],
+[
+1506,
+"Integrating SOAP legacy"
+],
+[
+1737,
+"Securing AI access"
+],
+[
+1981,
+"Scaling with RAG on schemas"
+]
+],
+"adFS-_sCTQ4": [
+[
+0,
+"Introduction and context"
+],
+[
+31,
+"Vector search fundamentals"
+],
+[
+302,
+"SIMD and hardware lanes"
+],
+[
+569,
+"Vector API demo"
+],
+[
+1002,
+"Lucene implementation details"
+],
+[
+1122,
+"Java Vector API vocabulary"
+],
+[
+1280,
+"Advanced performance optimization"
+],
+[
+1407,
+"SIMD constraints and fitting"
+],
+[
+1479,
+"Runtime activation strategy"
+],
+[
+1622,
+"Elasticsearch local environment"
+],
+[
+1705,
+"Quantization techniques (BBQ)"
+],
+[
+1978,
+"Optimizing BBQ with bit planes"
+],
+[
+2198,
+"Beyond the Vector API"
+],
+[
+2386,
+"Native simdvec integration"
+],
+[
+2508,
+"Platform and instruction tuning"
+],
+[
+2719,
+"Advanced use cases in ESQL"
+],
+[
+3090,
+"Conclusion and Q&A"
+]
+],
+"am8adCMJQzk": [
+[
+0,
+"Tribute to Margaret Hamilton"
+],
+[
+157,
+"The life of Ted Nelson"
+],
+[
+487,
+"Early visions of computing"
+],
+[
+870,
+"Hypertext and innovation"
+],
+[
+1363,
+"Computer Lib and Xanadu"
+],
+[
+1816,
+"Legacy and the web's path"
+],
+[
+2285,
+"Learning from the past"
+],
+[
+2868,
+"Closing thoughts"
+]
+],
+"bqwtnKLU35E": [
+[
+0,
+"Introduction"
+],
+[
+266,
+"Environmental impact areas"
+],
+[
+439,
+"Optimizing devices"
+],
+[
+1021,
+"Sustainable data networks"
+],
+[
+1335,
+"Greening data centers"
+],
+[
+2086,
+"Redundancy and availability"
+],
+[
+2433,
+"Efficient hardware selection"
+],
+[
+2687,
+"Conclusion and Q&A"
+]
+],
+"c4F7Iy3XqaY": [
+[
+0,
+"The agentic security challenge"
+],
+[
+377,
+"MCP server vulnerabilities"
+],
+[
+836,
+"Toxic flows and tool injection"
+],
+[
+1316,
+"Agent skill vulnerabilities"
+],
+[
+1872,
+"Supply chain attacks in skills"
+],
+[
+2184,
+"Why manual inspection fails"
+],
+[
+2490,
+"Mitigation and best practices"
+]
+],
+"cbSl8UVdMVg": [],
+"d1SJXp9QeWE": [
+[
+0,
+"Introduction and context"
+],
+[
+259,
+"Why AI slows development"
+],
+[
+623,
+"Best practices for AI"
+],
+[
+791,
+"Specification and security"
+],
+[
+980,
+"Agent decomposition models"
+],
+[
+1276,
+"Constraint and spec-first dev"
+],
+[
+1416,
+"Requirements and tooling"
+],
+[
+1628,
+"Context and skill management"
+],
+[
+1948,
+"Security and isolation"
+],
+[
+2236,
+"Guardrails and metrics"
+],
+[
+2813,
+"Conclusion and wrap-up"
+]
+],
+"d6D8nef-32c": [],
+"dq5rueVhiIM": [],
+"eFSEg54mwVU": [
+[
+0,
+"Introduction to talk"
+],
+[
+95,
+"Common microservice failures"
+],
+[
+390,
+"Defining ownership"
+],
+[
+609,
+"Understanding boundaries"
+],
+[
+743,
+"Strategic design with DDD"
+],
+[
+1151,
+"Accepting overlap"
+],
+[
+1229,
+"Analyzing relationships"
+],
+[
+1561,
+"Context mapping techniques"
+],
+[
+1618,
+"Relationship patterns"
+],
+[
+1668,
+"Asking the right questions"
+],
+[
+1692,
+"Implementation considerations"
+],
+[
+2706,
+"Conclusion"
+]
+],
+"ePBmAdRYl10": [
+[
+0,
+"Introduction and context"
+],
+[
+140,
+"Understanding connection pools"
+],
+[
+238,
+"Optimizing connection usage"
+],
+[
+476,
+"Debugging connection flow"
+],
+[
+515,
+"Transaction and configuration tuning"
+],
+[
+1222,
+"JPA and entity mapping basics"
+],
+[
+1548,
+"Advanced JPA optimization"
+],
+[
+3008,
+"Conclusion and resources"
+]
+],
+"ePQyy9sLmsY": [],
+"eSSPOCeoF0c": [
+[
+0,
+"Introduction and speakers"
+],
+[
+118,
+"AI adoption at ING"
+],
+[
+623,
+"Challenges and benefits of AI"
+],
+[
+929,
+"AI implementation timeline"
+],
+[
+1313,
+"Agentic use cases"
+],
+[
+1763,
+"Devoxx4Kids and coding labs"
+],
+[
+2357,
+"Cybersecurity workshop"
+],
+[
+2704,
+"The role of the engineer"
+],
+[
+2820,
+"Conclusion and closing"
+]
+],
+"ewCPBgOrLAE": [
+[
+0,
+"Introduction and panel"
+],
+[
+137,
+"Virtual threads and scheduling"
+],
+[
+582,
+"API deprecation and removal"
+],
+[
+1063,
+"Java and AI coding agents"
+],
+[
+1446,
+"Shifting architectural priorities"
+],
+[
+1740,
+"String performance and views"
+],
+[
+2204,
+"Value objects and generics"
+],
+[
+2300,
+"Improving Java modules"
+],
+[
+2488,
+"Introspection and values"
+],
+[
+2654,
+"String templates update"
+],
+[
+2778,
+"Construction and garbage collection"
+]
+],
+"fszyRIZXjQM": [
+[
+0,
+"Introduction and motivation"
+],
+[
+106,
+"The problem with ownership"
+],
+[
+316,
+"WebAssembly as a blueprint"
+],
+[
+434,
+"Introducing Brewlet"
+],
+[
+609,
+"Technical architecture"
+],
+[
+872,
+"Platform and workload setup"
+],
+[
+1219,
+"Managed dependency bundles"
+],
+[
+1341,
+"Live demonstration"
+],
+[
+2824,
+"Lessons and Q&A"
+]
+],
+"gPtWq_LHL8o": [],
+"hHu3rLsbYog": [
+[
+0,
+"Introduction and context"
+],
+[
+118,
+"Java's role in the AI landscape"
+],
+[
+280,
+"The enterprise advantage"
+],
+[
+319,
+"Architecture and agentic systems"
+],
+[
+884,
+"Managing uncertainty"
+],
+[
+1032,
+"Security and boundaries"
+],
+[
+1460,
+"Control flow in AI applications"
+],
+[
+1772,
+"Real-world scaling"
+],
+[
+1957,
+"Performance and tool selection"
+],
+[
+1992,
+"The value of Java engineering"
+],
+[
+2262,
+"Open source tool announcement"
+],
+[
+2266,
+"Q&A and concluding remarks"
+]
+],
+"i_VXe0mNicY": [],
+"jFxR6YYWdmI": [
+[
+0,
+"Introduction and history"
+],
+[
+214,
+"Foundations of modern IDEs"
+],
+[
+647,
+"The impact of AI on development"
+],
+[
+881,
+"The evolution of IDEs into tools"
+],
+[
+1507,
+"Managing fleets of agents"
+],
+[
+1611,
+"Supporting agents as new users"
+],
+[
+2013,
+"Outlook and conclusion"
+]
+],
+"jhvT8hVYSvQ": [],
+"kaT6UpLrzhU": [
+[
+0,
+"Introduction and context"
+],
+[
+397,
+"Agenda and core scenarios"
+],
+[
+491,
+"Defense domain constraints"
+],
+[
+613,
+"Working in air-gapped systems"
+],
+[
+826,
+"Scenario walkthrough"
+],
+[
+969,
+"Architectural components"
+],
+[
+1787,
+"Engineering tool reliability"
+],
+[
+2116,
+"The role of documentation"
+],
+[
+2252,
+"Demo: grounding vs hallucination"
+],
+[
+2304,
+"Analysis of demonstration results"
+],
+[
+2456,
+"Demo: the approval gateway"
+],
+[
+2554,
+"Operator control mechanisms"
+],
+[
+2759,
+"Lessons learned and conclusion"
+],
+[
+3017,
+"Final remarks"
+]
+],
+"knE4uy7IYXY": [
+[
+0,
+"Introduction to vectors"
+],
+[
+158,
+"Understanding vectors"
+],
+[
+375,
+"Java Vector API"
+],
+[
+711,
+"Vector search examples"
+],
+[
+903,
+"Math of vector similarity"
+],
+[
+1075,
+"Cosine similarity in practice"
+],
+[
+1304,
+"Embedding models and arithmetic"
+],
+[
+1682,
+"Indexing algorithms"
+],
+[
+1882,
+"Postgres and HNSW indexing"
+],
+[
+2194,
+"Retrieval Augmented Generation"
+],
+[
+2456,
+"Image similarity search"
+]
+],
+"kuUeHD_k5fs": [],
+"lUB15M3mMLs": [],
+"lsvVJaigNp8": [
+[
+0,
+"Introduction and context"
+],
+[
+90,
+"Defining the planning challenge"
+],
+[
+331,
+"Wedding seating requirements"
+],
+[
+652,
+"Limitations of manual solutions"
+],
+[
+883,
+"Introducing Timefold solver"
+],
+[
+1006,
+"Modeling constraints in Java"
+],
+[
+1326,
+"Solving the seating problem"
+],
+[
+1490,
+"Honeymoon itinerary optimization"
+],
+[
+1816,
+"Bachelor party beer planning"
+],
+[
+2036,
+"Advanced use cases and wrap-up"
+]
+],
+"m9viRAIRAUQ": [
+[
+0,
+"Introduction and context"
+],
+[
+122,
+"The trap of over-abstraction"
+],
+[
+338,
+"Why we add layers"
+],
+[
+515,
+"Trade-offs of layered architecture"
+],
+[
+651,
+"The Kafka project lesson"
+],
+[
+817,
+"Architecture fundamentals"
+],
+[
+1048,
+"Deep dive into cohesion"
+],
+[
+1343,
+"Understanding distance"
+],
+[
+1540,
+"Coupling types and strategies"
+],
+[
+1783,
+"Practical contract management"
+],
+[
+2296,
+"Mental model for architecture"
+],
+[
+2491,
+"Evaluating hexagonal architecture"
+],
+[
+2747,
+"Conclusion and takeaways"
+]
+],
+"mOmuF5fDiUM": [],
+"nHRSwiFNQ9E": [
+[
+0,
+"Introduction and agenda"
+],
+[
+145,
+"Seven stages of agentic coding"
+],
+[
+343,
+"Agentic surfaces and interfaces"
+],
+[
+502,
+"Evolution of coding tools"
+],
+[
+718,
+"Mastering prompt engineering"
+],
+[
+938,
+"Managing rules and context"
+],
+[
+1217,
+"Standardization and protocols"
+],
+[
+1426,
+"Agent skills and just-in-time loading"
+],
+[
+1746,
+"Classifying skill types"
+],
+[
+1944,
+"Subagents and swarm coding"
+],
+[
+2339,
+"Sidecars and custom extensions"
+],
+[
+2714,
+"Plugins and final takeaways"
+]
+],
+"niBYuCuViGw": [],
+"npSWywhFDHo": [],
+"oey2TbFvfWE": [
+[
+0,
+"Introduction to Neo4j"
+],
+[
+132,
+"The problem with AI agents"
+],
+[
+274,
+"Memory management strategies"
+],
+[
+417,
+"Knowledge graphs for context"
+],
+[
+757,
+"Distilling skills into code"
+],
+[
+898,
+"Demo: Tool loops vs. code"
+],
+[
+1138,
+"Optimizing context lookups"
+],
+[
+1292,
+"Scaling through compilation"
+],
+[
+1438,
+"Demo: Governed workflows"
+],
+[
+1709,
+"Handling configuration drift"
+],
+[
+1928,
+"Updating security and permissions"
+],
+[
+2236,
+"Conclusion and key lessons"
+]
+],
+"pMv_39iSXVA": [],
+"q58Y2tyRdCE": [],
+"qrtd6svRUnk": [],
+"rNOzf12RORI": [
+[
+0,
+"How Java compilation works"
+],
+[
+860,
+"Overview of JDK updates"
+],
+[
+1022,
+"GC and memory management"
+],
+[
+1208,
+"Compact object headers"
+],
+[
+1292,
+"Native memory optimizations"
+],
+[
+1331,
+"Standard library enhancements"
+],
+[
+1494,
+"Vectorization and AOT"
+],
+[
+1747,
+"Initialization and threads"
+],
+[
+1931,
+"GC robustness and monitoring"
+],
+[
+2058,
+"Future sneak peek"
+],
+[
+2117,
+"FFM and AOT performance"
+],
+[
+2291,
+"Benchmarking best practices"
+],
+[
+2433,
+"Closing recommendations"
+]
+],
+"rv2KpWgb0Mw": [
+[
+0,
+"Motivation for private AI"
+],
+[
+236,
+"Hardware and capacity"
+],
+[
+532,
+"Network architecture"
+],
+[
+702,
+"Cluster software stack"
+],
+[
+1290,
+"Model selection strategy"
+],
+[
+1294,
+"Models, documents, and tools"
+],
+[
+2472,
+"Q&A and closing thoughts"
+]
+],
+"sWP9osLV45I": [
+[
+0,
+"Introduction and context"
+],
+[
+336,
+"Interactive session setup"
+],
+[
+426,
+"Conflict theory and types"
+],
+[
+1308,
+"Practical case studies"
+],
+[
+2164,
+"Resolution and prevention"
+],
+[
+2968,
+"Key takeaways and conclusion"
+],
+[
+3088,
+"Closing remarks"
+]
+],
+"ufhs9THbYZI": [],
+"v86SfHA5ISw": [
+[
+0,
+"Introduction and context"
+],
+[
+140,
+"Microservices journey"
+],
+[
+384,
+"Benefits and challenges"
+],
+[
+453,
+"Industry insights"
+],
+[
+641,
+"Platform engineering"
+],
+[
+781,
+"Coupling problems"
+],
+[
+923,
+"Defining better boundaries"
+],
+[
+1033,
+"Domain-driven design"
+],
+[
+1170,
+"Event storming technique"
+],
+[
+1345,
+"Workshop outcomes"
+],
+[
+1512,
+"Architectural strategy"
+],
+[
+1626,
+"Modular monolith approach"
+],
+[
+1745,
+"Spring Modulith usage"
+],
+[
+1826,
+"Executable architecture"
+],
+[
+1943,
+"Inter-module communication"
+],
+[
+2284,
+"Migration journey"
+],
+[
+2289,
+"Migration scenarios"
+],
+[
+2705,
+"Key takeaways"
+],
+[
+2709,
+"Refining the hypothesis"
+],
+[
+2783,
+"Conclusion"
+],
+[
+2879,
+"Q&A session"
+]
+],
+"vLDbzmiT7Xs": [],
+"vNeyNkeU4ms": [],
+"vcL6eCAwLwY": [
+[
+0,
+"Introduction to Bitvavo"
+],
+[
+122,
+"Company journey and mission"
+],
+[
+291,
+"Identifying system bottlenecks"
+],
+[
+511,
+"Latency challenges"
+],
+[
+594,
+"Redesign requirements"
+],
+[
+634,
+"Rebuilding with replicated state machines"
+],
+[
+1374,
+"Networking and protocol optimization"
+],
+[
+1511,
+"Leveraging the Aeron stack"
+],
+[
+1696,
+"Operational strategies and results"
+]
+],
+"w2RTFWet_6c": [
+[
+0,
+"Introduction and agent basics"
+],
+[
+110,
+"Agentic design concerns"
+],
+[
+453,
+"Programmatic planning pattern"
+],
+[
+886,
+"Context engineering patterns"
+],
+[
+1015,
+"Progressive disclosure and hierarchy"
+],
+[
+1459,
+"Hierarchical agent decomposition"
+],
+[
+1841,
+"LLM as judge pattern"
+],
+[
+2330,
+"Goal-oriented action planning"
+],
+[
+2744,
+"Coding agent loops and wrap-up"
+]
+],
+"wJ7R4qkVs8Y": [
+[
+0,
+"Introduction and context"
+],
+[
+118,
+"Redaction failures explained"
+],
+[
+238,
+"Document exploitation demos"
+],
+[
+528,
+"Attack vectors and security"
+],
+[
+748,
+"Advanced PDF manipulation"
+],
+[
+1025,
+"Metadata and email analysis"
+],
+[
+1302,
+"Data locality and NER concepts"
+],
+[
+1640,
+"Image and video deobfuscation"
+],
+[
+2159,
+"Machine learning model approach"
+],
+[
+2785,
+"Conclusion and resources"
+]
+],
+"wUyQmRriCng": [
+[
+0,
+"Introduction and context"
+],
+[
+142,
+"The end of the old normal"
+],
+[
+441,
+"Europe at a crossroads"
+],
+[
+688,
+"Responding to global shifts"
+],
+[
+1036,
+"Defining digital sovereignty"
+],
+[
+1296,
+"Technology as a weapon"
+],
+[
+1775,
+"The copy-back economy"
+],
+[
+2156,
+"Investment and security"
+],
+[
+2525,
+"Transitioning the AI race"
+],
+[
+3115,
+"Hope and future perspective"
+]
+],
+"wbzpP0T9w6I": [
+[
+0,
+"Introduction and history"
+],
+[
+386,
+"Understanding Git internals"
+],
+[
+667,
+"Game development with Git"
+],
+[
+1045,
+"Demonstrating the Git-RTS game"
+],
+[
+1512,
+"Advanced Git mechanics"
+],
+[
+1856,
+"Inside the .git folder"
+],
+[
+2140,
+"Advanced Git commands and strategies"
+],
+[
+2530,
+"Git safety and data loss"
+],
+[
+2680,
+"Conclusion and acknowledgments"
+]
+],
+"wrV4f83UMWI": [],
+"wxNQRGPnJ24": [
+[
+0,
+"Introduction and context"
+],
+[
+146,
+"Context development life cycle"
+],
+[
+390,
+"Closing the feedback loop"
+],
+[
+441,
+"Common context pathologies"
+],
+[
+463,
+"The context flywheel"
+],
+[
+518,
+"Organizational enablement layers"
+],
+[
+533,
+"Enabling teams and leaders"
+],
+[
+722,
+"Building an AI platform team"
+],
+[
+994,
+"Business case and ROI"
+],
+[
+1144,
+"Transition to concurrent delivery"
+],
+[
+1176,
+"Concurrent delivery and coordination"
+]
+],
+"wzN6qq08w0U": [
+[
+0,
+"Design vs. architecture"
+],
+[
+801,
+"Trade-offs and reasoning"
+],
+[
+935,
+"The importance of the why"
+],
+[
+1365,
+"Documentation and decisions"
+],
+[
+1953,
+"ADR implementation"
+],
+[
+2496,
+"ADR content guidelines"
+],
+[
+2529,
+"Tenets and best practices"
+]
+],
+"xEAYnXyt3L4": [
+[
+0,
+"Introduction"
+],
+[
+67,
+"API keys explained"
+],
+[
+175,
+"Limitations of API keys"
+],
+[
+314,
+"Security risks and stories"
+],
+[
+561,
+"Real-world failure cases"
+],
+[
+681,
+"Alternative security standards"
+],
+[
+789,
+"Benefits of tokens"
+],
+[
+924,
+"Use cases for API keys"
+],
+[
+975,
+"Authorization code flow"
+],
+[
+1161,
+"Workload identity federation"
+],
+[
+1279,
+"SPIFFE and SPIRE overview"
+],
+[
+1724,
+"Implementing identity federation"
+],
+[
+1818,
+"Demo of token-based access"
+],
+[
+1933,
+"Conclusion and Q&A"
+]
+],
+"yhk1qvy6A_4": [
+[
+0,
+"Introduction and context"
+],
+[
+126,
+"The problem with helping"
+],
+[
+792,
+"Active listening skills"
+],
+[
+1011,
+"Coaching formats"
+],
+[
+1425,
+"The five coaching questions"
+],
+[
+2313,
+"Heuristics and decision making"
+],
+[
+2536,
+"Coaching and power dynamics"
+],
+[
+2718,
+"Pitfalls and conclusion"
+]
+],
+"z8lal-Yt_04": [],
+"zC2tbq7S5UE": [],
+"zDqS1U5Gnk8": [],
+"zEUSFvDOiCo": [
+[
+0,
+"Introduction and context"
+],
+[
+112,
+"The dopamine loop of coding"
+],
+[
+396,
+"Refining specifications"
+],
+[
+679,
+"Dual-track workflow"
+],
+[
+853,
+"Tactical vs strategic work"
+],
+[
+987,
+"Constraints and the harness"
+],
+[
+1152,
+"Engineering guardrails"
+],
+[
+1643,
+"Agent management lessons"
+],
+[
+1986,
+"Clean code in the AI era"
+],
+[
+2068,
+"The operator role"
+],
+[
+2244,
+"Takeaways and scorecard"
+]
+],
+"zo6L7bxn4OY": [
+[
+0,
+"Introduction and background"
+],
+[
+121,
+"The server-side dilemma"
+],
+[
+269,
+"Anatomy of a Micronaut app"
+],
+[
+498,
+"Technical building blocks"
+],
+[
+591,
+"Introducing Pyronaut"
+],
+[
+675,
+"Development and testing demo"
+],
+[
+901,
+"Project structure and IDE support"
+],
+[
+1087,
+"Pet clinic and complex projects"
+],
+[
+1231,
+"Language interoperability"
+],
+[
+1410,
+"Performance and future plans"
+],
+[
+1565,
+"Running Java scripts"
+],
+[
+1857,
+"Building and productionizing"
+],
+[
+2134,
+"IDE and Maven integration"
+],
+[
+2326,
+"Conclusion and resources"
+]
 ]
 }

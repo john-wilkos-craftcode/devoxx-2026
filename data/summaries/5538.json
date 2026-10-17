@@ -1,14 +1,89 @@
 {
   "id": 5538,
-  "source": "abstract",
-  "tldr": "Daniel Raneland shares experience using the Strangler Fig pattern, with DDD and the Inverse Conway Manoeuvre, to modernise legacy systems instead of rewriting them.",
-  "summary": ["The session argues against the tempting full rewrite of a legacy system. Rewrites of complicated systems rarely succeed: they take long, the business cannot pause while they happen, and the second system effect tends to make the replacement over-engineered and bloated.", "Daniel Raneland instead describes his experience with the Strangler Fig pattern, where the original system is gradually replaced by breaking out or rewriting parts as separate systems. The talk also covers combining it with Domain Driven Design and using the resulting design for an Inverse Conway Manoeuvre, so that team structure works with Conway's law rather than against it."],
-  "keyPoints": ["Rewrites fail because of time, the need to keep delivering, and the second system effect.", "Strangler Fig replaces the legacy system piece by piece as separate systems.", "Domain Driven Design guides where to cut the system.", "Inverse Conway Manoeuvre aligns teams with the target design."],
-  "takeaways": ["Pick one bounded part of the legacy system to extract first instead of proposing a rewrite."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Strangler Fig pattern", "Domain Driven Design", "Conway's law"],
-  "watchIf": "You maintain a legacy system and are being pushed toward a big-bang rewrite.",
-  "themes": ["Legacy modernization", "Architecture & design"],
+  "source": "transcript",
+  "tldr": "Raneland argues against rewriting legacy systems and shows how to replace them piece by piece with the Strangler Fig pattern, backed by TDD, Domain-Driven Design and the Inverse Conway Manoeuvre.",
+  "summary": [
+    "Raneland opens with the urge to throw a legacy 'dragon' in a burning dumpster and start over, then lists why rewrites fail: outdated requirements documentation, the second system effect (the second system overcompensates for the first and ends up worse), underestimated complexity with forgotten edge cases, the question of whether to reproduce old bugs, and a moving target because the old system keeps evolving. The alternative is the Strangler Fig pattern, named by Martin Fowler after a tree that grows around a host until it replaces or supports it: identify one small part, break it out or replace it, repeat.",
+    "At a startup, from 2016, features of a JavaScript image service left over from a prototype moved into a new album service whenever they needed changing, and in 2019 the empty shell was decommissioned and celebrated with champagne. For larger systems Raneland adds three partners. TDD protects the business: pin current behaviour with tests at the boundary, test-drive the new implementation, switch paths with a feature flag rolled out per user, country or percentage, then delete the old path and the flag. Knight Capital's 2012 loss of 460 million dollars in 45 minutes, which Raneland blamed on a stale flag, is the warning.",
+    "Domain-Driven Design supplies the target. With domain experts, and ideally event storming, the team builds a context map (illustrated with a dragon business of princess kidnapping, knight combat, treasure hoarding and ransom) and starts by breaking out something tiny, such as the initial ransom demand, as a module, service or self-contained system. Conway's law then says teams produce systems that mirror their communication structure, so an Inverse Conway Manoeuvre aligns teams to bounded contexts: one context belongs to exactly one team, and a team may own several small ones. Unfix and Team Topologies are suggested for inspiration.",
+    "The benefits Raneland claims over a rewrite: lower risk, fewer repeated mistakes, the old system keeps evolving, modernisation can ride on new business opportunities, the second system effect stays limited to the first few breakouts, and the effort can be paused without losing value. Pitfalls are over-ambition, starting many projects at once, not budgeting for overhead and working in isolation instead of trunk-based development. In Q&A Raneland said buy-in usually comes from management noticing slow delivery, and that juniors are best kept to one side of the old/new split."
+  ],
+  "keyPoints": [
+    "Rewrites fail on stale requirements, the second system effect, underestimated complexity, old bugs and a moving target; an unfinished rewrite delivers no business value.",
+    "Strangler Fig: identify one small part, break it out or replace it, repeat; the result either fully replaces the old system or supports the parts worth keeping.",
+    "In legacy code, first write tests that fix current behaviour (and break the code to see them fail), then test-drive the change.",
+    "Test the boundary between the system and the part being extracted, create a seam, and switch from old to new path with feature flags rolled out to a small percentage first.",
+    "Always remove the old path and the flag afterwards; Raneland cited Knight Capital losing 460 million dollars in 45 minutes to a stale feature flag in 2012.",
+    "Use DDD and event storming to build a context map as the architectural vision, then break out the first tiny feature into a new module, service or self-contained system.",
+    "Inverse Conway Manoeuvre: design the team structure around bounded contexts; never split one bounded context across teams.",
+    "Design the new team configuration up front but do not reorganise everyone at once: start one small trailblazer project and move people over as it proves itself."
+  ],
+  "takeaways": [
+    "Before touching a legacy area, add tests that pin its current behaviour and make each one fail once to prove it works.",
+    "Put the new implementation behind a feature flag, roll it out to a few percent of users, and schedule deletion of the old path and the flag.",
+    "Run an event storming session with domain experts to produce a context map before choosing what to extract first.",
+    "Pick one small, low-risk feature as the first breakout, ship it to production, and celebrate the milestone.",
+    "Check that no bounded context in your target architecture is owned by more than one team."
+  ],
+  "quotes": [
+    {
+      "text": "If you're building houses for yourself, you should live in the third house you built. And the same with the software system.",
+      "at": "03:40"
+    },
+    {
+      "text": "If you pause a rewrite, it's useless.",
+      "at": "26:28"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Why rewrites fail"
+    },
+    {
+      "at": "05:47",
+      "title": "The Strangler Fig pattern"
+    },
+    {
+      "at": "08:14",
+      "title": "Startup image service story"
+    },
+    {
+      "at": "11:24",
+      "title": "Test-driving the breakout"
+    },
+    {
+      "at": "17:22",
+      "title": "Domain-Driven Design as vision"
+    },
+    {
+      "at": "21:52",
+      "title": "Inverse Conway Manoeuvre"
+    },
+    {
+      "at": "24:22",
+      "title": "Benefits and pitfalls"
+    },
+    {
+      "at": "30:04",
+      "title": "Getting started and Q&A"
+    }
+  ],
+  "tech": [
+    "Strangler Fig pattern",
+    "Test-driven development",
+    "Domain-Driven Design",
+    "Event storming",
+    "Feature flags",
+    "Conway's law",
+    "Team Topologies",
+    "unFIX",
+    "Trunk-based development"
+  ],
+  "watchIf": "You maintain a long-lived legacy system and someone is proposing a big-bang rewrite.",
+  "themes": [
+    "Legacy modernization",
+    "Architecture & design"
+  ],
   "demo": false
 }

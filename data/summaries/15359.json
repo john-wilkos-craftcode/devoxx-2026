@@ -1,24 +1,96 @@
 {
   "id": 15359,
-  "source": "abstract",
-  "tldr": "Argues that seven Extreme Programming practices are tempting to skip with AI assistance, and that they matter more, not less, when AI amplifies both good and bad habits.",
+  "source": "transcript",
+  "tldr": "Cougil puts seven XP practices on trial against AI's arguments for skipping them and concludes each matters more, because AI amplifies bad habits as much as good ones.",
   "summary": [
-    "Nacho Cougil's session looks at seven XP practices, drawn from the family that includes TDD, refactoring, pair programming, simple design, collective code ownership, continuous integration and coding standards, that are at risk in an AI-assisted world. The risk is not that they are wrong, but that AI makes skipping them tempting.",
-    "The talk sets out to show what happens when teams skip them and why the practices become more critical. The central argument is that AI amplifies everything: a team without tests, shared standards or a feedback loop will build a mess faster, so AI acts as a stress test that XP practices pass."
+    "Cougil, a Java Champion at Dynatrace and founder of the Barcelona JUG, opens with AI incidents: an agent that deleted a production database during a code freeze, and a series of Amazon outages and lost orders that, Cougil said, followed a push for 80% of engineers to use AI daily, after which Amazon required two-engineer review of changes. XP is traced back to Kent Beck, Ward Cunningham and Ron Jeffries at Chrysler, practices that came from real project pain rather than theory, and the question is whether they still apply when the IDE writes a method before you finish its name.",
+    "The talk then stages a trial: seven 'charges' AI brings against TDD, refactoring, simple design, pair programming, collective code ownership, continuous integration and small releases. On TDD, an agent told Cougil its tests had validated the implementation, not the business; tests must encode domain behaviour, and spec-driven development is presented as an evolution of TDD with humans as architects. On refactoring, Cougil cited GitClear data showing refactoring falling and duplication roughly doubling since 2023, and an AI cleanup the team no longer recognised. On simple design, AI over-engineers, ignores YAGNI and never says no.",
+    "Pairing only with AI loses mentoring for juniors and raises the bus factor: about 70% of the room had paired with AI in the last two weeks, but half doubted teammates understood that work. AI-written code blurs ownership. More generated code means more broken pipelines, so CI matters more, and one-shot releases collapse the feedback loop and make rollback costly. The failures compound, so Cougil ends with an audit checklist and calls AI the best stress test XP has had, one the practices pass. Coding standards, listed in the abstract, gave way to small releases."
   ],
   "keyPoints": [
-    "Seven XP practices are examined as being at risk when AI makes skipping them easy.",
-    "Candidate practices include TDD, refactoring, pair programming, simple design, collective ownership, CI and coding standards.",
-    "AI amplifies both good and bad habits.",
-    "Without tests, standards and feedback loops, AI speeds up building a mess."
+    "The seven practices on trial: TDD, refactoring, simple design, pair programming, collective code ownership, continuous integration and small releases.",
+    "AI-generated tests tend to confirm what the code does rather than what the business needs, so a large green suite can hide broken behaviour.",
+    "Cougil cited GitClear repository data: refactoring activity down to about 30% of its 2023 level, duplication roughly doubled and two-week code churn rising.",
+    "AI refactors syntactically by pattern but does not know the domain, and changes the code without changing the team's mental model of it.",
+    "AI never pushes back on a bad idea, so YAGNI and saying no to complexity have to come from humans.",
+    "Cited figures, attributed to the reports: Lightrun, 43% of AI-generated code needs debugging in production; Cloud Security Alliance, 62% contains design flaws or vulnerabilities.",
+    "Small releases were never about delivery speed but about learning whether you build the right thing in the right order; big AI-built features make rollback and blame harder."
   ],
   "takeaways": [
-    "Keep tests and refactoring in your workflow when using AI assistants rather than treating them as optional."
+    "Audit your tests: check that they verify the behaviour the business needs rather than mirroring the implementation.",
+    "Write the spec or the test first and let the AI implement against it.",
+    "Keep humans pairing, especially with juniors, and make sure someone besides the author can explain each AI-written change.",
+    "Keep releases small enough to roll back individually, even when an agent can build the whole feature in a morning.",
+    "Watch duplication and code churn as signals that refactoring has stopped."
   ],
-  "quotes": [],
-  "chapters": [],
-  "tech": [],
-  "watchIf": "Your team is adopting AI coding tools and you worry about engineering discipline slipping.",
-  "themes": ["Testing & quality", "AI agents & agentic coding"],
+  "quotes": [
+    {
+      "text": "AI will never push back your crazy idea.",
+      "at": "29:57"
+    },
+    {
+      "text": "The constraint was never if we can build it, it was if we are building the right thing at the right moment.",
+      "at": "42:47"
+    },
+    {
+      "text": "AI is the best stress test that extreme programming practices have ever had.",
+      "at": "47:54"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "AI incidents and XP's origins"
+    },
+    {
+      "at": "12:23",
+      "title": "Seven practices on trial"
+    },
+    {
+      "at": "13:52",
+      "title": "TDD and AI-written tests"
+    },
+    {
+      "at": "20:31",
+      "title": "Refactoring and GitClear data"
+    },
+    {
+      "at": "27:14",
+      "title": "Simple design and YAGNI"
+    },
+    {
+      "at": "29:57",
+      "title": "Pair programming and bus factor"
+    },
+    {
+      "at": "35:14",
+      "title": "Collective code ownership"
+    },
+    {
+      "at": "37:49",
+      "title": "Continuous integration"
+    },
+    {
+      "at": "40:17",
+      "title": "Small releases"
+    },
+    {
+      "at": "44:03",
+      "title": "Compounding gaps and an audit"
+    }
+  ],
+  "tech": [
+    "Extreme Programming",
+    "TDD",
+    "Spec-driven development",
+    "Pair programming",
+    "Continuous integration",
+    "GitClear"
+  ],
+  "watchIf": "Your team has adopted AI coding assistants and you need arguments for keeping TDD, pairing, CI and small releases.",
+  "themes": [
+    "Testing & quality",
+    "AI agents & agentic coding"
+  ],
   "demo": false
 }

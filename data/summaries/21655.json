@@ -1,24 +1,97 @@
 {
   "id": 21655,
-  "source": "abstract",
-  "tldr": "Gavin Bierman presents the next wave of Project Amber pattern-matching experiments, including user-defined deconstruction, nested constant patterns, primitive conversions and reconstruction of records.",
+  "source": "transcript",
+  "tldr": "Bierman reviews Amber's themes and previews experiments: primitive patterns with exact conversions, deconstruction statements, constant patterns, record with-expressions, and data interfaces that give interfaces record-style patterns.",
   "summary": [
-    "The talk starts from Amber's existing features, which together enable data oriented programming built on compositional pattern matching. It then explores where the project goes next, presenting experimental designs and the language design challenges they raise.",
-    "Directions under development include user-defined deconstruction for ordinary interfaces and classes, nested constant patterns, an exhaustive pattern-matching statement, safer primitive value conversions within pattern matching, and a compact notation for deconstructing and constructing record instances, called reconstruction."
+    "Bierman, of Oracle's Java language team, groups Amber's JEPs from the last 13 releases, all previewed before finalization with ten features final so far, into themes. Strings: text blocks shipped, string templates were withdrawn after previews in JDK 21 and 22, and a replacement is under active work. Paving the on-ramp: JDK 25 features remove the class and main boilerplate for beginners and also make Java scripts practical. Flexible constructor bodies, proposed by Archie Cobbs from outside Oracle, turned out to suit Valhalla. The biggest theme is data-oriented programming on records, sealed classes and patterns, with guidelines to model plain data immutably and precisely and make illegal values unrepresentable.",
+    "A web-crawler example, borrowed from Nicolai Parlog, replaces a flat Page class full of optional getters with records for error, external, GitHub issue and pull request pages under a sealed hierarchy of interfaces that reads like the domain, processed by an exhaustive switch with no default. The first 'enhancing' feature, primitive types in patterns, is already in preview: a pattern matches only when the conversion is exact, so 16,777,217 does not match float, and switch works over any type. Bierman showed why converting and converting back is no test: Integer.MAX_VALUE to float and back returns the original after two lossy steps.",
+    "Further sketches came with no promises on syntax. Pattern declaration statements deconstruct a record unconditionally into variables in scope for the rest of the block, and patterns could appear in the header of an enhanced for. Constant patterns let literals, enum constants and null sit inside a pattern, such as Point(0, 0), instead of a when guard that runs only after the full match. A with expression copies a record while naming only the changed components, avoiding wither methods that break invariants spanning several components.",
+    "Beyond the current theme, Bierman showed data interfaces: an interface with a header gets implicit abstract accessors and supports record-like patterns. The JDK's public-interface, hidden-implementation style used by the Class-File API, FFM API, the upcoming JSON API and Babylon fits this; with a prototype compiler Bierman added headers to 110 Class-File API and 18 FFM interfaces and rewrote code using them, and Map.Entry is another candidate. Deconstruction for ordinary classes is being worked on."
   ],
   "keyPoints": [
-    "Pattern matching is the core of Amber's data oriented programming style.",
-    "User-defined deconstruction would extend patterns to ordinary classes and interfaces.",
-    "Other experiments: nested constant patterns, an exhaustive matching statement and safer primitive conversions.",
-    "Reconstruction is a compact notation for deconstructing and constructing records."
+    "Every Amber language feature is previewed first; ten have been finalized across the last 13 releases.",
+    "Data-oriented programming guidelines: model plain data immutably, model it precisely enough for a domain expert to read, and make illegal values unrepresentable.",
+    "Primitive patterns match only on exact conversions, fixing the asymmetry where construction may widen but deconstruction could not narrow.",
+    "Checking exactness by round-tripping fails: Integer.MAX_VALUE converted to float and back returns the original value despite two lossy conversions.",
+    "Constant patterns (literals, enum constants, null) keep equality checks inside composable patterns and avoid deep navigation before a when guard fails.",
+    "Withers cannot update several components at once when the canonical constructor enforces a cross-component invariant, such as two lists of equal length; a with expression can.",
+    "A header on an interface would declare accessors usable in patterns; a prototype applied it to 110 Class-File API and 18 FFM interfaces."
   ],
   "takeaways": [
-    "Follow the Amber design discussions to see how upcoming pattern features could simplify your data-handling code."
+    "Model a domain's variants as records under a sealed interface and process them with exhaustive switches instead of a flat class with optional getters.",
+    "Enforce invariants in the record's canonical constructor so every constructed value can be trusted.",
+    "Try primitive types in patterns in the current preview and send feedback before it is finalized."
   ],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Project Amber", "Pattern matching", "Records", "Java"],
-  "watchIf": "You track Java language evolution and want to hear it from a member of the language team.",
-  "themes": ["Java language & JDK"],
+  "quotes": [
+    {
+      "text": "This is a talk with no AI in it.",
+      "at": "00:32"
+    },
+    {
+      "text": "Two wrongs made a right here.",
+      "at": "26:34"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Amber's shipped features"
+    },
+    {
+      "at": "01:33",
+      "title": "Strings and the on-ramp"
+    },
+    {
+      "at": "05:46",
+      "title": "Themes still to come"
+    },
+    {
+      "at": "07:14",
+      "title": "Data-oriented programming recap"
+    },
+    {
+      "at": "13:02",
+      "title": "Modelling web pages"
+    },
+    {
+      "at": "19:40",
+      "title": "Primitive types in patterns"
+    },
+    {
+      "at": "28:02",
+      "title": "Pattern declaration statements"
+    },
+    {
+      "at": "32:00",
+      "title": "Constant patterns"
+    },
+    {
+      "at": "35:55",
+      "title": "Record with expressions"
+    },
+    {
+      "at": "40:44",
+      "title": "Data interfaces"
+    }
+  ],
+  "tech": [
+    "Project Amber",
+    "Records",
+    "Sealed classes",
+    "Pattern matching",
+    "Record patterns",
+    "Primitive types in patterns",
+    "Text blocks",
+    "String templates",
+    "Flexible constructor bodies",
+    "Class-File API",
+    "Foreign Function & Memory API",
+    "Map.Entry"
+  ],
+  "watchIf": "You use records, sealed types and pattern matching and want to see where the Java language team is taking them next.",
+  "themes": [
+    "Java language & JDK",
+    "Architecture & design"
+  ],
   "demo": false
 }

@@ -1,14 +1,98 @@
 {
-  "id": 21694,
-  "source": "abstract",
-  "tldr": "David Simms explains what JEP 401 value objects are, what they do for the JVM, and the path from Valhalla toward healing the rift between objects and primitives.",
-  "summary": ["With JEP 401 value objects arriving in OpenJDK as a first preview, David Simms from the Java Platform Group sets out to explain what they are, why and how to use them, and what they do for the JVM and for your code. The change is a single keyword and does not require recompiling libraries.", "The talk includes project history, including peak Valhalla prototype performance and how dangerous edges were smoothed off, some JVM implementation details, and speculative future ideas. The message is that while List<int> is not here yet, JEP 401 is a path toward it, bringing safety and clarity benefits and some performance wins."],
-  "keyPoints": ["JEP 401 value objects arrive as a first preview, enabled by one keyword.", "Libraries do not need to be recompiled.", "Goal is to heal the rift between objects and primitives.", "Covers project history and JVM implementation details.", "List<int> is a longer-term goal."],
-  "takeaways": ["Try JEP 401 preview builds on small immutable types in your code."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Project Valhalla", "JEP 401", "OpenJDK", "JVM"],
-  "watchIf": "You want to understand Valhalla value objects from someone working on the JVM implementation.",
-  "themes": ["Java language & JDK", "JVM performance & runtime"],
-  "demo": false
+ "id": 21694,
+ "source": "transcript",
+ "tldr": "Simms explains what JEP 401 value objects change for Java developers, why Valhalla took a decade to land, and how HotSpot implements them with heap flattening and C2 scalarization.",
+ "summary": [
+  "Simms, a HotSpot runtime engineer in Oracle's Java Platform Group, starts with the user view. An object carries an 8 to 16 byte header and is reached through pointers, costly next to an 8-byte payload when a cache miss costs hundreds of times an add. Putting `value` on a class (JEP 401, a preview targeted at JDK 28) makes fields implicitly final, drops identity, makes the class final unless abstract, requires fields to be set before the super call, and turns == into a field-by-field comparison. A contrived microbenchmark gained 40%. With preview enabled, wrapper and other value-based classes migrate automatically, and he asked for reports of libraries that break.",
+  "Valhalla went public in 2014; Simms joined around 2015. Early prototypes ignored compatibility: their own signatures, 13 new bytecodes and no null support, and a tenfold speedup on matrix multiplication. Flattening paid off for density, and scalarization worked in C2, not the interpreter. The LWorld branch was cut around 2019, the construction story (strict field initialization, flexible constructor bodies) settled around 2024, and production quality took two more years. Simms merged mainline into the project for years; the final integration of almost 3000 commits after the JDK 27 fork touched javac, javap, class loading, the interpreter, C1 and C2, with 64 authors and 14 reviewers.",
+  "Flattening stores the payload inline in arrays and fields with a null marker, purely as an implementation choice. Since nulls and atomicity must be kept, a LocalDate (48 bits plus a null bit) is flattened while a two-int Point (64 bits plus the marker) is not. Wider vector instructions cost too much density in alignment, and beyond about a cache line, or with many object references needing GC barriers, flattening rarely pays. A LoadableDescriptors class-file attribute lets the VM load value classes early, observably changing class-loading order. The interpreter still buffers values on the heap and calls up into Java for ==, so -Xint can show more allocation.",
+  "Scalarization keeps fields in registers instead of allocating. C2 already does this for identity objects but gives up when an object escapes; value objects are conceptually passed by value, so mutation is impossible and it is safe. This needed new C2 nodes and a new calling convention that passes fields in registers, an investment so large the team could not back out of that repo. Deoptimization and calls from interpreter or C1 frames rematerialize buffers. A point-moving example ran nearly ten times faster with allocation gone. Simms expects several previews and said null restriction and loosely consistent values exist in the VM but may never be exposed by the language."
+ ],
+ "keyPoints": [
+  "On JDK 28 early-access builds, value classes need --enable-preview at runtime and --source 28 when compiling.",
+  "With preview enabled, Integer and the other value-based classes become value classes even if you change nothing; code that puts them in weak references can break.",
+  "Flattening and scalarization are not in the JEP 401 spec; they are HotSpot implementation choices that the value keyword enables.",
+  "Nullability and atomicity limit flattening: a two-int Point (64 bits plus a null marker) is not flattened today, while a 48-bit LocalDate is.",
+  "Flattening rarely pays beyond about a cache line or when a value holds many object references that need GC barriers.",
+  "The generated equals and hashCode of a value object read every field, so their cost grows with the object's size.",
+  "C2's existing escape analysis breaks when an object escapes; values are passed by value conceptually, so C2 can always scalarize them, using a new register-based calling convention.",
+  "Two diagnostic flags alongside PrintFieldLayout print the chosen layouts, such as 'nullable non-atomic flat' for a final field."
+ ],
+ "takeaways": [
+  "Download a JDK 28 early-access build and run your test suite with --enable-preview to catch breakage from the migrated wrapper classes.",
+  "Mark small immutable data carriers as value classes, not large structures full of references.",
+  "Look for weak references, synchronization or identity comparisons on Integer and other value-based classes in your code and libraries.",
+  "Inspect flattening decisions with PrintFieldLayout and report surprising results or regressions to the Valhalla mailing list."
+ ],
+ "quotes": [
+  {
+   "text": "These are all slow-path things. We can make the fast path even faster, but as long as we catch the catastrophic one-in-a-million case, we're good.",
+   "at": "32:05"
+  },
+  {
+   "text": "We're a managed runtime. You have to kind of trust us that we did the work for you.",
+   "at": "38:42"
+  }
+ ],
+ "chapters": [
+  {
+   "at": "00:00",
+   "title": "Primitives versus objects"
+  },
+  {
+   "at": "06:11",
+   "title": "The value keyword"
+  },
+  {
+   "at": "13:12",
+   "title": "Why it took so long"
+  },
+  {
+   "at": "17:07",
+   "title": "What the change touched"
+  },
+  {
+   "at": "21:54",
+   "title": "Lessons from early prototypes"
+  },
+  {
+   "at": "26:06",
+   "title": "Heap flattening"
+  },
+  {
+   "at": "33:33",
+   "title": "Costs in the interpreter"
+  },
+  {
+   "at": "39:59",
+   "title": "Inspecting field layouts"
+  },
+  {
+   "at": "41:29",
+   "title": "Scalarization in C2"
+  },
+  {
+   "at": "48:01",
+   "title": "The merge and what's next"
+  }
+ ],
+ "tech": [
+  "Project Valhalla",
+  "JEP 401",
+  "Flexible constructor bodies",
+  "Strict field initialization",
+  "HotSpot",
+  "C2 JIT compiler",
+  "C1 JIT compiler",
+  "Template interpreter",
+  "javap",
+  "Class-File API",
+  "PrintFieldLayout"
+ ],
+ "watchIf": "You want to know what the value keyword changes for your existing code, and how HotSpot decides when to flatten or scalarize value objects.",
+ "themes": [
+  "Java language & JDK",
+  "JVM performance & runtime"
+ ],
+ "demo": false
 }

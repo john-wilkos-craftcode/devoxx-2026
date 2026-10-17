@@ -1,14 +1,95 @@
 {
-  "id": 21675,
-  "source": "abstract",
-  "tldr": "Matthias Bünger covers why Maven 4 took years, the challenges of changing Maven without breaking the ecosystem, and its new features and improvements.",
-  "summary": ["Maven 3 was released in 2010, and while it has had updates since, the Maven team concluded it could not evolve further without large changes that could break the ecosystem if done badly. After years of planning and coding, Maven 4 is close to release.", "Matthias Bünger sets out to explain the motivation and challenges behind Maven 4 development, and to present its new features and improvements."],
-  "keyPoints": ["Maven 3 dates from 2010, and further evolution needed big changes.", "Risk of breaking the wider ecosystem shaped the development.", "Talk covers motivation and challenges of the Maven 4 effort.", "Covers new features and improvements."],
-  "takeaways": ["Check your builds and plugins for Maven 4 compatibility before the release."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Maven 4", "Maven 3"],
-  "watchIf": "You maintain Maven builds and want to know what Maven 4 changes.",
-  "themes": ["Developer experience & tooling"],
-  "demo": false
+ "id": 21675,
+ "source": "transcript",
+ "tldr": "Bünger walks through Maven 4: Java 17 to run it, split build and consumer POMs that let the POM schema evolve, reactor and lifecycle improvements, and the migration path.",
+ "summary": [
+  "Bünger, a Maven PMC member, explains why Maven 4 exists. Maven is over 25 years old; Maven 3 dates from 2010. The POM, unchanged as model 4.0.0 since 2005, both builds a project and is consumed from Maven Central by IDEs and other build tools, so changing its schema would break the ecosystem. Maven 4, at release candidate 7, makes one breaking change: Java 17 is needed to run Maven, while projects can still compile for any version. Its key change: the build POM can move to model 4.1.0, while a generated consumer POM stays at 4.0.0 without plugin configuration. Both are deployed, the build POM to support reproducible builds.",
+  "Model 4.1.0 renames modules to subprojects, keeping the old element as deprecated, and adds a dedicated bom packaging. A service provider interface allows POMs in other formats, though the team keeps XML; an extension by two Maven committers already reads YAML, JSON5, TOML and HOCON. Bünger said the release took this long because of limited volunteer time, proofs of concept for the consumer POM, and seven release candidates checked with IDE vendors such as IntelliJ and Eclipse.",
+  "Many smaller changes target everyday frustrations. Resuming a failed multi-module build with the suggested command now works, and a project-local repository stops unfinished artifacts from polluting the user repository, so he advises `mvn verify` rather than `mvn clean install` in most cases. A project root can be declared with a .mvn folder or a root attribute, exposed through new root and top directory properties. Artifacts share one timestamp, install and deploy at the end become the default, parent and in-project dependency versions are inferred, CI-friendly versions no longer need the flatten plugin, and profiles can be optional with a question mark.",
+  "The build lifecycle is now a tree in which every phase has before and after phases, plus project-level all and each phases. This allows custom lifecycles and an experimental concurrent builder that starts dependent projects earlier. Migration means moving to the latest Maven 3 and 3.x plugins, running on Java 17, fixing warnings (--fail-on-severity helps) and then running Maven 4; the mvnup tool automates the upgrade. Maven 4.1 will bring model 4.2 with mixins for combining several parents. On timing, Bünger said only 'when it's done'."
+ ],
+ "keyPoints": [
+  "Maven 4 needs Java 17 only to run Maven itself; the JDK you compile and run your application with can differ.",
+  "The build POM can use model 4.1.0, while the generated consumer POM stays at 4.0.0 and drops plugin configuration, so existing tools keep working.",
+  "Model 4.1.0 brings subprojects instead of modules, bom packaging, inferred parent and in-project dependency versions, and a root attribute.",
+  "Resuming a failed build at the failing project now works, and a project-local repository keeps unfinished artifacts out of the user repository.",
+  "Maven 4 rejects things Maven 3 tolerated, such as duplicate POM declarations, which show up as warnings in Maven 3.9.",
+  "The lifecycle gains before and after phases for every phase plus all and each phases, enabling custom lifecycles and an experimental concurrent builder.",
+  "Maven 4.1 plans model 4.2 with mixins, so a project can combine for example a Spring parent with a company parent POM."
+ ],
+ "takeaways": [
+  "Upgrade builds to the latest Maven 3.9 or 3.10 and the latest 3.x plugins, and avoid the experimental 4.x plugins.",
+  "Run your build with --fail-on-severity WARN and fix every warning before trying Maven 4.",
+  "Use `mvn verify` instead of `mvn clean install` unless another local project needs your artifact.",
+  "Try a Maven 4 release candidate, using mvnup if you want the 4.1.0 model, and report results to the Maven team.",
+  "If you maintain Maven plugins, follow the current Maven 3 plugin API recommendations and drop old Maven 2 APIs."
+ ],
+ "quotes": [
+  {
+   "text": "Never use mvn clean install.",
+   "at": "24:24"
+  },
+  {
+   "text": "When will it come? When it's done.",
+   "at": "45:14"
+  }
+ ],
+ "chapters": [
+  {
+   "at": "00:00",
+   "title": "Introduction and version poll"
+  },
+  {
+   "at": "02:29",
+   "title": "Why Maven 4"
+  },
+  {
+   "at": "07:13",
+   "title": "Java 17 and API cleanup"
+  },
+  {
+   "at": "11:04",
+   "title": "Build and consumer POMs"
+  },
+  {
+   "at": "16:32",
+   "title": "Subprojects, BOMs and other syntaxes"
+  },
+  {
+   "at": "21:57",
+   "title": "Reactor improvements"
+  },
+  {
+   "at": "27:18",
+   "title": "Project root and versioning"
+  },
+  {
+   "at": "34:25",
+   "title": "Lifecycle as a tree"
+  },
+  {
+   "at": "39:43",
+   "title": "Migrating to Maven 4"
+  },
+  {
+   "at": "42:22",
+   "title": "Maven 4.1 and Q&A"
+  }
+ ],
+ "tech": [
+  "Maven 4",
+  "Maven 3.9",
+  "Consumer POM",
+  "POM model 4.1.0",
+  "mvnup",
+  "Concurrent lifecycle builder",
+  "Flatten Maven Plugin",
+  "Maven Daemon",
+  "Java 17"
+ ],
+ "watchIf": "You maintain Maven builds or plugins and want to know what changes in Maven 4 and how to prepare for it.",
+ "themes": [
+  "Developer experience & tooling"
+ ],
+ "demo": false
 }

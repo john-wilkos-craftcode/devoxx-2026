@@ -45,15 +45,17 @@
   },
   {
    "title": "Review is the new bottleneck",
-   "body": "Agents make code cheap, but speakers agreed human review time has not shrunk. Martignole described huge PRs and an $86,000 bill as Back Market grew to 350 engineers on Claude Code. Rentea wants a fresh-context, adversarial AI to review before any human does; Cavalcanti showed such a review confidently reporting a bug that did not exist. Rivas and Martinelli review a short spec or plan instead of a 5,000-line PR, and Lippert and Gavrilescu want tools that show changes at architecture level. Hoogendoorn's team has dropped pull requests and code review for pairing and trunk-based development, while Schrijver insisted that if you bring it to review, it is your code.",
-   "count": 18,
+   "body": "Agents make code cheap, but speakers agreed human review time has not shrunk. Martignole described huge PRs and an $86,000 bill as Back Market grew to 350 engineers on Claude Code. Rentea wants a fresh-context, adversarial AI to review before any human does; Cavalcanti showed such a review confidently reporting a bug that did not exist. Rivas and Martinelli review a short spec or plan instead of a 5,000-line PR, and Lippert and Gavrilescu want tools that show changes at architecture level. Hoogendoorn's team has dropped pull requests and code review for pairing and trunk-based development, while Schrijver insisted that if you bring it to review, it is your code. Burns's controlled experiment on Cargo Tracker found that Java build-time guardrails (strict lint, Maven Enforcer, SpotBugs) rarely changed what agents produced; code review stayed the last line of defence. Van Rijn's team got pull requests down to about 100 lines by slicing specs small in joint refinement.",
+   "count": 20,
    "talkIds": [
     8171,
     31452,
     25042,
     7008,
     16414,
-    17782
+    17782,
+    21687,
+    23531
    ],
    "consensus": "Agents produce code faster than people can review it, so human attention has to move to smaller or higher-level units: specs, plans, phases or architecture views.",
    "debate": {
@@ -177,15 +179,17 @@
   },
   {
    "title": "The JVM gets leaner and faster",
-   "body": "Pressler's keynote argued that if AI makes syntax matter less, the runtime matters more; platform talks brought numbers. Speakers said compact object headers are the default in JDK 27; van Dijk and Przybyl saw a 10-million-object heap drop from about 190 MB to 114 MB, though Parlog said to measure decompression's CPU cost. Leyden's AOT cache took a Quarkus REST app from about 350 ms to 80 ms startup, with caveats on custom class loaders. JEP 401 value classes are planned as a preview in JDK 28 according to the speakers, but Paumard and Forax warned generic code loses scalarization and null-safety remains open. Structured concurrency, they said, is proposed as final in JDK 28.",
-   "count": 19,
+   "body": "Pressler's keynote argued that if AI makes syntax matter less, the runtime matters more; platform talks brought numbers. Speakers said compact object headers are the default in JDK 27; van Dijk and Przybyl saw a 10-million-object heap drop from about 190 MB to 114 MB, though Parlog said to measure decompression's CPU cost. Leyden's AOT cache took a Quarkus REST app from about 350 ms to 80 ms startup, with caveats on custom class loaders. JEP 401 value classes are planned as a preview in JDK 28 according to the speakers, but Paumard and Forax warned generic code loses scalarization and null-safety remains open. Structured concurrency, they said, is proposed as final in JDK 28. On the last day Simms explained why JEP 401 took about 3,000 commits: HotSpot flattens values only within limits set by nullability and atomicity, and C2 can always scalarize them through a new calling convention. De Tastes and Forax's ray tracer went from 128,000 GCs to none with value records.",
+   "count": 21,
    "talkIds": [
     49251,
     23543,
     15354,
     5510,
     9752,
-    29351
+    29351,
+    21694,
+    17794
    ],
    "consensus": "Upgrading the JDK brings real memory and startup gains with little or no code change, from compact object headers to Leyden's AOT cache, each with some caveats.",
    "debate": {
@@ -257,15 +261,17 @@
   },
   {
    "title": "Boundaries before services",
-   "body": "Architecture talks pushed back on service count as a goal. Klaver's Port of Rotterdam had more than 4.5 microservices per engineer and is consolidating into Spring Modulith services along event-storming boundaries; Hillaert argued bounded contexts need not map one-to-one to services. Van de Ven warned that hexagonal layers relocate dependencies rather than remove them, while Vandeperre and van der Meer used separate build modules and ArchUnit to keep agent-written code clean. On consistency, Trandafir, Zinck and Sulyz all started from the dual-write problem, then covered outbox or Debezium CDC (with heartbeats so Postgres WAL cannot fill the disk), sagas with idempotent compensations, and reconciliation as the final net.",
-   "count": 16,
+   "body": "Architecture talks pushed back on service count as a goal. Klaver's Port of Rotterdam had more than 4.5 microservices per engineer and is consolidating into Spring Modulith services along event-storming boundaries; Hillaert argued bounded contexts need not map one-to-one to services. Van de Ven warned that hexagonal layers relocate dependencies rather than remove them, while Vandeperre and van der Meer used separate build modules and ArchUnit to keep agent-written code clean. On consistency, Trandafir, Zinck and Sulyz all started from the dual-write problem, then covered outbox or Debezium CDC (with heartbeats so Postgres WAL cannot fill the disk), sagas with idempotent compensations, and reconciliation as the final net. Topçu and Chevalier traced design debt to one domain model reused for unrelated problems, which spread into synchronised releases, dozens of feature flags and unclear ownership; Raneland made the case for strangling a legacy system piece by piece rather than rewriting it.",
+   "count": 18,
    "talkIds": [
     8153,
     12751,
     8186,
     17791,
     10034,
-    16418
+    16418,
+    10023,
+    5538
    ],
    "consensus": "Good business boundaries matter more than service count, and consistency across boundaries needs explicit patterns: outbox or CDC, sagas with idempotent compensations, and reconciliation.",
    "debate": {
@@ -295,15 +301,16 @@
   },
   {
    "title": "From writing code to judging it",
-   "body": "Speakers agreed developer roles are shifting, not disappearing, but disagreed on what to hold on to. Clark and Rohrer traced \"programmers will be unnecessary\" predictions back to Fortran in 1956 and named de-skilling as the real risk. Rentea's keynote urged moves toward product, architecture or quality work and concluded that hand debugging no longer pays, while Cavalcanti cited Bainbridge's automation paradox: people who only monitor lose the skills for what cannot be automated. Schrijver cited measured gains of 5-15% and METR's finding that developers felt faster while being 19% slower. Debois and ING treated scaling as an enablement problem, with shared, reviewed skills and agents rather than individual habits.",
-   "count": 20,
+   "body": "Speakers agreed developer roles are shifting, not disappearing, but disagreed on what to hold on to. Clark and Rohrer traced \"programmers will be unnecessary\" predictions back to Fortran in 1956 and named de-skilling as the real risk. Rentea's keynote urged moves toward product, architecture or quality work and concluded that hand debugging no longer pays, while Cavalcanti cited Bainbridge's automation paradox: people who only monitor lose the skills for what cannot be automated. Schrijver cited measured gains of 5-15% and METR's finding that developers felt faster while being 19% slower. Debois and ING treated scaling as an enablement problem, with shared, reviewed skills and agents rather than individual habits. Cougil put seven XP practices on trial against AI and concluded each matters more, since AI amplifies bad habits as much as good ones.",
+   "count": 21,
    "talkIds": [
     51951,
     8164,
     25042,
     19706,
     21671,
-    9023
+    9023,
+    15359
    ],
    "consensus": "Developer roles are shifting toward specifying, judging and owning results rather than disappearing, and accountability for agent output stays with people.",
    "debate": {

@@ -1,24 +1,85 @@
 {
   "id": 9025,
-  "source": "abstract",
-  "tldr": "Cristian Schuszter of CERN shares how to move from individual contributor to technical leadership while staying hands-on and scaling impact through the team.",
+  "source": "transcript",
+  "tldr": "Schuszter of CERN maps the move from engineer to tech lead: wearing several hats, influencing without authority, writing decisions down, delegating, and staying selectively hands-on so impact multiplies through others.",
   "summary": [
-    "The talk addresses the transition after being promoted to lead a team or project: adapting ways of working, dropping old habits and worrying about having less impact because of less coding. Schuszter argues that leadership can amplify technical impact instead.",
-    "Drawing on their own path at CERN to a mix of Solution Architect, Tech Lead and Engineering Manager, the speaker shares best practices and adjustment techniques for the transition, and how to stay relevant without spending countless hours on coding."
+    "Schuszter, who works in CERN's business computing group (purchasing, payroll and similar systems), starts with the promotion paradox: excellent engineers get promoted into roles they are not yet excellent at, the Peter Principle. Coding offers deterministic systems and fast feedback; working with people brings ambiguity, alignment and slow feedback, and the drop in 'dopamine' feels like withdrawal. A career map shows three broad paths, deep technical expert, technical leader and hands-off engineering manager, with bridges between them that people cross in both directions.",
+    "Thinking in layers means being architect, solver, strategist, mentor and communicator at once, and zooming out from your team to the organisation: a DevOps team may pause deployments to fix its process so every other team can scale. Titles carry context outside your team, and the goal is output that multiplies the output of the teams you influence; Schuszter spends only about 10% of their time on architecture. Scaling beyond code relies on influence without authority and on writing, 'the written word is the new compiler': one-screen ADRs (a javax to Jakarta EE migration example), design docs, RFCs and one-pagers. Empathy, listening and psychological safety decide whether people trust you.",
+    "Goleman's six leadership styles (authoritative, coaching, affiliative, democratic, pacesetting, coercive) are all used at different moments; coaching should be the default outside crunch time, with public praise and private constructive feedback. Organisations behave like distributed systems with latency (approval chains), expensive consensus, eventual consistency of decisions across teams, back pressure (saying no) and Conway's law. To stay hands-on without becoming the bottleneck, pick impactful work you can finish, block focus time, use side projects and non-critical code to scratch the itch, delegate even when it feels slow, and value invisible glue work such as documentation, onboarding and mentoring.",
+    "Because it is lonely at the top, Schuszter recommends a regular circle of tech leads; theirs meets every three or four weeks. The spheres of control, influence and concern show that a lead's direct control barely grows while influence spreads into other teams' concerns. Roles are not permanent, and the same skills of delegation, context, specs, reviews, ADRs and paved roads apply to agentic coding, where the lead risks becoming a human proxy reviewing all output. The talk ends with book recommendations and a plug for Voxxed Days CERN on 5 March 2027."
   ],
   "keyPoints": [
-    "Being a great engineer does not automatically make you a great leader.",
-    "Leadership can amplify technical impact by scaling influence through the team.",
-    "The speaker combines Solution Architect, Tech Lead and Engineering Manager roles at CERN.",
-    "Techniques for staying technically relevant while coding less."
+    "The Peter Principle: strong engineers are promoted into leadership roles that need different skills, with slower and more ambiguous feedback loops.",
+    "Career paths split into technical expert, technical leader and engineering manager, with bridges that people cross back and forth; you are never stuck in one.",
+    "Short written decisions (ADRs, design docs, RFCs, one-pagers) are a lead's main tool, because code is cheap but decisions are costly to undo.",
+    "Goleman's leadership styles: authoritative for deadlines, coaching by default, democratic only when there is time, and all of them used at some point.",
+    "Organisations act like distributed systems: approval latency, costly consensus, eventual consistency of decisions, back pressure and Conway's law.",
+    "Be selective about hands-on work: do only what you can finish without blocking the team, and delegate even when someone else is slower.",
+    "A peer group of tech leads meeting every three or four weeks gives support that a lead lacks inside their own team.",
+    "Delegation, context, specs, reviews, ADRs and paved roads carry over directly to working with AI coding agents."
   ],
   "takeaways": [
-    "Identify which old habits to drop when you take on a lead role."
+    "Write your next technical decision as a one-screen ADR and share it beyond your own team.",
+    "Before picking up a coding task yourself, check whether you can finish it this week; if not, delegate it with enough context.",
+    "Try a ten-minute listening exercise with a colleague where you are not allowed to interrupt.",
+    "Propose a recurring meeting of tech leads across teams to share problems and solutions.",
+    "Give praise in public and constructive feedback in private."
   ],
-  "quotes": [],
-  "chapters": [],
-  "tech": [],
-  "watchIf": "You are a new or aspiring tech lead worried about losing technical impact.",
-  "themes": ["Teams, careers & leadership"],
+  "quotes": [
+    {
+      "text": "The code is cheap nowadays, but the decisions are really important to be taken before that.",
+      "at": "17:42"
+    },
+    {
+      "text": "It's Alcoholics Anonymous for tech leads.",
+      "at": "35:19"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "The promotion paradox"
+    },
+    {
+      "at": "04:19",
+      "title": "A career map"
+    },
+    {
+      "at": "07:07",
+      "title": "Thinking in layers"
+    },
+    {
+      "at": "15:00",
+      "title": "Scaling impact beyond code"
+    },
+    {
+      "at": "22:53",
+      "title": "Leadership styles"
+    },
+    {
+      "at": "25:32",
+      "title": "Organisations as distributed systems"
+    },
+    {
+      "at": "28:10",
+      "title": "Staying hands-on without burnout"
+    },
+    {
+      "at": "36:45",
+      "title": "Redefining impact"
+    },
+    {
+      "at": "42:09",
+      "title": "Leadership and AI agents"
+    }
+  ],
+  "tech": [
+    "Architecture Decision Records",
+    "Jakarta EE"
+  ],
+  "watchIf": "You have just become a tech lead or staff engineer and miss the feedback of writing code all day.",
+  "themes": [
+    "Teams, careers & leadership"
+  ],
   "demo": false
 }

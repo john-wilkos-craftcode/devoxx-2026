@@ -1,14 +1,101 @@
 {
   "id": 16408,
-  "source": "abstract",
-  "tldr": "Martin Ladecky post-mortems a Commerzbank incident on an 11TB Oracle Exadata database that reached BaFin, and the write-side redesign and PostgreSQL migration that followed.",
-  "summary": ["The session reverse-engineers a critical failure at a major bank, where a system holding 11TB on Oracle Exadata, at around 10 billion records, saw indexing and read-side duplicate checks collapse and led to a formal report to BaFin. It walks through five milestones: application-layer first aid against cascading timeouts, a removed 10-day query window check that later triggered an 11TB full scan, the war-room decision to wait for Exadata Smart Flash Cache to warm up, and the move of deduplication from read side to a write-side integrity layer.", "It ends with the exit strategy: a zero-loss dual-write ingestion architecture to migrate the 10 billion records to Cloud PostgreSQL without CDC. Martin Ladecky aims to give a practical blueprint for the compliance-performance paradox and database cold starts."],
-  "keyPoints": ["At about 10 billion records, standard indexing and read-side duplicate checks collapsed.", "A query window check removed during refactoring years earlier led to an 11TB full scan.", "The team chose to wait for Exadata Smart Flash Cache to warm up.", "Deduplication moved from read side to a write-side integrity layer.", "Migration to Cloud PostgreSQL planned via dual-write without CDC."],
-  "takeaways": ["Review whether refactorings removed implicit query limits that protect large tables.", "Prefer write-side integrity checks over read-side deduplication at large scale."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Oracle Exadata", "Exadata Smart Flash Cache", "PostgreSQL", "Dual-write"],
-  "watchIf": "You run large relational databases and want a candid incident story and migration plan.",
-  "themes": ["Data & databases", "Architecture & design"],
+  "source": "transcript",
+  "tldr": "Ladecky recounts how a cold Exadata cache after a failover exposed a costly read-side deduplication query at Commerzbank, and the tactical fix, write-side redesign and planned PostgreSQL exit.",
+  "summary": [
+    "Ladecky, tech lead and solution architect at Commerzbank, opens by stressing that Oracle did not fail, the architecture did. On a Monday, users could not see transactions and balances: Dynatrace showed only HTTP 200s while database CPU and IO were saturated and responses went from 20-40 ms to as much as 20 minutes. A hard-coded 30-second frontend timeout logged users out. As banks are critical infrastructure, the outage was reported to BaFin. First aid was a code change raising the timeout, deployed in 15 minutes instead of the usual two weeks, since 90% of users got answers within three minutes.",
+    "The trigger was a weekend disaster recovery test that moved the load to a replica with cold caches; execution plans were unchanged. Exadata has four caches, and Ladecky suspects the columnar cache. With 10 billion records, 11 TB (14 TB today) and a 700 GB main index, the hardware had hidden bad queries for years. The war room chose to do nothing: the other replica was cold too, warming the cache under 600 requests per second was not feasible, and business colleagues confirmed accounts stayed fast once loaded. It recovered in about 12 hours, slowest for small companies with up to a million transactions.",
+    "The root cause was a roughly 10 KB query run on every request, merging two pending-transaction sources (an audit-style table needing ROW_NUMBER deduplication, and another team's view that never deletes) and joining them against 10 billion booked transactions to return about 40 rows. A refactoring three years earlier had removed a 10-day filter; restoring it as a parameter avoided full scans. It could not be proven in advance, since the load-test environment has only 10,000-20,000 accounts, but the next recovery test passed.",
+    "The structural fix moves deduplication to the write side, in the 15 importers that alone write to the team's schema, accepting about 20 ms extra per write even though writes (40 million a day) outnumber reads (20 million). The team chose two tables, booked and pending, over Ladecky's single table; half the traffic now reads a plain select. The exit to cloud PostgreSQL rules out CDC with Debezium, which would need admin privileges on Exadata. Instead the importers will dual-write from 1 January 2027, a custom application will copy the history, and pilot users and a 1% to 100% rollout keep 99.998% availability."
+  ],
+  "keyPoints": [
+    "Monitoring showed only HTTP 200s; the outage was visible only as a 30-second frontend timeout logging users out, so look through the whole stack.",
+    "A disaster recovery failover onto a replica with cold caches, not a changed execution plan, turned a heavy query into minutes-long responses.",
+    "Waiting for the cache to warm was a deliberate decision, backed by business users confirming that loaded accounts stayed fast.",
+    "Removing a 10-day date filter during a refactoring three years earlier had left the query scanning 10 billion booked rows; it returned as a parameter.",
+    "Read-side deduplication across an audit table, an external view and the booked table moves to write-side integrity in the importers.",
+    "CDC with Debezium was ruled out because it needs admin privileges on a vendor-managed Exadata; the plan is dual writes plus a custom history copy.",
+    "Rollout goes through pilot users, then 1%, 2%, 5% up to 100% of clients with instant fallback to Oracle, to protect 99.998% availability."
+  ],
+  "takeaways": [
+    "Check whether your monitoring would catch slow successes, not just errors, and verify what users actually experience.",
+    "Review refactorings for removed date windows or limits on large tables, and keep such windows as configuration parameters.",
+    "Apply a good-enough first aid fix before root-causing, and back any 'wait and watch' decision with data from real users.",
+    "Move deduplication and integrity checks to the write path when you own all writers to a schema.",
+    "Plan database migrations with pilot users and percentage-based routing with fast fallback, never a big bang."
+  ],
+  "quotes": [
+    {
+      "text": "The Oracle did not fail. The architecture failed.",
+      "at": "00:22"
+    },
+    {
+      "text": "Hardware is too good for developers.",
+      "at": "14:54"
+    },
+    {
+      "text": "A hunch is nice, but prove it.",
+      "at": "37:00"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "A bank down, officially"
+    },
+    {
+      "at": "02:48",
+      "title": "The Monday morning call"
+    },
+    {
+      "at": "05:20",
+      "title": "All 200s, users locked out"
+    },
+    {
+      "at": "10:21",
+      "title": "Data scale and Exadata"
+    },
+    {
+      "at": "11:23",
+      "title": "Cold caches after failover"
+    },
+    {
+      "at": "15:59",
+      "title": "Deciding to do nothing"
+    },
+    {
+      "at": "19:36",
+      "title": "Three tables, one query"
+    },
+    {
+      "at": "26:38",
+      "title": "Restoring the 10-day window"
+    },
+    {
+      "at": "30:40",
+      "title": "Write-side integrity"
+    },
+    {
+      "at": "39:57",
+      "title": "Migrating without CDC"
+    }
+  ],
+  "tech": [
+    "Oracle Exadata",
+    "Oracle Database",
+    "PostgreSQL",
+    "Dynatrace",
+    "Debezium",
+    "Change data capture",
+    "Kafka",
+    "Kubernetes",
+    "InfiniBand"
+  ],
+  "watchIf": "You run a large regulated Oracle system and want a candid incident story, from first aid to a migration plan that avoids CDC.",
+  "themes": [
+    "Data & databases",
+    "Architecture & design",
+    "Legacy modernization"
+  ],
   "demo": false
 }

@@ -1,5 +1,90 @@
 [
  {
+  "id": "TB45qqp-OxM",
+  "title": "10 Billion Records vs  The Regulator: An Architectural Post Mortem of an 11TB Exadata Failure  by Ma",
+  "duration": 2922
+ },
+ {
+  "id": "wrV4f83UMWI",
+  "title": "Is AI killing XP practices? Or are we letting it? By Nacho Cougil",
+  "duration": 2956
+ },
+ {
+  "id": "ufhs9THbYZI",
+  "title": "Java Next   From Valhalla to Leyden, from Babylon to Panama, from Amber to Detroit By Nicolai Parlog",
+  "duration": 3096
+ },
+ {
+  "id": "niBYuCuViGw",
+  "title": "We created our own AI orchestrator and it became so much more!  by Ricky van Rijn",
+  "duration": 3093
+ },
+ {
+  "id": "lUB15M3mMLs",
+  "title": "Escaping Java's Allocation Gravity with Value Classes By Cle\u0301ment de Tastes, Remi Forax",
+  "duration": 3074
+ },
+ {
+  "id": "jhvT8hVYSvQ",
+  "title": "In the loop , not in the dark: Staying in controlling the era dark software factories   By Alex Gavr",
+  "duration": 2692
+ },
+ {
+  "id": "TgkY2UmWtBo",
+  "title": "All you need to know about Maven 4!  by Matthias Bu\u0308nger",
+  "duration": 2833
+ },
+ {
+  "id": "Spxl1eDQJKs",
+  "title": "The Quantum Tech Lead: Hands On and Abstract at the Same Time  by Cristian Schuszter",
+  "duration": 2831
+ },
+ {
+  "id": "SoWgxHeAPGU",
+  "title": "You thought technical debt was bad? Meet design debt!  by Julien Topc\u0327u, Josian Chevalier",
+  "duration": 2996
+ },
+ {
+  "id": "Qg7Uu_XBvpI",
+  "title": "10 boring reasons why Java is the best ecosystem for agentic development By Ed Burns",
+  "duration": 2989
+ },
+ {
+  "id": "LIGVpEuIrrY",
+  "title": "My old trains have a second life, with TinyGo! By Florian FORESTIER, Justine Bachelard",
+  "duration": 2403
+ },
+ {
+  "id": "Go76-9Q51wU",
+  "title": "What\u2019s happening with Project Amber? By Gavin Bierman",
+  "duration": 3101
+ },
+ {
+  "id": "DniA37kVfvI",
+  "title": "Embabel Agent v1 5 By Rod Johnson",
+  "duration": 3073
+ },
+ {
+  "id": "D_AmK8-UnZg",
+  "title": "Why it takes 3000 commits to bring Valhalla's value objects to the JDK by David Simms",
+  "duration": 3069
+ },
+ {
+  "id": "AmL_OCs5F4E",
+  "title": "Strangling the dragon: modernizing legacy systems with the Strangler Fig pattern   by Daniel Ranela",
+  "duration": 2123
+ },
+ {
+  "id": "Qw6845LaSGw",
+  "title": "An Architectural Post-Mortem of an 11TB Exadata Failure",
+  "duration": 2922
+ },
+ {
+  "id": "VTxhxCy_2lE",
+  "title": "Solving Multimodal and Long Context Challenges by Laurent Picard",
+  "duration": 10737
+ },
+ {
   "id": "4ck-T2gaMQ4",
   "title": "Teaching an Old Handle New Tricks: From Core Reflection to FFM  by Maurizio Cimadamore, Viktor Klang",
   "duration": 3094
@@ -2913,90 +2998,5 @@
   "id": "1J6mbMReOnI",
   "title": "Deep Dive: GraalVM in Practice by Alina Yurenko",
   "duration": 8946
- },
- {
-  "id": "-OSYyY17VzE",
-  "title": "The power of Cursor rules in Java Enterprise development by Juan Antonio Bren\u0303a Moral",
-  "duration": 1892
- },
- {
-  "id": "-0vkHxlGlOU",
-  "title": "Java Memory Leaks by Victor Rentea",
-  "duration": 10042
- },
- {
-  "id": "z4zAKNLmrIw",
-  "title": "Spec Driven Development with Kiro: Vibe Coding with Guardrails  by  Kevin Azijn, Adriaan de Jonge",
-  "duration": 1821
- },
- {
-  "id": "wL5f2Gw08Y0",
-  "title": "Wirespec   API design, actually spec first, in your ecosystem  By  Jerre van Veluw",
-  "duration": 1899
- },
- {
-  "id": "usTiNoSNdlw",
-  "title": "Picocli: put some Java in your terminal \ud83d\udcbb! by Ste\u0301phane Philippart",
-  "duration": 1669
- },
- {
-  "id": "sw-G9F4RJV4",
-  "title": "Securing Your CICD Pipelines: Best Practices and Strategies  By  Adrien Pessu",
-  "duration": 1723
- },
- {
-  "id": "qgGIIpsF050",
-  "title": "Extending Functional Pipeline with Gatherers by Venkat Subramaniam",
-  "duration": 8928
- },
- {
-  "id": "nzDpu4qh0jA",
-  "title": "Bootiful Spring Boot: the Deep Dive by Josh Long",
-  "duration": 10857
- },
- {
-  "id": "na7yitK39kY",
-  "title": "Stop Scheduling Like It\u2019s 1999 \u2013 Green Software Needs Better Timing  by  Ted Vinke",
-  "duration": 2301
- },
- {
-  "id": "lCprbhmX4II",
-  "title": "Java 21 to 25   Better Language, Better APIs, Better Runtime by Nicolai Parlog",
-  "duration": 9639
- },
- {
-  "id": "khRkbvTuPX4",
-  "title": "30 minutes to understand MCP Model Context Protocol  by S e\u0301bastien Blanc",
-  "duration": 1848
- },
- {
-  "id": "jBQ0WdiNbdA",
-  "title": "Gemini CLI in Action by Wietse Venema",
-  "duration": 1887
- },
- {
-  "id": "dwcNiEEuV_Y",
-  "title": "Why Haven\u2019t They Fixed This? by Maurice  Naftalin, Stuart Marks",
-  "duration": 9672
- },
- {
-  "id": "cvEd8PHXY3U",
-  "title": "Practical API Testing with OpenAPI and Citrus Framework  by  Timon Borter",
-  "duration": 1867
- },
- {
-  "id": "ZcpD1M0Wa8Q",
-  "title": "Large Scale Distributed LLM Inference with LLM D and Kubernetes by Abdel Sghiouar",
-  "duration": 6251
- },
- {
-  "id": "WNQ5ylMs4Ok",
-  "title": "TornadoVM Deep Dive: Empowering Java Developers with GPU Acceleration  by  Thanos Stratikopoulos, Ch",
-  "duration": 8731
- },
- {
-  "id": "V_73mdDxplQ",
-  "title": "RoboCoders: Judgment Day \u2013 AI IDEs Face Off By Viktor Gamov, Baruch Sadogursky",
-  "duration": 10870
  }
 ]

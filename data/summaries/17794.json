@@ -1,14 +1,96 @@
 {
-  "id": 17794,
-  "source": "abstract",
-  "tldr": "Clément de Tastes and Remi Forax explain JEP 401 value classes and their stack and heap optimisations through a black hole ray-tracing simulation, plus a look at null-restricted types.",
-  "summary": ["The session covers what value classes are, how the Java spec was reinterpreted to allow classes without identity, how they interact with existing code, and which optimisations they enable on the stack and the heap. The abstract says Java 28 will introduce them as a preview feature through JEP 401.", "To make it concrete, the speakers use a black hole simulation and rendering, which involves huge numbers of vectors, rays, coordinates and intermediate values along thousands of light-ray trajectories. They finish with the experimental ! syntax for null-restricted types, its optimisation potential and the limits of the current design."],
-  "keyPoints": ["Value classes give up identity in exchange for better performance (JEP 401).", "Covers how the spec was reinterpreted and how value classes interact with existing code.", "Stack and heap optimisations are illustrated by a black hole ray simulation.", "Previews the experimental ! syntax for null-restricted types and its limitations."],
-  "takeaways": ["Identify allocation-heavy small immutable types in your code that could become value classes."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Project Valhalla", "JEP 401", "Value classes", "Null-restricted types"],
-  "watchIf": "You care about JVM performance and want a concrete Valhalla example beyond slides.",
-  "themes": ["Java language & JDK", "JVM performance & runtime"],
-  "demo": false
+ "id": 17794,
+ "source": "transcript",
+ "tldr": "De Tastes and Forax introduce JEP 401 value classes, demo their semantics, and use a black hole ray tracer to show allocation and GC work disappearing once the JIT scalarizes.",
+ "summary": [
+  "Forax frames Project Valhalla with its motto 'code like a class, works like an int' and three goals: abstraction at no cost, dense data layouts that suit modern CPUs, and treating primitives as objects, which comes later. De Tastes shows the cost today: a Mass type is safer than a double, but an array of objects is an array of pointers to headered, padded objects, wasting memory and causing cache misses. JEP 401 is the first part of Valhalla to land, as a preview in JDK 28 in March; its pull request had almost 3000 commits and 2000 changed files, twice Loom's, the speakers said.",
+  "A value class or record has no identity (no address), so it is immutable and conceptually passed as a tuple of fields, though large ones may still use pointers. In an IntelliJ demo on a JDK 28 early-access build, de Tastes shows Class.isValue, == comparing fields, and a default hashCode computed from fields. Synchronizing on a value object is a compile error, or an IdentityException at runtime via an Object variable, and weak references fail too, a concern Forax raised for WeakHashMap-based caches. Fields must be assigned before super(), using Java 25's flexible constructor bodies; Forax said this construction problem was a big reason Valhalla took so long.",
+  "Flattening stores a value's fields inside its container, but field reads must be atomic and nulls need a marker, so on 64-bit hardware only payloads under 64 bits flatten. Three doubles are too big. The black hole renderer traces one ray per pixel through curved spacetime in about 100 steps, creating some 200 million vectors with Ray, Vector3 and Color records. Wall time was about the same with and without value, which they put down to an efficient G1 and a single-thread microbenchmark, but GC count fell from 128,000 to zero. In JFR, Vector3 allocation dropped from 10.7 GB to 316 MB, all of it before the JIT kicked in.",
+  "The point, de Tastes says, is not raw speed, since hand-written primitive code was equally fast, but readable vector code at primitive cost. With preview enabled, Integer, Long and Optional are value classes, so == works on all Integers; identity operations on such classes have produced warnings since Java 16. The compiler only clears the identity flag and marks fields strict, with no new bytecodes, so existing classes can become value classes without recompiling callers. The null-restricted ! types promised in the abstract were not covered for lack of time."
+ ],
+ "keyPoints": [
+  "A value object has no identity, so its fields and class are final and it is conceptually passed by value as a tuple of fields.",
+  "For value objects, == compares fields and the default hashCode is computed from fields, since there is no header to store a random hash.",
+  "synchronized on a value object fails at compile time, or with an IdentityException at runtime; weak references to them fail too.",
+  "Value classes need strict initialization: all fields assigned before super(); an abstract class must also be marked value for value subclasses.",
+  "Heap flattening is limited by atomic field access and the null marker, so only payloads under 64 bits are flattened on 64-bit hardware.",
+  "In the black hole renderer, value records took GC count from 128,000 to zero and Vector3 allocation from 10.7 GB to 316 MB, all of it before JIT compilation.",
+  "Integer, Long and Optional become value classes with preview enabled; the compiler emits no new bytecodes, only an identity flag and strict fields."
+ ],
+ "takeaways": [
+  "Move field initialization before super() in your constructors now, using flexible constructor bodies, so classes are ready for value.",
+  "Find code that synchronizes on, compares by reference or weakly references Integer, Optional and other value-based classes, and heed the existing warnings.",
+  "Try value on small records such as vectors or coordinates in a JDK 28 early-access build and check allocation in JFR, not only wall time.",
+  "Measure GC count and allocation rate alongside single-thread timings in microbenchmarks."
+ ],
+ "quotes": [
+  {
+   "text": "Code like a class, works like an int.",
+   "at": "03:44"
+  },
+  {
+   "text": "Don't do inheritance, but you can.",
+   "at": "33:03"
+  }
+ ],
+ "chapters": [
+  {
+   "at": "00:00",
+   "title": "Project Valhalla's goals"
+  },
+  {
+   "at": "05:49",
+   "title": "Abstraction versus memory density"
+  },
+  {
+   "at": "10:31",
+   "title": "JEP 401 and the speakers"
+  },
+  {
+   "at": "13:46",
+   "title": "Value classes as tuples"
+  },
+  {
+   "at": "19:33",
+   "title": "Demo: equality and hash codes"
+  },
+  {
+   "at": "24:40",
+   "title": "Synchronization and weak references"
+  },
+  {
+   "at": "28:18",
+   "title": "Strict initialization"
+  },
+  {
+   "at": "34:41",
+   "title": "Flattening and atomicity"
+  },
+  {
+   "at": "38:14",
+   "title": "Ray tracing a black hole"
+  },
+  {
+   "at": "47:15",
+   "title": "Retrofitted JDK classes"
+  }
+ ],
+ "tech": [
+  "Project Valhalla",
+  "JEP 401",
+  "Flexible constructor bodies",
+  "Records",
+  "JDK 28 early access",
+  "IntelliJ IDEA",
+  "JFR",
+  "G1",
+  "WeakReference",
+  "Optional"
+ ],
+ "watchIf": "You write allocation-heavy numeric or domain code in Java and want to see what value classes change in semantics and allocation on a concrete workload.",
+ "themes": [
+  "Java language & JDK",
+  "JVM performance & runtime"
+ ],
+ "demo": true
 }

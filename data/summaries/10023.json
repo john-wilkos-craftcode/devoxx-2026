@@ -1,14 +1,98 @@
 {
   "id": 10023,
-  "source": "abstract",
-  "tldr": "Julien Topçu and Josian Chevalier argue that technical debt is the visible part of deeper accidental design debt, and show how to detect and act on it.",
-  "summary": ["The session starts from the frustration that technical debt keeps piling up even when teams apply refactoring, KISS and YAGNI. It asks whether those practices sometimes make things worse, and suggests technical debt is only the visible part of accidental design debt, which can lead to spaghetti software and microservices that are really a distributed monolith.", "Julien Topçu and Josian Chevalier set out to explore how design debt works and how it affects architecture, processes, organisation and the business. Through concrete examples they show how to detect it, assess how deep it goes, and act before it becomes entrenched."],
-  "keyPoints": ["Technical debt may be a symptom of deeper design debt.", "Following KISS, YAGNI and refactoring does not prevent design debt.", "Design debt can produce distributed monoliths disguised as microservices.", "Impacts reach architecture, processes, organisation and business."],
-  "takeaways": ["Check whether your microservices can be deployed and changed independently, or form a distributed monolith."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Microservices"],
-  "watchIf": "Your codebase keeps accumulating debt despite refactoring and you suspect a design-level cause.",
-  "themes": ["Architecture & design"],
+  "source": "transcript",
+  "tldr": "In a Lord of the Rings-styled dialogue, Topçu and Chevalier show how reusing one domain model for unrelated problems creates design debt that spreads into services, processes and organisation.",
+  "summary": [
+    "Topçu and Chevalier stage the talk as a dialogue between a cruise-booking developer, clinging to a 'precious' model, and a colleague tracing his regressions. The developer's search model also handles selection and booking through added 'selected' and 'booked' booleans, so fixing one bug breaks unrelated features. They contrast technical debt, a deliberate shortcut in Ward Cunningham's sense, with accidental design debt: misguided model decisions that add coupling and reduce cohesion. Left unpaid, it becomes model entropy. KISS, DRY, YAGNI and refactoring push developers to keep extending an obsolete model, so each new need must challenge the existing model.",
+    "Solving several problems with one model creates intrinsic coupling, the 'spork effect': fragile, then rigid, so new code is stacked on top. Design debt shows up as model tensions, smells that stretch a concept beyond its conceptual integrity; left unresolved, a tension crystallizes into a structuring constraint. In the event storming board they find a linguistic tension: 'selected fares' plus ancillaries hide a missing concept, the selection, with its own lifecycle of incomplete, complete and priced states.",
+    "In the code, the misplaced selected flag forces streaming over every ship and fare, allows two selected fares per bound, needs a two-step unselect and select, and spreads price and completeness across concepts. A dedicated Selection class built around a map of bound to fare replaces this in about 20 lines. Extracting a Booking model with a finalisation status also fixes the original bug of showing past departures.",
+    "The second act moves to architecture. A post-booking team created to bypass the slow cruising service handles exchange and cancellation, which are really booking states, so the two services form a distributed monolith through extrinsic coupling. This forces synchronised deployments, around 50 feature flags and a full-time 'readiness toggle engineer'. Unclear ownership and backlog takeover follow, with management acting as shadow designer per Conway's law. Detection means collecting several heuristics into a body of evidence; they point to their earlier model mitosis and reverse Conway maneuver talks for remedies."
+  ],
+  "keyPoints": [
+    "Technical debt is a deliberate shortcut; accidental design debt comes from model decisions that add coupling, and its unpaid interest is model entropy.",
+    "Reusing one model for orthogonal problems (search, selection, booking) creates intrinsic coupling, the 'spork effect', making the model fragile and then rigid.",
+    "Model tensions are the signals of design debt: linguistic tension, implicit lifecycle, loss of atomicity, diffusion of responsibility, disseminated representation.",
+    "A defensive check for a state that 'should never happen' shows the model structurally allows invalid states; aim for an always-valid domain model.",
+    "Event storming can carry design debt too: salience bias led to 'selected fares' instead of the real concept, the selection.",
+    "Microservices are a deployment strategy, not a design strategy; splitting one concept's lifecycle across services yields a distributed monolith.",
+    "Extrinsic coupling spreads into processes (synchronised releases, many feature flags) and organisation (palliative roles, unclear ownership, backlog takeover).",
+    "A single heuristic proves nothing: an order and a parcel are distinct lifecycles, so gather several signals before calling it design debt."
+  ],
+  "takeaways": [
+    "When a feature request arrives, ask whether it is a new problem that deserves its own model instead of adding fields or booleans to an existing one.",
+    "Treat defensive checks for impossible states as a smell and restructure the model so the invalid state cannot be represented.",
+    "Look for concepts hidden behind phrases like 'selected X' in event storming and user stories, and make them first-class with their own class, endpoint and table.",
+    "If two services must deploy together or share many feature flags, check whether they hold fragments of the same concept's lifecycle."
+  ],
+  "quotes": [
+    {
+      "text": "Each new need must challenge the existing model.",
+      "at": "05:21"
+    },
+    {
+      "text": "You're confusing power with heaviness. Your model is a burden.",
+      "at": "06:48"
+    },
+    {
+      "text": "Microservices are not a design strategy, this is a deployment one.",
+      "at": "13:53"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "One model to rule them all"
+    },
+    {
+      "at": "04:03",
+      "title": "Iterative modelling gone wrong"
+    },
+    {
+      "at": "06:48",
+      "title": "Design debt and model entropy"
+    },
+    {
+      "at": "11:02",
+      "title": "Intrinsic coupling and the spork"
+    },
+    {
+      "at": "13:53",
+      "title": "Finding model tensions"
+    },
+    {
+      "at": "16:49",
+      "title": "Design debt in event storming"
+    },
+    {
+      "at": "22:27",
+      "title": "Tensions in the code"
+    },
+    {
+      "at": "30:32",
+      "title": "A distributed monolith"
+    },
+    {
+      "at": "37:21",
+      "title": "Process and organisational tensions"
+    },
+    {
+      "at": "45:40",
+      "title": "Conway's law and heuristics"
+    }
+  ],
+  "tech": [
+    "Domain-driven design",
+    "Event storming",
+    "Example mapping",
+    "Microservices",
+    "Feature flags",
+    "Conway's law",
+    "IntelliJ IDEA"
+  ],
+  "watchIf": "Your services keep breaking each other or need coordinated releases, and you want vocabulary and heuristics to trace that back to the domain model.",
+  "themes": [
+    "Architecture & design",
+    "Teams, careers & leadership"
+  ],
   "demo": false
 }

@@ -1,25 +1,110 @@
 {
   "id": 52101,
-  "source": "abstract",
-  "tldr": "A tour of the major OpenJDK projects, from Valhalla, Leyden and Babylon to Panama, Amber, Loom and Detroit, and what each means for Java in the coming years.",
+  "source": "transcript",
+  "tldr": "Parlog tours Amber's pattern work, Leyden's AOT cache, Valhalla's JDK 28 value class preview and Babylon's code reflection, then speeds through Loom, Panama, Lilliput and Detroit.",
   "summary": [
-    "Nicolai Parlog's closing session surveys where Java's big projects stand. Amber, Leyden, Panama and Loom have already improved the language, APIs and runtime, while Valhalla and Babylon are described as just getting started.",
-    "The talk looks at how Valhalla addresses the rift in Java's type system, Leyden startup and warmup time, Babylon reaching foreign programming models and hardware, Panama native interop, Amber language expressiveness, Loom structured concurrency and Detroit interop with Python and JavaScript. The goal is to show what to expect from Java in the next few years."
+    "Parlog, a Java developer advocate at Oracle, closed Devoxx with a status report on OpenJDK's big projects. Amber's current focus is pattern matching. Primitive patterns are still in preview: `x instanceof float` on an int asks whether it converts to float without loss, which fails for 16,777,217 (2^24 + 1). Constant patterns, such as putting a 0 directly into a Point record pattern, have no JEP yet and are tied up with primitive patterns, Valhalla and type classes. Withers (JEP 468) wait on deconstruction for ordinary classes with a state-description header, and for interfaces, which may come sooner because they are never reconstructed.",
+    "Leyden splits the time to peak performance into startup and warmup and shifts that work ahead of time. A training run records the JVM's decisions into an AOT cache that production runs start from. If training and production differ, the cache helps less or is ignored, and a cache causing wrong behaviour would be a bug. The cache holds loaded and linked classes, method profiles, GC-agnostic cached objects (JDK 26) and, new in JDK 28, compiled code. Parlog cited a javac benchmark with 15% faster startup and 75% fewer warmup iterations, and suggested training in a canary or by hammering every endpoint at the end of the build.",
+    "Valhalla's value classes preview in JDK 28 behind --enable-preview, with the primitive wrappers, Optional and java.time types among the JDK's own. They give up identity: `==` compares state, synchronization throws, fields are final and null is still the default. In return the JIT may scalarize them into registers or flatten them, though flattening is brittle: a nullable Long would need 65 bits, and erased generics hide the value type. Null restrictions, specialized generics and type classes for operators on custom numeric types are explorations without a timeline. Parlog's advice was to pick value classes because the domain type is a value, not for performance.",
+    "Babylon adds code reflection: javac stores a code model, an intermediate representation inspired by MLIR, for marked methods, and libraries read and transform it at runtime into SQL, GPU kernels or other targets, with the Heterogeneous Accelerator Toolkit (HAT) evolving alongside. Only a JEP draft for incubating it exists. In a closing speedrun, Parlog expected structured concurrency to finalize in JDK 28, said the Vector API is waiting for value classes, noted compact object headers are on by default since JDK 27 and shrink heaps by roughly 10%, and introduced Detroit, which implements the javax.script API on V8 and CPython."
   ],
   "keyPoints": [
-    "Valhalla targets the split in Java's type system.",
-    "Leyden targets startup and warmup time.",
-    "Babylon extends Java to foreign programming models and hardware.",
-    "Panama improves interop with native code; Detroit with Python and JavaScript.",
-    "Amber and Loom continue to evolve the language and concurrency."
+    "In the primitive-patterns preview, `instanceof float` on an int tests for lossless conversion; 16,777,217 is the smallest positive int that fails.",
+    "Withers (JEP 468) are held back so that deconstruction can extend beyond records to classes with a state-description header and to interfaces.",
+    "Leyden's training-run profiling has low overhead (Parlog recalled about 1% from a Netflix conversation, unconfirmed), so the AOT cache can be created from a production canary.",
+    "AOT code compilation in JDK 28 requires the same JDK release, OS, architecture, CPU feature set and GC as training; load-time bytecode weaving by JVMTI agents causes the cache to be discarded.",
+    "Value classes drop identity: `==` compares state, synchronization throws, serialization needs a proxy, and equals should still be implemented.",
+    "Scalarization and flattening of value objects are JIT freedoms, not guarantees; a nullable 64-bit value cannot be flattened atomically, and erasure hides value types inside generics.",
+    "Babylon's code models sit between javac's AST and bytecode, are modelled on MLIR, and are read through an extension of the reflection API.",
+    "Compact object headers (64-bit) are the default from JDK 27, typically shrinking the heap by 5-20%, with occasional CPU cost from decoding."
   ],
   "takeaways": [
-    "Follow the OpenJDK project pages to see which upcoming features affect your codebase."
+    "Add a Leyden training run to your build or a canary deployment and start production from the AOT cache.",
+    "Move bytecode weaving from load time to build time so the AOT cache is not discarded.",
+    "Try value classes on JDK 28 with --enable-preview for types that are genuinely values, and keep implementing equals.",
+    "On JDK 27 or later, watch heap and CPU after the switch to compact object headers and toggle the flag if performance drops.",
+    "Try preview features on your own code base and give the OpenJDK projects feedback from that experience."
   ],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Project Valhalla", "Project Leyden", "Project Babylon", "Project Panama", "Project Amber", "Project Loom", "Project Detroit"],
-  "watchIf": "You want a single overview of the Java roadmap across all current OpenJDK projects.",
-  "themes": ["Java language & JDK"],
+  "quotes": [
+    {
+      "text": "Don't be an armchair language architect. Be the person who actually takes that to their code base, tries it out, and then comes back with practical feedback.",
+      "at": "22:04"
+    },
+    {
+      "text": "Don't use a value class in order to get performance. Consider whether the thing you have in front of you actually is a value.",
+      "at": "34:31"
+    },
+    {
+      "text": "If you already have highly optimized code, then Valhalla is not going to make your code faster.",
+      "at": "38:23"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Project Amber today"
+    },
+    {
+      "at": "03:05",
+      "title": "Primitive and constant patterns"
+    },
+    {
+      "at": "05:37",
+      "title": "Withers and deconstruction"
+    },
+    {
+      "at": "09:46",
+      "title": "Leyden and the AOT cache"
+    },
+    {
+      "at": "17:57",
+      "title": "AOT code compilation"
+    },
+    {
+      "at": "23:25",
+      "title": "Valhalla's value classes"
+    },
+    {
+      "at": "33:06",
+      "title": "Null restrictions and specialized generics"
+    },
+    {
+      "at": "39:39",
+      "title": "Babylon's code reflection"
+    },
+    {
+      "at": "44:26",
+      "title": "Speedrun: Loom, Panama, Lilliput, Detroit"
+    }
+  ],
+  "tech": [
+    "Project Amber",
+    "Project Leyden",
+    "Project Valhalla",
+    "Project Babylon",
+    "Project Loom",
+    "Project Panama",
+    "Project Lilliput",
+    "Project Detroit",
+    "Primitive types in patterns",
+    "JEP 468",
+    "AOT cache",
+    "Value classes",
+    "Code reflection",
+    "HAT",
+    "MLIR",
+    "Structured concurrency",
+    "Scoped values",
+    "Foreign Function & Memory API",
+    "Vector API",
+    "jextract",
+    "Compact object headers",
+    "javax.script"
+  ],
+  "watchIf": "You want one map of which OpenJDK project features are final, in preview or still on the whiteboard as of JDK 28.",
+  "themes": [
+    "Java language & JDK",
+    "JVM performance & runtime"
+  ],
   "demo": false
 }

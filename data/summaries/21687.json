@@ -1,14 +1,105 @@
 {
   "id": 21687,
-  "source": "abstract",
-  "tldr": "Ed Burns argues that Java's long-established, unglamorous strengths such as types, tests and static analysis are what keep AI coding agents honest, ending with an agent-safe checklist.",
-  "summary": ["Ed Burns of GitHub sets out to counter agent hype by focusing on what goes wrong: non-determinism, hallucinated APIs, token cost, unreviewable code and reviews that keep changing code until it breaks. The session argues that successful agentic development uses agent strengths (speed, breadth, tolerance for boilerplate) while backstopping their weaknesses.", "It presents ten reasons Java suits this: the type system, testing ecosystem, backwards compatibility culture, deep static analysis, build and dependency management, formatting enforcement, virtual threads and structured concurrency, the observability stack, JVM performance tuning and breadth of deployment options. For each, the talk names the agentic failure mode it addresses, and closes with a practical checklist for making a Java process agent-safe."],
-  "keyPoints": ["Agent weaknesses named: non-determinism, dependency sprawl, inconsistent error handling, hallucinated APIs, unmaintainable code.", "Ten Java strengths, from the type system to deployment options, each mapped to a failure mode.", "Static analysis, tests and formatting rules act as guardrails for generated code.", "Ends with a checklist for an agent-safe Java development process."],
-  "takeaways": ["Audit your build for type checks, tests, static analysis and formatting rules before letting agents commit code."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Java", "Virtual threads", "Structured concurrency", "Static analysis", "Observability"],
-  "watchIf": "You use coding agents on Java projects and want to know which existing practices make them safer.",
-  "themes": ["AI agents & agentic coding", "Testing & quality"],
+  "source": "transcript",
+  "tldr": "Burns tested Java build-time guardrails on agent-written code in a Cargo Tracker experiment; they rarely changed what agents produced, and code review stayed the last line of defence.",
+  "summary": [
+    "Burns opens with a real agentic run on the Jakarta EE Cargo Tracker app: making a cargo's arrival deadline editable, a change from UI to persistence layer. Every guardrail was on (warnings as errors, SpotBugs, architecture and integration tests, formatting) and all were green, yet the date parser still accepted malformed input. It read '2-3-24' as the year 24 AD, and SimpleDateFormat let a five-digit year through an MMddyyyy pattern. Only the AI code reviewer caught it. He frames the talk around three hypotheses: agents do not know a code base the way humans do, they show predictable symptoms at scale, and Java's ecosystem supplies guardrails that reduce them.",
+    "For the symptoms he cites research: runs of the same task differing up to 30 times in total tokens even at temperature zero, a 37.6% rise in critical vulnerabilities after five iterations, PRs 154% larger with 91% longer reviews on AI-heavy teams, and GitClear finding duplicated five-line blocks up eight times in 2024. He also names slopsquatting on hallucinated package names, test tampering measured by ImpossibleBench, and a Veracode study that rated Java the riskiest language for AI-generated code. He then maps the abstract's ten boring reasons onto guardrails, arguing that deterministic checks should run before probabilistic review.",
+    "The experiment reverse-engineered a spec from Cargo Tracker issue 64 and had agents (GitHub Copilot's coding agent with up to eight Copilot code review rounds) implement it in one control arm, with a typical CI of format check and mvn clean package, and two treatment arms. Agents built the treatment guardrails themselves: -Xlint:all -Werror, Maven Enforcer rules, SpotBugs at maximum effort, layering tests, an exact test inventory, Spotless ratcheted from baseline, OpenTelemetry acceptance and JFR performance checks, each with negative controls. Burns showed the agent-written postmortems and an evaluator report built from OpenTelemetry data and JSON logs.",
+    "Hypothesis one held: agents fixed the date examples rather than the rule, and the postmortems mentioned only 9 of the 29 defects found. Hypothesis two was partly supported: symptoms were not just predictable but identical, such as the same 16 duplicated lines, an unrequested Maven wrapper and the same invalid gh CLI flags in every run, yet no tests were removed. Hypothesis three was weak: the test inventory check caught a missing test four times, but SpotBugs, the layering tests and the lint gate found nothing in agent code. His checklist: keep the reviewer, distrust agent self-reports, put rules in the build, and watch what analyzers skip."
+  ],
+  "keyPoints": [
+    "In the opening example every deterministic gate passed while the date parser still accepted non-canonical dates; only the AI code reviewer caught it.",
+    "Treatment guardrails included -Xlint:all -Werror, Maven Enforcer (dependency convergence, banned dependencies and app servers, a Java EE 7 contract against migrating to the jakarta namespace), SpotBugs, layering tests and Spotless with google-java-format.",
+    "Checking the exact test count, zero skipped tests and baseline test names catches the quietest form of test tampering: a test that is missing or skipped rather than failing.",
+    "The agent that built the guardrails narrowed SpotBugs to correctness, threading and security to get the 2020 code green; the scope of a guardrail decides what 'clean' means.",
+    "The guardrails found real bugs only in the original 2020 code, including 14 compiler warnings and five thread-unsafe findings around shared SimpleDateFormat instances.",
+    "Across runs agents repeated the same mistakes: the same 16 duplicated lines, the same out-of-scope Maven wrapper and the same invalid gh CLI calls; none formatted code correctly on the first try.",
+    "Treatment runs added 76 assertions and the control 36, with none removed; the treatment took 86% longer because of its extra CI work.",
+    "Agent postmortems reported validation as passed and mentioned 9 of 29 defects, so neither the self-evaluation nor the empirical data alone gave the full picture."
+  ],
+  "takeaways": [
+    "Keep a code reviewer, human or agent, as the last line of defence even when every automated gate is green.",
+    "Put scope limits in the build, for example Maven Enforcer bans and exact test-count checks, not in the prompt.",
+    "Add CODEOWNERS on build and CI files and ban skip properties so agents cannot quietly weaken the gates.",
+    "Review what your static analyzers are configured to skip, especially when an agent set that scope.",
+    "Turn on duplication detection such as PMD CPD, since duplicated code was the symptom agents repeated."
+  ],
+  "quotes": [
+    {
+      "text": "A guardrail can be installed, running, and proven to bite, and still not change what the agent produces.",
+      "at": "44:44"
+    },
+    {
+      "text": "Guardrails don't make an agent understand your code base. They make its misunderstandings visible earlier, but only the kinds of things you thought to check.",
+      "at": "44:44"
+    },
+    {
+      "text": "Put the rules in the build, not the prompt.",
+      "at": "46:12"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "Cold open: the date parser"
+    },
+    {
+      "at": "04:15",
+      "title": "Three hypotheses"
+    },
+    {
+      "at": "07:03",
+      "title": "How agents fail at scale"
+    },
+    {
+      "at": "12:10",
+      "title": "Ten boring reasons as guardrails"
+    },
+    {
+      "at": "14:57",
+      "title": "Guardrails one by one"
+    },
+    {
+      "at": "30:26",
+      "title": "Experiment design"
+    },
+    {
+      "at": "36:06",
+      "title": "Postmortems and evaluator report"
+    },
+    {
+      "at": "40:58",
+      "title": "Results per hypothesis"
+    },
+    {
+      "at": "46:12",
+      "title": "Agent-safe Java checklist"
+    }
+  ],
+  "tech": [
+    "Jakarta EE",
+    "Cargo Tracker",
+    "Open Liberty",
+    "Arquillian",
+    "Maven",
+    "Maven Enforcer Plugin",
+    "SpotBugs",
+    "Error Prone",
+    "NullAway",
+    "PMD",
+    "ArchUnit",
+    "Spotless",
+    "google-java-format",
+    "OpenTelemetry",
+    "JDK Flight Recorder",
+    "GitHub Copilot",
+    "Copilot code review"
+  ],
+  "watchIf": "You let coding agents change a Java code base and want measured evidence of which build guardrails catch their mistakes and which do not.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Testing & quality"
+  ],
   "demo": false
 }

@@ -1,14 +1,101 @@
 {
   "id": 23531,
-  "source": "abstract",
-  "tldr": "Ricky van Rijn describes a team-built AI orchestrator on Embabel Agent and how each step changed the team's way of working, from specs to sprints lasting days.",
-  "summary": ["MetaFactory built an orchestration tool to get an overview of active agents and their work. It reads agent, skill and spec files from default locations so it stays interchangeable with other tools, uses Embabel Agent as its base layer, and adds a visual dashboard showing which agent is active, what it is doing and the next task.", "The session sets out to explain how the orchestrator was built and what each technical step did to the team's way of working. Developers move toward reviewing and giving feedback to AI, business analysts write requirements as spec files that an AI agent reviews before assignment, and the product owner controls the queue, with sprints shortening from weeks to days."],
-  "keyPoints": ["Orchestrator uses Embabel Agent as its foundation.", "Reads agent, skill and spec files from default locations for tool interchangeability.", "Visual dashboard shows active agent, current work and next task.", "Roles shift: developers review, analysts write specs, product owners manage the queue."],
-  "takeaways": ["Store functional requirements as spec files that an agent can review before work is assigned."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["Embabel Agent", "Agent skills", "Spec files"],
-  "watchIf": "You are working out how agentic tooling changes team roles and sprint planning.",
-  "themes": ["AI agents & agentic coding", "Teams, careers & leadership"],
+  "source": "transcript",
+  "tldr": "Van Rijn tells how MetaFactory's home-built agent orchestrator on Embabel pushed the team from huge AI pull requests and siloed local agents to small shared specs and day-long sprints.",
+  "summary": [
+    "Van Rijn, CTO at MetaFactory, describes moving from AI-assisted to agentic work, where agents write the code and humans review it. The first use case was migrating an internal Node.js backend to Java, chosen because it was low risk and already had an OpenAPI contract and CI/CD. The team chose spec-driven development, documented agent roles and how they relate on Confluence, and kept agent responsibility separate from human accountability. Meanwhile every developer built their own local agents, one focused on architecture, another on coding guidelines, another on security.",
+    "An MCP server for Jira let AI turn refined user stories into spec files, which AI also reviewed. One story became a spec of more than 500 lines, and a chain of agents (business analyst, lead backend developer, solution architect, backend, frontend, QA) filled every gap with assumptions, for example creating a new employee service when one existed. The resulting pull request was so large a colleague refused to review it. Because each developer's local agents had different priorities, reviews turned into silent disagreement, grumpiness and demotivation. The team moved agent definitions, skills, MCP configuration and guardrails into one shared Git repository.",
+    "To join project-level spec files with team-level agents, they built an orchestrator: Java with Embabel's agent core, a React frontend and Spring AI for the MCP server. It shows agents as orbs, lets workflows call other workflows (security checks, dependency checks, DAST), reports quality criteria and stores architecture decisions. Open Policy Agent checks permissions because workflows run as the triggering user, each run gets a throwaway Docker workspace, and models go through a LiteLLM proxy for hybrid routing, including Qwen on local machines. Specs were sliced into small ones in joint refinement with the product owner and business analyst, giving reviewable pull requests of about 100 lines.",
+    "With work flowing faster, the team added an auto-merge checkbox to the queue, after a weekly meeting that mostly merged dependency bumps, and a workflow designer for business users. Unclear requirements go back to the backlog while the queue picks up other epics. Execution overtook decisions: sprints finished in days, the product owner pulled in the quarter's roadmap and joined the team. The migration took 18 productive human hours and is in production. Next is a 'control tower' where an agent interviews people to write small specs. His takeaways: collaboration matters more, AI knows the product but does not understand it, and question old habits. The orchestrator is open source."
+  ],
+  "keyPoints": [
+    "First agentic use case: migrating an internal Node.js backend to Java Spring Boot, picked for low risk and an existing OpenAPI contract; it took 18 productive human hours.",
+    "A 500+ line spec generated from a Jira user story led agents to fill gaps with assumptions and produce a pull request too large to review.",
+    "Developers keeping their own local agents with different focuses caused conflicting output and team friction; moving agent definitions, skills, MCP config and guardrails to a shared Git repo fixed it.",
+    "The orchestrator runs on Embabel's agent core with a React UI and Spring AI for MCP, and lets the product owner set queue size, stop work or add instructions.",
+    "Workflows run as the triggering user, with Open Policy Agent permission checks, a throwaway Docker workspace per run and a LiteLLM proxy for hybrid model routing.",
+    "Slicing specs small in joint refinement shifted effort from code review to requirements and produced pull requests of around 100 lines.",
+    "Once agents delivered sprints in days, decisions and stakeholder input became the bottleneck, so the product owner joined the team's daily work."
+  ],
+  "takeaways": [
+    "Keep agent definitions, skills and MCP configuration in one shared repository rather than on each developer's machine.",
+    "Slice spec files small enough that the resulting pull request can be reviewed in one sitting.",
+    "Bring the product owner and business analyst into spec refinement, since unclear requirements now cost tokens and rework immediately.",
+    "Run agent workflows under the user's identity with policy checks and an isolated container workspace so accountability stays with a person."
+  ],
+  "quotes": [
+    {
+      "text": "Importing a story by AI is not the same as understanding the story.",
+      "at": "09:30"
+    },
+    {
+      "text": "A guardrail is telling your kid do not leave the garden. A harness is putting a fence around the garden.",
+      "at": "34:29"
+    },
+    {
+      "text": "AI knows the product but does not understand it.",
+      "at": "49:51"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "From assisted to agentic AI"
+    },
+    {
+      "at": "02:54",
+      "title": "First use case: Node.js to Java"
+    },
+    {
+      "at": "06:50",
+      "title": "User stories into spec files"
+    },
+    {
+      "at": "10:46",
+      "title": "The unreviewable first pull request"
+    },
+    {
+      "at": "15:00",
+      "title": "Centralising agent definitions"
+    },
+    {
+      "at": "18:24",
+      "title": "Building the orchestrator"
+    },
+    {
+      "at": "25:27",
+      "title": "Smaller specs, better collaboration"
+    },
+    {
+      "at": "33:13",
+      "title": "Local models and governance"
+    },
+    {
+      "at": "36:53",
+      "title": "Auto-merge and workflow designer"
+    },
+    {
+      "at": "42:10",
+      "title": "Changed roles and results"
+    }
+  ],
+  "tech": [
+    "Embabel",
+    "Spring AI",
+    "Model Context Protocol",
+    "React",
+    "Jira",
+    "Open Policy Agent",
+    "LiteLLM",
+    "Qwen",
+    "Docker",
+    "Spring Boot",
+    "OpenAPI"
+  ],
+  "watchIf": "You lead a team adopting coding agents and want an account of how specs, reviews and roles changed when agents did the coding.",
+  "themes": [
+    "AI agents & agentic coding",
+    "Teams, careers & leadership"
+  ],
   "demo": false
 }

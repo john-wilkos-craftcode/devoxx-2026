@@ -1,14 +1,94 @@
 {
   "id": 9036,
-  "source": "abstract",
-  "tldr": "A retrospective on converting 1970s analogue HO model trains to digital control over Bluetooth using Seeed Studio boards and TinyGo, with successes and mistakes.",
-  "summary": ["Florian Forestier and Justine Bachelard describe taking old HO gauge model trains, which run on simple 12V DC track power, out of the attic and converting them to digital. Using Seeed Studio hardware, Bluetooth and TinyGo, they built a working railway network where speed, direction and lights of each train can be managed individually.", "The talk is a retrospective on the hardware and software architecture of this embedded project, including what worked and what went wrong during design. Everything is open source, so attendees are invited to use, fork and extend it."],
-  "keyPoints": ["Analogue 12V DC trains converted to individually controlled digital ones.", "Stack: Seeed Studio boards, Bluetooth and TinyGo.", "Control covers speed, direction and lights per train.", "Retrospective on hardware and software architecture, including mistakes.", "Project is open source."],
-  "takeaways": ["Look at TinyGo if you want to try embedded projects in Go."],
-  "quotes": [],
-  "chapters": [],
-  "tech": ["TinyGo", "Seeed Studio", "Bluetooth", "Embedded systems"],
-  "watchIf": "You enjoy hardware tinkering and want a story of embedded Go on microcontrollers.",
-  "themes": ["Hardware, robots & fun"],
+  "source": "transcript",
+  "tldr": "Forestier and Bachelard retrace converting family HO trains to digital control, from Raspberry Pi Pico boards over Wi-Fi to Seeed Studio nRF52840 boards over Bluetooth LE, written in TinyGo.",
+  "summary": [
+    "The trains date from the early 1980s and have been played with by three generations of one speaker's family, on a layout under a ping-pong table. HO scale is 1:87, and electrically each train is just a lamp and a motor in parallel on 14 V DC. Running analogue means all trains share direction and roughly speed, so beyond three trains they relied on a panel of power-cut switches and about four kilometres of cable. DCC would solve this, but a layout cannot mix analogue and DCC, the estimate for converting 18 trains was 2,900 euros, and the hardware was proprietary.",
+    "A TinyGo talk at the French conference Volcamp in 2024 revived the idea. A Raspberry Pi Pico W fit inside the first locomotive, a BB 9201, with a cheap 14 V to 5 V step-down converter and an Adafruit DRV8871 motor driver. Turning the train around reversed polarity and fried the board (no diode), and micro-cuts in the track made the Pico reboot in a loop until a capacitor smoothed the supply. Their first KiCad PCB, a hat for the Pico, worked first time. Each train exposed a small REST API over a hand-rolled Wi-Fi implementation, to a Go server on a Raspberry Pi 3 with a Svelte UI.",
+    "Trains that lost power for over five seconds turned into 'zombies' that kept driving at full speed with Wi-Fi off, fixed with a hardware watchdog fed by a goroutine that checks Wi-Fi every four seconds. Commands took over 300 ms, and a small draisine had no room for the board. Seeed Studio's 21 by 18 mm boards came next: the RP2040 version lacks wireless, and the ESP32-C6 was not yet supported by TinyGo, so they settled on the nRF52840 with Bluetooth Low Energy, plus smaller Pololu regulators and a double-sided PCB soldered by hand.",
+    "BLE's GATT model maps neatly onto REST: services as collections, characteristics as items to read and write, with persistent connections giving under 1 ms latency. On the single-core nRF52840, Bluetooth handling starved motor updates and deadlocked, so writes now go into a Go channel processed in the main loop. The server connects to devices advertising as 'Trainberry', and a WebSocket replaced REST to the frontend so several phones see updates at once. Dropping Wi-Fi removed the dedicated router and TCP/IP stack. A diode bridge now fixes polarity. Plans include their own microcontroller PCB, NFC-based stops, a live map, OpenTTD control and onboard cameras."
+  ],
+  "keyPoints": [
+    "Analogue HO trains are a lamp and motor in parallel on 14 V DC, so every train on a powered section shares direction and roughly speed.",
+    "Converting the layout to DCC was quoted at 2,900 euros, required converting all trains at once and used proprietary hardware, which ruled it out.",
+    "Putting a microcontroller on track power needs a step-down converter, a diode (later a diode bridge) against reversed polarity, and a capacitor to ride out micro-cuts from wheels and rails.",
+    "A hardware watchdog, fed by a goroutine that resets it only while Wi-Fi is up, fixed trains that kept running at full speed after losing their network.",
+    "Seeed Studio's 21 by 18 mm boards let them swap microcontrollers without redesigning the PCB; they checked TinyGo support only after buying ESP32-C6 boards.",
+    "Moving from per-train REST over Wi-Fi to BLE with persistent connections cut command latency from over 300 ms to under 1 ms, they said.",
+    "On the single-core nRF52840, BLE callbacks starved PWM motor updates; queuing events in a Go channel and handling them in the main loop removed the deadlock."
+  ],
+  "takeaways": [
+    "Check that TinyGo supports a board, including its radio, before ordering hardware.",
+    "Add reverse-polarity protection and supply smoothing before powering a microcontroller from an unstable source.",
+    "Use a hardware watchdog on embedded devices that must not keep running in a broken state.",
+    "Do not copy web architecture onto microcontrollers: prefer protocols such as BLE with persistent connections over HTTP on each command."
+  ],
+  "quotes": [
+    {
+      "text": "You don't do embedded the same way you do web.",
+      "at": "36:57"
+    }
+  ],
+  "chapters": [
+    {
+      "at": "00:00",
+      "title": "A family train layout"
+    },
+    {
+      "at": "03:00",
+      "title": "How analogue model trains work"
+    },
+    {
+      "at": "05:38",
+      "title": "Why not DCC"
+    },
+    {
+      "at": "08:22",
+      "title": "A Raspberry Pi Pico inside"
+    },
+    {
+      "at": "13:39",
+      "title": "Custom PCB and TinyGo"
+    },
+    {
+      "at": "16:10",
+      "title": "REST API, watchdog and demo"
+    },
+    {
+      "at": "21:03",
+      "title": "Miniaturising with Seeed Studio"
+    },
+    {
+      "at": "26:01",
+      "title": "Switching to Bluetooth LE"
+    },
+    {
+      "at": "30:59",
+      "title": "WebSocket and diode bridge"
+    },
+    {
+      "at": "35:39",
+      "title": "Next steps and lessons"
+    }
+  ],
+  "tech": [
+    "TinyGo",
+    "Go",
+    "Raspberry Pi Pico W",
+    "Seeed Studio XIAO nRF52840",
+    "ESP32-C6",
+    "RP2040",
+    "Bluetooth Low Energy",
+    "WebSocket",
+    "Svelte",
+    "KiCad",
+    "Adafruit DRV8871",
+    "DCC",
+    "GoLand"
+  ],
+  "watchIf": "You want a beginner-friendly embedded story of TinyGo on microcontrollers, with the hardware mistakes and the move from Wi-Fi REST to Bluetooth LE explained.",
+  "themes": [
+    "Hardware, robots & fun"
+  ],
   "demo": false
 }
