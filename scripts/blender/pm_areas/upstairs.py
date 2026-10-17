@@ -342,13 +342,20 @@ def rest_of_build(root, M, unified):
     (xa, za), (xb, zb) = E(-2.12, 4.0), E(3.0, 6.52)
     yq = Y_END - 0.455
     L.quad("screen", [(xa, yq, za), (xb, yq, za), (xb, yq, zb), (xa, yq, zb)], M["screen"])
-    # tensile funnels: wide at the top under the screen, pinched to a stem that meets the floor
-    # (set back between the columns and the backdrop, so the columns cover their outer edges as in the photo)
-    for xc, r in ((-1.93, 1.03), (2.59, 1.09)):
-        (xf, zp), zt = E(xc, 1.63), E(0, 3.87)[1]
-        rt = r * K_END
-        prof = [(0.09, 0.0)] + [(0.11 + (rt - 0.11) * (t / 16) ** 2.2, zp + (zt - zp) * t / 16) for t in range(17)]
-        lathe("funnel", prof, xf, Y_END - 0.35, M["funnel"])
+    # the two fabric cones either side under the screen (the corridor's cones, form-found the same way: John 17/10):
+    # set back between the columns and the backdrop, so the columns cover their outer edges as in the photo; six
+    # corners at the rig's underside, the back ones tied to the backdrop's face; hoop and spike below, the spike's tip
+    # clear above head height
+    zt = E(0, 3.87)[1] - CONE_CLEAR / S
+    sail = cone_fabric(lit=False)
+    for k, (xc, r) in enumerate(((-1.93, 1.03), (2.59, 1.09))):
+        xf, ya, rt = E(xc, 1.63)[0], Y_END - 0.35, r * K_END
+        corners = []
+        for j in range(6):
+            th = math.radians(30 + 60 * j)
+            x, y = xf + rt * math.cos(th), min(ya + rt * math.sin(th), Y_END - 0.05)
+            corners.append((x, y, zt))         # (no wires: from the corridor they'd cross the lit screen)
+        fabric_cone(f"rig-cone-{k}", xf, ya, corners, sail, tip=RIG_CONE_TIP, ring=RIG_CONE_RING, ring_r=0.3)
     # posters and a lit cabinet at the rig's ends
     (xa, za), (xb, zb) = E(-6.78, 0.21), E(-4.24, 2.26)
     L.box("poster-l-back", xa - 0.02, Y_END - 0.1, za - 0.02, xb + 0.02, Y_END - 0.06, zb + 0.02, M["dark"])
@@ -519,6 +526,7 @@ CONE_GUARD = 0.22                # metres: overhead taken as the lowest within t
                                  # spacing, so no face between two vertices cuts a girder's edge (and every vertex is
                                  # clamped under it: whatever the column's position, the fabric never pierces anything)
 CONE_SEAMS = 9                   # seams across the flare (white welds; the close-up shows about nine)
+RIG_CONE_TIP, RIG_CONE_RING = 1.3, 2.4    # metres: the screen rig's two cones hang lower, under the rig at ~4.3 m
 CONE_FACE_Z = 6.2                # metres: corners tied to a girder's face (the close-up's lobe on the face at ~6 m)
 CONE_UPLIGHT = 6000.0             # W, the cyan spot inside each cone washing the ceiling round it
 CONE_CYAN = (0.0, 0.3, 0.4)      # the glow's colour at its strongest (linear; AgX pales anything brighter, 17/10 A/B)
@@ -550,10 +558,7 @@ def cone_mesh(name, cx, cy, mat, wire_mat):
     """a tensile funnel with its axis at local (cx, cy): spike, hoop, and the flare form-found between the hoop and
     CONE_N corners (cone_form.solve), every vertex then clamped under the structure; a wire from each corner up to
     whatever is overhead"""
-    import numpy as np
-    from pm_areas import cone_form
-    nr, nt, ns = 168, 30, 8                       # around, flare rows, spike rows
-    ring_r, z_ring = CONE_RING_R / S, CONE_RING / S
+    z_ring = CONE_RING / S
     # corners: a cone hanging between the girders ties the corners that would land past a girder to the girder's face
     # (the close-up: a lobe on the face at 6 m), so every fixed node is on the corridor side of both faces and the
     # solved fabric, inside their hull, can't reach into a girder; a cone hanging under a girder keeps all its
@@ -572,16 +577,38 @@ def cone_mesh(name, cx, cy, mat, wire_mat):
         else:
             z = min(CONE_TOP / S, overhead_safe(x)) if between else min(CONE_TOP / S, overhead_safe(x), under)
         corners.append((x, y, z))
-    G = cone_form.solve((cx, cy), z_ring, ring_r, corners, nr=nr, nt=nt, q_hoop=CONE_Q_HOOP, q_cable=CONE_Q_CABLE)
-    cap = np.vectorize(lambda x: overhead(x) - clear)(G[..., 0])
-    n_clamped = int((G[..., 2] > cap).sum())
-    G[..., 2] = np.minimum(G[..., 2], cap)
+    ob, n_clamped = fabric_cone(name, cx, cy, corners, mat, lambda x: overhead(x) - clear)
     print(f"CONE {name}: {'between the girders' if between else 'under a girder'}, corners at "
           f"{', '.join(f'{c[2] * S:.1f}' for c in corners)} m, {n_clamped} vertices clamped", flush=True)
-    verts, uvs, faces = [(cx, cy, CONE_TIP / S)], [(0.5, 0.0)], []
+    # the light inside: an uplight washing the dark ceiling cyan round the canopy (the photos), no shadows
+    li = L.spot(f"{name}-uplight", (cx, cy, z_ring + 0.3 / S), (cx, cy, z_ring + 5), CONE_UPLIGHT, angle_deg=120, blend=0.6,
+                color=(0.2, 0.85, 1.0), radius=0.3)
+    li.data.use_shadow = False
+    for k, (x, y, z) in enumerate(corners):       # the hanging wires
+        top = overhead(x)
+        if k not in tied and top - z > 0.05:          # (a corner tied to a girder's face needs none)
+            L.tube(f"{name}-wire{k}", (x, y, z), (x, y, top), 0.006 / S, wire_mat, segs=4)
+    return ob
+
+
+def fabric_cone(name, cx, cy, corners, mat, cap=None, tip=CONE_TIP, ring=CONE_RING, ring_r=CONE_RING_R):
+    """the fabric itself (local frame; heights in metres above floor 1 for tip and ring): a spike from the tip up to
+    the hoop, the flare form-found from the hoop to the corners (cone_form.solve), every vertex held under cap(x).
+    Returns the object and how many vertices the cap moved."""
+    import numpy as np
+    from pm_areas import cone_form
+    nr, nt, ns = 168, 30, 8                       # around, flare rows, spike rows
+    ring_r, z_ring = ring_r / S, ring / S
+    G = cone_form.solve((cx, cy), z_ring, ring_r, corners, nr=nr, nt=nt, q_hoop=CONE_Q_HOOP, q_cable=CONE_Q_CABLE)
+    n_clamped = 0
+    if cap is not None:
+        lim = np.vectorize(cap)(G[..., 0])
+        n_clamped = int((G[..., 2] > lim).sum())
+        G[..., 2] = np.minimum(G[..., 2], lim)
+    verts, uvs, faces = [(cx, cy, tip / S)], [(0.5, 0.0)], []
     for i in range(1, ns + 1):                    # spike: tip vertex, then rings up to just under the hoop
         u = i / ns
-        r, z = ring_r * u, (CONE_TIP + (CONE_RING - CONE_TIP) * u) / S
+        r, z = ring_r * u, (tip + (ring - tip) * u) / S
         for j in range(nr):
             th = 2 * math.pi * j / nr
             verts.append((cx + r * math.cos(th), cy + r * math.sin(th), z))
@@ -600,15 +627,7 @@ def cone_mesh(name, cx, cy, mat, wire_mat):
     ob = L.mesh_obj(name, verts, faces, mat, uvs=uvs)
     for poly in ob.data.polygons:
         poly.use_smooth = True
-    # the light inside: an uplight washing the dark ceiling cyan round the canopy (the photos), no shadows
-    li = L.spot(f"{name}-uplight", (cx, cy, z_ring + 0.3 / S), (cx, cy, z_ring + 5), CONE_UPLIGHT, angle_deg=120, blend=0.6,
-                color=(0.2, 0.85, 1.0), radius=0.3)
-    li.data.use_shadow = False
-    for k, (x, y, z) in enumerate(corners):       # the hanging wires
-        top = overhead(x)
-        if k not in tied and top - z > 0.05:          # (a corner tied to a girder's face needs none)
-            L.tube(f"{name}-wire{k}", (x, y, z), (x, y, top), 0.006 / S, wire_mat, segs=4)
-    return ob
+    return ob, n_clamped
 
 
 def cones(M):
@@ -627,11 +646,13 @@ def cones(M):
         cone_mesh(f"cone-{k}", ax, y, sail, wire)
 
 
-def cone_fabric():
+def cone_fabric(lit=True):
     """white tensile fabric lit cyan from inside (Street View close-up): saturated cyan in the throat above the hoop,
-    fading to plain white towards the points and down the spike; white seams across the flare"""
+    fading to plain white towards the points and down the spike; white seams across the flare. lit=False: the plain
+    white fabric with its seams, no light inside (the screen rig's cones, under the stage's blue wash)"""
     import bpy as _b
-    m = _b.data.materials.new("up-cone-fabric")
+    glow_k = CONE_GLOW if lit else 0.0
+    m = _b.data.materials.new("up-cone-fabric" if lit else "up-cone-fabric-unlit")
     m.use_nodes = True
     nt = m.node_tree
     b = nt.nodes["Principled BSDF"]
@@ -670,7 +691,7 @@ def cone_fabric():
     v = sep.outputs["Y"]
     # the fabric's own colour: white on the spike and the arms, dimmed where the light inside dominates
     base = ramp([(0.0, CONE_WHITE), (0.24, (0.3, 0.42, 0.45)), (0.33, (0.0, 0.02, 0.03)), (0.6, (0.0, 0.03, 0.04)),
-                 (0.85, CONE_WHITE), (1.0, CONE_WHITE)])
+                 (0.85, CONE_WHITE), (1.0, CONE_WHITE)] if lit else [(0.0, CONE_WHITE), (1.0, CONE_WHITE)])
     cy = CONE_CYAN
     glow = ramp([(0.0, (0.0, 0.0, 0.0)), (0.22, tuple(c * 0.3 for c in cy)), (0.33, cy), (0.6, tuple(c * 0.9 for c in cy)),
                  (0.78, (0.0, 0.04, 0.06)), (1.0, (0.0, 0.0, 0.0))])
@@ -685,7 +706,7 @@ def cone_fabric():
     ins["B_Color"].default_value = (*CONE_WHITE, 1)
     nt.links.new(next(o for o in mix.outputs if o.identifier == "Result_Color"), b.inputs["Base Color"])
     nt.links.new(glow.outputs["Color"], b.inputs["Emission Color"])
-    nt.links.new(math_node("MULTIPLY_ADD", seam, -CONE_GLOW * 0.6, CONE_GLOW), b.inputs["Emission Strength"])
+    nt.links.new(math_node("MULTIPLY_ADD", seam, -glow_k * 0.6, glow_k), b.inputs["Emission Strength"])
     return m
 
 

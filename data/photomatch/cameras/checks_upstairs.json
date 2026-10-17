@@ -154,5 +154,43 @@
    9
   ],
   "notes": "the east cone beside the panorama (column at 6.5, 30.75) under the east girder and soffit"
+ },
+ "check_rig_cones": {
+  "area": "venue",
+  "C": [
+   2.7,
+   -39.5,
+   7.85
+  ],
+  "look": [
+   2.7,
+   -47.4,
+   9.0
+  ],
+  "fov_h": 70,
+  "size": [
+   16,
+   9
+  ],
+  "notes": "the screen rig at the corridor's south end, its two fabric cones either side under the screen (17/10 rebuild)"
+ },
+ "check_rig_cones_low": {
+  "area": "venue",
+  "C": [
+   4.0,
+   -43.5,
+   7.6
+  ],
+  "look": [
+   4.6,
+   -47.2,
+   10.0
+  ],
+  "fov_h": 80,
+  "size": [
+   16,
+   9
+  ],
+  "notes": "walking up to the screen rig, looking up at its east cone"
  }
 }
