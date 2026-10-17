@@ -78,15 +78,19 @@ DOOR_H = 2.4
 
 def double_doors(name, xa, xb, M, open_out=0):
     """white double doors in a glass box's side opening (xa..xb is the wall's thickness), a frosted panel above them to
-    the ceiling; open_out = +1/-1 swings both leaves 90 deg out towards +x/-x (the side the walk comes from)"""
+    the ceiling; open_out = +1/-1 swings the leaves out towards +x/-x (the side the walk comes from)"""
     y0, y1 = GAP_Y
     xm = (xa + xb) / 2
     w = (y1 - y0) / 2
     L.box(f"{name}-transom", xa, y0, DOOR_H + 0.08, xb, y1, TOP, M["frosted"])
     L.box(f"{name}-head", xa - 0.01, y0, DOOR_H, xb + 0.01, y1, DOOR_H + 0.08, M["door_frame"])
     for k, (h0, sgn) in enumerate(((y0, 1), (y1, -1))):           # hinge at each end, leaves meet in the middle
-        if open_out:                                            # swung out flat against nothing: perpendicular to the wall
-            xs, xe = sorted((xm, xm + open_out * w))
+        if open_out and k == 0:                                 # the south leaf swung right round, flat on the wall's
+            face = xa if open_out < 0 else xb                   # hall face: at 90 deg it stood 0.9 m into the walks'
+            xs, xe = sorted((face, face + open_out * 0.05))     # line through the doorway (0.49 m from the lens, 17/10)
+            L.box(f"{name}-leaf{k}", xs, h0 - w + 0.01, 0.01, xe, h0 - 0.01, DOOR_H - 0.01, M["door"])
+        elif open_out:                                          # the north leaf only to 90 deg: the divider wall is flush
+            xs, xe = sorted((xm, xm + open_out * w))            # with the box (hall_screen.DIVIDER), so it stops there
             L.box(f"{name}-leaf{k}", xs, h0 + sgn * 0.02 - 0.025, 0.01, xe, h0 + sgn * 0.02 + 0.025, DOOR_H - 0.01, M["door"])
         else:
             ys, ye = sorted((h0, h0 + sgn * (w - 0.005)))

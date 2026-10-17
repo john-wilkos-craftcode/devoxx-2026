@@ -579,7 +579,14 @@ def upstairs(P):
 
 
 def place(crowd, root):
+    import pm_areas.venue as V
+    sc = bpy.context.scene
+    f_was = sc.frame_current
+    if V.BACK and "cam-walk" in bpy.data.objects:   # the walk back starts in the auditorium, where the hall side is
+        import pm_areas.room_walk as RW          # out of render: measure the venue on its last frame (the hall still)
+        sc.frame_set(RW.last_frame(bpy.data.objects["cam-walk"]))   # or every hall spot fails free() (17/10: no hall crowd)
     P = Placer(crowd, root)
+    sc.frame_set(f_was)
     for zone in (queue, reception, foyer, below_steps, aisle, far_hall, upstairs):
         zone(P)
     print("CROWD placed: " + ", ".join(f"{k} {v}" for k, v in REPORT.items())

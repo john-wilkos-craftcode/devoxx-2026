@@ -172,7 +172,10 @@ def speeds(pts):
     relatively faster than the stairs and the corridor"""
     v = []
     for p in pts:
-        on_stairs = STAIR_TOP - 0.5 < p.y < STAIR_FOOT + 0.5 and (p.x < -4.6 or p.x > 10.2)
+        # the flight, the stairwell box and its doorway: the 90 deg turn between the side door and the foot of the stairs
+        # ran at hall speed and whipped (17/10)
+        on_stairs = (STAIR_TOP - 0.5 < p.y < STAIR_FOOT + 0.5 and (p.x < -4.6 or p.x > 10.2)) or \
+            (p.z < FH and STAIR_FOOT - 0.5 < p.y < GAP_Y + 1.0 and (p.x < -3.3 or p.x > 8.7))
         in_room = p.x < -7.4 or p.x > 12.8
         upstairs = p.z > FH + 0.5
         if in_room:
@@ -296,7 +299,7 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True):
 # the walk back (John, 17/10: "about 10 s back to the main menu"): the forward route reversed from the seat (or the
 # door totem) to the stairwell's gap, then round to the hall still's pose square on to the screen (phones: the totem),
 # approaching it along its axis from the south, west of the hall column at (2.65, 5.17) and clear of the totem plant
-BACK_APPROACH = {("east", "laptop"): [(7.7, 9.4), (4.4, 7.7), (2.4, 7.4)],
+BACK_APPROACH = {("east", "laptop"): [(8.6, 9.3), (5.0, 7.9), (2.4, 7.4)],     # wide of the totem plant (0.51 m at (7.7, 9.4))
                  ("west", "laptop"): [(-0.6, 8.2), (2.4, 7.2)],
                  ("east", "phone"): [(7.6, 8.4), (5.6, 7.6)],
                  ("west", "phone"): [(-0.6, 8.2), (4.4, 7.2), (5.6, 7.6)]}
