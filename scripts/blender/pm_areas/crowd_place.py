@@ -312,11 +312,15 @@ class Placer:
             vis = self.view.seen(lambda f: pts, occlusion=False) or [None]
         else:
             return []
-        if vis and self.back is not None:                          # --both: on in the walk back's frames as well
-            more = self.back.seen(lambda f: pts, occlusion=False)
-            if more:
-                vis = sorted({f for f in vis if f is not None} | set(more))
         return vis
+
+    def widen(self, vis, at):
+        """--both: the render switch-on frames widened by the walk back's camera (at(f): the person's points at
+        frame f); after the skip decision, so forced group members and walkers get them too"""
+        if self.back is None or vis is None:
+            return vis
+        more = self.back.seen(at, occlusion=False)
+        return sorted({f for f in vis if f is not None} | set(more)) if more else vis
 
     def put(self, role, x, y, zf, yaw, sex=None, force=False):
         """place someone; False (and nobody placed) when the camera never sees the spot, unless forced (a group
@@ -326,6 +330,7 @@ class Placer:
         if vis is not None and not vis and not force:
             self.unseen += 1
             return False
+        vis = self.widen(vis, lambda f: body_points(x, y, zf))
         tmpl, clip = self.pick(role, x, y, sex)
         crowd.person(tmpl, clip, x, y, zf, yaw, offset=rng.randrange(0, 600), speed=rng.uniform(0.9, 1.1),
                      height=rng.uniform(0.96, 1.04), badge=rng.random() < 0.85, role=role,
@@ -434,7 +439,7 @@ class Placer:
             if not (self.view.seen(at) or any(v.seen(at) for v in self.others)):
                 self.unseen += 1
                 return False
-            vis = self.view.seen(at, occlusion=False) or [None]
+            vis = self.widen(self.view.seen(at, occlusion=False) or [None], at)
         crowd.person(tmpl, clip, x, y, zf, self.facing(dx, dy), offset=rng.randrange(0, 600), speed=speed,
                      height=rng.uniform(0.96, 1.04), walk=((x, y), pts[-1], frames), badge=rng.random() < 0.85,
                      role="walk", backpack=rng.random() < C.BACKPACK_SHARE)

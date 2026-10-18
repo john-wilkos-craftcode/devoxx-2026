@@ -82,6 +82,24 @@ else:
     else:
         area.build(ROOT)
     print(f"BUILT {args.area} in {time.time() - t0:.1f}s, {len(scene.objects)} objects")
+if args.area == "venue":                             # what the stills need beyond the scene (filled while building):
+    import pm_areas.hall_screen as HS                # kept on the scene so a saved build still has it after --load
+    import pm_areas.door_totems as DT                # (ID properties hold numbers and dicts: names joined, corners flat)
+    quads = {"screen": "screen_corners", "totem": "totem_corners"}
+    if args.load:
+        HS.FRONT = set(scene.get("pm_stills_front", "").split("\n")) - {""}
+        DT.CORNERS = {k: [Vector(list(v)[i:i + 3]) for i in range(0, 12, 3)] for k, v in scene.get("pm_stills_corners", {}).items()}
+        for k, name in quads.items():
+            setattr(HS, name, [tuple(list(scene[f"pm_stills_{k}"])[i:i + 3]) for i in range(0, 12, 3)])
+    else:
+        scene["pm_stills_front"] = "\n".join(sorted(HS.FRONT))
+        scene["pm_stills_corners"] = {k: [float(c) for p in v for c in p] for k, v in DT.CORNERS.items()}
+        for k, name in quads.items():
+            scene[f"pm_stills_{k}"] = [float(c) for p in getattr(HS, name) for c in p]
+if args.save and not args.load:                      # the build alone, before this run's render settings (--hide,
+    t1 = time.time()                                 # --shadow-scale, --final, --eevee are given again on each --load)
+    bpy.ops.wm.save_as_mainfile(filepath=args.save)
+    print(f"SAVED {args.save} in {time.time() - t1:.0f}s", flush=True)
 for cn in [c for c in args.hide.split(",") if c]:
     if cn in bpy.data.collections:
         bpy.data.collections[cn].hide_render = True
@@ -156,19 +174,6 @@ for item in [s for s in args.eevee.split(",") if s]:       # --eevee a.b=v: for 
         val = raw                                        # an enum name, e.g. ray_tracing_options.resolution_scale=4
     setattr(holder, attr, val)
     print(f"FINAL eevee {path} = {getattr(holder, attr)!r} (was {old!r})", flush=True)
-if args.area == "venue":                             # what the stills need beyond the scene (filled while building):
-    import pm_areas.hall_screen as HS                # kept on the scene so a saved build still has it after --load
-    import pm_areas.door_totems as DT
-    if args.load:                                    # (ID properties hold numbers and dicts: names joined, corners flat)
-        HS.FRONT = set(scene.get("pm_stills_front", "").split("\n")) - {""}
-        DT.CORNERS = {k: [Vector(list(v)[i:i + 3]) for i in range(0, 12, 3)] for k, v in scene.get("pm_stills_corners", {}).items()}
-    else:
-        scene["pm_stills_front"] = "\n".join(sorted(HS.FRONT))
-        scene["pm_stills_corners"] = {k: [float(c) for p in v for c in p] for k, v in DT.CORNERS.items()}
-if args.save and not args.load:                      # the build with its render settings, before any render: later
-    t1 = time.time()                                 # processes render from it with --load (no ~8 min build each)
-    bpy.ops.wm.save_as_mainfile(filepath=args.save)
-    print(f"SAVED {args.save} in {time.time() - t1:.0f}s", flush=True)
 
 # ---------------------------------------------------------------------------------- walk frames / plan cut
 def render_plan():
@@ -293,6 +298,8 @@ def walk_clips():
     (--back; both with --both) or the fly-through. Each walk camera carries its frames (venue.build's "clip"), so a
     build with two clips on its timeline, or one saved and rendered with --load, doesn't go by the scene's range"""
     tag = "walk" + (f"-{args.variant}" if args.variant else "") + (f"-room{args.room}" if args.room else "")
+    if args.both and (not args.room or args.back or args.anim_range):
+        sys.exit("--both takes --room N without --back, and no --anim-range (the clips' frames differ)")
     out = []
     for back in ([False, True] if args.both else [args.back]):
         cam = bpy.data.objects["cam-walk"]            # --both keyed the walk back as its own camera
@@ -332,7 +339,7 @@ def render_anim(out, cam, f0, f1):
           f" -> {out.name}", flush=True)
 
 
-if args.stills and not args.walk:
+if args.stills and args.walk != "anim":           # (after the clips with --walk anim)
     render_stills()
 if args.plan:
     render_plan()
