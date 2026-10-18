@@ -114,3 +114,12 @@ Visual (contact sheet every ~0.5 s + the critical frames, judged by a fresh-eyes
     frame-precise events; our crowd limbs and whip turns near the lens make it risky.
   - Cycles + OpenImageDenoise for animation needs stable noise (fixed seed is not the answer: it smears) and
     hundreds of samples indoors on a weak GPU: not quicker than EEVEE here.
+
+A/B of cheaper EEVEE settings (19/10, room 8's corridor frames 330-339 at full quality, base 29.1 s a frame;
+`--load` of a `--save`d build takes ~3 s instead of the ~8 min build):
+- `light_threshold=0.05`: 19.9 s (-32 %) but the whole corridor 15-18 grey levels darker, the cones' cyan uplight
+  gone: rejected (it cuts every light's reach, so it is a look change, not a speed setting).
+- `shadow_step_count=8`: 27.8 s (-4 %), mean difference 0.6 levels: invisible but not worth the light-leak risk the
+  16 steps were chosen against.
+- `ray_tracing_options.trace_max_roughness=0.3`: 32.3 s (slower): rejected.
+The finals keep the approved settings; the saving is one build per room and variant (`--both`).
