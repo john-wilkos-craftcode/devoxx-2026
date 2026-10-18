@@ -260,13 +260,22 @@ def body_points(x, y, zf):
 # ---------------------------------------------------------------------------------- placing
 class Placer:
     def __init__(self, crowd, root):
+        import time
         self.crowd, self.rng = crowd, crowd.rng
+        t0 = time.time()
         self.bvh = venue_bvh()
+        t1 = time.time()
         self.paths = camera_paths(root)
         self.spots = []                                  # (x, y) of everyone placed, walkers' sweeps sampled
         self.looks = []                                  # (x, y, avatar) for keeping clones apart
         self.view = View(self.bvh) if "cam-walk" in bpy.data.objects else None
         self.others = other_views(self.bvh, root) if self.view else []
+        # --both (venue.BOTH): the walk back renders from this build too. It only widens the render switch-on
+        # (seen_at); every placement decision still goes by the walk there's camera, so the people are the ones a
+        # separate build of either clip places (the counts per zone match clip to clip in the 18/10 logs)
+        back = bpy.data.objects.get("cam-walk-back")
+        self.back = View(self.bvh, back) if self.view and back else None
+        print(f"CROWD timing: venue BVH {t1 - t0:.0f} s, camera views {time.time() - t1:.0f} s", flush=True)
         self.unseen = 0                                  # spots skipped: no walk camera ever sees them
         self.zone = ""
 
@@ -298,10 +307,16 @@ class Placer:
             return None
         pts = body_points(x, y, zf)
         if self.view.seen(lambda f: pts):                          # placed where some clip has a line of sight,
-            return self.view.seen(lambda f: pts, occlusion=False)   # switched on whenever this clip's frame holds it
-        if any(v.seen(lambda f: pts) for v in self.others):
-            return self.view.seen(lambda f: pts, occlusion=False) or [None]
-        return []
+            vis = self.view.seen(lambda f: pts, occlusion=False)   # switched on whenever this clip's frame holds it
+        elif any(v.seen(lambda f: pts) for v in self.others):
+            vis = self.view.seen(lambda f: pts, occlusion=False) or [None]
+        else:
+            return []
+        if vis and self.back is not None:                          # --both: on in the walk back's frames as well
+            more = self.back.seen(lambda f: pts, occlusion=False)
+            if more:
+                vis = sorted({f for f in vis if f is not None} | set(more))
+        return vis
 
     def put(self, role, x, y, zf, yaw, sex=None, force=False):
         """place someone; False (and nobody placed) when the camera never sees the spot, unless forced (a group
@@ -587,10 +602,13 @@ def place(crowd, root):
         sc.frame_set(RW.last_frame(bpy.data.objects["cam-walk"]))   # or every hall spot fails free() (17/10: no hall crowd)
     P = Placer(crowd, root)
     sc.frame_set(f_was)
+    import time
+    t0 = time.time()
     for zone in (queue, reception, foyer, below_steps, aisle, far_hall, upstairs):
         zone(P)
     print("CROWD placed: " + ", ".join(f"{k} {v}" for k, v in REPORT.items())
           + f"; {P.unseen} spots skipped (never in view)", flush=True)
+    print(f"CROWD timing: zones placed in {time.time() - t0:.0f} s", flush=True)
     return P
 
 

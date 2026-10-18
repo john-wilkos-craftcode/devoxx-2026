@@ -35,6 +35,8 @@ VARIANT = "laptop"                                  # or "phone" (set by the run
 CROWD = False                                       # the crowd (pm_areas/crowd.py), set by the runner's --crowd
 ROOM = None                                         # a room walk (pm_areas/room_walk.py) instead of the fly-through: --room
 BACK = False                                        # with ROOM: the walk back from the room to the hall still: --back
+BOTH = False                                        # with ROOM: the walk there AND back from one build (--both): the
+                                                    # build (~8 min of a 70 min clip, 18/10 logs) is the same for both
 FOV_V, WALK_SIZE, DOF_END = 44.5, (16, 9), None
 
 WALK, SCREEN, FILLET = [], (0, 0, 0), 2.5         # from data/photomatch/walk.json
@@ -108,7 +110,20 @@ def build(root, unified=True):
         start = bpy.context.scene.frame_end
         cam.name = "cam-flythrough"
         RW = importlib.import_module("pm_areas.room_walk")
-        if BACK:                               # the walk back starts on the forward walk's last frame
+        scene = bpy.context.scene
+        if BOTH:                               # both clips from one build: the walk back keyed after the walk there
+            # on the one timeline (it starts on the walk's last frame anyway). Both visibility swaps key the same
+            # objects at disjoint frames and agree on the shared one (auditorium in render, hall side out); the crowd
+            # is placed as for the walk there (crowd_place.Placer: the same decisions, so the same people as a
+            # separate build) and switched on for the frames either camera holds them
+            rw = RW.camera(root, ROOM, VARIANT, first_frame=start)
+            f0, f1 = scene.frame_start, scene.frame_end
+            bk = RW.camera_back(root, ROOM, VARIANT, first_frame=f1)
+            bk.name, bk["clip"], bk["back"] = "cam-walk-back", (f1, scene.frame_end), True
+            scene.frame_start = f0                                  # the crowd's render switches cover both clips
+            scene.camera = rw                                       # (the renderer sets the range per clip)
+            scene.frame_set(f0)                                     # the hall side in render, as the walk there's build
+        elif BACK:                             # the walk back starts on the forward walk's last frame
             fw = RW.camera(root, ROOM, VARIANT, first_frame=start, activate=False)
             start = RW.last_frame(fw)
             bpy.data.objects.remove(fw)
@@ -116,6 +131,8 @@ def build(root, unified=True):
         else:
             rw = RW.camera(root, ROOM, VARIANT, first_frame=start)
         rw.name = "cam-walk"
+        rw["clip"], rw["back"] = (scene.frame_start, RW.last_frame(rw)), BACK   # its own frames: a build saved
+        # with --save and rendered with --load, or with --both, can't read them off the scene's range
     if CROWD:                                  # last: placement looks through the walk camera (who is ever seen)
         importlib.import_module("pm_areas.crowd").build(root, unified=True)
     try:                                       # BRIEF.md step 2: numbers before any render

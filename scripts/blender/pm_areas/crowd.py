@@ -502,6 +502,8 @@ def build(root, unified=False):
     bpy.context.scene.render.fps = FPS
     coll = bpy.data.collections.new("crowd")
     bpy.context.scene.collection.children.link(coll)
+    import time
+    t = [time.time()]
     crowd = Crowd(root, coll, random.Random(20261015))
     horizon = 740
     if not unified:
@@ -510,10 +512,16 @@ def build(root, unified=False):
         import pm_areas.crowd_place as crowd_place                  # placement lives in crowd_place.py
         crowd_place.place(crowd, ROOT)
         horizon = crowd_place.HORIZON
+    t.append(time.time())
     crowd_wear.dress(crowd, ROOT)
+    t.append(time.time())
     fix_badges(crowd, horizon)
+    t.append(time.time())
     if unified:
         crowd_place.hide_unseen(crowd)
+    t.append(time.time())                                           # where the ~400-600 s crowd build goes (18/10)
+    print("CROWD timing: " + ", ".join(f"{k} {b - a:.0f} s" for k, a, b in
+                                       zip(("avatars + placement", "dress", "badge checks", "render switches"), t, t[1:])), flush=True)
     print(f"CROWD {crowd.n} people, {sum(1 for p in crowd.people if p.get('pack_ob'))} backpacks, "
           f"{sum(1 for p in crowd.people if p.get('cord_ob'))} badges", flush=True)
     return crowd

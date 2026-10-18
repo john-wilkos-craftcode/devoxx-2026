@@ -98,6 +98,12 @@ Visual (contact sheet every ~0.5 s + the critical frames, judged by a fresh-eyes
     textures from filling VRAM (bug reports: 4K textures + EEVEE = out of memory where Cycles copes).
   - Build once, save the .blend (--save), render the clip in chunks of ~100 frames in fresh Blender processes:
     EEVEE's per-frame GPU memory growth is a recurring bug-tracker pattern, and a fresh process also resets a stall.
+  - Where a room's time goes (18/10 logs, full quality): the build 7-11 min a process, of which the venue is ~25 s
+    and the crowd the rest (BVH of 35 M triangles, 17 camera views, placement, dressing, badge checks); the walk
+    there 65 min (hall 13 s a frame, stairs + corridor 30 s, the auditorium 4 s), the fly-through 40 s a frame.
+    So `--room N --crowd --both --stills --walk anim` renders there, back and the stills from one build (the same
+    people: the placement goes by the walk there's camera either way), and `--save X.blend` + `--load X.blend`
+    renders any clip of a build in a fresh process. `--eevee a.b=v` overrides a setting for an A/B render.
   - Motion-blur steps multiply the cost (each step re-evaluates the scene): samples are split across steps, so 4
     steps x 12 samples ~ 48 samples' quality at the price of 4 evaluations.
   - Shadows: shadow_resolution_scale below 1 is faster and soft shadows hide it; shadow steps up to 16 are cheap and

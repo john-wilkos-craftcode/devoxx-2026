@@ -38,6 +38,13 @@ ap.add_argument("--blur", action="store_true", help="walk stills: the clip's mot
 ap.add_argument("--blur-steps", default="4", help="EEVEE motion blur steps (accumulation; 4 fixed the vector blur's hard edges on near columns, 16/10 A/B; 0 = Blender's 1); stills take a comma list to A/B")
 ap.add_argument("--max-spf", type=float, default=0, help="walk anim: render 5 frames, stop if they average more seconds a frame than this")
 ap.add_argument("--back", action="store_true", help="with --room: the walk back from the room to the hall still")
+ap.add_argument("--both", action="store_true", help="with --room and --walk anim: the walk there and the walk back from "
+                "one build (and --stills after them): one ~8 min build instead of two or three, the same crowd by construction")
+ap.add_argument("--load", default="", help="render from a build saved with --save (Windows path) instead of building: "
+                "a fresh Blender process per clip without the build (with --room/--variant/--back as the build was made)")
+ap.add_argument("--eevee", default="", help="EEVEE setting overrides for A/B renders, comma list of path=value under "
+                "scene.eevee, e.g. shadow_step_count=8,light_threshold=0.05,ray_tracing_options.trace_max_roughness=0.3 "
+                "(applied last; printed with the value they replace)")
 ap.add_argument("--anim-range", default="", help="walk anim: only frames a-b (time a clip before rendering it all)")
 ap.add_argument("--hide", default="", help="collections to leave out of the render, comma list (checks)")
 ap.add_argument("--stills", action="store_true", help="venue with --room: the page's stills from this walk's build "
@@ -50,10 +57,6 @@ ROOT = Path(args.root)
 sys.path[:0] = [str(ROOT / "scripts" / "blender"), str(ROOT / "scripts" / "photomatch")]
 from pm import Cam  # noqa: E402
 
-bpy.ops.wm.read_factory_settings(use_empty=True)
-scene = bpy.context.scene
-scene.unit_settings.system = "METRIC"
-
 t0 = time.time()
 area = importlib.import_module(f"pm_areas.{args.area}")
 if args.variant:
@@ -63,11 +66,22 @@ if args.crowd:
 if args.room:
     area.ROOM = args.room
     area.BACK = args.back
-if args.unified:
-    area.build(ROOT, unified=True)
+    area.BOTH = args.both
+if args.load:                                        # a saved build: its scene as it was, nothing built
+    bpy.ops.wm.open_mainfile(filepath=args.load)
+    scene = bpy.context.scene
+    if hasattr(area, "load_walk"):                   # the walk's frame size and lens for this variant (venue.py)
+        area.load_walk(ROOT)
+    print(f"LOADED {args.load} in {time.time() - t0:.1f}s, {len(scene.objects)} objects", flush=True)
 else:
-    area.build(ROOT)
-print(f"BUILT {args.area} in {time.time() - t0:.1f}s, {len(scene.objects)} objects")
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    scene = bpy.context.scene
+    scene.unit_settings.system = "METRIC"
+    if args.unified:
+        area.build(ROOT, unified=True)
+    else:
+        area.build(ROOT)
+    print(f"BUILT {args.area} in {time.time() - t0:.1f}s, {len(scene.objects)} objects")
 for cn in [c for c in args.hide.split(",") if c]:
     if cn in bpy.data.collections:
         bpy.data.collections[cn].hide_render = True
@@ -127,6 +141,34 @@ except TypeError:
     scene.view_settings.look = "None"
 scene.view_settings.exposure = getattr(area, "EXPOSURE", 0.0)
 scene.render.image_settings.file_format = "PNG"
+for item in [s for s in args.eevee.split(",") if s]:       # --eevee a.b=v: for A/B renders without a code change
+    path, raw = item.split("=", 1)
+    holder = scene.eevee
+    for attr in path.split(".")[:-1]:
+        holder = getattr(holder, attr)
+    attr = path.split(".")[-1]
+    old = getattr(holder, attr)
+    if isinstance(old, bool):
+        val = raw.lower() in ("1", "true")
+    elif isinstance(old, (int, float)):
+        val = type(old)(raw)
+    else:
+        val = raw                                        # an enum name, e.g. ray_tracing_options.resolution_scale=4
+    setattr(holder, attr, val)
+    print(f"FINAL eevee {path} = {getattr(holder, attr)!r} (was {old!r})", flush=True)
+if args.area == "venue":                             # what the stills need beyond the scene (filled while building):
+    import pm_areas.hall_screen as HS                # kept on the scene so a saved build still has it after --load
+    import pm_areas.door_totems as DT
+    if args.load:                                    # (ID properties hold numbers and dicts: names joined, corners flat)
+        HS.FRONT = set(scene.get("pm_stills_front", "").split("\n")) - {""}
+        DT.CORNERS = {k: [Vector(list(v)[i:i + 3]) for i in range(0, 12, 3)] for k, v in scene.get("pm_stills_corners", {}).items()}
+    else:
+        scene["pm_stills_front"] = "\n".join(sorted(HS.FRONT))
+        scene["pm_stills_corners"] = {k: [float(c) for p in v for c in p] for k, v in DT.CORNERS.items()}
+if args.save and not args.load:                      # the build with its render settings, before any render: later
+    t1 = time.time()                                 # processes render from it with --load (no ~8 min build each)
+    bpy.ops.wm.save_as_mainfile(filepath=args.save)
+    print(f"SAVED {args.save} in {time.time() - t1:.0f}s", flush=True)
 
 # ---------------------------------------------------------------------------------- walk frames / plan cut
 def render_plan():
@@ -197,7 +239,11 @@ def render_stills():
     def seat_front(o):                                # this room's "#DEVOXX" and the seats (build_scene.front_layer);
         base = o.name.split(".")[0].removeprefix(f"aud{n}-")   # extract_auditorium.py names them aud<n>-<source>
         return base.startswith(f"word-{n}-") or base in ("seats", "seat-model")
-    f0, f1 = scene.frame_start, scene.frame_end
+    walk = bpy.data.objects["cam-walk"]               # the walk there's frames (with --both or --load the scene's
+    if walk.get("back"):                              # range spans the walk back too: venue.build keeps each clip's)
+        sys.exit("STILLS need the walk there's build (hall still = its first frame, seat = its last), not --back's")
+    f0, f1 = (int(f) for f in walk.get("clip", (scene.frame_start, scene.frame_end)))
+    scene.render.use_motion_blur = False              # stills before any walk: never blurred; after one: as before
     if phone:
         jobs = [("hall-phone", bpy.data.objects["cam-hall-phone"], (1080, 2340), f0, lambda o: o.name in HS.FRONT,
                  ("programme", HS.totem_corners, [HS.TOTEM["w"], HS.TOTEM["h"]])),
@@ -242,7 +288,51 @@ def render_stills():
     sys.exit(0)
 
 
-if args.stills:
+def walk_clips():
+    """the clips this build renders, [(frames dir, camera, first frame, last frame)]: the walk there, the walk back
+    (--back; both with --both) or the fly-through. Each walk camera carries its frames (venue.build's "clip"), so a
+    build with two clips on its timeline, or one saved and rendered with --load, doesn't go by the scene's range"""
+    tag = "walk" + (f"-{args.variant}" if args.variant else "") + (f"-room{args.room}" if args.room else "")
+    out = []
+    for back in ([False, True] if args.both else [args.back]):
+        cam = bpy.data.objects["cam-walk"]            # --both keyed the walk back as its own camera
+        if back and "cam-walk-back" in bpy.data.objects:
+            cam = bpy.data.objects["cam-walk-back"]
+        if args.room and bool(cam.get("back", False)) != back:
+            sys.exit(f"this build has no walk {'back' if back else 'there'} (built with --back={cam.get('back')})")
+        f0, f1 = (int(f) for f in cam.get("clip", (scene.frame_start, scene.frame_end)))
+        out.append((tag + ("-back" if back else ""), cam, f0, f1))
+    return out
+
+
+def render_anim(out, cam, f0, f1):
+    """one clip's frames to out/anim (the clip's motion blur is on): --anim-range narrows it, --max-spf times it first"""
+    out.mkdir(parents=True, exist_ok=True)
+    scene.camera = cam
+    if args.anim_range:
+        f0, f1 = (int(v) for v in args.anim_range.split("-"))
+    scene.frame_start, scene.frame_end = f0, f1
+    scene.render.filepath = str(out / "anim" / "f_####")
+    t1 = time.time()
+    if args.max_spf and f1 - f0 > 5:                 # time the clip before committing to it
+        # 5 frames spread over the whole clip: the first 5 (the street) ran 7.6 s, the hall averaged 11.4 (16/10)
+        for f in [f0 + round(i * (f1 - f0) / 4) for i in range(5)]:
+            scene.frame_set(f)
+            scene.render.filepath = str(out / "anim" / f"f_{f:04d}")
+            bpy.ops.render.render(write_still=True)
+        spf = (time.time() - t1) / 5
+        print(f"TIMING {spf:.1f} s a frame over 5 spread frames: the clip would take {spf * (f1 - f0 + 1) / 60:.0f} min", flush=True)
+        if spf > args.max_spf:
+            print(f"STOPPED: over the {args.max_spf:.0f} s a frame limit", flush=True)
+            sys.exit(3)
+        scene.render.filepath = str(out / "anim" / "f_####")
+        t1 = time.time()
+    bpy.ops.render.render(animation=True)
+    print(f"RENDERED anim {f1 - f0 + 1} frames in {time.time() - t1:.0f}s ({(time.time() - t1) / (f1 - f0 + 1):.1f} s a frame)"
+          f" -> {out.name}", flush=True)
+
+
+if args.stills and not args.walk:
     render_stills()
 if args.plan:
     render_plan()
@@ -250,40 +340,25 @@ if args.plan:
         print("done")
         sys.exit(0)
 if args.walk:
-    out = Path(args.out) / args.area / ("walk" + (f"-{args.variant}" if args.variant else "") + (f"-room{args.room}" if args.room else "") + ("-back" if args.back else ""))
+    clips = walk_clips()
+    out = Path(args.out) / args.area / clips[0][0]
     out.mkdir(parents=True, exist_ok=True)
-    cam = bpy.data.objects["cam-walk"]
+    cam = clips[0][1]
     scene.camera = cam
     ww, wh = getattr(area, "WALK_SIZE", (16, 9))
     scene.render.resolution_x, scene.render.resolution_y = args.width, round(args.width * wh / ww)
-    f0, f1 = scene.frame_start, scene.frame_end
+    f0, f1 = clips[0][2], clips[0][3]
+    scene.frame_start, scene.frame_end = f0, f1
     if args.walk == "anim" or args.blur:      # the clip's motion blur
         scene.render.use_motion_blur, scene.render.motion_blur_shutter = True, 1.0   # a full frame: long, soft streaks (John: "the blurrier the crowd, the better")
         if hasattr(scene.render, "motion_blur_position"):
             scene.render.motion_blur_position = "CENTER"
         set_blur_steps(int(args.blur_steps.split(",")[0]))
     if args.walk == "anim":
-        if args.anim_range:
-            a, b = (int(v) for v in args.anim_range.split("-"))
-            scene.frame_start, scene.frame_end = a, b
-            f0, f1 = a, b
-        scene.render.filepath = str(out / "anim" / "f_####")
-        t1 = time.time()
-        if args.max_spf and f1 - f0 > 5:                 # time the clip before committing to it
-            # 5 frames spread over the whole clip: the first 5 (the street) ran 7.6 s, the hall averaged 11.4 (16/10)
-            for f in [f0 + round(i * (f1 - f0) / 4) for i in range(5)]:
-                scene.frame_set(f)
-                scene.render.filepath = str(out / "anim" / f"f_{f:04d}")
-                bpy.ops.render.render(write_still=True)
-            spf = (time.time() - t1) / 5
-            print(f"TIMING {spf:.1f} s a frame over 5 spread frames: the clip would take {spf * (f1 - f0 + 1) / 60:.0f} min", flush=True)
-            if spf > args.max_spf:
-                print(f"STOPPED: over the {args.max_spf:.0f} s a frame limit", flush=True)
-                sys.exit(3)
-            scene.render.filepath = str(out / "anim" / "f_####")
-            t1 = time.time()
-        bpy.ops.render.render(animation=True)
-        print(f"RENDERED anim {f1 - f0 + 1} frames in {time.time() - t1:.0f}s ({(time.time() - t1) / (f1 - f0 + 1):.1f} s a frame)")
+        for tag, cam, f0, f1 in clips:        # --both: the walk back straight after the walk there, same build
+            render_anim(Path(args.out) / args.area / tag, cam, f0, f1)
+        if args.stills:                       # and the page's stills from the same build (John 18/10: the stills
+            render_stills()                   # match the walks); it exits
         print("done")
         sys.exit(0)
     if args.walk == "all":
@@ -345,6 +420,4 @@ for name in wanted:
     t1 = time.time()
     bpy.ops.render.render(write_still=True)
     print(f"RENDERED {name} in {time.time() - t1:.0f}s -> {scene.render.filepath}")
-if args.save:
-    bpy.ops.wm.save_as_mainfile(filepath=args.save)
 print("done")
