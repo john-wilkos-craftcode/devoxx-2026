@@ -89,8 +89,8 @@ def seat_pose(root, n, key="seats"):
     return pose
 
 
-def waypoints(root, n, variant="laptop", end="seat"):
-    """the route's corner points (x, y, eye z) for room n, to the seat or (phones, end "totem") the door totem"""
+def waypoints(root, n, variant="laptop"):
+    """the route's corner points (x, y, eye z) for room n"""
     v = venue_json(root)
     door = door_for(v, n)
     side = "west" if door["west"] else "east"
@@ -122,7 +122,7 @@ def waypoints(root, n, variant="laptop", end="seat"):
             pts.append((lane, y_turn, FH + EYE))
     else:                                                        # rooms 6, 7: through the gate, down the middle
         pts += [(lane, GATE_Y + 5.0, FH + EYE), (CENTRE_X, GATE_Y + 1.5, FH + EYE), (CENTRE_X, yc + 3.0, FH + EYE)]
-    if variant == "phone" or end == "totem":                  # on to the door totem's still
+    if variant == "phone":                                    # on to the door totem's still
         e = seat_pose(root, n, "doors_phone")["pos"]
         pts.append((e.x, e.y, e.z))
         return pts, door, e
@@ -133,16 +133,6 @@ def waypoints(root, n, variant="laptop", end="seat"):
     pts += [(wx + face * 2.4, yc, FH + EYE), (wx - face * 1.8, yc, FH + EYE), (high + face * 0.7, ay, zf(high + face * 0.7) + EYE),
             (e.x - face * 0.4, ay, e.z + 0.7), (e.x - face * 0.4, e.y, e.z + 0.7), (e.x, e.y, e.z)]
     return pts, door, e
-
-
-def totem_in_waypoints(root, n):
-    """from the door totem's still into the theatre: the totem's pose, then the seat route from its first point at the
-    door (2.4 m short of the doorway) on"""
-    pts, door, e = waypoints(root, n, "laptop")
-    k = next(i for i, p in enumerate(pts) if abs(p[0] - (door["x"] + door["face"] * 2.4)) < 1e-6)   # (by x: room 3's
-    # door point sits 0.4 m off the door's y)
-    t = seat_pose(root, n, "doors_phone")["pos"]
-    return [(t.x, t.y, t.z)] + pts[k:], door, e
 
 
 def polyline(pts, fillet=1.6):
@@ -269,15 +259,12 @@ def timing(pts, step, target=WALK_T, caps=None):
     return run(k_max, c)
 
 
-def camera(root, n, variant="laptop", first_frame=402, activate=True, end="seat", start="hall"):
+def camera(root, n, variant="laptop", first_frame=402, activate=True):
     """keys a camera along room n's walk from first_frame; returns it. activate: make it the scene's camera, set the
     frame range and the visibility swaps (False: a camera only for the crowd's placement, crowd_place.py)"""
     scene = bpy.context.scene
-    if start == "totem":
-        pts_c, door, e = totem_in_waypoints(root, n)
-    else:
-        pts_c, door, e = waypoints(root, n, variant, end)
-    seat = seat_pose(root, n) if variant == "laptop" and end == "seat" else seat_pose(root, n, "doors_phone")
+    pts_c, door, e = waypoints(root, n, variant)
+    seat = seat_pose(root, n) if variant == "laptop" else seat_pose(root, n, "doors_phone")
     hall = HALL[variant]
     data = bpy.data.cameras.new(f"cam-room-{n}")
     data.sensor_fit, data.sensor_height, data.sensor_width = "VERTICAL", 24, 36
@@ -288,20 +275,16 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True, end="seat"
     step = 0.02
     pts = resample(polyline(pts_c), step)
     target = WALK_T
-    if variant == "phone" or end != "seat" or start != "hall":   # shorter walks in proportion (sqrt: not crawling)
+    if variant == "phone":                         # the shorter phone walks in proportion (sqrt: not crawling)
         lap = resample(polyline(waypoints(root, n, "laptop")[0]), 0.1)
         target = WALK_T * min(1.0, math.sqrt(step * (len(pts) - 1) / (0.1 * (len(lap) - 1))))
     L = step * (len(pts) - 1)
     look = int(LOOK_AHEAD / step)
     screen_dir = (Vector(hall["look"]) - Vector(hall["pos"])).normalized()
     end_dir = seat["fwd"].normalized() if seat else None
-    start_dir, start_lens = screen_dir, hall_lens                  # the hall still, or the door totem's
-    if start == "totem":
-        tp = seat_pose(root, n, "doors_phone")
-        start_dir, start_lens = tp["fwd"].normalized(), tp["lens"]
 
     def blend(s, d):                                               # the start and end views, as in the loop below
-        d = (d or start_dir).lerp(start_dir, smooth(max(0.0, 1.0 - s / 3.0))).normalized()
+        d = (d or screen_dir).lerp(screen_dir, smooth(max(0.0, 1.0 - s / 3.0))).normalized()
         if end_dir is not None:
             d = d.lerp(end_dir, smooth(max(0.0, min(1.0, (s - (L - 5.0)) / 5.0)))).normalized()
         return d
@@ -318,9 +301,9 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True, end="seat"
         p = pts[j].lerp(pts[j + 1], max(0.0, min(1.0, a)))
         s = (j + a) * step
         q = pts[min(len(pts) - 1, max(j + look, bisect.bisect_left(ts, t + LOOK_S)))]
-        d = (q - p).normalized() if (q - p).length > 1e-4 else (prev_d or start_dir)
-        w0 = max(0.0, 1.0 - s / 3.0)                               # leave the screen's (totem's) view over 3 m
-        d = d.lerp(start_dir, w0 * w0 * (3 - 2 * w0)).normalized()
+        d = (q - p).normalized() if (q - p).length > 1e-4 else (prev_d or screen_dir)
+        w0 = max(0.0, 1.0 - s / 3.0)                               # leave the screen's view over the first 3 m
+        d = d.lerp(screen_dir, w0 * w0 * (3 - 2 * w0)).normalized()
         we = 0.0
         if end_dir is not None:
             we = max(0.0, min(1.0, (s - (L - 5.0)) / 5.0))          # settle onto the seat's view over the last 5 m
@@ -341,7 +324,7 @@ def camera(root, n, variant="laptop", first_frame=402, activate=True, end="seat"
         cam.keyframe_insert("location", frame=fr)
         cam.keyframe_insert("rotation_euler", frame=fr)
         if seat:                                                   # the hall still's lens to the seat's lens and shift
-            data.lens = start_lens + (seat["lens"] - start_lens) * we
+            data.lens = hall_lens + (seat["lens"] - hall_lens) * we
             data.shift_x, data.shift_y = seat["shift_x"] * we, seat["shift_y"] * we
             data.keyframe_insert("lens", frame=fr)
             data.keyframe_insert("shift_x", frame=fr)
@@ -381,8 +364,8 @@ def last_frame(cam):
     return int(max(k.co.x for k in fc.keyframe_points))
 
 
-def back_waypoints(root, n, variant="laptop", start="seat"):
-    pts, door, e = waypoints(root, n, variant, start)
+def back_waypoints(root, n, variant="laptop"):
+    pts, door, e = waypoints(root, n, variant)
     k = next(i for i, p in enumerate(pts) if abs(p[1] - GAP_Y) < 1e-6)       # the stairwell's gap, hall side
     side = "west" if door["west"] else "east"
     h = HALL[variant]["pos"]
@@ -390,12 +373,12 @@ def back_waypoints(root, n, variant="laptop", start="seat"):
     return back, door, e
 
 
-def camera_back(root, n, variant="laptop", first_frame=600, activate=True, start="seat"):
+def camera_back(root, n, variant="laptop", first_frame=600, activate=True):
     """keys a camera along room n's walk back from first_frame (the forward walk's last frame, so the cut is seamless):
     from the seat's crop (phones: the door totem) out and down to the hall still, ending square on to the screen"""
     scene = bpy.context.scene
-    pts_c, door, e = back_waypoints(root, n, variant, start)
-    seat = seat_pose(root, n) if variant == "laptop" and start == "seat" else seat_pose(root, n, "doors_phone")
+    pts_c, door, e = back_waypoints(root, n, variant)
+    seat = seat_pose(root, n) if variant == "laptop" else seat_pose(root, n, "doors_phone")
     hall = HALL[variant]
     data = bpy.data.cameras.new(f"cam-back-{n}")
     data.sensor_fit, data.sensor_height, data.sensor_width = "VERTICAL", 24, 36
@@ -406,7 +389,7 @@ def camera_back(root, n, variant="laptop", first_frame=600, activate=True, start
     step = 0.02
     pts = resample(polyline(pts_c), step)
     target = WALK_T
-    if variant == "phone" or start != "seat":
+    if variant == "phone":
         lap = resample(polyline(back_waypoints(root, n, "laptop")[0]), 0.1)
         target = WALK_T * min(1.0, math.sqrt(step * (len(pts) - 1) / (0.1 * (len(lap) - 1))))
     L = step * (len(pts) - 1)
@@ -586,7 +569,4 @@ def all_paths(root, variants=("laptop", "phone")):
             for wp in (waypoints, back_waypoints):
                 pts, _, _ = wp(root, n, var)
                 out.append([(p.x, p.y) for p in resample(polyline(pts), 0.25)])
-            if var == "laptop":                            # the totem walks (their walk back is the same ground)
-                for pts in (waypoints(root, n, var, "totem")[0], totem_in_waypoints(root, n)[0]):
-                    out.append([(p.x, p.y) for p in resample(polyline(pts), 0.25)])
     return out
