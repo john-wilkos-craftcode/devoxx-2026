@@ -430,6 +430,7 @@ def camera_back(root, n, variant="laptop", first_frame=600, activate=True):
         quat = d.to_track_quat("-Z", "Y")
         rot = quat.to_euler("XYZ", prev) if prev else quat.to_euler("XYZ")
         prev = rot
+        rot0 = rot0 if f else rot
         cam.location, cam.rotation_euler = p, rot
         fr = first_frame + f
         cam.keyframe_insert("location", frame=fr)
@@ -439,9 +440,11 @@ def camera_back(root, n, variant="laptop", first_frame=600, activate=True):
         data.keyframe_insert("lens", frame=fr)
         data.keyframe_insert("shift_x", frame=fr)
         data.keyframe_insert("shift_y", frame=fr)
-    for fr, pos, fwd in ((first_frame, seat["pos"], start_dir), (first_frame + nf - 1, Vector(hall["pos"]), screen_dir)):
-        cam.location = pos                                         # both ends exactly on the stills
-        cam.rotation_euler = fwd.to_track_quat("-Z", "Y").to_euler("XYZ", prev)
+    for fr, pos, fwd, near in ((first_frame, seat["pos"], start_dir, rot0),
+                               (first_frame + nf - 1, Vector(hall["pos"]), screen_dir, prev)):
+        cam.location = pos                                         # both ends exactly on the stills, each euler kept
+        cam.rotation_euler = fwd.to_track_quat("-Z", "Y").to_euler("XYZ", near)   # next to its neighbour's (the first
+        # frame took the last's and could land a turn away: a 360 deg spin blurred into frames 1-2, room 3, 18/10)
         cam.keyframe_insert("location", frame=fr)
         cam.keyframe_insert("rotation_euler", frame=fr)
     if not activate:
