@@ -40,6 +40,8 @@ ap.add_argument("--max-spf", type=float, default=0, help="walk anim: render 5 fr
 ap.add_argument("--back", action="store_true", help="with --room: the walk back from the room to the hall still")
 ap.add_argument("--anim-range", default="", help="walk anim: only frames a-b (time a clip before rendering it all)")
 ap.add_argument("--hide", default="", help="collections to leave out of the render, comma list (checks)")
+ap.add_argument("--stills", action="store_true", help="venue with --room: the page's stills from this walk's build "
+                "(laptop: hall + seat, phone: hall totem + door totem), each with its front layer and overlay corners")
 ap.add_argument("--room", type=int, default=0, help="venue: the walk to this room (3-10) instead of the fly-through")
 ap.add_argument("--crowd", action="store_true", help="venue: add the crowd (pm_areas/crowd.py)")
 ap.add_argument("--unified", action="store_true", help="build the area as part of the whole venue (no photo hacks)")
@@ -160,6 +162,88 @@ def set_blur_steps(n):
             return
 
 
+def render_stills():
+    """The page's stills from a room walk's build (John 18/10: the stills over, so they match the walks): laptops the
+    hall still (the walk's first frame) and the room's wide seat still (its last; the published camera); phones the
+    hall totem still and the door totem still. Each with its cut-out front layer (what stands in front of the screen,
+    on transparency) and the screen's corners on the image, in shots-stills-<variant>-<n>.json (the seat's overlay is
+    the published one: same camera, same auditorium)."""
+    from bpy_extras.object_utils import world_to_camera_view
+    import pm_areas.hall_screen as HS
+    import pm_areas.door_totems as DT
+    n, phone = args.room, args.variant == "phone"
+    seats = json.loads((ROOT / "data" / "photomatch" / "seats.json").read_text())
+    published = json.loads((ROOT / "site" / "cinema" / "media" / "shots.json").read_text())
+    out = Path(args.out) / args.area / "stills"
+    out.mkdir(parents=True, exist_ok=True)
+
+    def cam_from(spec, name):
+        data = bpy.data.cameras.new(name)
+        ob = bpy.data.objects.new(name, data)
+        scene.collection.objects.link(ob)
+        ob.matrix_world = Matrix(spec["matrix"])
+        data.sensor_fit, data.sensor_width, data.sensor_height = spec["sensor_fit"], spec["sensor_width"], spec["sensor_height"]
+        data.lens, data.shift_x, data.shift_y, data.clip_start = spec["lens"], spec["shift_x"], spec["shift_y"], 0.05
+        return ob
+
+    def grow(corners, by=0.01):                       # a little larger: the HTML tucks under the bezel (build_scene)
+        c = Vector([sum(p[i] for p in corners) / 4 for i in range(3)])
+        return [c + (Vector(p) - c) * (1 + by / max(0.1, (Vector(p) - c).length)) for p in corners]
+
+    def quad(corners, camera):
+        bpy.context.view_layer.update()
+        return [[round(v.x, 5), round(1 - v.y, 5)] for v in (world_to_camera_view(scene, camera, Vector(c)) for c in corners)]
+
+    def seat_front(o):                                # this room's "#DEVOXX" and the seats (build_scene.front_layer);
+        base = o.name.split(".")[0].removeprefix(f"aud{n}-")   # extract_auditorium.py names them aud<n>-<source>
+        return base.startswith(f"word-{n}-") or base in ("seats", "seat-model")
+    f0, f1 = scene.frame_start, scene.frame_end
+    if phone:
+        jobs = [("hall-phone", bpy.data.objects["cam-hall-phone"], (1080, 2340), f0, lambda o: o.name in HS.FRONT,
+                 ("programme", HS.totem_corners, [HS.TOTEM["w"], HS.TOTEM["h"]])),
+                (f"door-phone-{n}", cam_from(seats["doors_phone"][str(n)], f"cam-door-phone-{n}"), (1080, 2340), f1, None,
+                 ("screen", DT.CORNERS[str(n)], [DT.W, DT.H]))]
+    else:
+        px = published.get(f"seat-{n}", {}).get("px", [2534, 1620])
+        jobs = [("hall", bpy.data.objects["cam-hall"], (1920, 1080), f0, lambda o: o.name in HS.FRONT,
+                 ("programme", HS.screen_corners, [HS.SCREEN["w"], HS.SCREEN["h"]])),
+                (f"seat-{n}", cam_from(seats["seats"][str(n)], f"cam-seat-{n}"), tuple(px), f1, seat_front, None)]
+    shots = {}
+    for name, camera, res, frame, front, ov in jobs:
+        scene.camera = camera
+        scene.frame_set(frame)
+        scene.render.resolution_x, scene.render.resolution_y = res
+        scene.render.resolution_percentage = 100
+        scene.render.filepath = str(out / f"{name}.png")
+        t1 = time.time()
+        bpy.ops.render.render(write_still=True)
+        print(f"RENDERED still {name} {res[0]}x{res[1]} at frame {frame} in {time.time() - t1:.0f}s", flush=True)
+        entry = dict(published.get(name, {"kind": "still"}))
+        if ov:
+            key, corners, size = ov
+            entry["overlay"], entry["size"] = {key: quad(grow(corners), camera)}, {key: size}
+        if front:
+            held = [o for o in scene.objects if o.type in ("MESH", "CURVE", "FONT") and not front(o) and not o.is_holdout]
+            for o in held:
+                o.is_holdout = True
+            comp, scene.render.use_compositing = scene.render.use_compositing, False
+            scene.render.film_transparent, scene.render.image_settings.color_mode = True, "RGBA"
+            scene.render.filepath = str(out / f"{name}-front.png")
+            bpy.ops.render.render(write_still=True)
+            for o in held:
+                o.is_holdout = False
+            scene.render.film_transparent, scene.render.image_settings.color_mode = False, "RGB"
+            scene.render.use_compositing = comp
+            entry["front"] = f"{name}-front"
+            print(f"RENDERED still {name}-front ({len(held)} objects held out)", flush=True)
+        shots[name] = entry
+    (out / f"shots-stills-{'phone' if phone else 'laptop'}-{n}.json").write_text(json.dumps(shots, indent=1))
+    print("done")
+    sys.exit(0)
+
+
+if args.stills:
+    render_stills()
 if args.plan:
     render_plan()
     if not args.walk:

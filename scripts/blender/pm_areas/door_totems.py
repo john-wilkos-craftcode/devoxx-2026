@@ -10,6 +10,7 @@ from mathutils import Matrix, Vector
 import pm_lib as L
 
 FH, DIST, W, H = 6.2, 1.7, 0.70, 1.42
+CORNERS = {}                                         # room -> the screen's corners (the stills' overlay, photomatch_scene)
 
 
 def build(root, unified=True):
@@ -28,6 +29,7 @@ def build(root, unified=True):
             q = p + side * u + fwd * w
             return (q.x, q.y, v)
         z0, z1 = c.z - H / 2, c.z + H / 2
+        CORNERS[n] = [at(-W / 2, z0), at(W / 2, z0), at(W / 2, z1), at(-W / 2, z1)]
         L.mesh_obj(f"door-totem-{n}", [at(-W / 2, z0, -0.005), at(W / 2, z0, -0.005), at(W / 2, z1, -0.005), at(-W / 2, z1, -0.005)],
                    [(0, 1, 2, 3)], screen)
         b = 0.05
