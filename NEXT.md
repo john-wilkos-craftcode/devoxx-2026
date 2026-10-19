@@ -5,7 +5,8 @@
   3, 4, 5, 6, 8 (walk there + back + wide seat still), the wide hall still.
 - **Crowd fix committed** (6f8381e; John 19/10: two identical women at right angles in the fly-through's slow ending):
   EEVEE test of the ending: nearest double ~10 m apart. Side effect sent to John for review: nobody stands in front of
-  the schedule screen in the last ~2 s (the >= 2.5 m spacing for singles). Rooms 3-6 and 8 were rendered with the old
+  the schedule screen in the last ~2 s (the >= 2.5 m spacing for singles); John 19/10 20:05: "It all looks great"
+  (room 6 and the crowd ending). Rooms 3-6 and 8 were rendered with the old
   crowd; the room walks start on the screen close-up, so there's no pop, only different people in the hall.
 - **Queue running since 18:40** (`.finals-run.sh --until 07:45`): the laptop fly-through again (new crowd), laptop
   rooms 7, 9, 10, the phone fly-through, phone rooms 3-10 (~26 h in all, so it spans two nights). Rerun the same
