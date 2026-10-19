@@ -232,7 +232,8 @@ def timing(pts, step, target=WALK_T, caps=None):
 
     def run(k, c=None):
         vt = [b * k for b in base] if c is None else [min(b * k, c * cp) for b, cp in zip(base, caps)]
-        vt[0], vt[-1] = 0.3, 0.05
+        vt[0], vt[-1] = 0.0, 0.05      # from rest: the first frame is the still it leaves (0.3 m/s panned ~6 px on frame 1
+        #                                 in front of the hall screen, a jolt off the still, 19/10 seams check)
         for i in range(1, len(vt)):
             vt[i] = min(vt[i], math.sqrt(vt[i - 1] ** 2 + 2 * EASE_IN * step))
         for i in range(len(vt) - 2, -1, -1):
