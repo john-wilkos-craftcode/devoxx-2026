@@ -1,25 +1,17 @@
-# Where this stands (19/10, 15:30)
+# Where this stands (19/10, 18:45)
 
 ## Next session: start here
 - **Live on the site** (new video set: AV1/HEVC/H.264, -s smaller, -g walks-off glimpse; publish.py): the intro, rooms
-  3, 4, 5, 8 (walk there + back + wide seat still), the wide hall still. Room 6 walk back + stills were rendering at
-  John's 17:00 cut-off; room 6 publishes by itself once both are in.
-- **Crowd fix waiting, untested** (John 19/10: two identical women at right angles in the fly-through's slow ending):
-  `git apply scripts/photomatch/pending/crowd-rubric.patch` (crowd_place.py: no avatar repeat within CLONE_R, else the
-  farthest double; singles >= 2.5 m from anyone, facing the walkway or, near the screen, the programme; a "CROWD
-  ending" report of doubles in a clip's last 3 s). Rubric and sources: memory research-first. Then a cheap test of the
-  ending: `scripts/photomatch/render.sh venue --crowd --walk anim --anim-range 150-241 --engine eevee --samples 8
-  --width 800 --out <dir>`; check the CROWD ending line and the frames; commit; re-render the laptop fly-through at
-  full quality (delete final/venue/walk/anim/.complete first) before the rest of the queue.
-- **Room 6's walk back was cut off at ~frame 605 of 481-721** (17:00 shutdown; the hall stretch renders ~39 s/frame).
-  Its frames are kept in final/venue/walk-room6-back/anim. Before the crowd patch (same code = same crowd), resume it
-  from the last frame (`--room 6 --back --anim-range <next>-721`, same flags as finals.sh) instead of letting finals.sh
-  wipe and redo the clip; then write anim/.complete and render room 6's laptop stills. Worth teaching finals.sh/run()
-  to resume partial clips this way.
-- **Queue:** `cp scripts/photomatch/finals.sh scripts/photomatch/.finals-run.sh && scripts/photomatch/.finals-run.sh
-  [--until HH:MM]` (run a copy: bash reads a script as it runs, editing the original mid-run derailed the queue on
-  19/10). Left: room 6 (if cut off), laptop rooms 7, 9, 10, the phone fly-through, phone rooms 3-10. It publishes and
-  pushes each room as it lands and ends with a last publish pass.
+  3, 4, 5, 6, 8 (walk there + back + wide seat still), the wide hall still.
+- **Crowd fix committed** (6f8381e; John 19/10: two identical women at right angles in the fly-through's slow ending):
+  EEVEE test of the ending: nearest double ~10 m apart. Side effect sent to John for review: nobody stands in front of
+  the schedule screen in the last ~2 s (the >= 2.5 m spacing for singles). Rooms 3-6 and 8 were rendered with the old
+  crowd; the room walks start on the screen close-up, so there's no pop, only different people in the hall.
+- **Queue running since 18:40** (`.finals-run.sh --until 07:45`): the laptop fly-through again (new crowd), laptop
+  rooms 7, 9, 10, the phone fly-through, phone rooms 3-10 (~26 h in all, so it spans two nights). Rerun the same
+  command after a restart: done jobs are skipped, and a clip cut off half way now resumes from its frames if the code
+  is unchanged (anim/.code, render --resume). Run a copy: bash reads a script as it runs.
+- **Pushing:** `scripts/push.sh` (the global "ask: git push" rule stays; John 19/10).
 
 # Earlier notes (16/10 onwards)
 
