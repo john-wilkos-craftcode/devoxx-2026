@@ -337,6 +337,8 @@ def render_anim(out, cam, f0, f1):
     bpy.ops.render.render(animation=True)
     print(f"RENDERED anim {f1 - f0 + 1} frames in {time.time() - t1:.0f}s ({(time.time() - t1) / (f1 - f0 + 1):.1f} s a frame)"
           f" -> {out.name}", flush=True)
+    if not args.anim_range:                          # the whole clip is in: a resumed queue (finals.sh) skips it
+        (out / "anim" / ".complete").write_text(f"{f0}-{f1}\n")
 
 
 if args.stills and args.walk != "anim":           # (after the clips with --walk anim)

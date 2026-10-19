@@ -5,7 +5,8 @@
 # rest wait for the next run. Extra render flags (e.g. adopted A/B settings) come from final/extra-flags if present.
 #   scripts/photomatch/finals.sh [--until 07:45]
 # One build per room and variant (--both: walk there + walk back + stills, 18/10 optimisation review); encodes run in
-# the background while the next build goes. Phone walks get a clearance check first (< 0.45 m: skipped and reported).
+# the background while the next build goes. A clip is done when its anim/.complete exists, so a job stopped by a
+# shutdown resumes with what's missing (the walk back, then the stills from their own build). Phone walks get a clearance check first (< 0.45 m: skipped and reported).
 set -u
 cd "$(dirname "$0")/../.." || exit 1
 F=/mnt/c/Users/wilkojo/kino-renders/photomatch/final; LG=/mnt/c/Users/wilkojo/kino-renders/photomatch/logs
@@ -13,13 +14,14 @@ W=$(wslpath -w $F); mkdir -p $F/done
 Q="--engine eevee --samples 48 --tex-limit 1024 --shadow-scale 0.5"
 X=$(cat $F/extra-flags 2>/dev/null || true)
 UNTIL=""; [ "${1:-}" = "--until" ] && UNTIL=$2
+END=""                                     # the deadline, fixed at the start: the next HH:MM from now
+if [ -n "$UNTIL" ]; then END=$(date -d "$UNTIL" +%s); [ "$END" -lt "$(date +%s)" ] && END=$(date -d "tomorrow $UNTIL" +%s); fi
 lastlog() { echo $LG/$(ls -t $LG | head -1); }
 fits() {   # minutes: does a job that long finish before --until?
-  [ -z "$UNTIL" ] && return 0
-  local end now
-  end=$(date -d "$UNTIL" +%s); [ "$end" -lt "$(date +%s)" ] && end=$(date -d "tomorrow $UNTIL" +%s)
-  now=$(date +%s); [ $((now + $1 * 60)) -le "$end" ]
+  [ -z "$END" ] && return 0
+  [ $(( $(date +%s) + $1 * 60 )) -le "$END" ]
 }
+clip_done() { [ -e "$F/venue/$1/anim/.complete" ]; }   # photomatch_scene writes it when a whole clip is in
 encode() {   # frames dir, mp4 name
   local s
   s=$(ls "$1" 2>/dev/null | head -1 | tr -dc 0-9 | sed 's/^0*//')
@@ -35,19 +37,35 @@ clear_ok() {   # room, variant flags: both directions clear >= 0.45 m (a cheap b
     python3 -c "import sys; sys.exit(0 if '$m' and float('$m') >= 0.45 else 1)" || { echo "SKIPPED room $1 $2 ${b:-there}: clearance ${m:-none} m"; return 1; }
   done
 }
-run() {   # job name, estimate (min), render.sh args, mp4 pairs "dir:name ..."
-  local job=$1 est=$2 args=$3 outs=$4 L n_ok
+run() {   # job name, estimate (min), render.sh args, mp4 pairs "dir:name ..."; resumes a job stopped half way
+  local job=$1 est=$2 args=$3 outs=$4 L todo="" o stills=""
   [ -e $F/done/$job ] && return
+  for o in $outs; do clip_done "${o%%:*}" || todo="$todo $o"; done
+  case "$args" in *--stills*) stills=$(echo "$args" | sed 's/ --both//; s/ --walk anim//; s/ --width [0-9]*//');; esac
+  if [ -z "$todo" ]; then                  # every clip in (the PC went off before the stills): only those
+    args=""; est=15
+  elif [ "$(echo $todo | wc -w)" -lt "$(echo $outs | wc -w)" ]; then   # the walk there is in: the walk back alone
+    args=$(echo "$args" | sed 's/--both/--back/; s/ --stills//'); est=$((est / 2 + 10))
+  else
+    stills=""                              # --both --stills renders the stills itself
+  fi
   fits $est || { echo "WAIT $job (~$est min, past $UNTIL)"; return; }
-  echo "start $job $(date +%H:%M)"
-  for o in $outs; do rm -rf "${F:?}/venue/${o%%:*}/anim"; done
-  scripts/photomatch/render.sh venue $args $Q $X --out "$W" >/dev/null 2>&1
-  L=$(lastlog); grep -E "RENDERED anim|Traceback|CROWD timing" "$L" | sed "s/^/  /"
-  n_ok=$(grep -c "RENDERED anim" "$L")
-  grep -q "RENDERED still" "$L" && echo "  stills: $(grep -c 'RENDERED still' "$L")"
-  if grep -q Traceback "$L" || [ "$n_ok" -lt "$(echo $outs | wc -w)" ]; then echo "FAILED $job: $L"; return; fi
+  echo "start $job $(date +%H:%M)${todo:+ (clips:$todo)}"
+  for o in $todo; do rm -rf "${F:?}/venue/${o%%:*}/anim"; done
+  if [ -n "$args" ]; then
+    scripts/photomatch/render.sh venue $args $Q $X --out "$W" >/dev/null 2>&1
+    L=$(lastlog); grep -E "RENDERED anim|Traceback|CROWD timing" "$L" | sed "s/^/  /"
+    grep -q "RENDERED still" "$L" && echo "  stills: $(grep -c 'RENDERED still' "$L")"
+    grep -q Traceback "$L" && { echo "FAILED $job: $L"; return; }
+  fi
+  for o in $todo; do clip_done "${o%%:*}" || { echo "FAILED $job: ${o%%:*} incomplete"; return; }; done
+  if [ -n "$stills" ]; then                # the stills from their own build (the walk back's build can't)
+    scripts/photomatch/render.sh venue $stills $Q $X --out "$W" >/dev/null 2>&1
+    L=$(lastlog); echo "  stills: $(grep -c 'RENDERED still' "$L")"
+    grep -q Traceback "$L" && { echo "FAILED $job stills: $L"; return; }
+  fi
   touch $F/done/$job
-  (for o in $outs; do encode "$F/venue/${o%%:*}/anim" "${o##*:}"; done) &
+  (for o in $todo; do encode "$F/venue/${o%%:*}/anim" "${o##*:}"; done) &
 }
 
 # laptops (the fly-through and room 8's walks are done): rooms 3-10, one build each (~140 min)
