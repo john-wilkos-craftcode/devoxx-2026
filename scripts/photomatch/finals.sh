@@ -22,6 +22,8 @@ fits() {   # minutes: does a job that long finish before --until?
   [ $(( $(date +%s) + $1 * 60 )) -le "$END" ]
 }
 clip_done() { [ -e "$F/venue/$1/anim/.complete" ]; }   # photomatch_scene writes it when a whole clip is in
+done_() { [ -e "$F/done/$1" ] && ! grep -qs hold "$F/done/$1"; }   # (a "hold" marker only parks a job for a queue
+                                                                    # already running: not done)
 encode() {   # frames dir, mp4 name
   local s
   s=$(ls "$1" 2>/dev/null | head -1 | tr -dc 0-9 | sed 's/^0*//')
@@ -39,7 +41,7 @@ clear_ok() {   # room, variant flags: both directions clear >= 0.45 m (a cheap b
 }
 run() {   # job name, estimate (min), render.sh args, mp4 pairs "dir:name ..."; resumes a job stopped half way
   local job=$1 est=$2 args=$3 outs=$4 L todo="" o stills=""
-  [ -e $F/done/$job ] && return
+  done_ $job && return
   for o in $outs; do clip_done "${o%%:*}" || todo="$todo $o"; done
   case "$args" in *--stills*) stills=$(echo "$args" | sed 's/ --both//; s/ --walk anim//; s/ --width [0-9]*//');; esac
   if [ -z "$todo" ]; then                  # every clip in (the PC went off before the stills): only those
@@ -64,7 +66,7 @@ run() {   # job name, estimate (min), render.sh args, mp4 pairs "dir:name ..."; 
     L=$(lastlog); echo "  stills: $(grep -c 'RENDERED still' "$L")"
     grep -q Traceback "$L" && { echo "FAILED $job stills: $L"; return; }
   fi
-  touch $F/done/$job
+  echo done > $F/done/$job
   (for o in $todo; do encode "$F/venue/${o%%:*}/anim" "${o##*:}"; done) &
 }
 
@@ -73,14 +75,14 @@ for n in 3 4 5 6 7 9 10; do
   run laptop-$n 150 "--room $n --crowd --both --stills --walk anim --width 1600" \
     "walk-room$n:final-room$n-laptop.mp4 walk-room$n-back:final-room$n-back-laptop.mp4"
 done
-if [ ! -e $F/done/stills-8-laptop ] && fits 15; then
+if ! done_ stills-8-laptop && fits 15; then
   scripts/photomatch/render.sh venue --room 8 --crowd --stills $Q $X --out "$W" >/dev/null 2>&1
-  grep -q "RENDERED still seat-8-front" "$(lastlog)" && touch $F/done/stills-8-laptop && echo "stills 8 laptop done $(date +%H:%M)"
+  grep -q "RENDERED still seat-8-front" "$(lastlog)" && echo done > $F/done/stills-8-laptop && echo "stills 8 laptop done $(date +%H:%M)"
 fi
 # phones: the fly-through (~165 min), then one build per room (~95 min) after a clearance check
 run phone-fly 165 "--variant phone --crowd --walk anim --width 810" "walk-phone:final-flythrough-phone.mp4"
 for n in 3 4 5 6 7 8 9 10; do
-  [ -e $F/done/phone-$n ] && continue
+  done_ phone-$n && continue
   fits 100 || { echo "WAIT phone-$n (~100 min, past $UNTIL)"; continue; }
   clear_ok $n "--variant phone" || continue
   run phone-$n 95 "--room $n --variant phone --crowd --both --stills --walk anim --width 810" \
