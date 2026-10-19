@@ -70,15 +70,35 @@ run() {   # job name, estimate (min), render.sh args, mp4 pairs "dir:name ..."; 
   (for o in $todo; do encode "$F/venue/${o%%:*}/anim" "${o##*:}"; done) &
 }
 
+# every clip as soon as it's whole (anim/.complete), not when its room's job ends (John 19/10: the walk there sat
+# unencoded while its walk back rendered): a background pass every minute, for as long as this queue runs
+mp4_for() { case "$1" in
+  walk) echo final-flythrough-laptop.mp4;; walk-phone) echo final-flythrough-phone.mp4;;
+  walk-phone-room*-back) n=${1#walk-phone-room}; echo "final-room${n%-back}-back-phone.mp4";;
+  walk-phone-room*) echo "final-room${1#walk-phone-room}-phone.mp4";;
+  walk-room*-back) n=${1#walk-room}; echo "final-room${n%-back}-back-laptop.mp4";;
+  walk-room*) echo "final-room${1#walk-room}-laptop.mp4";; esac; }
+( while kill -0 $$ 2>/dev/null; do
+    for c in $F/venue/*/anim/.complete; do
+      [ -e "$c" ] || continue
+      d=$(basename "$(dirname "$(dirname "$c")")"); m=$(mp4_for "$d"); [ -n "$m" ] || continue
+      [ "$F/$m" -nt "$c" ] || encode "$F/venue/$d/anim" "$m"
+    done
+    sleep 60
+  done ) &
+# the laptop stills rendered before they were made wider (John 19/10: ultrawide windows) and room 8's, from their own
+# builds (~12 min each); room 8 first, for the page preview
+for n in 8 3 4 5; do
+  done_ stills-$n-laptop && continue
+  fits 15 || { echo "WAIT stills-$n-laptop"; continue; }
+  scripts/photomatch/render.sh venue --room $n --crowd --stills $Q $X --out "$W" >/dev/null 2>&1
+  grep -q "RENDERED still seat-$n-front" "$(lastlog)" && echo done > $F/done/stills-$n-laptop && echo "stills $n laptop done $(date +%H:%M)"
+done
 # laptops (the fly-through and room 8's walks are done): rooms 3-10, one build each (~140 min)
 for n in 3 4 5 6 7 9 10; do
   run laptop-$n 150 "--room $n --crowd --both --stills --walk anim --width 1600" \
     "walk-room$n:final-room$n-laptop.mp4 walk-room$n-back:final-room$n-back-laptop.mp4"
 done
-if ! done_ stills-8-laptop && fits 15; then
-  scripts/photomatch/render.sh venue --room 8 --crowd --stills $Q $X --out "$W" >/dev/null 2>&1
-  grep -q "RENDERED still seat-8-front" "$(lastlog)" && echo done > $F/done/stills-8-laptop && echo "stills 8 laptop done $(date +%H:%M)"
-fi
 # phones: the fly-through (~165 min), then one build per room (~95 min) after a clearance check
 run phone-fly 165 "--variant phone --crowd --walk anim --width 810" "walk-phone:final-flythrough-phone.mp4"
 for n in 3 4 5 6 7 8 9 10; do
