@@ -78,21 +78,22 @@ mp4_for() { case "$1" in
   walk-phone-room*) echo "final-room${1#walk-phone-room}-phone.mp4";;
   walk-room*-back) n=${1#walk-room}; echo "final-room${n%-back}-back-laptop.mp4";;
   walk-room*) echo "final-room${1#walk-room}-laptop.mp4";; esac; }
-( while kill -0 $$ 2>/dev/null; do
-    for c in $F/venue/*/anim/.complete; do
-      [ -e "$c" ] || continue
-      d=$(basename "$(dirname "$(dirname "$c")")"); m=$(mp4_for "$d"); [ -n "$m" ] || continue
-      [ "$F/$m" -nt "$c" ] || encode "$F/venue/$d/anim" "$m"
-    done
-    # and onto the page as they come (John 19/10: commit and push as we go): a walk with the still it ends on
-    p=$(python3 scripts/photomatch/publish.py 2>&1 | tail -1)
-    if [ -n "$(git status --porcelain site/cinema/media)" ]; then
-      git add site/cinema/media && git commit -qm "Cinema media: final ${p#published: }" -- site/cinema/media \
-        && { git pull -q --rebase --autostash && git push -q; } && echo "  pushed ${p#published: } $(date +%H:%M)" \
-        || echo "  PUBLISH: commit/push failed ($p)"
-    fi
-    sleep 60
-  done ) &
+pass() {
+  for c in $F/venue/*/anim/.complete; do
+    [ -e "$c" ] || continue
+    d=$(basename "$(dirname "$(dirname "$c")")"); m=$(mp4_for "$d"); [ -n "$m" ] || continue
+    [ "$F/$m" -nt "$c" ] || encode "$F/venue/$d/anim" "$m"
+  done
+  # and onto the page as they come (John 19/10: commit and push as we go): a walk with the still it ends on
+  p=$(python3 scripts/photomatch/publish.py 2>&1 | tail -1)
+  if [ -n "$(git status --porcelain site/cinema/media)" ]; then
+    git add site/cinema/media && git commit -qm "Cinema media: final ${p#published: }" -- site/cinema/media \
+      && { git pull -q --rebase --autostash && git push -q; } && echo "  pushed ${p#published: } $(date +%H:%M)" \
+      || echo "  PUBLISH: commit/push failed ($p)"
+  fi
+}
+STOP=$F/.queue-end; rm -f "$STOP"
+( while kill -0 $$ 2>/dev/null && [ ! -e "$STOP" ]; do pass; sleep 60; done ) &
 # the laptop stills rendered before they were made wider (John 19/10: ultrawide windows) and room 8's, from their own
 # builds (~12 min each); room 8 first, for the page preview
 for n in 8 3 4 5; do
@@ -115,5 +116,5 @@ for n in 3 4 5 6 7 8 9 10; do
   run phone-$n 95 "--room $n --variant phone --crowd --both --stills --walk anim --width 810" \
     "walk-phone-room$n:final-room$n-phone.mp4 walk-phone-room$n-back:final-room$n-back-phone.mp4"
 done
-wait
+touch "$STOP"; wait; rm -f "$STOP"; pass       # the last clips and stills, once the jobs are through
 echo "queue done $(date +%H:%M): $(ls $F/done | wc -l) jobs finished, $(ls $F/done | tr '\n' ' ')"
