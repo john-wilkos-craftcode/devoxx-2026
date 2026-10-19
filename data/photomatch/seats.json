@@ -571,10 +571,10 @@
    "shift_x": -0.016633623441647857,
    "shift_y": 0.08180974269114828,
    "inner": [
-    0.15058,
-    0.05704,
-    0.82692,
-    0.65212
+    0.1555,
+    0.11614,
+    0.83184,
+    0.71122
    ],
    "screen_fill": 0.88
   },
@@ -583,10 +583,10 @@
    "shift_x": 0.016628463103706158,
    "shift_y": 0.06130147081941283,
    "inner": [
-    0.18417,
-    0.07347,
-    0.83756,
-    0.64836
+    0.17941,
+    0.12844,
+    0.83281,
+    0.70334
    ],
    "screen_fill": 0.88
   },
@@ -595,10 +595,10 @@
    "shift_x": 0.002402735242169483,
    "shift_y": 0.07246666930149824,
    "inner": [
-    0.15104,
-    0.04793,
-    0.85233,
-    0.66497
+    0.15031,
+    0.10582,
+    0.85159,
+    0.72285
    ],
    "screen_fill": 0.88
   },
@@ -607,10 +607,10 @@
    "shift_x": 0.010163013306865372,
    "shift_y": 0.05942619118886793,
    "inner": [
-    0.16912,
-    0.06371,
-    0.84461,
-    0.65805
+    0.16612,
+    0.11871,
+    0.84161,
+    0.71305
    ],
    "screen_fill": 0.88
   },
@@ -619,10 +619,10 @@
    "shift_x": 0.0131388643482452,
    "shift_y": 0.07362030640651179,
    "inner": [
-    0.15557,
-    0.0447,
-    0.86302,
-    0.66715
+    0.15151,
+    0.10292,
+    0.85895,
+    0.72538
    ],
    "screen_fill": 0.88
   },
@@ -631,10 +631,10 @@
    "shift_x": -0.013140335392762575,
    "shift_y": 0.0736718943207422,
    "inner": [
-    0.13663,
-    0.04436,
-    0.84476,
-    0.66742
+    0.1407,
+    0.10261,
+    0.84883,
+    0.72566
    ],
    "screen_fill": 0.88
   },
@@ -643,10 +643,10 @@
    "shift_x": 0.002406884276873224,
    "shift_y": 0.07204159671606784,
    "inner": [
-    0.15371,
-    0.05058,
-    0.84964,
-    0.66289
+    0.15298,
+    0.10828,
+    0.8489,
+    0.72059
    ],
    "screen_fill": 0.88
   },
@@ -655,13 +655,13 @@
    "shift_x": -0.010170153980929289,
    "shift_y": 0.059346489363981875,
    "inner": [
-    0.15588,
-    0.06418,
-    0.8304,
-    0.65767
+    0.15888,
+    0.11915,
+    0.8334,
+    0.71264
    ],
    "screen_fill": 0.88
   }
  },
- "note_walk_end": "the laptop walks end on a crop of the seat still where the screen spans 88% of the width (John 16/10: the screen should take most of the frame): same position and direction, this lens and shift; 'inner' is that crop in the still's normalised coords, for shots.json when the new walks are published"
+ "note_walk_end": "the laptop walks end on a crop of the seat still where the screen spans 88% of the width (John 16/10: the screen should take most of the frame): same position and direction, this lens and shift; 'inner' is that crop in the still's normalised coords, for shots.json when the new walks are published inner: where that crop sits in the published still (0-1), from the lenses and shifts (Blender shifts a vertical-fit camera in units of the frame height; corrected 19/10)."
 }

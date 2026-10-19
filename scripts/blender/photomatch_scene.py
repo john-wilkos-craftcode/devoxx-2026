@@ -249,16 +249,27 @@ def render_stills():
         sys.exit("STILLS need the walk there's build (hall still = its first frame, seat = its last), not --back's")
     f0, f1 = (int(f) for f in walk.get("clip", (scene.frame_start, scene.frame_end)))
     scene.render.use_motion_blur = False              # stills before any walk: never blurred; after one: as before
+    extra = {}                                        # px / inner / overlay set here (laptops), else as published
     if phone:
         jobs = [("hall-phone", bpy.data.objects["cam-hall-phone"], (1080, 2340), f0, lambda o: o.name in HS.FRONT,
                  ("programme", HS.totem_corners, [HS.TOTEM["w"], HS.TOTEM["h"]])),
                 (f"door-phone-{n}", cam_from(seats["doors_phone"][str(n)], f"cam-door-phone-{n}"), (1080, 2340), f1, None,
                  ("screen", DT.CORNERS[str(n)], [DT.W, DT.H]))]
     else:
+        # wider than the walk, same vertical framing (John 19/10: no black bars on ultrawide screens): the hall 32:9
+        # round the walk's 16:9 frame, the seat half as wide again round the published still; "inner" says where the
+        # walk's frame sits in each (the page frames that part like the walk and fills the rest of a wide window)
         px = published.get(f"seat-{n}", {}).get("px", [2534, 1620])
-        jobs = [("hall", bpy.data.objects["cam-hall"], (1920, 1080), f0, lambda o: o.name in HS.FRONT,
+        sw = round(px[0] * 1.5 / 2) * 2
+        widen = lambda u: round((u * px[0] + (sw - px[0]) / 2) / sw, 5)
+        x0, y0, x1, y1 = seats["walk_end"][str(n)]["inner"]
+        sov = published.get(f"seat-{n}", {}).get("overlay", {}).get("screen")
+        extra = {"hall": {"px": [3840, 1080], "inner": [0.25, 0.0, 0.75, 1.0]},
+                 f"seat-{n}": {"px": [sw, px[1]], "inner": [widen(x0), y0, widen(x1), y1],
+                               **({"overlay": {"screen": [[widen(u), v] for u, v in sov]}} if sov else {})}}
+        jobs = [("hall", bpy.data.objects["cam-hall"], (3840, 1080), f0, lambda o: o.name in HS.FRONT,
                  ("programme", HS.screen_corners, [HS.SCREEN["w"], HS.SCREEN["h"]])),
-                (f"seat-{n}", cam_from(seats["seats"][str(n)], f"cam-seat-{n}"), tuple(px), f1, seat_front, None)]
+                (f"seat-{n}", cam_from(seats["seats"][str(n)], f"cam-seat-{n}"), (sw, px[1]), f1, seat_front, None)]
     shots = {}
     for name, camera, res, frame, front, ov in jobs:
         scene.camera = camera
@@ -270,6 +281,8 @@ def render_stills():
         bpy.ops.render.render(write_still=True)
         print(f"RENDERED still {name} {res[0]}x{res[1]} at frame {frame} in {time.time() - t1:.0f}s", flush=True)
         entry = dict(published.get(name, {"kind": "still"}))
+        entry.pop("inner_measured", None)
+        entry.update(extra.get(name, {}))
         if ov:
             key, corners, size = ov
             entry["overlay"], entry["size"] = {key: quad(grow(corners), camera)}, {key: size}
