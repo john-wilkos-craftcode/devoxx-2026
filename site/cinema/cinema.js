@@ -86,6 +86,35 @@ const plate = document.getElementById("plate"), clip = document.getElementById("
 const front = document.getElementById("front"), fade = document.getElementById("fade");
 const loading = document.getElementById("loading"), statusBox = document.getElementById("status"), skipBtn = document.getElementById("skip");
 const shots = await fetch("media/shots.json").then((r) => r.json());
+// which file of a walk plays (John 19/10: not one big mp4 each time). A final walk comes in AV1, HEVC and H.264
+// (publish.py), each full size, smaller (-s) and as a glimpse (-g: its first and last half second, for walks off);
+// H.264 has no full size. AV1 is the smallest; HEVC is what Apple devices without AV1 decode in hardware; H.264 is the
+// fallback. A codec counts only if the browser says it plays it smoothly (Safari reports AV1 as not smooth on most
+// Macs and iPhones, so those take HEVC).
+const CODEC_TYPES = { av1: 'video/mp4; codecs="av01.0.08M.08"', hevc: 'video/mp4; codecs="hvc1.1.6.L120.90"' };
+async function pickCodec() {
+  for (const c of ["av1", "hevc"]) {
+    if (!clip.canPlayType(CODEC_TYPES[c])) continue;
+    try {
+      const r = await Promise.race([
+        navigator.mediaCapabilities.decodingInfo({ type: "file", video: { contentType: CODEC_TYPES[c], width: 1600, height: 900, bitrate: 1500000, framerate: 24 } }),
+        new Promise((res) => setTimeout(() => res(null), 400)),
+      ]);
+      if (r && !(r.supported && r.smooth)) continue;
+    } catch (e) { /* no MediaCapabilities: canPlayType's word goes */ }
+    return c;
+  }
+  return "h264";
+}
+const codec = await pickCodec();
+// the smaller files: on data saver or a slow network, and where the window shows the walk barely bigger than them
+const lean = () => { const c = navigator.connection; return !!c && (c.saveData || /(^|-)(2g|3g)$/.test(c.effectiveType || "")); };
+function clipSrc(name, glimpse = false) {
+  const c = shots[name];
+  if (!c || !c.codecs) return `media/${name}.mp4`;               // a walk from before the finals: one file
+  const v = glimpse ? "-g" : codec === "h264" || lean() || stage.clientWidth * devicePixelRatio <= c.small[0] * 1.15 ? "-s" : "";
+  return `media/${name}${v}${codec === "h264" ? "" : `.${codec}`}.mp4`;
+}
 const walkable = new Set(Object.keys(shots).filter((k) => /^seat-\d+$/.test(k)).map((k) => Number(k.split("-")[1])));
 const form = () => (stage.clientWidth / stage.clientHeight < 0.8 ? "phone" : "laptop");
 let shape = form();
@@ -282,16 +311,27 @@ const showStill = (key) => new Promise((resolve) => {
   img.src = src;
 });
 
-// fetch a room's walk when its card is pointed at or focused, so the click plays at once without every walk
-// being downloaded up front (a lot on a phone's data plan)
+// fetch a walk just before it's likely wanted, so the click plays at once without every walk being downloaded up
+// front (a lot on a phone's data plan): a room's walk when its card is pointed at or focused, the walk back once you
+// sit down. The file is the one that will play (walks off: the glimpse).
 const warmed = new Set();
-function warm(n) {
-  if (!walkable.has(n) || warmed.has(n)) return;
-  warmed.add(n);
+function warmClip(name) {
+  const src = name && shots[name] ? clipSrc(name, !walksOn) : null;
+  if (!src || warmed.has(src)) return;
+  warmed.add(src);
   const l = document.createElement("link");
-  l.rel = "prefetch"; l.href = `media/${walkClip(n)}.mp4`;
+  l.rel = "prefetch"; l.href = src;
   document.head.append(l);
 }
+// and the still the walk arrives on, so a walk cut short (skipped, or stalled on a slow network) lands at once
+function warmStill(key) {
+  for (const src of [`media/${key}.jpg`, shots[key]?.front && `media/${shots[key].front}.webp`]) {
+    if (!src || warmed.has(src)) continue;
+    warmed.add(src);
+    new Image().src = src;
+  }
+}
+const warm = (n) => { if (walkable.has(n)) { warmClip(walkClip(n)); warmStill(shotKey(`seat-${n}`)); } };
 
 // Walks on or off (John 19/10: the quick, swooping walk can make people queasy). Off: only a glimpse of each walk, its
 // first and last half second with a dip through black between, so you still see where you set off and where you
@@ -317,9 +357,19 @@ let skipWalk = null;
 function playClip(name, { from = 0, until = null, nearEnd = null, cut = false } = {}) {
   return new Promise((resolve) => {
     let watching = true, glimpsing = false;
-    const done = () => { watching = false; clip.onended = clip.onerror = null; skipWalk = null; skipBtn.hidden = true; resolve(); };
+    // walks off: the glimpse file where there is one (a second long: its two halves either side of the dip)
+    const short = !walksOn && !!shots[name]?.glimpse && !from && until == null;
+    // never hang on a frozen frame: a walk that hasn't started after 3 s, or stalls for 1.2 s, cuts to the arrival
+    let stall = setTimeout(() => watching && done(), 3000);
+    const done = () => { watching = false; clearTimeout(stall); clip.onended = clip.onerror = clip.onwaiting = clip.onplaying = null;
+      clip.pause();
+      // not on screen yet (it never got going): stop its download, the arrival still needs the bandwidth
+      if (!clip.classList.contains("is-shown")) { clip.removeAttribute("src"); clip.load(); }
+      skipWalk = null; skipBtn.hidden = true; resolve(); };
     skipWalk = done;
-    clip.src = `media/${name}.mp4`;
+    clip.onwaiting = () => { clearTimeout(stall); stall = setTimeout(() => watching && done(), 1200); };
+    clip.onplaying = () => clearTimeout(stall);
+    clip.src = clipSrc(name, short);
     clip.classList.remove("is-shown");
     clip.style.transition = cut ? "none" : "";     // cut: shown from its first frame (nothing under it to fade from)
     clip.hidden = false;
@@ -330,18 +380,18 @@ function playClip(name, { from = 0, until = null, nearEnd = null, cut = false } 
     const glimpse = async () => {
       glimpsing = true;
       const to = end() - GLIMPSE;
-      if (to - clip.currentTime < 0.25) return;          // the end is already near: just let it play
+      if (!short && to - clip.currentTime < 0.25) return;  // the end is already near: just let it play
       clip.pause();
       await dip(true);
       if (!watching) { dip(false); return; }
-      await new Promise((r) => { clip.addEventListener("seeked", r, { once: true }); clip.currentTime = to; });
+      if (!short) await new Promise((r) => { clip.addEventListener("seeked", r, { once: true }); clip.currentTime = to; });
       clip.play().catch(() => {});
       dip(false);
     };
     // fade in over the still (the first frame is the still), which hides the moment the video starts
     // the still's cut-out layer (plants, seats) belongs to the still: off once the clip has faded in over it (or at
     // once for a cut), else it hangs in front of the moving walk; showStill puts it back
-    const go = () => { if (from) clip.currentTime = from; clip.play().then(() => { clip.classList.add("is-shown"); skipBtn.hidden = false;
+    const go = () => { if (!watching) return; if (from) clip.currentTime = from; clip.play().then(() => { if (!watching) return; clip.classList.add("is-shown"); skipBtn.hidden = false;
       setTimeout(() => {
         if (!watching) return;
         front.hidden = true;
@@ -357,7 +407,7 @@ function playClip(name, { from = 0, until = null, nearEnd = null, cut = false } 
     const tick = () => {
       if (!watching) return;
       if (until != null && clip.currentTime >= until) { clip.pause(); done(); return; }
-      if (!walksOn && !glimpsing && clip.currentTime >= from + GLIMPSE) glimpse();
+      if ((short || !walksOn) && !glimpsing && clip.currentTime >= from + GLIMPSE) glimpse();
       if (nearEnd && !nearCalled && end() - clip.currentTime <= nearEnd[0]) { nearCalled = true; nearEnd[1](); }
       requestAnimationFrame(tick);
     };
@@ -374,6 +424,8 @@ const hideClip = () => new Promise((resolve) => {
   setTimeout(gone, 400);
 });
 skipBtn.addEventListener("click", () => skipWalk && skipWalk());
+// a walk in a tab you left ends there: back in the tab, you've arrived
+document.addEventListener("visibilitychange", () => { if (document.hidden && skipWalk) skipWalk(); });
 // fade the whole stage to black and back
 const dip = (on) => new Promise((resolve) => {
   fade.classList.toggle("is-on", on);
@@ -1437,6 +1489,7 @@ async function sitDown(t, n, key, withWalk) {
   hideClip();
   say("");
   room = n; current = t;
+  warmClip(backClip(n));
   seat = { t, n, key, open: true, zoom: false, layout: null, cine: null, notes: null, notesPanel: null, cinePanel: null, player: null, timer: 0,
     chapters: chaptersOf(t), lastChapter: null, starting: false, startAt: 0 };
   tube.classList.remove("is-cc");
@@ -1550,6 +1603,7 @@ async function toSeat(t, withWalk) {
   if (shape === "phone") await Promise.all([hideClip(), zooming]); else hideClip();
   say("");
   room = n; current = t;
+  warmClip(backClip(n));
   mount(talkScreen(t, shape === "phone", true, n), shotKey(`seat-${n}`), "screen");
 }
 
