@@ -11,6 +11,11 @@
   ending: `scripts/photomatch/render.sh venue --crowd --walk anim --anim-range 150-241 --engine eevee --samples 8
   --width 800 --out <dir>`; check the CROWD ending line and the frames; commit; re-render the laptop fly-through at
   full quality (delete final/venue/walk/anim/.complete first) before the rest of the queue.
+- **Room 6's walk back was cut off at ~frame 605 of 481-721** (17:00 shutdown; the hall stretch renders ~39 s/frame).
+  Its frames are kept in final/venue/walk-room6-back/anim. Before the crowd patch (same code = same crowd), resume it
+  from the last frame (`--room 6 --back --anim-range <next>-721`, same flags as finals.sh) instead of letting finals.sh
+  wipe and redo the clip; then write anim/.complete and render room 6's laptop stills. Worth teaching finals.sh/run()
+  to resume partial clips this way.
 - **Queue:** `cp scripts/photomatch/finals.sh scripts/photomatch/.finals-run.sh && scripts/photomatch/.finals-run.sh
   [--until HH:MM]` (run a copy: bash reads a script as it runs, editing the original mid-run derailed the queue on
   19/10). Left: room 6 (if cut off), laptop rooms 7, 9, 10, the phone fly-through, phone rooms 3-10. It publishes and
