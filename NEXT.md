@@ -52,7 +52,13 @@ camera looks). John approved the EEVEE fly-through's motion (laptop and phone) a
   south leaf opens flat on the wall, the doorway and box turn run at stair speed; room 8 there and back 0.60 m clear.
   Friday's 15 talks transcribed, summarised, in the recap; the 22 unrecorded are labs/BOFs/overflow/documentary.
   Full quality: --samples 48 --width 1600 --tex-limit 1024 --shadow-scale 0.5, with a stall Monitor.
-- **Next, in order:** (0) the other 14 walks there and back: clearance re-check after the 10 s timing and door change;
+- **19/10 morning: finals in progress** (John 18/10: "render everything"; auditorium remodel skipped). Done at full
+  quality (kino-renders/photomatch/final/): fly-through laptop, rooms 3, 4, 8 there + back laptop, stills of rooms 3
+  and 4 (laptop) and room 8 (phone). Resume after any restart with `scripts/photomatch/finals.sh` (markers in
+  final/done/, per-clip anim/.complete; `--until HH:MM` before a planned shutdown). Remaining: laptop rooms 5, 6, 7,
+  9, 10 (~2.5 h each), room 8 laptop stills, phone fly-through, phone rooms 3-10. Then publish (publish_renders.py
+  needs teaching the new final/ layout and shots-stills-*.json) and wire the page (walks back, phone flow, 24 fps).
+- **Next, in order (older):** (0) the other 14 walks there and back: clearance re-check after the 10 s timing and door change;
   (1) John's notes on the re-rendered room 8 walk; (2) John's notes on the cones (fuller,
   deeper cyan?), lengths, routes; (3) previews of a phone walk and one west room; (4) remodel the auditoriums from the
   four new photos (blue seats, red LED step lights, the big screen; John: free to change the rooms but keep each
