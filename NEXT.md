@@ -15,7 +15,7 @@
 - **Seams (John 19/10: still <-> walk must feel seamless):** `python3 scripts/photomatch/seams.py` checks every
   published clip's first/last frame against its still (all laptop seams match to the pixel; walks 3-6 and 8 start at
   0.3 m/s, a jolt off the hall still, fixed in room_walk for every walk not rendered yet: re-render those five walks
-  there if John says so, ~1.5 h each). `node tools/ux/transitions.mjs <dir> 8` records the round trip in Chromium
+  there: John 19/10 "No rerender", they keep it) `node tools/ux/transitions.mjs <dir> 8` records the round trip in Chromium
   (the recording lags while Blender runs). The page swaps stills and walks without fades now (e84b7d8). Phones: check
   with seams.py once their finals are published.
 - **Pushing:** `scripts/push.sh` (the global "ask: git push" rule stays; John 19/10).
