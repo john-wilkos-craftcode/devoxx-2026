@@ -103,6 +103,9 @@ const doorTime = (n) => {
 };
 // phones have their own portrait walk, from the hall totem to the door totem; else the laptop's, stopped at the door
 const walkClip = (n) => (shape === "phone" && shots[`walk-phone-${n}`] ? `walk-phone-${n}` : `walk-${n}`);
+// the walk back to the hall (forwards, never the walk played backwards) and the way in from outside, where rendered
+const backClip = (n) => (shape === "phone" ? (shots[`back-phone-${n}`] ? `back-phone-${n}` : null) : shots[`back-${n}`] ? `back-${n}` : null);
+const introClip = () => (shape === "phone" ? (shots["intro-phone"] ? "intro-phone" : null) : shots.intro ? "intro" : null);
 const canvasFor = (key) => CANVAS[key.replace(/-\d+$/, "")];
 
 // How a still sits in the viewport: cropped to fill it (cover) unless that would cut more than 6% off a side and
@@ -159,6 +162,7 @@ function zoomTo(key, on, animate = false) {
 let face = null;      // { el, key, overlayName, w, h }
 function place() {
   if (!face) return;
+  markPicture(face.key);
   const { iw, ih, s, ox, oy } = fit(face.key);
   const quad = shots[face.key].overlay[face.overlayName];
   face.el.style.transform = matrix3d(face.w, face.h, ordered(quad).map(([x, y]) => [ox + x * iw * s, oy + y * ih * s]));
@@ -197,6 +201,7 @@ addEventListener("resize", () => {
     else if (face) {
       const mode = framing(face.key).contain ? "contain" : "cover";
       plate.style.objectFit = front.style.objectFit = mode;
+      if (!zoomed) alignStill(face.key);
       if (zoomed) { zoomTo(face.key, true); mount(face.el, face.key, face.overlayName); } else place();   // relaid for the new size
     }
   }, 180);
@@ -244,12 +249,29 @@ function centre(strip) {   // bring the pressed chip into view without scrolling
   if (on) strip.scrollLeft = on.offsetLeft - (strip.clientWidth - on.offsetWidth) / 2;
 }
 
+// A still wider than its walk (inner: the laptop stills render wider than 16:9 so ultrawide windows fill, John 19/10)
+// is moved from where object-fit puts it to where framing() frames it, so the walk's frame lines up and the rest fills
+// the window; the seat then moves on from there (frameRoom)
+function alignStill(key) {
+  if (!(shots[key] && shots[key].inner)) return;
+  const a = placed(key), f = framing(key), k = f.s / a.s;
+  for (const e of [plate, front]) { e.style.transformOrigin = "0 0"; e.style.transform = `translate(${f.ox - k * a.ox}px, ${f.oy - k * a.oy}px) scale(${k})`; }
+}
+// the visible part of the picture (inside any bars), so the chips in its corners stay on the picture, not on black
+function markPicture(key) {
+  const f = fit(key), W = stage.clientWidth, H = stage.clientHeight, r = document.documentElement.style;
+  r.setProperty("--pic-l", `${Math.max(0, f.ox)}px`);
+  r.setProperty("--pic-t", `${Math.max(0, f.oy)}px`);
+  r.setProperty("--pic-r", `${Math.max(0, W - (f.ox + f.iw * f.s))}px`);
+}
 const showStill = (key) => new Promise((resolve) => {
   const src = `media/${key}.jpg`;
   const done = () => {
     plate.src = src;
     const fr = shots[key] && shots[key].front;
     if (fr) { front.src = `media/${fr}.webp`; front.hidden = false; } else front.hidden = true;
+    alignStill(key);
+    markPicture(key);
     resolve();
   };
   const mode = framing(key).contain ? "contain" : "cover";
@@ -264,33 +286,80 @@ const showStill = (key) => new Promise((resolve) => {
 // being downloaded up front (a lot on a phone's data plan)
 const warmed = new Set();
 function warm(n) {
-  if (!walkable.has(n) || warmed.has(n) || reduceMotion) return;
+  if (!walkable.has(n) || warmed.has(n)) return;
   warmed.add(n);
   const l = document.createElement("link");
   l.rel = "prefetch"; l.href = `media/${walkClip(n)}.mp4`;
   document.head.append(l);
 }
 
+// Walks on or off (John 19/10: the quick, swooping walk can make people queasy). Off: only a glimpse of each walk, its
+// first and last half second with a dip through black between, so you still see where you set off and where you
+// arrive. The button stays on screen during a walk (switching off mid-walk jumps to the end the same way); the
+// choice is remembered in this browser, and starts off when the system asks for reduced motion.
+const GLIMPSE = 0.5;                                    // s of a walk shown at each end with walks off
+const walksBtn = document.getElementById("walks");
+let walksOn = !reduceMotion;
+try { const v = localStorage.getItem("cinema-walks"); if (v) walksOn = v === "on"; } catch (e) { /* no storage: the default */ }
+const showWalks = () => {
+  walksBtn.setAttribute("aria-pressed", String(walksOn));
+  walksBtn.querySelector(".walks-state").textContent = walksOn ? "on" : "off";
+  walksBtn.title = walksOn ? "Walk animations are on: switch them off for a short cut instead" : "Walk animations are off: switch them on for the full walk";
+};
+showWalks();
+walksBtn.addEventListener("click", () => {
+  walksOn = !walksOn;
+  try { localStorage.setItem("cinema-walks", walksOn ? "on" : "off"); } catch (e) { /* this visit only */ }
+  showWalks();
+});
+
 let skipWalk = null;
-function playClip(name, { from = 0, until = null, nearEnd = null } = {}) {
+function playClip(name, { from = 0, until = null, nearEnd = null, cut = false } = {}) {
   return new Promise((resolve) => {
-    if (reduceMotion) { resolve(); return; }
-    let watching = true;
-    const done = () => { watching = false; clip.onended = clip.onerror = clip.ontimeupdate = null; skipWalk = null; skipBtn.hidden = true; resolve(); };
+    let watching = true, glimpsing = false;
+    const done = () => { watching = false; clip.onended = clip.onerror = null; skipWalk = null; skipBtn.hidden = true; resolve(); };
     skipWalk = done;
     clip.src = `media/${name}.mp4`;
     clip.classList.remove("is-shown");
+    clip.style.transition = cut ? "none" : "";     // cut: shown from its first frame (nothing under it to fade from)
     clip.hidden = false;
     clip.onended = done;
     clip.onerror = done;                       // a missing clip is a cut, not a dead end
-    if (until != null) clip.ontimeupdate = () => { if (clip.currentTime >= until) { clip.pause(); done(); } };
+    const end = () => (until != null ? until : clip.duration);
+    // walks off: past the opening, dip to black, jump to the last GLIMPSE seconds and come back up for the arrival
+    const glimpse = async () => {
+      glimpsing = true;
+      const to = end() - GLIMPSE;
+      if (to - clip.currentTime < 0.25) return;          // the end is already near: just let it play
+      clip.pause();
+      await dip(true);
+      if (!watching) { dip(false); return; }
+      await new Promise((r) => { clip.addEventListener("seeked", r, { once: true }); clip.currentTime = to; });
+      clip.play().catch(() => {});
+      dip(false);
+    };
     // fade in over the still (the first frame is the still), which hides the moment the video starts
-    const go = () => { if (from) clip.currentTime = from; clip.play().then(() => { clip.classList.add("is-shown"); skipBtn.hidden = false; watchEnd(); }).catch(done); };
+    // the still's cut-out layer (plants, seats) belongs to the still: off once the clip has faded in over it (or at
+    // once for a cut), else it hangs in front of the moving walk; showStill puts it back
+    const go = () => { if (from) clip.currentTime = from; clip.play().then(() => { clip.classList.add("is-shown"); skipBtn.hidden = false;
+      setTimeout(() => {
+        if (!watching) return;
+        front.hidden = true;
+        // the walk is 16:9: where a wider window shows past it, the still it set off from stays, blurred and dimmed
+        // (an ambient edge, not black bars), and the arrival's still sharpens back in when the walk ends
+        plate.style.transition = [plate.style.transition, "filter .5s ease"].filter(Boolean).join(", ");
+        stage.classList.toggle("is-cut", cut);
+        stage.classList.add("is-walking");
+      }, cut ? 0 : 360); tick(); }).catch(done); };
+    // every frame while it plays: the stop point (until), the glimpse (walks off, also when switched off mid-walk) and
     // nearEnd: [seconds, fn], fn called that long before the clip ends
-    const watchEnd = () => {
-      if (!watching || !nearEnd) return;
-      if (clip.duration - clip.currentTime <= nearEnd[0]) { nearEnd[1](); return; }
-      requestAnimationFrame(watchEnd);
+    let nearCalled = false;
+    const tick = () => {
+      if (!watching) return;
+      if (until != null && clip.currentTime >= until) { clip.pause(); done(); return; }
+      if (!walksOn && !glimpsing && clip.currentTime >= from + GLIMPSE) glimpse();
+      if (nearEnd && !nearCalled && end() - clip.currentTime <= nearEnd[0]) { nearCalled = true; nearEnd[1](); }
+      requestAnimationFrame(tick);
     };
     if (clip.readyState >= 1) go(); else clip.addEventListener("loadedmetadata", go, { once: true });
   });
@@ -298,6 +367,7 @@ function playClip(name, { from = 0, until = null, nearEnd = null } = {}) {
 // fade the clip out over the still that replaced it, then let it go
 const hideClip = () => new Promise((resolve) => {
   clip.pause();
+  stage.classList.remove("is-walking", "is-cut");
   const gone = () => { clip.hidden = true; clip.removeAttribute("src"); clip.load(); resolve(); };
   if (clip.hidden || !clip.classList.contains("is-shown") || reduceMotion) { clip.classList.remove("is-shown"); gone(); return; }
   clip.classList.remove("is-shown");
@@ -1413,17 +1483,46 @@ function leaveSeat() {
   if (seat.notes) seat.notes.remove();
   for (const h of lap.querySelectorAll(".lap-hint")) h.remove();
   seatbar.hidden = true;
-  stage.classList.remove("is-seated");
+  stage.classList.remove("is-seated", "is-leaving");
+  lap.style.transition = lap.style.transform = "";
   seat = null;
   resetRoom();
+}
+
+// leaving: the laptop goes down and the view comes back up to the walk's framing (phones: the zoom on the door totem
+// eases back out), so the walk back starts on exactly what's showing
+const LEAVE = 650;
+async function standUp() {
+  if (seat) {
+    if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+    if (seat.player && seat.player.pauseVideo) seat.player.pauseVideo();
+    stage.classList.add("is-leaving");
+    const b = seat.layout.lap;
+    lap.style.transition = `transform ${LEAVE}ms ${EASE}`;
+    lap.style.transform = `translateY(${seat.layout.H + 20 - b.y}px)`;
+    const f = framing(seat.key), a = placed(seat.key), k = f.s / a.s;
+    for (const e of [plate, front]) {
+      e.style.transition = `transform ${LEAVE}ms ${EASE}`;
+      e.style.transform = `translate(${f.ox - k * a.ox}px, ${f.oy - k * a.oy}px) scale(${k})`;
+    }
+    await new Promise((r) => setTimeout(r, LEAVE));
+  } else if (zoomed) await zoomTo(face ? face.key : "hall", false, true);
 }
 
 // ---------- moving between the hall and a seat ----------
 let room = null, current = null, busy = false;
 
 async function toHall(withWalk) {
-  // the way back is a fade through black, not the walk played backwards
-  const dipped = withWalk && room && !reduceMotion;
+  // the way back: the walk back to the hall where it's rendered (it starts on the still you're looking at), else a fade
+  // through black
+  const back = withWalk && room ? backClip(room) : null;
+  if (back) {
+    say("Walking back to the hall");
+    await standUp();
+    await playClip(back);
+    say("");
+  }
+  const dipped = withWalk && room && !back;
   if (dipped) await dip(true);
   unmount();
   room = null; current = null;
@@ -1498,6 +1597,21 @@ addEventListener("keydown", (e) => {
 // ---------- start ----------
 const deep = /^#talk-(\d+)$/.exec(location.hash);
 const first = deep && talks.find((t) => t.id === Number(deep[1]));
-if (first) await open(first, false); else await toHall(false);
+if (first) await open(first, false);
+else {
+  // the first visit of a session walks in from outside, through the doors and the crowd, to the programme
+  let seen = true;
+  try { seen = sessionStorage.getItem("cinema-intro") === "1"; sessionStorage.setItem("cinema-intro", "1"); } catch (e) { /* no storage: skip it */ }
+  const intro = !seen ? introClip() : null;
+  if (intro) {
+    busy = true;
+    await showStill(shotKey("hall"));
+    const walking = playClip(intro, { cut: true });
+    clip.addEventListener("playing", () => loading.classList.add("is-done"), { once: true });
+    await walking;
+    busy = false;
+  }
+  await toHall(false);
+}
 loading.classList.add("is-done");
 

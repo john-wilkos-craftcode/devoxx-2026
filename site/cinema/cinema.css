@@ -51,12 +51,32 @@ button, input, a { font: inherit; color: inherit; }
 .prog.is-tall .prog-foot { display: flex; justify-content: flex-end; font-size: 13px; }
 .prog:not(.is-tall) .prog-foot { display: flex; justify-content: flex-end; margin-top: -8px; }
 .dock { position: fixed; z-index: 5; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; display: flex; gap: 8px; align-items: center; }
-.status, .skip { background: rgba(8, 11, 30, .78); border: 1px solid rgba(174, 184, 236, .35); border-radius: 999px; padding: 9px 15px; font-size: 14px; line-height: 1;
-  color: var(--ink); backdrop-filter: blur(6px); }
-.skip { cursor: pointer; }
-.skip:hover { border-color: var(--orange); }
+/* The dock during a walk: what's happening (information: a caption, no frame, a pulsing dot for "in progress") and
+   what you can do about it (the one action: a solid button with its key). They used to share the pill style and both
+   read as buttons (John 19/10). */
+.dock { gap: 14px; }
+.status { display: inline-flex; align-items: center; gap: 9px; padding: 6px 4px; font-size: 14px; font-weight: 500; line-height: 1;
+  color: var(--muted); letter-spacing: .01em; text-shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 0 14px rgba(0, 0, 0, .8); }
+.status::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--orange);
+  box-shadow: 0 0 0 0 rgba(246, 146, 30, .6); animation: pulse 1.4s ease-out infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 7px rgba(246, 146, 30, 0); } 100% { box-shadow: 0 0 0 0 rgba(246, 146, 30, 0); } }
+@media (prefers-reduced-motion: reduce) { .status::before { animation: none; } }
+.skip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 9px 8px 16px; border: 0; border-radius: 999px;
+  background: var(--orange); color: #0b1440; font: inherit; font-size: 14px; font-weight: 700; line-height: 1; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .45); transition: background .15s ease, transform .1s ease; }
+.skip kbd { padding: 3px 5px; border-radius: 4px; background: rgba(11, 20, 64, .16); font: inherit; font-size: 11px; font-weight: 700; }
+.skip:hover { background: #ffa83f; }
+.skip:active { transform: translateY(1px); }
 .skip:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .status[hidden], .skip[hidden] { display: none; }
+/* walks on/off: always on screen, above the walk and its dips through black (John 19/10) */
+.walks { position: fixed; z-index: 8; top: calc(var(--pic-t, 0px) + 14px + env(safe-area-inset-top, 0px)); right: calc(var(--pic-r, 0px) + 14px + env(safe-area-inset-right, 0px));
+  background: rgba(8, 11, 30, .82); border: 1px solid rgba(174, 184, 236, .45); border-radius: 999px; padding: 9px 15px;
+  font-size: 14px; font-weight: 600; line-height: 1; color: var(--ink); backdrop-filter: blur(6px); cursor: pointer; }
+.walks .walks-state { display: inline-block; min-width: 2.2em; margin-left: 4px; padding: 3px 7px; border-radius: 999px; background: var(--orange); color: #0b1440; }
+.walks[aria-pressed="false"] .walks-state { background: rgba(174, 184, 236, .25); color: var(--ink); }
+.walks:hover { border-color: var(--orange); }
+.walks:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .loading { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; background: #000; color: var(--muted); font-weight: 600; font-size: 17px; transition: opacity .5s; }
 .loading.is-done { opacity: 0; pointer-events: none; }
 
@@ -329,6 +349,9 @@ button, input, a { font: inherit; color: inherit; }
 .lap-art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; pointer-events: none; }
 .fade { z-index: 6; }
 .plate, .front { transition: filter .5s ease; }
+/* during a walk the still behind the 16:9 clip shows only past its sides: soft and dim there (John 19/10) */
+.stage.is-walking #plate { filter: blur(24px) brightness(.45); }
+.stage.is-walking.is-cut #plate { filter: blur(24px) brightness(.25); }
 .stage.is-reading .plate, .stage.is-reading .front, .stage.is-reading .overlay { filter: brightness(.4) blur(3px); }
 .overlay { transition: filter .5s ease; }
 
@@ -348,7 +371,7 @@ button, input, a { font: inherit; color: inherit; }
 .chip:hover { border-color: var(--orange); }
 .chip:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .chip[hidden] { display: none; }
-.seatbar { position: fixed; z-index: 7; left: 16px; top: 14px; }
+.seatbar { position: fixed; z-index: 7; left: calc(var(--pic-l, 0px) + 16px); top: calc(var(--pic-t, 0px) + 14px); }
 .seatbar[hidden], .lapdock[hidden] { display: none; }
 .lapdock { position: fixed; z-index: 7; right: 16px; bottom: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 
@@ -812,3 +835,6 @@ html, body { overscroll-behavior: none; }
 .lid-bar.is-on-lid { translate: -100% -50%; }
 .lap.is-moving .lap-hint, .lap.is-moving .lid-bar { visibility: hidden; }
 .tube.is-big .tube-bar .now-text { flex: 0 1 auto; max-width: 26%; }   /* the scrubber takes the room, not an empty gap */
+/* standing up to walk back: the seat's things fade while the laptop goes down */
+.stage.is-leaving .overlay, .stage.is-leaving .tube, .stage.is-leaving .lid-bar, .stage.is-leaving .lap-hint, .stage.is-leaving::after { opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+body:has(.stage.is-leaving) .seatbar { opacity: 0; transition: opacity .3s ease; pointer-events: none; }
