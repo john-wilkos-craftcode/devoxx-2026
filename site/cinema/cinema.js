@@ -354,9 +354,25 @@ walksBtn.addEventListener("click", () => {
 });
 
 let skipWalk = null;
-function playClip(name, { from = 0, until = null, nearEnd = null, cut = false } = {}) {
+// a walk's first and last frames are the stills it leaves and lands on (scripts/photomatch/seams.py), so it swaps in and
+// out without a fade (a fade over a moving camera showed a double image, John 19/10: "it should feel seamless"); a walk
+// that didn't play to its end (skipped, stalled) still fades
+let landed = false;
+const SHARPEN = 0.55;      // s before a walk ends: the still behind it is the arrival's, sharp, by the time it shows
+// the still a walk lands on, put behind it while it still plays (only its sides show, on a window wider than 16:9)
+function prepPlate(key) {
+  const src = `media/${key}.jpg`, img = new Image();
+  img.src = src;
+  img.decode().catch(() => {}).then(() => {
+    plate.style.transition = "filter .5s ease";
+    plate.src = src;
+    alignStill(key);
+  });
+}
+function playClip(name, { from = 0, until = null, nearEnd = null, cut = false, arrive = null } = {}) {
+  landed = false;
   return new Promise((resolve) => {
-    let watching = true, glimpsing = false;
+    let watching = true, glimpsing = false, sharpened = false;
     // walks off: the glimpse file where there is one (a second long: its two halves either side of the dip)
     const short = !walksOn && !!shots[name]?.glimpse && !from && until == null;
     // never hang on a frozen frame: a walk that hasn't started after 3 s, or stalls for 1.2 s, cuts to the arrival
@@ -373,7 +389,7 @@ function playClip(name, { from = 0, until = null, nearEnd = null, cut = false } 
     clip.classList.remove("is-shown");
     clip.style.transition = cut ? "none" : "";     // cut: shown from its first frame (nothing under it to fade from)
     clip.hidden = false;
-    clip.onended = done;
+    clip.onended = () => { landed = until == null && clip.classList.contains("is-shown"); done(); };
     clip.onerror = done;                       // a missing clip is a cut, not a dead end
     const end = () => (until != null ? until : clip.duration);
     // walks off: past the opening, dip to black, jump to the last GLIMPSE seconds and come back up for the arrival
@@ -388,19 +404,34 @@ function playClip(name, { from = 0, until = null, nearEnd = null, cut = false } 
       clip.play().catch(() => {});
       dip(false);
     };
-    // fade in over the still (the first frame is the still), which hides the moment the video starts
-    // the still's cut-out layer (plants, seats) belongs to the still: off once the clip has faded in over it (or at
-    // once for a cut), else it hangs in front of the moving walk; showStill puts it back
-    const go = () => { if (!watching) return; if (from) clip.currentTime = from; clip.play().then(() => { if (!watching) return; clip.classList.add("is-shown"); skipBtn.hidden = false;
+    // from its start, the walk's first frame is the still under it: shown the moment that frame is on screen, no fade
+    // (a seek elsewhere fades in, as it starts on a different picture). The still's cut-out layer (plants, seats)
+    // belongs to the still: off as the clip shows, else it hangs in front of the moving walk; showStill puts it back
+    const swap = !from;
+    const show = () => {
+      if (!watching) return;
+      clip.style.transition = swap || cut ? "none" : "";
+      clip.classList.add("is-shown");
       setTimeout(() => {
         if (!watching) return;
         front.hidden = true;
         // the walk is 16:9: where a wider window shows past it, the still it set off from stays, blurred and dimmed
-        // (an ambient edge, not black bars), and the arrival's still sharpens back in when the walk ends
+        // (an ambient edge, not black bars), and the arrival's still sharpens back in as the walk ends
         plate.style.transition = [plate.style.transition, "filter .5s ease"].filter(Boolean).join(", ");
         stage.classList.toggle("is-cut", cut);
         stage.classList.add("is-walking");
-      }, cut ? 0 : 360); tick(); }).catch(done); };
+      }, swap || cut ? 0 : 360);
+    };
+    // (from the start: frame 0 is decoded and on screen, paused, before it plays, so a slow decoder can't swap in a
+    // picture already under way)
+    const play = () => clip.play().then(() => { if (!watching) return; skipBtn.hidden = false; if (!swap) show(); tick(); }).catch(done);
+    const go = () => {
+      if (!watching) return;
+      if (from) clip.currentTime = from;
+      if (!swap) { play(); return; }
+      const ready = () => { if (!watching) return; show(); requestAnimationFrame(() => requestAnimationFrame(play)); };   // painted, then on
+      if (clip.readyState >= 2) ready(); else clip.addEventListener("loadeddata", ready, { once: true });
+    };
     // every frame while it plays: the stop point (until), the glimpse (walks off, also when switched off mid-walk) and
     // nearEnd: [seconds, fn], fn called that long before the clip ends
     let nearCalled = false;
@@ -409,17 +440,29 @@ function playClip(name, { from = 0, until = null, nearEnd = null, cut = false } 
       if (until != null && clip.currentTime >= until) { clip.pause(); done(); return; }
       if ((short || !walksOn) && !glimpsing && clip.currentTime >= from + GLIMPSE) glimpse();
       if (nearEnd && !nearCalled && end() - clip.currentTime <= nearEnd[0]) { nearCalled = true; nearEnd[1](); }
+      if (!sharpened && until == null && end() - clip.currentTime <= SHARPEN) {
+        sharpened = true;
+        if (arrive) prepPlate(arrive);
+        stage.classList.remove("is-walking", "is-cut");
+      }
       requestAnimationFrame(tick);
     };
     if (clip.readyState >= 1) go(); else clip.addEventListener("loadedmetadata", go, { once: true });
   });
 }
 // fade the clip out over the still that replaced it, then let it go
+// (a walk that landed: at once, its last frame is the still, once that is decoded behind it)
 const hideClip = () => new Promise((resolve) => {
   clip.pause();
   stage.classList.remove("is-walking", "is-cut");
   const gone = () => { clip.hidden = true; clip.removeAttribute("src"); clip.load(); resolve(); };
   if (clip.hidden || !clip.classList.contains("is-shown") || reduceMotion) { clip.classList.remove("is-shown"); gone(); return; }
+  if (landed) {
+    landed = false;
+    plate.decode().catch(() => {}).then(() => { clip.style.transition = "none"; clip.classList.remove("is-shown"); gone(); });
+    return;
+  }
+  clip.style.transition = "";
   clip.classList.remove("is-shown");
   setTimeout(gone, 400);
 });
@@ -1483,7 +1526,7 @@ function relayoutSeat() {
 async function sitDown(t, n, key, withWalk) {
   if (withWalk) {
     say(`Walking to Room ${n}`);
-    await playClip(walkClip(n));
+    await playClip(walkClip(n), { arrive: key });
   }
   await showStill(key);
   hideClip();
@@ -1572,7 +1615,7 @@ async function toHall(withWalk) {
   if (back) {
     say("Walking back to the hall");
     await standUp();
-    await playClip(back);
+    await playClip(back, { arrive: shotKey("hall") });
     say("");
   }
   const dipped = withWalk && room && !back;
@@ -1587,6 +1630,10 @@ async function toHall(withWalk) {
 
 async function toSeat(t, withWalk) {
   const n = roomNo(t), key = shotKey(`seat-${n}`);
+  if (withWalk && face && !reduceMotion) {      // the programme fades off the screen first, not gone in a frame
+    face.el.style.animation = "off .25s ease-in both";     // (an inline opacity loses to the entrance animation's fill)
+    await new Promise((r) => setTimeout(r, 250));
+  }
   unmount();
   if (shape === "laptop") return sitDown(t, n, key, withWalk);
   // phones: the walk pushes in on the door totem and the zoom carries on from it until the totem's screen fills the
@@ -1660,7 +1707,7 @@ else {
   if (intro) {
     busy = true;
     await showStill(shotKey("hall"));
-    const walking = playClip(intro, { cut: true });
+    const walking = playClip(intro, { cut: true, arrive: shotKey("hall") });
     clip.addEventListener("playing", () => loading.classList.add("is-done"), { once: true });
     await walking;
     busy = false;

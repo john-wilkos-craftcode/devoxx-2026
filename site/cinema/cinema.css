@@ -30,6 +30,7 @@ button, input, a { font: inherit; color: inherit; }
 .face { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: auto; box-sizing: border-box; overflow: clip;
   background: var(--night); color: var(--ink); animation: on .45s ease-out both; }
 @keyframes on { from { opacity: 0; filter: brightness(1.8); } to { opacity: 1; filter: none; } }
+@keyframes off { from { opacity: 1; filter: none; } to { opacity: 0; filter: brightness(1.8); } }   /* a screen switching off before a walk */
 .face *, .face *::before, .face *::after { box-sizing: border-box; }
 .face :focus-visible { outline: 3px solid #fff; outline-offset: 3px; box-shadow: 0 0 0 7px rgba(246, 146, 30, .55); }
 .face button { cursor: pointer; }
