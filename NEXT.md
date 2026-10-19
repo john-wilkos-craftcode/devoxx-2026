@@ -1,4 +1,22 @@
-# Where this stands (16/10)
+# Where this stands (19/10, 15:30)
+
+## Next session: start here
+- **Live on the site** (new video set: AV1/HEVC/H.264, -s smaller, -g walks-off glimpse; publish.py): the intro, rooms
+  3, 4, 5, 8 (walk there + back + wide seat still), the wide hall still. Room 6 walk back + stills were rendering at
+  John's 17:00 cut-off; room 6 publishes by itself once both are in.
+- **Crowd fix waiting, untested** (John 19/10: two identical women at right angles in the fly-through's slow ending):
+  `git apply scripts/photomatch/pending/crowd-rubric.patch` (crowd_place.py: no avatar repeat within CLONE_R, else the
+  farthest double; singles >= 2.5 m from anyone, facing the walkway or, near the screen, the programme; a "CROWD
+  ending" report of doubles in a clip's last 3 s). Rubric and sources: memory research-first. Then a cheap test of the
+  ending: `scripts/photomatch/render.sh venue --crowd --walk anim --anim-range 150-241 --engine eevee --samples 8
+  --width 800 --out <dir>`; check the CROWD ending line and the frames; commit; re-render the laptop fly-through at
+  full quality (delete final/venue/walk/anim/.complete first) before the rest of the queue.
+- **Queue:** `cp scripts/photomatch/finals.sh scripts/photomatch/.finals-run.sh && scripts/photomatch/.finals-run.sh
+  [--until HH:MM]` (run a copy: bash reads a script as it runs, editing the original mid-run derailed the queue on
+  19/10). Left: room 6 (if cut off), laptop rooms 7, 9, 10, the phone fly-through, phone rooms 3-10. It publishes and
+  pushes each room as it lands and ends with a last publish pass.
+
+# Earlier notes (16/10 onwards)
 
 ## Right now: room walks through the photo-matched venue (16/10, evening)
 Process and rules: scripts/photomatch/BRIEF.md (John's rules, the review steps, the checklist; effort goes where the
