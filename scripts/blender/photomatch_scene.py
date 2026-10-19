@@ -46,6 +46,8 @@ ap.add_argument("--eevee", default="", help="EEVEE setting overrides for A/B ren
                 "scene.eevee, e.g. shadow_step_count=8,light_threshold=0.05,ray_tracing_options.trace_max_roughness=0.3 "
                 "(applied last; printed with the value they replace)")
 ap.add_argument("--anim-range", default="", help="walk anim: only frames a-b (time a clip before rendering it all)")
+ap.add_argument("--resume", action="store_true", help="walk anim: keep the frames already in out/anim and render only "
+                "the missing ones (a clip cut off by a shutdown; the caller checks the code hasn't changed since)")
 ap.add_argument("--hide", default="", help="collections to leave out of the render, comma list (checks)")
 ap.add_argument("--stills", action="store_true", help="venue with --room: the page's stills from this walk's build "
                 "(laptop: hall + seat, phone: hall totem + door totem), each with its front layer and overlay corners")
@@ -333,6 +335,7 @@ def render_anim(out, cam, f0, f1):
         f0, f1 = (int(v) for v in args.anim_range.split("-"))
     scene.frame_start, scene.frame_end = f0, f1
     scene.render.filepath = str(out / "anim" / "f_####")
+    scene.render.use_overwrite = not args.resume     # Blender skips a frame whose file exists
     t1 = time.time()
     if args.max_spf and f1 - f0 > 5:                 # time the clip before committing to it
         # 5 frames spread over the whole clip: the first 5 (the street) ran 7.6 s, the hall averaged 11.4 (16/10)

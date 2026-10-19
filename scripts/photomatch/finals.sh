@@ -6,7 +6,8 @@
 #   scripts/photomatch/finals.sh [--until 07:45]
 # One build per room and variant (--both: walk there + walk back + stills, 18/10 optimisation review); encodes run in
 # the background while the next build goes. A clip is done when its anim/.complete exists, so a job stopped by a
-# shutdown resumes with what's missing (the walk back, then the stills from their own build). Phone walks get a clearance check first (< 0.45 m: skipped and reported).
+# shutdown resumes with what's missing (the walk back, then the stills from their own build); a clip cut off half way
+# keeps its frames if the code is unchanged (keep, --resume). Phone walks get a clearance check first (< 0.45 m: skipped and reported).
 set -u
 cd "$(dirname "$0")/../.." || exit 1
 F=/mnt/c/Users/wilkojo/kino-renders/photomatch/final; LG=/mnt/c/Users/wilkojo/kino-renders/photomatch/logs
@@ -39,6 +40,18 @@ clear_ok() {   # room, variant flags: both directions clear >= 0.45 m (a cheap b
     python3 -c "import sys; sys.exit(0 if '$m' and float('$m') >= 0.45 else 1)" || { echo "SKIPPED room $1 $2 ${b:-there}: clearance ${m:-none} m"; return 1; }
   done
 }
+code_id() { echo "$(git rev-parse HEAD:scripts)$(git diff HEAD -- scripts data/photomatch | md5sum | cut -c1-8)"; }
+keep() {   # a clip's frames dir: keep a cut-off clip's frames if the code that made them is unchanged (the same crowd and
+           # path; the render then fills in the rest, --resume), else start it empty (19/10: room 6's walk back was cut
+           # off at frame 649 of 721 and would have been wiped)
+  local n
+  if [ -n "$(ls "$1" 2>/dev/null)" ] && [ "$(cat "$1/.code" 2>/dev/null)" = "$(code_id)" ]; then
+    rm -f "$1/$(ls "$1" | tail -1)"          # the newest frame may be half written
+    n=$(ls "$1" | wc -l); echo "  resuming $(basename "$(dirname "$1")") from its $n frames"
+  else
+    rm -rf "${1:?}"; mkdir -p "$1"; code_id > "$1/.code"
+  fi
+}
 run() {   # job name, estimate (min), render.sh args, mp4 pairs "dir:name ..."; resumes a job stopped half way
   local job=$1 est=$2 args=$3 outs=$4 L todo="" o stills=""
   done_ $job && return
@@ -53,9 +66,9 @@ run() {   # job name, estimate (min), render.sh args, mp4 pairs "dir:name ..."; 
   fi
   fits $est || { echo "WAIT $job (~$est min, past $UNTIL)"; return; }
   echo "start $job $(date +%H:%M)${todo:+ (clips:$todo)}"
-  for o in $todo; do rm -rf "${F:?}/venue/${o%%:*}/anim"; done
+  for o in $todo; do keep "$F/venue/${o%%:*}/anim"; done
   if [ -n "$args" ]; then
-    scripts/photomatch/render.sh venue $args $Q $X --out "$W" >/dev/null 2>&1
+    scripts/photomatch/render.sh venue $args --resume $Q $X --out "$W" >/dev/null 2>&1
     L=$(lastlog); grep -E "RENDERED anim|Traceback|CROWD timing" "$L" | sed "s/^/  /"
     grep -q "RENDERED still" "$L" && echo "  stills: $(grep -c 'RENDERED still' "$L")"
     grep -q Traceback "$L" && { echo "FAILED $job: $L"; return; }
