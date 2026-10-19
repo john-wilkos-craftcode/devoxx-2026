@@ -24,6 +24,9 @@ CAM_CLEAR = 1.4                 # person centre to the camera's path (m)
 BODY_R = 0.36                   # nothing solid within this of a person's centre
 GAP = 0.75                      # between two people's centres (0.62 let gesturing arms overlap)
 CLONE_R = 12.0                  # the same avatar not twice within this (6 m still showed one model 3x in a long view)
+SOLO_GAP = 2.5                  # someone on their own: this clear of anyone else, so two singles never read as an
+                                # awkward pair (19/10: two at right angles, one staring at the other's back)
+ENDING = 72                     # frames: the slow last 3 s of a clip, where the eye settles; doubles there reported
 HORIZON = 450                   # frames the walkers must stay clear over (the fly-through is ~400)
 REPORT = {}
 
@@ -291,13 +294,19 @@ class Placer:
         return free(self.bvh, x, y, zf)
 
     def pick(self, role, x, y, sex=None):
-        """an avatar and clip for a role, avoiding an avatar already standing within CLONE_R"""
-        near = {n for (sx, sy, n) in self.looks if (sx - x) ** 2 + (sy - y) ** 2 < CLONE_R ** 2}
-        for _ in range(12):
-            tmpl, clip = C.pick(self.crowd, role, sex)
-            if tmpl["name"] not in near:
-                break
-        self.looks.append((x, y, tmpl["name"]))
+        """an avatar and clip for a role: an avatar nobody within CLONE_R wears, else the one whose nearest double is
+        farthest. 20 avatars for ~240 people: in the busy hall 'none within CLONE_R' often runs out, and the old
+        fallback (whatever the 12th draw gave) stood two identical women side by side at the fly-through's end (John
+        19/10). Clones show in looks far more than in motion (McDonnell et al., 'Clone attack!', 2008)."""
+        crowd, rng = self.crowd, self.rng
+        pool = [t for t in crowd.templates if sex is None or t["sex"] == sex]
+        rng.shuffle(pool)
+        def nearest(t):
+            return min(((sx - x) ** 2 + (sy - y) ** 2 for sx, sy, n in self.looks if n == t["name"]), default=1e18)
+        free_ = [t for t in pool if nearest(t) >= CLONE_R ** 2]
+        tmpl = free_[0] if free_ else max(pool, key=nearest)
+        clips = [c for c in C.CLIPS[role] if f'{tmpl["sex"]}_{c}' in crowd.clips]
+        clip = f'{tmpl["sex"]}_{rng.choice(clips)}' if clips else f'{tmpl["sex"]}_idle_neutral_01'
         return tmpl, clip
 
     def seen_at(self, x, y, zf):
@@ -335,6 +344,8 @@ class Placer:
         crowd.person(tmpl, clip, x, y, zf, yaw, offset=rng.randrange(0, 600), speed=rng.uniform(0.9, 1.1),
                      height=rng.uniform(0.96, 1.04), badge=rng.random() < 0.85, role=role,
                      backpack=rng.random() < C.BACKPACK_SHARE)
+        self.looks.append((x, y, tmpl["name"]))
+        crowd.people[-1]["avatar"], crowd.people[-1]["at"] = tmpl["name"], (x, y)
         crowd.people[-1]["near_cam"] = path_dist(self.paths, x, y)
         crowd.people[-1]["vis"] = vis
         self.spots.append((x, y))
@@ -342,14 +353,9 @@ class Placer:
         return True
 
     def face_something(self, x, y):
-        """someone on their own faces the nearest person within 3.5 m, else the walkway"""
-        best = None
-        for sx, sy in self.spots:
-            d = (sx - x) ** 2 + (sy - y) ** 2
-            if 0.01 < d < 3.5 ** 2 and (best is None or d < best[0]):
-                best = (d, sx, sy)
-        if best:
-            return self.facing(best[1] - x, best[2] - y)
+        """someone on their own faces the walkway, watching people go by: a purpose a viewer reads at a glance.
+        (Facing the nearest person made one-sided pairs: a stare at someone's back or side, 19/10. Conversations are
+        groups, which face their own centre: a ring, face to face or an L round a shared space, Kendon's F-formations.)"""
         S = self.paths
         ax, ay, bx, by = S[:, 0], S[:, 1], S[:, 2], S[:, 3]
         dx, dy = bx - ax, by - ay
@@ -402,7 +408,7 @@ class Placer:
             if s >= singles:
                 break
             x, y = rng.uniform(x0, x1), rng.uniform(y0, y1)
-            if self.ok(x, y, zf, gap=0.9):
+            if self.ok(x, y, zf, gap=SOLO_GAP):
                 yaw = face(x, y) if face else self.face_something(x, y)
                 if self.put(single_role, x, y, zf, yaw + rng.uniform(-0.3, 0.3)):
                     s += 1
@@ -411,12 +417,7 @@ class Placer:
         """someone walking along heading (radians, 0 = +y) from (x, y); the whole sweep over HORIZON frames stays
         inside bounds and clear"""
         crowd, rng = self.crowd, self.rng
-        tmpl, clip = C.pick(crowd, "walk")
-        near = {n for (sx, sy, n) in self.looks if (sx - x) ** 2 + (sy - y) ** 2 < CLONE_R ** 2}
-        for _ in range(12):
-            if tmpl["name"] not in near:
-                break
-            tmpl, clip = C.pick(crowd, "walk")
+        tmpl, clip = self.pick("walk", x, y)
         speed = rng.uniform(0.9, 1.1)
         v = (crowd.clips[clip].get("speed", 1.2) or 1.2) * speed
         L = v * HORIZON / C.FPS
@@ -443,6 +444,7 @@ class Placer:
         crowd.person(tmpl, clip, x, y, zf, self.facing(dx, dy), offset=rng.randrange(0, 600), speed=speed,
                      height=rng.uniform(0.96, 1.04), walk=((x, y), pts[-1], frames), badge=rng.random() < 0.85,
                      role="walk", backpack=rng.random() < C.BACKPACK_SHARE)
+        crowd.people[-1]["avatar"], crowd.people[-1]["at"] = tmpl["name"], (x, y)
         crowd.people[-1]["near_cam"] = min(path_dist(self.paths, px, py) for px, py in pts)
         crowd.people[-1]["vis"] = vis
         self.spots += pts
@@ -584,7 +586,10 @@ def far_hall(P):
     P.scatter((10.0, 6.5, 16.0, 16.5), HALL_Z, groups=1, singles=2)
     # between the stairwells, west of the screen's axis: the walks back cross the hall here looking west (it read empty,
     # 17/10); kept south of the hall still's camera (y 9.81) so nobody stands between it and the screen
-    P.scatter((-4.2, 3.5, 1.0, 9.3), HALL_Z, groups=2, singles=2)
+    # the fly-through's slow ending looks up this stretch at the screen: singles here read the programme on it
+    import pm_areas.hall_screen as HS
+    P.scatter((-4.2, 3.5, 1.0, 9.3), HALL_Z, groups=2, singles=2,
+              face=lambda x, y: P.facing(HS.SCREEN["x"] - x, HS.SCREEN["y"] - y))
 
 
 def upstairs(P):
@@ -614,7 +619,19 @@ def place(crowd, root):
     print("CROWD placed: " + ", ".join(f"{k} {v}" for k, v in REPORT.items())
           + f"; {P.unseen} spots skipped (never in view)", flush=True)
     print(f"CROWD timing: zones placed in {time.time() - t0:.0f} s", flush=True)
+    doubles_in_ending(crowd, sc.frame_end)
     return P
+
+
+def doubles_in_ending(crowd, f_end):
+    """the same avatar twice in the clip's slow last ENDING frames, within 15 m of each other: reported (there the eye
+    has time to find them)"""
+    seen = [p for p in crowd.people if p.get("avatar") and any(f is not None and f > f_end - ENDING for f in (p.get("vis") or []))]
+    pairs = [(a, b) for i, a in enumerate(seen) for b in seen[i + 1:] if a["avatar"] == b["avatar"]
+             and (a["at"][0] - b["at"][0]) ** 2 + (a["at"][1] - b["at"][1]) ** 2 < 15 ** 2]
+    print(f"CROWD ending: {len(seen)} people in the last {ENDING} frames, {len(pairs)} doubles within 15 m"
+          + "".join(f"; {a['avatar']} at ({a['at'][0]:.1f}, {a['at'][1]:.1f}) and ({b['at'][0]:.1f}, {b['at'][1]:.1f})"
+                    for a, b in pairs), flush=True)
 
 
 def _tree(ob):

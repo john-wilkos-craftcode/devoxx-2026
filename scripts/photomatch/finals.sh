@@ -115,7 +115,9 @@ for n in 8 3 4 5; do
   scripts/photomatch/render.sh venue --room $n --crowd --stills $Q $X --out "$W" >/dev/null 2>&1
   grep -q "RENDERED still seat-$n-front" "$(lastlog)" && echo done > $F/done/stills-$n-laptop && echo "stills $n laptop done $(date +%H:%M)"
 done
-# laptops (the fly-through and room 8's walks are done): rooms 3-10, one build each (~140 min)
+# the laptop fly-through again with the crowd rubric (19/10: no avatar repeated near another; its anim/.complete removed)
+run laptop-fly 150 "--crowd --walk anim --width 1600" "walk:final-flythrough-laptop.mp4"
+# laptops (room 8's walks are done): rooms 3-10, one build each (~140 min)
 for n in 3 4 5 6 7 9 10; do
   run laptop-$n 150 "--room $n --crowd --both --stills --walk anim --width 1600" \
     "walk-room$n:final-room$n-laptop.mp4 walk-room$n-back:final-room$n-back-laptop.mp4"
