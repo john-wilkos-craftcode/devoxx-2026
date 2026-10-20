@@ -15,6 +15,9 @@
   scripts/photomatch/.finals-run.sh --until 07:45`. Done: laptop everything, phone rooms 3 and 4. Left: the phone
   fly-through again (~1.5 h, the 1 cm fix), phone rooms 5-10 (~75 min each now) - about 9 h, so it should all fit.
   Then seams.py on the phones, one last review on laptop and phone, and John's go.
+- **Re-render after the queue (20/10):** phone rooms 6 and 7's walks back whipped round (968 / 343 deg/s; room_walk
+  timing now caps turns at 270 deg/s and takes longer). Remove final/done/phone-6, phone-7 and the walk-phone-room6-back,
+  walk-phone-room7-back anim/.complete, then run the finals copy again (only the walks back re-render, ~1 h each).
 - **Pushing:** `scripts/push.sh` (the global "ask: git push" rule stays; John 19/10).
 
 # Earlier notes (16/10 onwards)
