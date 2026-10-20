@@ -29,7 +29,7 @@ encode() {   # frames dir, mp4 name
   local s
   s=$(ls "$1" 2>/dev/null | head -1 | tr -dc 0-9 | sed 's/^0*//')
   [ -z "$s" ] && { echo "  NO FRAMES in $1"; return; }
-  ffmpeg -y -loglevel error -framerate 24 -start_number "$s" -i "$1/f_%04d.png" -c:v libx264 -pix_fmt yuv420p -crf 16 "$F/$2" \
+  ffmpeg -y -loglevel error -framerate 24 -start_number "$s" -i "$1/f_%04d.png" -vf "crop=trunc(iw/2)*2:trunc(ih/2)*2:0:0" -c:v libx264 -pix_fmt yuv420p -crf 16 "$F/$2" \
     && echo "  encoded $2 $(date +%H:%M) $(python3 scripts/photomatch/qc.py "$1" | grep -E '^QC (PASS|FAIL)')"
 }
 clear_ok() {   # room, variant flags: both directions clear >= 0.45 m (a cheap build without the crowd)

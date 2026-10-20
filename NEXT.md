@@ -11,19 +11,10 @@
   the schedule screen in the last ~2 s (the >= 2.5 m spacing for singles); John 19/10 20:05: "It all looks great"
   (room 6 and the crowd ending). Rooms 3-6 and 8 were rendered with the old
   crowd; the room walks start on the screen close-up, so there's no pop, only different people in the hall.
-- **Queue running since 18:40** (`.finals-run.sh --until 07:45`): the laptop fly-through again (new crowd), laptop
-  rooms 7, 9, 10, the phone fly-through, phone rooms 3-10 (~26 h in all, so it spans two nights). Rerun the same
-  command after a restart: done jobs are skipped, and a clip cut off half way now resumes from its frames if the code
-  is unchanged (anim/.code, render --resume). Run a copy: bash reads a script as it runs.
-- **Seams (John 19/10: still <-> walk must feel seamless):** `python3 scripts/photomatch/seams.py` checks every
-  published clip's first/last frame against its still (all laptop seams match to the pixel; walks 3-6 and 8 start at
-  0.3 m/s, a jolt off the hall still, fixed in room_walk for every walk not rendered yet: re-render those five walks
-  there: John 19/10 "No rerender", they keep it) `node tools/ux/transitions.mjs <dir> 8` records the round trip in Chromium
-  (the recording lags while Blender runs). The page swaps stills and walks without fades now (e84b7d8). Phones: check
-  with seams.py once their finals are published.
-- **Phone fly-through queued again** (20/10): it stopped ~1 cm short of the totem still (venue.resample dropped the
-  path's last point; the phone room walks and the still agree). Fixed in venue.py; its done marker and .complete are
-  removed, so the next finals run renders it (~1.5 h) before phone rooms 5-10. Phones: seams.py once published.
+- **Queue for tonight (20/10):** `cp scripts/photomatch/finals.sh scripts/photomatch/.finals-run.sh &&
+  scripts/photomatch/.finals-run.sh --until 07:45`. Done: laptop everything, phone rooms 3 and 4. Left: the phone
+  fly-through again (~1.5 h, the 1 cm fix), phone rooms 5-10 (~75 min each now) - about 9 h, so it should all fit.
+  Then seams.py on the phones, one last review on laptop and phone, and John's go.
 - **Pushing:** `scripts/push.sh` (the global "ask: git push" rule stays; John 19/10).
 
 # Earlier notes (16/10 onwards)
