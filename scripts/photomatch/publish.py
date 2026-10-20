@@ -103,14 +103,14 @@ def files(name):
     return out
 
 
-def encode(src, first, n, codec, v, dst, w, h):
-    vf = []
+def encode(src, first, n, codec, v, dst, w, h, full):
+    vf = [f"crop={full[0]}:{full[1]}:0:0"]           # even sides (H.264/HEVC need them; the phones render 810x1755)
     if v == "-s":
         vf.append(f"scale={w}:{h}:flags=lanczos")
     if v == "-g":                                   # the first and last half second, back to back
         vf.append(f"select='lt(n\\,{GLIMPSE})+gte(n\\,{n - GLIMPSE})',setpts=N/{FPS}/TB")
     subprocess.run(["nice", "-n", "19", "ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS),
-                    "-start_number", str(first), "-i", str(src / "f_%04d.png"), *(["-vf", ",".join(vf)] if vf else []),
+                    "-start_number", str(first), "-i", str(src / "f_%04d.png"), "-vf", ",".join(vf),
                     *CODECS[codec], *COMMON, str(dst)], check=True)
 
 
@@ -120,6 +120,7 @@ for done in sorted((FINAL / "venue").glob("*/anim/.complete")):
         continue
     frames = sorted(done.parent.glob("f_*.png"))
     w, h = Image.open(frames[0]).size
+    w, h = w - w % 2, h - h % 2                      # an odd side loses its last pixel row or column
     small = [round(w * SMALL / 2) * 2, round(h * SMALL / 2) * 2]
     entry = {"kind": "clip", "frames": len(frames), "fps": FPS, "px": [w, h], "small": small, "glimpse": GLIMPSE,
              "codecs": list(CODECS)}
@@ -128,7 +129,7 @@ for done in sorted((FINAL / "venue").glob("*/anim/.complete")):
         continue
     first = int(frames[0].stem[2:])
     for (codec, v), dst in out.items():
-        encode(done.parent, first, len(frames), codec, v, dst, *small)
+        encode(done.parent, first, len(frames), codec, v, dst, *small, (w, h))
     (OUT / f"{name}.mp4").unlink(missing_ok=True)   # the single H.264 file of before
     shots[name] = entry
     changed.append(name)
