@@ -1,8 +1,11 @@
 # Where this stands (19/10, 18:45)
 
 ## Next session: start here
-- **Live on the site** (new video set: AV1/HEVC/H.264, -s smaller, -g walks-off glimpse; publish.py): the intro, rooms
-  3, 4, 5, 6, 8 (walk there + back + wide seat still), the wide hall still.
+- **Laptop complete (20/10 03:05)** (new video set: AV1/HEVC/H.264, -s smaller, -g walks-off glimpse; publish.py): the
+  intro with the new crowd, rooms 3-10 (walk there + back + wide seat still), the wide hall still; seams.py: all
+  match except the walks there of 3-6 and 8 (their 0.3 m/s start; John: no re-render). qc.py's breathing check
+  fails on rooms 7, 9, 10 at the fast pan off the hall screen (f_0261) and at the auditorium doorway on the way back:
+  checked, smooth motion, content leaving the frame; the check is too strict for those.
 - **Crowd fix committed** (6f8381e; John 19/10: two identical women at right angles in the fly-through's slow ending):
   EEVEE test of the ending: nearest double ~10 m apart. Side effect sent to John for review: nobody stands in front of
   the schedule screen in the last ~2 s (the >= 2.5 m spacing for singles); John 19/10 20:05: "It all looks great"
