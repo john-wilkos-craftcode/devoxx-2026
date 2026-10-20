@@ -170,6 +170,8 @@ def resample(poly, step):
             i += 1
         t = (s - acc) / seg[i] if seg[i] else 0
         res.append(poly[i].lerp(poly[i + 1], min(1.0, t)))
+    if (res[-1] - poly[-1]).length > 1e-6:           # end on the end: the last step fell up to 2 cm short of it (the
+        res.append(poly[-1])                         # phone fly-through stopped ~1 cm off the totem still, 20/10)
     return res
 
 
@@ -210,7 +212,7 @@ def timing(pts, step):
             vt[i] = min(vt[i], math.sqrt(vt[i + 1] ** 2 + 2 * DECEL * step))
         t, out = 0.0, [0.0]
         for i in range(1, n):
-            t += step / max(0.05, 0.5 * (vt[i] + vt[i - 1]))
+            t += (pts[i] - pts[i - 1]).length / max(0.05, 0.5 * (vt[i] + vt[i - 1]))   # (the last step is shorter)
             out.append(t)
         return out
     if not DURATION:

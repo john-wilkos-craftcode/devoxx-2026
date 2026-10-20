@@ -21,6 +21,9 @@
   there: John 19/10 "No rerender", they keep it) `node tools/ux/transitions.mjs <dir> 8` records the round trip in Chromium
   (the recording lags while Blender runs). The page swaps stills and walks without fades now (e84b7d8). Phones: check
   with seams.py once their finals are published.
+- **Phone fly-through queued again** (20/10): it stopped ~1 cm short of the totem still (venue.resample dropped the
+  path's last point; the phone room walks and the still agree). Fixed in venue.py; its done marker and .complete are
+  removed, so the next finals run renders it (~1.5 h) before phone rooms 5-10. Phones: seams.py once published.
 - **Pushing:** `scripts/push.sh` (the global "ask: git push" rule stays; John 19/10).
 
 # Earlier notes (16/10 onwards)
