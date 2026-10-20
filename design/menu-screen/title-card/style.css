@@ -1,0 +1,343 @@
+/* The Week in Eight Cards. Each verdict is a poster in its own ink; one grotesk (Archivo, width axis 62-125).
+   TWO VOICES (one rule, every screen, every width):
+     - The verdict voice: Archivo 800 at the extra-condensed cut (--cond, 62), one size per card, ragged left. The
+       size comes from the card: the biggest that fits the height and the longest line. Nothing else is condensed.
+     - The door voice: Archivo 700-800 at one wide cut (--wide, 115) for questions, doors, days, numbers and UI.
+     - Text is Archivo 400-600 at normal width, 15 px or more, at full contrast. No grey text on black.
+   ONE FEEDBACK VOCABULARY: whatever you point at or pick inverts (bone turns black, ink or black turns bone).
+   ONE COLOUR CODE: the eight inks are the eight verdicts. The chip row on the poster teaches it; the same numbered
+   chips tag every argued talk in search and the programme. Flat fields only. */
+:root {
+  --ink: #B6241C;      /* set per card by menu.js; all eight inks give bone >= 5.2:1 */
+  --bone: #F3EBDD;     /* all type, on ink and on black */
+  --black: #111111;
+  --page: #0A0A0A;
+  --rule: #4A443C;     /* 1 px row rules on black (a rule, never text) */
+  --sans: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --wide: 115%;        /* the door voice */
+  --cond: 62%;         /* the verdict voice */
+  --lh: .92;           /* verdict line pitch; menu.js adds .1em under a line with descenders */
+  --hold: 9s;          /* how long a card holds before the screen turns over */
+  --fh: 48px;          /* the black foot strip */
+  --m: 40px;           /* the margin */
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--page); color: var(--bone); font-family: var(--sans);
+  display: grid; place-items: center; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: left; letter-spacing: inherit; }
+a { color: inherit; }
+ol, ul { list-style: none; }
+:focus-visible { outline: 3px solid var(--bone); outline-offset: 6px; }
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+#menu {
+  position: relative; width: 980px; height: 613px; overflow: hidden;
+  background: var(--ink); color: var(--bone);
+}
+.phone #menu { width: 340px; height: 690px; --m: 22px; }
+#menu:not([data-layer="card"]) { background: var(--black); }
+/* a door: bone with the card's ink; it turns black when you point at it */
+.door { background: var(--bone); color: var(--ink); font: 800 22px/1 var(--sans); font-stretch: var(--wide); letter-spacing: -.01em; }
+.door:hover, .door:focus-visible { background: var(--black); color: var(--bone); }
+.door:focus-visible { outline: 3px solid var(--bone); outline-offset: -8px; }
+/* a quiet door: bone type on the field under a bone rule; it turns bone when you point at it */
+.door2 { border-top: 3px solid var(--bone); font: 800 21px/1.05 var(--sans); font-stretch: var(--wide); letter-spacing: -.01em; padding: 12px 14px 0; }
+.door2:hover, .door2:focus-visible { background: var(--bone); color: var(--ink); }
+.door2:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
+
+/* the verdict chip: its number on its ink. The current one is bone. */
+.chip {
+  display: inline-grid; place-items: center; width: 40px; height: 30px; flex: none; position: relative;
+  background: var(--c); color: var(--bone);
+  font: 800 14px/1 var(--sans); font-stretch: var(--wide); font-variant-numeric: tabular-nums;
+}
+
+/* ---------- the poster (rest) ---------- */
+.card {
+  position: absolute; inset: 0; padding: 26px var(--m) 32px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "sig chips chips" "verdict verdict verdict" "doors doors doors";
+}
+.sig { grid-area: sig; align-self: center; font: 500 21px/1.1 var(--sans); white-space: nowrap; }
+.sig b { font-weight: 800; font-stretch: var(--wide); letter-spacing: -.01em; margin-right: 8px; }
+.card .chips { grid-area: chips; }
+.card .verdict { grid-area: verdict; }
+.card .doors { grid-area: doors; }
+
+.chips { display: flex; gap: 4px; align-items: center; }
+.chips .chip:hover, .chips .chip:focus-visible { background: var(--bone); color: var(--c); }
+.chips .chip:focus-visible { outline-offset: 3px; }
+/* the current chip: outlined in bone, and the bone fill runs through it over the hold */
+.chip[aria-current="true"] { background: transparent; box-shadow: inset 0 0 0 2px var(--bone); }
+.chip[aria-current="true"]::after {
+  content: attr(data-n); position: absolute; inset: 0; display: grid; place-items: center;
+  background: var(--bone); color: var(--ink);
+  clip-path: inset(0 100% 0 0); animation: hold var(--hold) linear forwards;
+}
+#menu.paused .chip[aria-current="true"]::after { animation-play-state: paused; }
+#menu.still .chip[aria-current="true"]::after { animation: none; clip-path: none; }
+@keyframes hold { to { clip-path: inset(0 0 0 0); } }
+
+/* the verdict sits centred in its band: when its longest line caps the size, the spare height is equal air above and below */
+.verdict { min-height: 0; display: flex; flex-direction: column; justify-content: center; padding: 22px 0 24px; }
+.verdict-btn { display: block; font-weight: 800; font-stretch: var(--cond); line-height: var(--lh); letter-spacing: -.005em; }
+.vl { display: block; width: max-content; max-width: 100%; white-space: nowrap; }
+.verdict-btn:focus-visible { outline-offset: 10px; }
+
+/* the doors: the question is the main door; programme and search are the quiet ones beside it */
+.doors { display: grid; grid-template-columns: minmax(0, 1fr) 236px; grid-template-rows: 1fr 1fr; column-gap: 24px; row-gap: 14px; }
+.cta { grid-row: 1 / span 2; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; padding: 18px 24px 18px; }
+.cq { font-size: 29px; line-height: 1.1; text-wrap: balance; }
+.cw { font-size: 18px; }
+/* pointing at (or focusing) the verdict lights the door it opens */
+.card:has(.verdict-btn:hover, .verdict-btn:focus-visible) .cta { background: var(--black); color: var(--bone); }
+
+/* ---------- the dark pages ---------- */
+.layer {
+  position: absolute; left: 0; right: 0; top: 0; bottom: var(--fh);
+  background: var(--black); display: grid; grid-template-rows: auto minmax(0, 1fr); grid-template-columns: minmax(0, 1fr);
+}
+.scroll { overflow-y: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: #6b6358 transparent; overscroll-behavior: contain; }
+
+/* the black foot strip: back to the cards (the verdict's chip is the only colour), the other pages, the text version.
+   Opening a talk turns the whole strip bone, names where you are going, and a black line fills along it like the walk. */
+#lfoot {
+  position: absolute; left: 0; right: 0; bottom: 0; height: var(--fh); z-index: 4;
+  background: var(--black); border-top: 2px solid var(--bone); padding: 0 var(--m);
+  display: flex; align-items: center; gap: 20px;
+  font: 500 16px/1 var(--sans);
+}
+.back { display: flex; align-items: center; gap: 10px; font-weight: 700; white-space: nowrap; min-width: 0; flex: 0 1 auto; }
+.back .chip { width: 34px; height: 24px; font-size: 12px; }
+.blabel { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.lnav { display: flex; gap: 24px; align-items: baseline; white-space: nowrap; margin-left: auto; }
+.lnav a { text-decoration: none; }
+#lfoot :is(button, a):hover .blabel, .lnav :is(button, a):hover { text-decoration: underline 2px; text-underline-offset: 5px; }
+.lnav [aria-current="page"] { text-decoration: underline 2px; text-underline-offset: 5px; }
+#lfoot :focus-visible { outline-width: 2px; outline-offset: 4px; }
+.toast { display: none; font: 700 16px/1 var(--sans); white-space: nowrap; }
+#lfoot.toasting { background: var(--bone); color: var(--black); }
+#lfoot.toasting .back { display: none; }
+#lfoot.toasting .toast { display: block; }
+#lfoot.toasting :focus-visible { outline-color: var(--black); }
+#lfoot::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: var(--black);
+  transform: scaleX(0); transform-origin: left; visibility: hidden;
+}
+#lfoot.toasting::after { visibility: visible; animation: walk 2.6s linear forwards; }
+@keyframes walk { to { transform: scaleX(1); } }
+/* the thing you opened stays inverted while the walk starts */
+.opening, .opening:hover { background: var(--bone) !important; color: var(--black) !important; }
+.pick.opening { background: var(--black) !important; color: var(--bone) !important; }
+
+/* the verdict tag: the same chip, wherever a talk belongs to an argument */
+.tags { display: flex; flex-direction: column; gap: 4px; align-self: start; }
+.tag {
+  display: inline-grid; place-items: center; width: 34px; height: 24px; background: var(--tg);
+  font: 800 12px/1 var(--sans); font-stretch: var(--wide); font-variant-numeric: tabular-nums; color: var(--bone);
+}
+
+/* debate: two zones. The card shrunk into a header (its chip, the verdict, the consensus, one bone door to the talk
+   to watch first), then the question on black, its positions laid along one axis, each as wide as its talk count. */
+.dcard {
+  background: var(--ink); padding: 18px var(--m) 18px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 476px; column-gap: 30px; align-items: start;
+}
+.dhead { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 18px; margin-bottom: 14px; }
+.dhead .chip { background: var(--bone); color: var(--ink); margin-top: 4px; }
+.dverdict { font-weight: 800; font-stretch: var(--cond); line-height: var(--lh); letter-spacing: -.005em; min-width: 0; flex: 1; }
+.dverdict:focus { outline: none; }
+.dleft { display: flex; flex-direction: column; gap: 14px; }
+.dcons { font: 400 17px/1.4 var(--sans); }
+.dleft .door2 { align-self: start; padding: 10px 14px 6px 0; border-top-width: 3px; font-size: 19px; }
+.dleft .door2:hover, .dleft .door2:focus-visible { padding-left: 14px; margin-left: -14px; }
+.pick { display: block; padding: 14px 20px 16px; }
+.pick .pk-l { display: block; font: 700 15px/1 var(--sans); font-stretch: 100%; color: var(--black); }
+.pick .pk-t { display: block; margin-top: 7px; font-size: 20px; line-height: 1.1; }
+.pick .pk-w { display: block; margin-top: 7px; font: 400 16px/1.36 var(--sans); font-stretch: 100%; letter-spacing: 0; color: var(--black); }
+.pick .pk-w b { font-weight: 700; }
+.pick:hover .pk-l, .pick:hover .pk-w, .pick:focus-visible .pk-l, .pick:focus-visible .pk-w { color: var(--bone); }
+
+.dbody { padding: 14px var(--m) 12px; min-height: 0; }
+.question { font: 700 21px/1.15 var(--sans); font-stretch: var(--wide); letter-spacing: -.01em; }
+.sides { margin-top: 12px; display: grid; column-gap: 6px; }
+.side { display: flex; flex-direction: column; min-width: 0; }
+/* the axis: each position's bar is as wide as its share of the talks, with the tally in it */
+.tally {
+  display: flex; align-items: baseline; gap: 6px; height: 32px; padding: 0 12px; background: var(--bone); color: var(--black);
+  font: 800 24px/32px var(--sans); font-stretch: var(--wide); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.tally small { font: 600 15px/1 var(--sans); font-stretch: 100%; }
+.side > :not(.tally) { padding-right: 18px; }
+.stance { margin-top: 10px; font: 800 20px/1.06 var(--sans); font-stretch: var(--wide); letter-spacing: -.015em; text-wrap: balance; }
+.sides.n3 .stance { font-size: 18px; }
+.because { margin-top: 6px; font: 400 15px/1.34 var(--sans); }
+.who { margin-top: 6px; font: 600 15px/1.34 var(--sans); }
+.who button { text-decoration: underline 1px; text-underline-offset: 3px; text-decoration-color: rgb(243 235 221 / .5); }
+.who button:hover { text-decoration-color: currentColor; text-decoration-thickness: 2px; }
+.who :focus-visible { outline-width: 2px; outline-offset: 2px; }
+.side.plain .stance { font-size: 18px; }
+
+/* talk tables (search): the verdict tag, title and people, the metric. The whole row is the way in. */
+.tools { display: flex; align-items: baseline; gap: 22px; padding-bottom: 9px; border-bottom: 1px solid var(--bone); font: 500 15px/1.2 var(--sans); }
+.tools .count { font-weight: 700; }
+.sort { display: flex; align-items: baseline; gap: 18px; margin-left: auto; }
+.sort button, .argued { padding: 2px 0; }
+.sort button[aria-pressed="true"] { text-decoration: underline 2px; text-underline-offset: 5px; font-weight: 700; }
+.sort button:hover, .argued:hover { text-decoration: underline 1px; text-underline-offset: 5px; }
+.tools :focus-visible, .p-head :focus-visible { outline-width: 2px; outline-offset: 4px; }
+.argued { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.argued::before { content: ""; width: 13px; height: 13px; border: 2px solid var(--bone); }
+.argued[aria-pressed="true"]::before { background: var(--bone); box-shadow: inset 0 0 0 2px var(--black); }
+.argued[aria-pressed="true"] { font-weight: 700; }
+.thm { width: 120px; text-align: right; }
+.row {
+  display: grid; grid-template-columns: 46px minmax(0, 1fr) 120px; align-items: center;
+  width: calc(100% + 24px); margin: 0 -12px; padding: 9px 12px 10px; border-bottom: 1px solid var(--rule);
+}
+.row .tags { align-self: center; }
+.row:hover, .row:focus-visible { background: var(--bone); color: var(--black); border-bottom-color: var(--bone); }
+.row:focus-visible { outline: 3px solid var(--bone); outline-offset: 0; }
+.rt { display: block; font: 600 17px/1.25 var(--sans); }
+.rs { display: block; margin-top: 3px; font: 400 15px/1.35 var(--sans); }
+.metric { text-align: right; font: 600 16px/1.25 var(--sans); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.metric small { display: block; font: 400 13px/1.3 var(--sans); }
+.play { font-size: 12px; margin-right: 7px; position: relative; top: -1px; }
+.empty { padding: 18px 0; font: 400 17px/1.45 var(--sans); max-width: 60ch; }
+
+/* search */
+.srch-head { padding: 22px var(--m) 0; }
+.qrow { display: flex; align-items: end; gap: 18px; border-bottom: 3px solid var(--bone); }
+.q {
+  flex: 1; min-width: 0; background: none; border: 0; border-radius: 0;
+  color: var(--bone); caret-color: var(--bone); padding: 0 0 8px;
+  font: 800 48px/1 var(--sans); font-stretch: var(--wide); letter-spacing: -.02em;
+}
+.q::placeholder { color: var(--bone); opacity: .62; }
+.q:focus { outline: none; }
+.qrow:focus-within { box-shadow: 0 3px 0 var(--bone); }
+.q::-webkit-search-cancel-button { display: none; }
+.vchip { flex: none; margin-bottom: 10px; display: inline-flex; align-items: center; gap: 10px; background: var(--tg); padding: 7px 12px; font: 700 15px/1.1 var(--sans); max-width: 46%; }
+.vchip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vchip b { font-weight: 800; font-stretch: var(--wide); }
+.srch-head .tools { margin-top: 14px; }
+.s-list { padding: 0 var(--m) 20px; }
+/* where the results were argued: the verdicts as small posters in their own ink */
+.related { padding-top: 14px; display: flex; align-items: center; gap: 18px; }
+.related h3 { flex: none; font: 600 15px/1.25 var(--sans); }
+.rel-row { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.rel {
+  display: flex; align-items: center; gap: 14px; min-height: 50px;
+  background: var(--tg); padding: 8px 16px;
+}
+.rel b { font: 800 22px/1 var(--sans); font-stretch: var(--wide); letter-spacing: -.02em; }
+.rel span { font: 800 18px/1.08 var(--sans); font-stretch: var(--wide); letter-spacing: -.01em; }
+.rel:hover, .rel:focus-visible { background: var(--bone); color: var(--tg); }
+
+/* programme: a schedule board, one day at a time, time as the rail */
+.p-head { margin: 0 var(--m); padding-top: 20px; display: flex; align-items: end; gap: 24px; border-bottom: 3px solid var(--bone); }
+.days { display: flex; gap: 22px; }
+.days button { font: 800 32px/1 var(--sans); font-stretch: var(--wide); letter-spacing: -.02em; padding-bottom: 10px; position: relative; opacity: .62; }
+.days button[aria-pressed="true"] { opacity: 1; }
+.days button[aria-pressed="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 8px; background: var(--bone); }
+.days button:hover { opacity: 1; }
+.p-side { margin-left: auto; padding-bottom: 12px; display: flex; align-items: baseline; gap: 20px; font: 500 15px/1.2 var(--sans); white-space: nowrap; }
+.board { padding: 0 var(--m) 20px; }
+.tg { display: grid; grid-template-columns: 104px minmax(0, 1fr); border-bottom: 1px solid var(--rule); padding: 12px 0 10px; }
+.tg time { font: 800 24px/1 var(--sans); font-stretch: var(--wide); font-variant-numeric: tabular-nums; letter-spacing: -.02em; align-self: start; position: sticky; top: 8px; padding-top: 3px; }
+.slot {
+  display: grid; grid-template-columns: 66px 30px minmax(0, 1fr) 220px; column-gap: 14px; align-items: baseline;
+  width: calc(100% + 20px); margin: 0 -10px; padding: 5px 10px 6px;
+}
+.slot .sroom { font: 600 15px/1.3 var(--sans); white-space: nowrap; }
+.slot .tags { align-self: start; }
+.slot .st { font: 600 16px/1.28 var(--sans); }
+.slot .sw { font: 400 15px/1.3 var(--sans); }
+.slot:hover, .slot:focus-visible { background: var(--bone); color: var(--black); }
+.slot:focus-visible { outline-width: 2px; outline-offset: 2px; }
+
+/* ---------- the cut ---------- */
+#splice { position: absolute; inset: 0; background: #000; z-index: 9; }
+
+/* ---------- phone totem 340 x 690 ---------- */
+.phone .card {
+  padding: 20px var(--m) 22px; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: "sig" "chips" "verdict" "doors";
+}
+.phone .sig { font-size: 15px; white-space: normal; }
+.phone .sig b { display: block; font-size: 19px; margin: 0 0 3px; }
+.phone .chips { margin-top: 12px; justify-content: space-between; }
+.phone .chips .chip { width: 34px; height: 28px; font-size: 13px; }
+.phone .verdict { padding: 14px 0 18px; }
+.phone .doors { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; column-gap: 14px; row-gap: 16px; }
+.phone .cta { grid-column: 1 / -1; grid-row: auto; padding: 16px 18px 16px; gap: 12px; }
+.phone .cq { font-size: 22px; line-height: 1.12; }
+.phone .cw { font-size: 16px; }
+.phone .door2 { font-size: 18px; padding: 10px 0 0; min-height: 40px; }
+.phone .long { display: none; }
+.phone .door2:hover, .phone .door2:focus-visible { padding-left: 8px; }
+
+.phone .layer { display: block; overflow-y: auto; }
+.phone #lfoot { padding: 0 16px; gap: 12px; font-size: 15px; }
+.phone .lnav { gap: 14px; }
+.phone .lnav [aria-current="page"] { display: none; }
+.phone .blabel { display: none; }
+.phone .back { flex: none; }
+.phone #lfoot.toasting .lnav { display: none; }
+.phone .toast { font-size: 15px; }
+.phone .back .chip { width: 30px; }
+/* the totem's debate scrolls: the header fills the screen bar 16 px, so a band of the black zone shows above the strip */
+.phone .dcard { display: flex; flex-direction: column; gap: 0; padding: 18px var(--m) 22px; min-height: calc(690px - var(--fh) - 16px); }
+.phone .dhead { flex-direction: column; gap: 12px; margin-bottom: 14px; }
+.phone .dhead .chip { margin: 0; }
+.phone .dverdict { flex: none; width: 100%; }
+.phone .dleft { min-height: 0; gap: 12px; }
+.phone .dcons { font-size: 16px; line-height: 1.4; }
+.phone .dleft .door2 { font-size: 17px; margin-top: 0; }
+.phone .pick { margin-top: auto; padding: 14px 16px 16px; }
+.phone .dleft + .pick { margin-top: auto; }
+.phone .pick .pk-t { font-size: 19px; }
+.phone .dbody { padding: 18px var(--m) 24px; }
+.phone .question { font-size: 20px; }
+.phone .sides { grid-template-columns: 1fr !important; row-gap: 22px; margin-top: 14px; }
+.phone .tally { width: var(--w); min-width: 120px; }
+.phone .side > :not(.tally) { padding-right: 0; }
+.phone .stance, .phone .sides.n3 .stance { font-size: 22px; }
+.phone .tools { flex-wrap: wrap; row-gap: 10px; column-gap: 16px; }
+.phone .sort { margin-left: 0; order: 3; width: 100%; gap: 14px; }
+.phone .thm { display: none; }
+.phone .row { grid-template-columns: 38px minmax(0, 1fr) 70px; }
+.phone .row .tags { align-self: start; margin-top: 2px; }
+.phone .tag { width: 28px; height: 22px; font-size: 12px; }
+.phone .rt { font-size: 16px; }
+.phone .srch-head { padding-top: 18px; }
+.phone .qrow { flex-direction: column; align-items: stretch; gap: 10px; }
+.phone .vchip { max-width: none; margin: 0; align-self: flex-start; }
+.phone .q { font-size: 38px; }
+.phone #search, .phone #programme { display: grid; overflow: hidden; }
+.phone .related { flex-direction: column; align-items: stretch; gap: 8px; }
+.phone .rel-row { flex-direction: column; }
+.phone .rel span { font-size: 16px; }
+.phone .p-head { flex-wrap: wrap; row-gap: 0; padding-top: 16px; }
+.phone .days { gap: 0; justify-content: space-between; width: 100%; }
+.phone .days button { font-size: 21px; padding-bottom: 8px; }
+.phone .p-side { order: -1; margin-left: 0; width: 100%; justify-content: space-between; padding-bottom: 12px; font-size: 14px; white-space: normal; }
+.phone .tg { grid-template-columns: 62px minmax(0, 1fr); }
+.phone .tg time { font-size: 17px; }
+.phone .slot { grid-template-columns: auto minmax(0, 1fr); column-gap: 8px; row-gap: 3px; }
+.phone .slot .sroom { grid-column: 2; grid-row: 1; }
+.phone .slot .tags { grid-column: 1; grid-row: 1 / span 2; }
+.phone .slot .st { grid-column: 2; }
+.phone .slot .sw { grid-column: 2; }
+.phone .slot:not(:has(.tag)) .sroom, .phone .slot:not(:has(.tag)) .st, .phone .slot:not(:has(.tag)) .sw { grid-column: 1 / -1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .chip[aria-current="true"]::after { animation: none; clip-path: none; }
+  #lfoot.toasting::after { animation: none; transform: none; visibility: hidden; }
+}

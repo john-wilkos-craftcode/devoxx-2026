@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rooms Three to Ten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="style.css">
+<script>if (/[?&]shape=phone/.test(location.search)) document.documentElement.classList.add("phone");</script>
+</head>
+<body>
+<main id="menu" aria-label="Devoxx Belgium 2026 hall screen">
+  <!-- the masthead at rest; in the week it becomes the verdict pager -->
+  <div id="top"><p class="mast">Devoxx Belgium 2026</p></div>
+
+  <p id="how">Pick a room</p>
+  <nav id="rooms" aria-label="Rooms">
+    <button class="room" type="button" data-room="3"><span class="n">3</span><span class="cap"></span></button>
+    <button class="room" type="button" data-room="4"><span class="n">4</span><span class="cap"></span></button>
+    <button class="room" type="button" data-room="5"><span class="n">5</span><span class="cap"></span></button>
+    <button class="room" type="button" data-room="6"><span class="n">6</span><span class="cap"></span></button>
+    <button class="room" type="button" data-room="7"><span class="n">7</span><span class="cap"></span></button>
+    <button class="room" type="button" data-room="8"><span class="n">8</span><span class="cap"></span></button>
+    <button class="room" type="button" data-room="9"><span class="n">9</span><span class="cap"></span></button>
+    <button class="room" type="button" data-room="10"><span class="n">10</span><span class="cap"></span></button>
+  </nav>
+
+  <!-- after the doors in the DOM so Tab and hover reach a room first; the poster: the week's verdict against what it still argues, in the same template on every week page -->
+  <button id="band" type="button"></button>
+
+  <section id="panel" aria-label="Detail" hidden></section>
+
+  <nav id="sign" aria-label="The story">
+    <ul>
+      <li class="only-open"><button type="button" data-go="rest"><svg class="ar back" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10h13.2l-5.6-5.6 2.8-2.8L22.8 12 12.4 22.4l-2.8-2.8 5.6-5.6H2z"/></svg><span>All rooms</span></button></li>
+      <li><button type="button" data-go="week"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10h13.2l-5.6-5.6 2.8-2.8L22.8 12 12.4 22.4l-2.8-2.8 5.6-5.6H2z"/></svg><span>The week</span></button></li>
+      <li><button type="button" data-go="picks"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10h13.2l-5.6-5.6 2.8-2.8L22.8 12 12.4 22.4l-2.8-2.8 5.6-5.6H2z"/></svg><span>Watch first</span></button></li>
+      <li><button type="button" data-go="days"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10h13.2l-5.6-5.6 2.8-2.8L22.8 12 12.4 22.4l-2.8-2.8 5.6-5.6H2z"/></svg><span>By day</span></button></li>
+      <li><button type="button" data-go="search"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10h13.2l-5.6-5.6 2.8-2.8L22.8 12 12.4 22.4l-2.8-2.8 5.6-5.6H2z"/></svg><span>Search</span></button></li>
+    </ul>
+  </nav>
+  <a class="textv" href="../../../site/index.html">Text version</a>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="glass" aria-hidden="true"></div>
+</main>
+<script src="../../menu-variants/data.js"></script>
+<script src="menu.js"></script>
+</body>
+</html>

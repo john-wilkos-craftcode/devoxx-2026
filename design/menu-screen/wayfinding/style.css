@@ -1,0 +1,435 @@
+/* Rooms Three to Ten: a cinema sign. One velvet-ink field, white type in one family, orange for "this one" only:
+   the room you point at or stand in, the day or sort you picked, the talk to watch first.
+   Desktop grid: 8 columns of 89.5px with 24px gutters between 48px margins (column n starts at 48 + n*113.5).
+   Vertical rhythm: 48 margins, 64 between zones, 32/16 inside a zone. Every text box is trimmed to cap height and
+   alphabetic baseline, so a "top" below is a cap line and a "bottom" is a baseline.
+     48   masthead cap line
+    122   the poster (the week's verdict, cols 1-5, against what it still argues, cols 6-8, same size)
+    277   one small label ("Pick a room"; on hover, the room's facts)
+    319   the doors: eight numerals, a rule at their foot, one word each
+    521   the sign strip's hairline; its baseline rests on the bottom margin (565) */
+:root {
+  --page: #050A14;
+  --field: #0E2347;          /* velvet ink: white 15.4:1 */
+  --white: #FFFFFF;
+  --soft: #CBD6E8;           /* reading text in second rank: 11.9:1 */
+  --mute: #8FA6CF;           /* the counter-voice: the open question, the room words at rest: 6.3:1 */
+  --orange: #F28C28;         /* "this one": 6.3:1 on the field; the field on orange is 6.3:1 too */
+  --hair: rgba(255, 255, 255, .24);
+  --w: 980px; --h: 613px;
+  --pad: 48px;
+  --col: 89.5px; --gx: 24px; --step: 113.5px;
+  --num: 128px;              /* door numerals, condensed cut: "10" fits its 89.5px column */
+  --poster: 52px;            /* set from JS: the largest step at which the verdict holds two lines */
+  --cond: "wdth" 62;         /* the door-plate face: numerals and the words under them */
+  --ease: cubic-bezier(.2, .7, .1, 1);
+  --t-mast: 48px; --t-poster: 122px; --t-how: 277px; --t-rooms: 319px; --sign-top: 521px; --base: 565px;
+  color-scheme: dark;
+}
+html.phone {
+  --w: 340px; --h: 690px; --pad: 22px; --col: 142px; --gx: 12px; --step: 154px;
+  --num: 86px; --poster: 27px;
+  --t-mast: 24px; --t-poster: 61px; --t-how: 180px; --t-rooms: 214px; --sign-top: 579px; --base: 668px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--page);
+  display: grid; place-items: center;
+  font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  font-variation-settings: "wdth" 100;
+  color: var(--white);
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; font-variation-settings: inherit; }
+:focus { outline: none; }
+/* default focus: an inset ring, so it never crosses the margins */
+:focus-visible { outline: 3px solid var(--white); outline-offset: -3px; }
+p, h2, h3, ul, ol { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+a { color: inherit; }
+.trim { text-box: trim-both cap alphabetic; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+#menu {
+  position: relative; overflow: hidden;
+  width: var(--w); height: var(--h); flex: none;
+  background: var(--field);
+}
+
+/* ---------- the glass: a lit LCD, not a bitmap. Click-through, above everything, never in the way of contrast:
+   a 2.5% lift of the blacks, a soft streak where the ceiling strip catches the glass, 3% falloff at the bezel. ---------- */
+#glass {
+  position: absolute; inset: 0; z-index: 20; pointer-events: none;
+  background:
+    linear-gradient(177deg, transparent 0 8%, rgba(255, 255, 255, .026) 12%, rgba(255, 255, 255, .008) 18%, transparent 24%),
+    radial-gradient(130% 120% at 50% 45%, transparent 62%, rgba(0, 0, 0, .14) 100%),
+    rgba(120, 140, 175, .025);
+}
+
+/* ---------- top line: the masthead at rest, the verdict pager in the week ---------- */
+#top {
+  position: absolute; left: var(--pad); right: var(--pad); top: var(--t-mast);
+  display: flex; align-items: baseline; justify-content: space-between;
+  font-size: 15px; line-height: 18px; font-weight: 600; text-box: trim-both cap alphabetic;
+  z-index: 3;
+}
+#top .mast { text-box: trim-both cap alphabetic; }
+#top .at { color: var(--soft); font-weight: 500; font-variant-numeric: tabular-nums; }
+#top .tp { display: flex; gap: 4px; margin: -10px -10px -10px 0; }
+#top .tp button { display: flex; align-items: center; gap: 8px; padding: 10px; font-weight: 600; }
+#top .tp svg { width: 12px; height: 12px; fill: currentColor; }
+#top .tp .prev svg { transform: scaleX(-1); }
+#top .tp button[aria-disabled="true"] { color: var(--mute); cursor: default; }
+#top .tp button:hover:not([aria-disabled="true"]) span { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+#menu.is-open:not(.v-week) #top { display: none; }
+
+/* ---------- the poster: a statement in white against an open question in the counter-voice, same size ---------- */
+#band {
+  position: absolute; left: var(--pad); right: var(--pad); top: var(--t-poster);
+  display: grid; grid-template-columns: calc(5 * var(--col) + 4 * var(--gx)) 1fr; column-gap: var(--gx);
+  align-items: start; z-index: 2;
+}
+#band .big {
+  display: block; font-weight: 700; letter-spacing: -.025em;
+  font-size: var(--poster); line-height: 1.04; text-wrap: balance;
+  text-box: trim-both cap alphabetic;
+}
+#band .q { color: var(--mute); }
+#band .l .big { font-size: var(--lsize, var(--poster)); }
+#band .u { text-decoration: underline transparent; text-decoration-thickness: 4px; text-underline-offset: .14em; text-decoration-skip-ink: none; }
+#band:hover .u, #band:focus-visible .u { text-decoration-color: var(--white); }
+#band:focus-visible { outline: none; }
+#band[disabled] { cursor: default; }
+#band[disabled] .u { text-decoration: none; }
+#menu.is-open:not(.v-week) #band, #menu.wk-talks #band { display: none; }
+
+/* ---------- the one small label: "Pick a room" at rest, the pointed room's facts on hover ---------- */
+#how {
+  position: absolute; left: var(--pad); right: var(--pad); bottom: calc(var(--h) - var(--t-how) - 10.5px);
+  font-size: 15px; line-height: 20px; color: var(--soft); text-box: trim-both cap alphabetic;
+}
+#how b { color: var(--white); font-weight: 650; }
+#how .v { font-variant-numeric: tabular-nums; }
+#menu.is-open #how { display: none; }
+
+/* ---------- the doors ---------- */
+#rooms {
+  position: absolute; left: var(--pad); top: var(--t-rooms);
+  display: grid; grid-template-columns: repeat(8, var(--col)); column-gap: var(--gx);
+  z-index: 2;
+}
+.room { position: relative; display: flex; flex-direction: column; align-items: flex-start; }
+.room .n {
+  display: block;
+  font-size: var(--num); font-weight: 700; line-height: 1;
+  font-variation-settings: var(--cond); letter-spacing: -.035em; font-variant-numeric: lining-nums proportional-nums;
+  text-box: trim-both cap alphabetic;
+  margin-left: -.03em;               /* optical: the digit's side bearing, so its stem sits on the column edge */
+  color: var(--white);
+  transform-origin: 0 0;
+}
+.room .cap {
+  display: block; margin-top: 36px; white-space: nowrap;
+  font-size: 20px; line-height: 24px; font-weight: 700; font-variation-settings: var(--cond); letter-spacing: .005em;
+  color: var(--soft); text-box: trim-both cap alphabetic;
+}
+/* one signal: the numeral turns orange and a 4px rule sits at its foot, across its column */
+.room::after { content: ""; position: absolute; left: 0; right: 0; top: calc(var(--num) * .7 + 16px); height: 4px; background: var(--orange); transform: scaleX(0); transform-origin: 0 50%; }
+.room:hover .n, .room:focus-visible .n { color: var(--orange); }
+.room:hover .cap, .room:focus-visible .cap { color: var(--white); }
+.room:hover::after, .room:focus-visible::after { transform: scaleX(1); transition: transform 160ms var(--ease); }
+.room:focus-visible { outline: none; }
+
+/* in a room: the doors fold into a corridor rail in column 1; the room you are in is a full orange plate */
+#menu.is-open #rooms {
+  left: var(--pad); top: var(--pad); bottom: calc(var(--h) - var(--sign-top) + 24px);
+  grid-template-columns: var(--col); grid-auto-rows: auto; align-content: space-between; column-gap: 0;
+}
+#menu.is-open .room { flex-direction: row; align-items: center; width: var(--col); padding: 0; }
+#menu.is-open .room .n { font-size: 22px; letter-spacing: -.01em; margin: 0; padding: 0; font-variation-settings: "wdth" 100; }
+#menu.is-open .room .cap, #menu.is-open .room::after { display: none; }
+#menu.is-open .room:hover .n { color: var(--orange); }
+#menu.is-open .room.is-on { background: var(--orange); color: var(--field); flex-direction: column; align-items: flex-start; padding: 12px 10px 12px; margin: -12px 0 -12px -10px; width: calc(var(--col) + 10px); }
+#menu.is-open .room.is-on .n { color: var(--field); font-size: 40px; font-variation-settings: var(--cond); letter-spacing: -.04em; }
+#menu.is-open .room.is-on .cap { display: block; color: var(--field); margin-top: 12px; font-size: 17px; white-space: normal; }
+#menu.is-open .room:focus-visible { outline: 3px solid var(--white); outline-offset: 2px; }
+#menu.is-open:not(.v-room) #rooms { display: none; }
+
+/* ---------- the sign strip ---------- */
+#sign { position: absolute; left: var(--pad); right: var(--pad); top: var(--sign-top); z-index: 3; border-top: 1px solid var(--hair); }
+#sign ul { display: grid; grid-template-columns: repeat(4, calc(2 * var(--col) + var(--gx))); column-gap: var(--gx); }
+#sign li { display: flex; position: relative; }
+#sign button {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  height: calc(var(--base) - var(--sign-top) + 18px); padding: 0; align-items: flex-end; padding-bottom: 18px;
+  font-size: 21px; line-height: 26px; font-weight: 600; letter-spacing: -.005em;
+  position: relative;
+}
+#sign button span { text-box: trim-both cap alphabetic; }
+#sign .ar { width: 17px; height: 17px; flex: none; fill: currentColor; margin-bottom: -1px; }
+#sign .ar.back { transform: scaleX(-1); }
+/* hover, focus and "you are here" share one mark: a 4px white rule on the strip's hairline */
+#sign button::after { content: ""; position: absolute; left: 0; right: 0; top: -2px; height: 4px; background: var(--white); transform: scaleX(0); transform-origin: 0 50%; }
+#sign button:hover::after, #sign button:focus-visible::after, #sign button[aria-current="true"]::after { transform: scaleX(1); transition: transform 160ms var(--ease); }
+#sign button:focus-visible { outline: none; }
+#sign button:focus-visible span { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.only-open { display: none !important; }
+#menu.is-open .only-open { display: flex !important; }
+
+/* Text version: a quiet item at the strip's end, on its baseline */
+.textv {
+  position: absolute; right: var(--pad); bottom: calc(var(--h) - var(--base)); z-index: 3;
+  font-size: 15px; line-height: 18px; color: var(--mute); text-decoration: none; text-box: trim-both cap alphabetic;
+}
+.textv:hover, .textv:focus-visible { color: var(--white); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; outline: none; }
+
+/* inner states: the same strip on the same line, set smaller, with "All rooms" leading */
+#menu.is-open #sign ul { display: flex; gap: 34px; }
+#menu.is-open #sign button { font-size: 17px; line-height: 20px; gap: 8px; }
+#menu.is-open #sign .ar { width: 13px; height: 13px; margin-bottom: 0; }
+
+/* ---------- the second screen: paged, never scrolled ---------- */
+#panel {
+  position: absolute; left: var(--pad); right: var(--pad); top: var(--pad); bottom: calc(var(--h) - var(--sign-top) + 24px);
+  display: flex; flex-direction: column;
+  z-index: 2;
+}
+#menu.v-room #panel { left: calc(var(--pad) + var(--step)); }
+/* the week keeps the poster where it was, at the size it was: the debate opens under it */
+#menu.v-week #panel { top: calc(var(--t-poster) + var(--poster) * 1.74 + 32px); }
+#panel[hidden] { display: none; }
+#panel.cuts { animation: wipe 240ms var(--ease) backwards; }
+@keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+/* a screen's head: the same poster template, a white statement and a muted voice at the poster size */
+.head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex: none; }
+.head h2 { font-size: var(--poster); font-weight: 700; letter-spacing: -.025em; line-height: 1.04; text-box: trim-both cap alphabetic; }
+.head h2 .q { color: var(--mute); }
+.head .sub { color: var(--soft); font-size: 16px; line-height: 20px; margin-top: 16px; text-box: trim-both cap alphabetic; }
+
+/* sort: the picked key carries the orange rule */
+.sort { display: flex; gap: 2px; align-items: baseline; font-size: 16px; color: var(--soft); flex: none; margin-top: -8px; }
+.sort .lbl { margin-right: 6px; }
+.sort button { padding: 6px 8px 10px; color: var(--white); position: relative; }
+.sort button:last-child { margin-right: -8px; }
+.sort button[aria-pressed="true"] { font-weight: 700; }
+.sort button[aria-pressed="true"]::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 0; height: 4px; background: var(--orange); }
+.sort button:hover:not([aria-pressed="true"]) { text-decoration: underline; text-underline-offset: 4px; }
+
+.page { flex: 1; min-height: 0; overflow: hidden; margin-top: 24px; border-top: 1px solid var(--hair); }
+.page.bare { border-top: 0; margin-top: 0; }
+
+/* pager: "11-20 of 34", previous, next. Quiet: it is never the main action. */
+.pager { flex: none; display: flex; align-items: center; justify-content: flex-end; gap: 4px; height: 36px; margin-bottom: -12px; font-size: 16px; color: var(--soft); }
+.pager[hidden] { display: none; }
+.pager .at { margin-right: auto; font-variant-numeric: tabular-nums; }
+.pager button { display: flex; align-items: center; gap: 8px; padding: 6px 10px; color: var(--white); font-weight: 600; }
+.pager button:last-child { margin-right: -10px; }
+.pager button svg { width: 12px; height: 12px; fill: currentColor; }
+.pager .prev svg { transform: scaleX(-1); }
+.pager button[aria-disabled="true"] { color: var(--mute); cursor: default; }
+.pager button:hover:not([aria-disabled="true"]) span { text-decoration: underline; text-underline-offset: 4px; }
+
+/* talk rows */
+.trow {
+  display: grid; grid-template-columns: 34px 52px 1fr 112px; column-gap: 0; align-items: baseline;
+  width: 100%; padding: 8px 4px 8px; border-bottom: 1px solid var(--hair);
+  font-size: 17px; line-height: 21px;
+}
+.trow.nodow { grid-template-columns: 62px 1fr 112px; }
+.trow:hover { background: rgba(255, 255, 255, .06); }
+.trow .dow, .trow .tm { color: var(--soft); font-variant-numeric: tabular-nums; font-size: 15px; }
+.trow .tm { padding-right: 16px; }
+.trow .t { display: block; font-weight: 600; }
+.trow .who { display: block; color: var(--soft); font-size: 15px; line-height: 19px; margin-top: 2px; }
+.trow .m { text-align: right; color: var(--soft); font-size: 15px; font-variant-numeric: tabular-nums; }
+.trow .m b { color: var(--white); font-weight: 600; }
+.trow .few { display: block; font-size: 14px; }
+/* search: titles in the counter-voice, the matched words lit white */
+.trow .t.hl { color: var(--mute); font-weight: 600; }
+.trow .t.hl mark { background: none; color: var(--white); font-weight: 800; }
+.empty { padding: 18px 4px; color: var(--soft); font-size: 18px; line-height: 24px; max-width: 60ch; }
+
+/* the week, page 0: the intro and the index of verdicts */
+.overview { display: flex; flex-direction: column; height: 100%; }
+.intro { font-size: 17px; line-height: 24px; max-width: 92ch; color: var(--soft); }
+.index { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--gx); margin-top: auto; border-top: 1px solid var(--hair); }
+.index button { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: baseline; padding: 9px 4px 10px; border-bottom: 1px solid var(--hair); font-size: 17px; line-height: 21px; font-weight: 600; }
+.index button:hover { background: rgba(255, 255, 255, .06); }
+.index .i { color: var(--mute); font-weight: 500; font-variant-numeric: tabular-nums; }
+.index .c { color: var(--soft); font-size: 15px; font-weight: 400; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.overview.tight .intro { font-size: 15px; line-height: 21px; }
+.overview.tight .index button { padding: 7px 4px 8px; font-size: 16px; }
+.overview.tighter .index { display: none; }   /* the totem keeps the intro; the verdicts are one arrow away */
+
+/* one verdict: the consensus, the full question, the sides on equal neutral rules, the pick, one action */
+.verdict { display: flex; flex-direction: column; height: 100%; }
+.consensus { font-size: 17px; line-height: 24px; max-width: 96ch; color: var(--soft); }
+.question { font-size: 17px; line-height: 22px; font-weight: 650; margin-top: 12px; }
+.sides { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; column-gap: var(--gx); margin-top: 24px; }
+.side { border-top: 1px solid var(--hair); padding-top: 14px; min-width: 0; }
+.side .w { display: block; font-size: 22px; line-height: 26px; font-weight: 700; letter-spacing: -.01em; }
+.side p { font-size: 17px; line-height: 23px; margin-top: 4px; }
+.side .names { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 0 16px; }
+/* names are plain bold type; they still walk to their talk on click, and show it on focus */
+.name { font-weight: 700; font-size: 16px; line-height: 22px; color: var(--soft); padding: 1px 0; }
+button.name:hover, button.name:focus-visible { color: var(--white); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; outline: none; }
+.vfoot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: auto; padding-top: 18px; }
+/* the pick is the one orange thing on the page: a 4px rule on its left and its label */
+.vpick { display: flex; align-items: baseline; gap: 10px; font-size: 15px; line-height: 20px; color: var(--soft); border-left: 4px solid var(--orange); padding: 3px 0 3px 12px; min-width: 0; }
+.vpick .k { color: var(--orange); font-weight: 700; white-space: nowrap; }
+.vpick button { font-size: 17px; line-height: 22px; font-weight: 700; color: var(--white); text-align: left; }
+.vpick button:hover, .vpick button:focus-visible { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; outline: none; }
+.vtalks { display: flex; align-items: center; gap: 10px; font-size: 19px; line-height: 24px; font-weight: 700; padding: 8px 0; position: relative; white-space: nowrap; flex: none; }
+.vtalks svg { width: 15px; height: 15px; fill: currentColor; flex: none; }
+.vtalks:hover span, .vtalks:focus-visible span { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.vtalks:focus-visible { outline: none; }
+.verdict.s1 .consensus, .verdict.s1 .side p { font-size: 16px; line-height: 21px; }
+.verdict.s1 .sides { margin-top: 18px; }
+.verdict.s2 .question { display: none; }
+.verdict:not(.full) .side p .ev { display: none; }
+.verdict.s3 .side p { display: none; }   /* a claim that is a whole long sentence: the heads and names carry the page */
+
+/* the talks a verdict rests on: the full stances (the evidence) over the list */
+.evid { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; column-gap: var(--gx); flex: none; }
+.evid + .page { margin-top: 24px; }
+.evid .side p { font-size: 15px; line-height: 20px; color: var(--soft); }
+.evid .side p .claim { color: var(--white); font-weight: 600; }
+.evid.tight .side p { font-size: 14px; line-height: 18px; }
+
+/* watch first */
+.prow {
+  display: grid; grid-template-columns: 1fr; width: 100%; padding: 10px 4px 11px;
+  border-bottom: 1px solid var(--hair);
+}
+.prow:hover { background: rgba(255, 255, 255, .06); }
+.prow .v { font-size: 15px; line-height: 19px; color: var(--mute); }
+.prow .t { font-size: 19px; line-height: 23px; font-weight: 700; margin-top: 2px; }
+.prow .why { font-size: 15px; line-height: 20px; color: var(--soft); margin-top: 3px; max-width: 96ch; }
+
+/* by day: the dates as door numerals */
+.days { display: flex; gap: var(--gx); flex: none; }
+.day { display: flex; flex-direction: column; position: relative; width: var(--col); padding-bottom: 0; }
+.day .d { font-size: 96px; font-weight: 700; line-height: 1; font-variation-settings: var(--cond); letter-spacing: -.04em; text-box: trim-both cap alphabetic; margin-left: -.03em; }
+.day .wd { font-size: 17px; line-height: 20px; color: var(--soft); font-weight: 700; font-variation-settings: var(--cond); margin-top: 30px; text-box: trim-both cap alphabetic; }
+.day::after { content: ""; position: absolute; left: 0; right: 0; top: calc(96px * .7 + 12px); height: 4px; background: var(--orange); transform: scaleX(0); transform-origin: 0 50%; }
+.day:hover .d, .day[aria-pressed="true"] .d { color: var(--orange); }
+.day[aria-pressed="true"]::after { transform: scaleX(1); }
+.day[aria-pressed="true"] .wd { color: var(--white); }
+.daybar { display: flex; justify-content: space-between; align-items: baseline; margin-top: 28px; color: var(--soft); font-size: 15px; flex: none; text-box: trim-both cap alphabetic; }
+.days + .daybar + .page { margin-top: 14px; }
+
+/* search: one line carries the query, the count and the sort; its rule is white */
+.searchline { display: flex; align-items: flex-end; gap: 24px; flex: none; border-bottom: 2px solid var(--white); padding-bottom: 10px; }
+.searchline:focus-within { border-bottom-width: 4px; padding-bottom: 8px; }
+.q {
+  flex: 1; min-width: 0; font: inherit; font-size: var(--poster); font-weight: 700; letter-spacing: -.025em; line-height: 1;
+  color: var(--white); background: none; border: 0; padding: 0; border-radius: 0; caret-color: var(--white); margin-top: -8px;
+}
+.q::-webkit-search-cancel-button, .q::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+.q::placeholder { color: var(--mute); opacity: 1; }
+.q:focus-visible { outline: none; }
+.resbar { display: flex; flex-direction: column; align-items: flex-end; flex: none; color: var(--soft); font-size: 15px; line-height: 18px; margin-bottom: -10px; font-variant-numeric: tabular-nums; }
+.resbar .sort { margin-top: 2px; }
+.slot > .page { margin-top: 0; border-top: 0; }
+
+/* toast: a small sign */
+#toast {
+  position: absolute; right: var(--pad); bottom: calc(var(--h) - var(--sign-top) + 16px); z-index: 6;
+  background: var(--white); color: var(--field);
+  font-size: 20px; font-weight: 700; padding: 12px 18px 13px; border-left: 6px solid var(--orange);
+  visibility: hidden;
+}
+#toast.is-on { visibility: visible; }
+
+/* ---------- phone totem: the same zones stacked ---------- */
+html.phone #top { font-size: 13px; }
+html.phone #band { grid-template-columns: 1fr; row-gap: 0; }
+html.phone #band .big { line-height: 28px; }
+html.phone #band .r .big { margin-top: 9px; }
+html.phone #how { font-size: 13px; line-height: 17px; bottom: calc(var(--h) - var(--t-how) - 9px); }
+html.phone #rooms { grid-template-columns: repeat(2, var(--col)); row-gap: 30px; }
+html.phone .room { flex-direction: row; align-items: flex-end; gap: 12px; width: var(--col); }
+html.phone .room .cap { margin-top: 0; font-size: 18px; line-height: 20px; }
+html.phone .room::after { top: calc(var(--num) * .7 + 9px); height: 4px; }
+html.phone #sign ul { grid-template-columns: repeat(2, 1fr); row-gap: 0; column-gap: var(--gx); }
+html.phone #sign { border-top: 0; }
+html.phone #sign li { border-top: 1px solid var(--hair); }
+html.phone #sign button { font-size: 18px; line-height: 22px; gap: 9px; height: 44px; padding-bottom: 14px; }
+html.phone #sign .ar { width: 14px; height: 14px; }
+html.phone .textv { top: var(--t-mast); bottom: auto; font-size: 13px; }
+html.phone #menu.is-open .textv { top: auto; bottom: 12px; left: var(--pad); right: auto; }
+
+html.phone #menu.is-open #rooms { left: var(--pad); right: var(--pad); top: 22px; bottom: auto; grid-template-columns: repeat(8, auto); align-content: start; justify-content: space-between; column-gap: 0; }
+html.phone #menu.is-open .room { width: auto; }
+html.phone #menu.is-open .room .n { font-size: 20px; }
+html.phone #menu.is-open .room.is-on { padding: 6px 7px; margin: -6px -7px; width: auto; }
+html.phone #menu.is-open .room.is-on .n { font-size: 20px; font-variation-settings: "wdth" 100; letter-spacing: -.01em; }
+html.phone #menu.is-open .room.is-on .cap { display: none; }
+html.phone #panel { top: 24px; bottom: calc(var(--h) - var(--sign-top) + 14px); }
+html.phone #menu.v-room #panel { left: var(--pad); top: 66px; }
+html.phone #menu.v-week #panel { top: calc(var(--t-poster) + var(--wk-h, 104px) + 22px); }
+html.phone #menu.is-open #sign ul { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 10px; }
+html.phone #menu.is-open #sign button { font-size: 15px; line-height: 18px; height: 38px; padding-bottom: 12px; }
+html.phone #menu.is-open #sign .ar { display: none; }
+html.phone .head { flex-direction: column; align-items: flex-start; gap: 14px; }
+html.phone .head h2 { font-size: 30px; }
+html.phone .head .sub { font-size: 14px; line-height: 18px; margin-top: 12px; }
+html.phone .sort { font-size: 14px; margin-top: 0; margin-left: -8px; }
+html.phone .page { margin-top: 14px; }
+html.phone .trow, html.phone .trow.nodow { grid-template-columns: 30px 46px 1fr; font-size: 15px; line-height: 19px; padding: 8px 2px 9px; }
+html.phone .trow.nodow { grid-template-columns: 50px 1fr; }
+html.phone .trow .m { grid-column: -2; text-align: left; font-size: 13px; }
+html.phone .trow .m .few { display: inline; margin-left: 6px; }
+html.phone .trow .dow, html.phone .trow .tm, html.phone .trow .who { font-size: 13px; line-height: 17px; }
+html.phone .pager { font-size: 14px; }
+html.phone .pager button { padding: 6px 6px; }
+html.phone .pager button:last-child { margin-right: -6px; }
+html.phone .intro { font-size: 14px; line-height: 19px; }
+html.phone .index { grid-template-columns: 1fr; margin-top: 14px; }
+html.phone .index button { font-size: 15px; line-height: 19px; padding: 7px 2px 8px; grid-template-columns: 20px 1fr; }
+html.phone .index .c { display: none; }
+html.phone #top .tp button span { display: none; }   /* arrows only on the totem; the buttons keep their names */
+html.phone .consensus { font-size: 14px; line-height: 19px; }
+html.phone .question { font-size: 14px; line-height: 18px; margin-top: 8px; }
+html.phone .sides { grid-auto-flow: row; row-gap: 12px; margin-top: 14px; }
+html.phone .side { padding-top: 9px; display: grid; grid-template-columns: 96px 1fr; column-gap: 8px; align-items: baseline; }
+html.phone .side .w { font-size: 18px; line-height: 22px; }
+html.phone .side p { display: none; }
+html.phone .side .names { margin-top: 0; gap: 0 10px; }
+html.phone .name { font-size: 14px; line-height: 19px; }
+html.phone .vfoot { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 12px; }
+html.phone .vpick { font-size: 13px; flex-direction: column; gap: 2px; }
+html.phone .vpick button { font-size: 15px; line-height: 19px; }
+html.phone .vtalks { font-size: 16px; line-height: 20px; gap: 8px; padding: 4px 0; }
+html.phone .vtalks svg { width: 13px; height: 13px; }
+html.phone .evid { grid-auto-flow: row; row-gap: 10px; }
+html.phone .evid .side { display: block; }
+html.phone .evid .side p { display: block; font-size: 13px; line-height: 17px; }
+html.phone .prow .t { font-size: 16px; line-height: 20px; }
+html.phone .prow .why { font-size: 13px; line-height: 17px; }
+html.phone .days { gap: 10px; }
+html.phone .day { width: 50px; }
+html.phone .day .d { font-size: 60px; }
+html.phone .day .wd { font-size: 15px; margin-top: 22px; }
+html.phone .day::after { top: calc(60px * .7 + 8px); }
+html.phone .searchline { flex-direction: column; align-items: stretch; gap: 10px; }
+html.phone .q { font-size: 32px; margin-top: 0; }
+html.phone .resbar { align-items: flex-start; margin-bottom: -6px; }
+html.phone .resbar .sort { margin-left: -8px; }
+html.phone #toast { left: var(--pad); right: var(--pad); }
+
+/* ---------- reduced motion: cuts only ---------- */
+@media (prefers-reduced-motion: reduce) {
+  #panel.cuts { animation: none; }
+  .room::after, #sign button::after, .day::after { transition: none !important; }
+  .room .n { transition: none !important; }
+}
+
+/* the totem's talks page: back and the page arrows share one row, so the list keeps the height */
+html.phone #menu.wk-talks .vfoot { flex-direction: row; align-items: center; padding-top: 8px; }
+html.phone #menu.wk-talks .vfoot .pager { margin-bottom: 0; }
+html.phone #menu.wk-talks .vfoot .pager button span { display: none; }
+html.phone #menu.wk-talks .evid + .page { margin-top: 14px; }

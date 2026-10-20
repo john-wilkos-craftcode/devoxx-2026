@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Main Menu Variants</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b22;--card:#0f1740;--line:#23306f;--ink:#F2F4FF;--mut:#aeb8ec;--or:#f6921e}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Archivo,system-ui,sans-serif;padding:28px 16px 60px}
+main{max-width:1180px;margin:0 auto}
+h1{font-size:28px;margin:0 0 6px}h1 span{color:var(--or)}
+.lead{color:var(--mut);margin:0 0 26px;max-width:760px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:22px}
+a.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;color:inherit;text-decoration:none}
+a.card:hover,a.card:focus-visible{border-color:var(--or);outline:none}
+a.card:focus-visible{box-shadow:0 0 0 3px var(--or)}
+.card img{display:block;width:100%;aspect-ratio:980/613;object-fit:cover;border-bottom:1px solid var(--line)}
+.body{padding:14px 16px 16px}
+.name{font-size:20px;font-weight:800;margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.score{font-size:14px;color:var(--mut);font-weight:600}
+.body p{margin:0 0 8px;color:#d3d8f2;font-size:14.5px;line-height:1.45}
+.body .sig{color:var(--mut)}
+.body .sig b{color:var(--or);font-weight:600}
+.links{display:flex;gap:14px;font-size:14px}
+.links a{color:var(--mut)}
+footer{margin-top:28px;color:var(--mut);font-size:13.5px}
+</style></head><body><main>
+<h1>Devoxx 2026: five main menus <span>·</span> the hall screen after the conference</h1>
+<p class="lead">Same content in all five: the story (the 8 verdicts and their debates), watch first, search, talks sorted by views / like rate / hearts, the programme by day and the text version. Each was built by its own agent in a screenshot-and-critique loop. Click a card for the live demo; "phone" opens the 340&times;690 totem version. Scores are each agent's own critic, before the cross-check.</p>
+<div class="grid">
+ <a class="card" href="split-flap/index.html"><img src="split-flap/shots/iter4/1-rest.png" alt="Split-flap departures board"><div class="body"><div class="name">Split-flap <span class="score">9.0</span></div><p>The venue's departures board: the 8 verdicts are destinations, watch first, talks and programme are the same board re-flapped.</p><p class="sig"><b>Signature:</b> every keystroke, sort or tab re-flaps the cells letter by letter; your letters land in orange mid-flip.</p></div></a>
+ <a class="card" href="debate-arena/index.html"><img src="debate-arena/shots/iter4/1-rest.png" alt="Debate arena"><div class="body"><div class="name">Debate arena <span class="score">8.7</span></div><p>The conference as its 8 arguments: each verdict a line between its two sides, speakers as dots, watch first and search in a rail.</p><p class="sig"><b>Signature:</b> point at a speaker and a thread runs to their talk and their other debates; the rest dims.</p></div></a>
+ <a class="card" href="sonar/index.html"><img src="sonar/shots/final/1-rest.png" alt="Sonar practice radar"><div class="body"><div class="name">Sonar <span class="score">8.6</span></div><p>A radar of what the talks told you to do: 46 practices on do it now / try it / watch it / push back, across agents, security, JVM and architecture.</p><p class="sig"><b>Signature:</b> a sweep arm you can grab and drag; practices ping as it passes and stack up in the side panel.</p></div></a>
+ <a class="card" href="reel/index.html"><img src="reel/shots/final/1-rest.png" alt="Film reel"><div class="body"><div class="name">Reel <span class="score">8.9</span></div><p>The week as a filmstrip: a countdown leader, the 8 verdicts as title cards, the picks as end credits.</p><p class="sig"><b>Signature:</b> drag the strip through the projector gate; the frame in the gate lights up and Enter projects its debate full screen.</p></div></a>
+ <a class="card" href="jshell/index.html"><img src="jshell/shots/iter4/1-rest.png" alt="jshell REPL"><div class="body"><div class="name">jshell <span class="score">9.0</span></div><p>The conference as a Java REPL: it boots with verdicts(); every chip and row types its command for you, so it works by mouse alone.</p><p class="sig"><b>Signature:</b> autocomplete that previews the result as you type; Tab accepts, Enter runs.</p></div></a>
+</div>
+<footer>Phone versions: add <code>?shape=phone</code> to any demo (narrow the window to ~400 px). Brief: <a href="BRIEF.md" style="color:inherit">BRIEF.md</a> · concepts: <a href="CONCEPTS.md" style="color:inherit">CONCEPTS.md</a> · data: <code>make_data.py</code> (fresh YouTube snapshot 20/10).</footer>
+</main></body></html>

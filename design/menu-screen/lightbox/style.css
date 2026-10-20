@@ -1,0 +1,276 @@
+/* Lightbox: the screen is the search field.
+   One grotesk with a voice (Familjen Grotesk) at five sizes: wall 84, ways 38, menu 30, small 19, and one mono
+   (JetBrains Mono, the IDE face of this audience) at 17 for every name, number and date.
+   Ink on a backlit panel turned down to sit in a dim cinema. Two marks, each with one meaning:
+     inversion = "this one": what your pointer or keyboard is on, the section you are in, the result Enter opens
+     orange    = where your typing goes (the caret, and nothing else)
+   The only underline is a link inside a sentence ("Start with <title>"). */
+:root {
+  --paper: #E8E5DE;        /* white at reduced emission: a lit panel in a dim room, not a browser tab */
+  --paper-edge: #E0DDD6;   /* the backlight falls off a little toward the corners */
+  --ink: #151515;          /* 14.5:1 */
+  --mid: #4A4844;          /* the debate's question. 7.3:1 */
+  --hush: #625F59;         /* the field's placeholder: reads as "not yet typed". 5.1:1 (4.5:1 at the corners) */
+  --you: #A83109;          /* the caret. 5.4:1 */
+  --sheen: rgba(255, 255, 255, 0.10);
+  --room: #0A0A0A;
+  --L: 84px;               /* the wall */
+  --W: 38px;               /* the three ways in */
+  --M: 30px;               /* start, field, lists, the debate */
+  --S: 19px;               /* prose */
+  --D: 17px;               /* names and numbers, in mono */
+  --inset: 46px;           /* the same margin on all four sides */
+  --u: 2px;                /* the field's rule, and the one underline */
+  font-synthesis: none;
+}
+:root[data-ground="dark"] {
+  --paper: #0C0C0C; --paper-edge: #050505; --ink: #EDEBE5; --mid: #B4B1AA; --hush: #96938C; --you: #F0632B;
+  --sheen: rgba(255, 255, 255, 0.035);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--room);
+  display: grid;
+  place-items: center;
+  font-family: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0;
+  cursor: pointer; text-align: left; letter-spacing: inherit;
+}
+ol, ul { list-style: none; margin: 0; padding: 0; }
+p, h1, h2, h3 { margin: 0; font-weight: inherit; }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--ink); color: var(--paper); }
+.d { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: var(--D); font-weight: 400;
+  letter-spacing: -0.02em; line-height: 1.3; font-variant-ligatures: none; }
+
+/* ---------- the panel: a backlit LCD behind glass ---------- */
+#menu {
+  position: relative;
+  width: 980px; height: 613px;
+  overflow: hidden;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image: radial-gradient(130% 120% at 46% 38%, var(--paper) 52%, var(--paper-edge) 100%);
+  cursor: text;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  padding: var(--inset);
+  padding-top: calc(var(--inset) - 0.21 * var(--L));  /* optical: the cap line of the wall sits on the inset */
+  padding-bottom: calc(var(--inset) - 0.2 * var(--W)); /* optical: the baseline of the ways sits on the inset */
+}
+/* the glass: one faint diagonal sheen over everything, as on the real panel */
+#menu::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(112deg, transparent 22%, var(--sheen) 44%, transparent 66%);
+}
+html.phone #menu { width: 340px; height: 690px; }
+
+/* ---------- the marks ---------- */
+/* a link inside a sentence: the only underline */
+.in {
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--u);
+  text-underline-offset: 0.17em;
+  text-decoration-skip-ink: none;
+}
+/* inversion: hover, focus, the selected result, the section you are in */
+.in:hover, .in:focus-visible, .hit:hover, .hit:focus-visible,
+button:hover > .x, button:focus-visible > .x, .row:hover .x, .row.on .x, .row:focus-visible .x,
+.hit[aria-current="true"], .hit[aria-pressed="true"] {
+  background: var(--ink); color: var(--paper);
+  text-decoration-color: transparent;
+  box-shadow: -0.12em 0 0 var(--ink), 0.12em 0 0 var(--ink);
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+:focus, :focus-visible { outline: none; }
+/* focus on something already inverted (the section you are in) adds a ring, so the keyboard is never lost */
+.hit[aria-current="true"]:focus-visible, .hit[aria-pressed="true"]:focus-visible { outline: 2px solid var(--ink); outline-offset: 0.16em; }
+.x { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+
+/* ---------- the wall: three arguments, one at a time, cut by a wipe ---------- */
+#stage { display: flex; flex-direction: column; min-height: 0; }
+.slides { display: grid; }
+.slide { grid-area: 1 / 1; display: flex; flex-direction: column; visibility: hidden; background: transparent; }
+.slide.on { visibility: visible; }
+.lead {
+  font-weight: 600;
+  font-size: var(--L);
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  margin-left: -0.045em;     /* optical: pull the D's stem onto the margin */
+  white-space: nowrap;
+}
+.lead .w > span { display: block; }
+.lead .p { display: none; }
+.start { margin-top: auto; padding-top: 31px; font-size: var(--M); font-weight: 500; letter-spacing: -0.01em; line-height: 1.12; text-wrap: balance; }
+.start .d { display: block; margin-top: 3px; }
+.start .in { margin-left: 0.07em; }    /* the inverted block must not eat the word space before it */
+/* the wipe: a hard vertical edge crosses the panel, the old argument on its right, the new one on its left.
+   Line 1 is the same in all three, so it never seems to move. */
+.slide.wipe-in { visibility: visible; animation: wipe-in 1.2s cubic-bezier(.55, 0, .35, 1) both; }
+.slide.wipe-out { visibility: visible; animation: wipe-out 1.2s cubic-bezier(.55, 0, .35, 1) both; }
+@keyframes wipe-in { from { clip-path: inset(-20px 100% -20px -20px); } to { clip-path: inset(-20px -20px -20px -20px); } }
+@keyframes wipe-out { from { clip-path: inset(-20px -20px -20px -20px); } to { clip-path: inset(-20px -20px -20px 100%); } }
+
+#menu:not([data-mode="rest"]) .slides { display: none; }
+.view { display: none; min-height: 0; flex: 1; flex-direction: column; }
+#menu:not([data-mode="rest"]) .view { display: flex; }
+
+.m { font-size: var(--M); font-weight: 500; line-height: 1.12; letter-spacing: -0.012em; }
+.s { font-size: var(--S); font-weight: 400; line-height: 1.35; }
+
+/* ---------- the field: the one door, in the same place on every screen ---------- */
+.field { display: flex; align-items: last baseline; gap: 32px; margin-top: 32px; }
+.qbox {
+  position: relative; flex: 0 0 580px; min-width: 0;   /* the field keeps one width on every screen */
+  font-size: var(--M); font-weight: 500; letter-spacing: -0.012em;
+  border-bottom: var(--u) solid var(--ink);
+  padding-bottom: 9px;
+}
+.field:hover .qbox, .qbox:focus-within { border-bottom-width: 3px; padding-bottom: 8px; }
+#q {
+  display: block; width: 100%;
+  border: 0; padding: 0; margin: 0; appearance: none; border-radius: 0; background: transparent;
+  font: inherit; letter-spacing: inherit; line-height: 1.2;
+  color: var(--ink); caret-color: transparent;
+}
+#q::placeholder { color: var(--hush); opacity: 1; }
+#q:placeholder-shown { padding-left: 0.2em; }
+.mirror { position: absolute; visibility: hidden; white-space: pre; font: inherit; letter-spacing: inherit; left: 0; top: 0; }
+.fmeta { flex: none; margin-left: auto; white-space: nowrap; text-align: right; }
+.fmeta .pager { font-family: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif; }
+
+/* the caret: a true 2 px text caret at cap height, the one orange thing */
+.caret {
+  position: absolute; left: 0; top: 0.29em;
+  width: 2px; height: 0.7em;
+  background: var(--you);
+  pointer-events: none;
+  animation: blink 1.06s steps(1) 2.4s infinite;   /* solid while the screen wakes, then it blinks */
+}
+@keyframes blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
+#menu.keyed .caret { animation: none; }        /* holds still while you type, like an editor */
+
+/* ---------- the bottom row: the three ways in, then your way back and the text version ---------- */
+.chrome {
+  margin-top: 18px;
+  display: flex; justify-content: space-between; align-items: last baseline; gap: 24px;
+}
+.ways { display: flex; gap: 38px; align-items: baseline; font-size: var(--W); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; }
+.ways .hit { white-space: nowrap; }
+.where { position: relative; display: flex; gap: 28px; align-items: baseline; white-space: nowrap; }
+.status:empty { display: none; }
+.toast { position: absolute; right: 0; top: 0; font-weight: 500; }
+.toast:empty { display: none; }
+.where.toasting .status, .where.toasting .textv { visibility: hidden; }
+
+/* ---------- lists ---------- */
+.list { overflow-y: auto; min-height: 0; flex: 1; scrollbar-width: none; }
+.list::-webkit-scrollbar { display: none; }
+.more { flex: none; padding-top: 2px; min-height: calc(var(--D) * 1.3 + 2px); }
+
+/* search results: a balanced title (two lines at most), then who, when and the count in one mono line */
+.row { position: relative; display: block; padding: 6px 0 10px; cursor: pointer; }
+.row .t {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  max-width: 28em; text-wrap: balance;
+}
+.row .meta { display: block; margin-top: 4px; white-space: pre; overflow: hidden; text-overflow: ellipsis; }
+.empty { margin-top: 6px; }
+.empty .s { margin-top: 10px; max-width: 36em; }
+
+/* ---------- the story: eight verdicts ---------- */
+.verdicts, .picks { display: flex; flex-direction: column; gap: 6px; }
+.vbtn { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; width: 100%; }
+.vbtn .d { flex: none; }
+.pbtn { display: block; width: 100%; text-wrap: balance; }
+.vbtn .x { text-wrap: balance; }
+.hint { margin-top: auto; padding-top: 14px; max-width: 42em; min-height: calc(2 * 1.35 * var(--S) + 14px); text-wrap: pretty; }
+.hint b { font-weight: 500; }
+
+/* ---------- a verdict: the claim on the wall, the question, the sides as doors, where to start ---------- */
+.verdict { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.verdict h2 {
+  font-weight: 600; font-size: var(--vL, var(--L)); line-height: 0.94; letter-spacing: -0.03em;
+  margin-left: -0.045em; text-wrap: balance;
+}
+.verdict .qn { margin-top: 18px; color: var(--mid); font-weight: 400; max-width: 30em; text-wrap: balance; }
+/* the sides share rows (subgrid), so claims and names line up across columns */
+.sides { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; grid-template-rows: auto auto; column-gap: 40px; row-gap: 6px; margin-top: 18px; }
+.side { display: grid; grid-row: span 2; grid-template-rows: subgrid; }
+.claim { text-wrap: balance; align-self: end; }
+.side .body { align-self: end; }
+.side .who { color: var(--ink); }
+.vfoot { margin-top: auto; padding-top: 18px; display: flex; justify-content: space-between; align-items: last baseline; gap: 32px; }
+.vfoot .start { margin: 0; padding: 0; }
+.pager { flex: none; display: flex; gap: 0.7em; align-items: baseline; font-size: var(--M); font-weight: 500; letter-spacing: -0.01em; white-space: nowrap; }
+
+/* ---------- by day ---------- */
+.days { display: flex; gap: 32px; align-items: baseline; margin-bottom: 10px; }
+.dbtn { display: inline-flex; align-items: baseline; gap: 8px; }
+.row.day { display: grid; grid-template-columns: 80px minmax(0, 1fr); column-gap: 0; padding: 4px 0 6px; }
+.row.day .t { -webkit-line-clamp: 1; }
+.row.day .who { grid-column: 2; margin-top: 2px; }
+
+/* ---------- reduced motion: the caret holds still and the marquee holds on the first argument ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .caret { animation: none; }
+  .slide.wipe-in, .slide.wipe-out { animation: none; }
+}
+
+/* ---------- phone totem: 340 x 690. Sentence, start, field, then the ways in the thumb zone ---------- */
+html.phone #menu {
+  --L: 40px; --W: 32px; --M: 22px; --S: 15px; --D: 13px; --inset: 24px;
+  display: flex; flex-direction: column;
+  padding: 34px var(--inset) 22px;
+}
+html.phone #stage, html.phone .chrome { display: contents; }
+html.phone .slides { order: 1; }
+html.phone .lead { line-height: 1.0; letter-spacing: -0.03em; }
+html.phone .lead .w { display: none; }
+html.phone .lead .p { display: block; }
+html.phone .lead .p > span { display: block; }
+html.phone .start { padding-top: 26px; line-height: 1.18; }
+html.phone .start .sw { display: block; }
+html.phone .start .in { margin-left: 0; }
+html.phone .start .d { margin-top: 5px; }
+html.phone .field { order: 2; margin-top: 30px; gap: 12px; }
+html.phone .qbox { flex: 1; }
+html.phone .fmeta { display: none; }
+html.phone #menu[data-mode="search"] .fmeta { display: block; }
+html.phone .fmeta .cnt { display: none; }
+html.phone .view { order: 1; flex: 1; min-height: 0; }
+html.phone .ways { order: 3; }
+html.phone .where { order: 4; margin-top: 20px; justify-content: space-between; gap: 16px; }
+html.phone .qbox { padding-bottom: 7px; }
+html.phone .field:hover .qbox, html.phone .qbox:focus-within { padding-bottom: 6px; }
+
+/* rest: the three ways are a list pinned above the foot, where a thumb rests */
+html.phone .ways { flex-direction: column; gap: 4px; align-items: flex-start; margin-top: auto; padding-top: 24px; }
+html.phone .ways .hit { padding: 3px 0; }
+/* elsewhere: the list takes the top, the field and the ways sit under it */
+html.phone #menu:not([data-mode="rest"]) .field { margin-top: 12px; }
+html.phone #menu:not([data-mode="rest"]) .ways { flex-direction: row; gap: 18px; margin-top: 12px; padding-top: 0; font-size: 21px; }
+html.phone #menu:not([data-mode="rest"]) .ways .hit { padding: 0; }
+html.phone #menu:not([data-mode="rest"]) .where { margin-top: 12px; }
+html.phone .row { padding: 6px 0 8px; }
+html.phone .row .meta { white-space: pre-wrap; }
+html.phone .row.day { grid-template-columns: 50px minmax(0, 1fr); }
+html.phone .row.day .t { -webkit-line-clamp: 2; }
+html.phone .verdicts, html.phone .picks { gap: 8px; overflow-y: auto; min-height: 0; flex: 1 1 0; scrollbar-width: none; }
+html.phone .vbtn .d { display: none; }
+html.phone .hint { padding-top: 10px; min-height: 0; }
+html.phone .verdict { overflow-y: auto; scrollbar-width: none; }
+html.phone .verdict h2 { font-size: 30px; line-height: 1.0; }
+html.phone .verdict .qn { margin-top: 12px; }
+html.phone .sides { grid-auto-flow: row; grid-template-rows: none; row-gap: 4px; margin-top: 12px; }
+html.phone .side { grid-row: auto; grid-template-rows: auto auto; row-gap: 3px; margin-bottom: 8px; }
+html.phone .vfoot { flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 12px; }
+html.phone .pager { font-size: var(--M); }
+html.phone .days { justify-content: space-between; gap: 0; }
+html.phone .dbtn { flex-direction: column; gap: 0; }
+html.phone .days .dbtn { font-size: 20px; }

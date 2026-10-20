@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devoxx 2026 jshell menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;650;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <div id="menu" role="application" aria-label="Devoxx Belgium 2026 main menu">
+    <header id="bar">
+      <span class="mark">DEVOX<b>X</b></span>
+      <span class="mark-sub">Belgium 2026, 5 to 9 October, Kinepolis Antwerp, 205 talks</span>
+      <span class="grow"></span>
+      <button type="button" class="barbtn" data-run="help()">help()</button>
+      <a class="barbtn" href="../../../site/index.html">Text version of every talk</a>
+    </header>
+    <main id="log" role="log" aria-live="polite" tabindex="-1">
+      <noscript>
+        <p class="boot">Devoxx Belgium 2026, 5 to 9 October, Kinepolis Antwerp, 205 talks. This menu needs JavaScript.
+        Read every talk as text: <a href="../../../site/index.html">text version</a>.</p>
+      </noscript>
+    </main>
+    <div id="pop" role="listbox" aria-label="Completions and preview" hidden></div>
+    <footer id="dock">
+      <div id="prompt">
+        <span class="ps" aria-hidden="true">jshell&gt;</span>
+        <div class="field">
+          <div id="mirror" aria-hidden="true"></div>
+          <input id="cmd" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"
+                 role="combobox" aria-expanded="false" aria-controls="pop" aria-autocomplete="list"
+                 aria-label="Command or search words" placeholder="type a word to search, or click a command below">
+        </div>
+      </div>
+      <nav id="chips" aria-label="Commands"></nav>
+    </footer>
+    <div id="toast" role="status"></div>
+  </div>
+</div>
+<button type="button" id="hallbtn" aria-pressed="false">See it in the hall</button>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

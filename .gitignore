@@ -13,3 +13,7 @@ data/textures/
 tools/ux/node_modules/
 tools/ux/out/
 data/models/
+
+# design explorations: screenshots stay local (tens of MB)
+design/**/shots/
+design/menu-variants/_crosscheck/

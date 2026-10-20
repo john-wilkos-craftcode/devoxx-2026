@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two Hundred and Five Seats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,600..800&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>if (new URLSearchParams(location.search).get("shape") === "phone") document.documentElement.dataset.shape = "phone";</script>
+</head>
+<body>
+<main id="stage">
+  <div id="menu" data-mode="rest" data-sort="views">
+    <!-- the plan of the room behind this screen: the screen and every row are arcs round one centre -->
+    <div class="hall">
+      <svg class="screen" aria-hidden="true" focusable="false"><path class="screen-band" d=""/></svg>
+      <div class="marquee">
+        <h1 class="heading"><span class="n">205</span> talks. <br class="narrow">Pick a seat.</h1>
+        <p class="credit"></p>
+      </div>
+      <div class="plan" role="group" aria-label="Seat plan of the hall, one seat per talk. Arrow keys move between seats, Enter walks you to the talk."></div>
+      <div class="vlabels" role="group" aria-label="The eight verdicts of the week, each named on its front-row run of seats. Arrow keys move, Enter opens the verdict."></div>
+    </div>
+
+    <!-- the base band: what the lit seat is, then the way in -->
+    <div class="readout" aria-live="polite">
+      <p class="now-title"></p>
+      <p class="now-meta"></p>
+      <p class="cue"><span class="wide">Point at any seat to see its talk. A verdict’s name opens what was argued.</span><span class="narrow">Tap a seat to see its talk, again to walk there.</span></p>
+    </div>
+
+    <!-- one step away: a list (search, by day) or a verdict, where the back stalls were -->
+    <section class="find" hidden aria-label="Talks">
+      <div class="find-head">
+        <div class="search" hidden>
+          <label class="vh" for="q">Search the talks</label>
+          <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search 205 talks">
+        </div>
+        <div class="days" hidden role="group" aria-label="Programme by day"></div>
+        <div class="sorts" hidden role="group" aria-label="Order"></div>
+      </div>
+      <p class="cap"></p>
+      <ol class="rows"></ol>
+      <p class="more-note" aria-hidden="true"></p>
+    </section>
+
+    <section class="story" hidden aria-label="Verdicts"></section>
+
+    <nav class="chrome" aria-label="Ways in">
+      <button type="button" data-go="story" aria-pressed="false">verdicts</button>
+      <button type="button" data-go="watch" aria-pressed="false">watch first</button>
+      <button type="button" data-go="day" aria-pressed="false">by day</button>
+      <button type="button" data-go="search" aria-pressed="false">search</button>
+    </nav>
+    <a class="textv" href="../../../site/index.html">text version</a>
+    <p class="toast" role="status"></p>
+    <div class="glass" aria-hidden="true"></div>
+  </div>
+</main>
+<script src="../../menu-variants/data.js"></script>
+<script src="seats.js"></script>
+</body>
+</html>

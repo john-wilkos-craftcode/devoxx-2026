@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Week in Eight Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap">
+<link rel="stylesheet" href="style.css">
+<script>if (/[?&]shape=phone\b/.test(location.search)) document.documentElement.classList.add("phone");</script>
+</head>
+<body>
+<main id="menu" data-layer="card" style="--ink:#B6241C" aria-label="Devoxx Belgium 2026: what the week argued, in eight verdicts">
+
+  <!-- Rest: one poster per verdict. Card 1 is written out here so the screen reads before (or without) JS.
+       Source order is the reading and Tab order (verdict, doors, chips); the grid puts the deck row on top. -->
+  <section id="card" class="card">
+    <h1 class="verdict" id="verdictBox">
+      <button type="button" class="verdict-btn" id="verdict" aria-describedby="hint" style="font-size:131.5px"><span class="vl">The harness</span><span class="vl">outweighs the model</span></button>
+    </h1>
+    <nav class="doors" aria-label="Menu">
+      <button type="button" class="door cta" data-go="debate"><span class="cq" id="tease">Should coding agents reach tools through MCP servers or plain CLIs?</span><span class="cw">Watch the debate <span aria-hidden="true">→</span></span></button>
+      <button type="button" class="door2" data-go="programme">Programme</button>
+      <button type="button" class="door2" data-go="search">Search<span class="long"> the talks</span></button>
+    </nav>
+    <p class="sig"><b>Devoxx Belgium 2026</b> <span id="sigN">205 talks, 8 verdicts</span></p>
+    <div class="chips" id="pager" role="group" aria-label="The eight verdicts">
+      <button type="button" class="chip" data-n="01" style="--c:#B6241C" aria-current="true" aria-label="Verdict 1">01</button>
+      <button type="button" class="chip" data-n="02" style="--c:#2743B4" tabindex="-1" aria-label="Verdict 2">02</button>
+      <button type="button" class="chip" data-n="03" style="--c:#A4420F" tabindex="-1" aria-label="Verdict 3">03</button>
+      <button type="button" class="chip" data-n="04" style="--c:#1F5C38" tabindex="-1" aria-label="Verdict 4">04</button>
+      <button type="button" class="chip" data-n="05" style="--c:#9A1F5C" tabindex="-1" aria-label="Verdict 5">05</button>
+      <button type="button" class="chip" data-n="06" style="--c:#0B5A6A" tabindex="-1" aria-label="Verdict 6">06</button>
+      <button type="button" class="chip" data-n="07" style="--c:#5A5B14" tabindex="-1" aria-label="Verdict 7">07</button>
+      <button type="button" class="chip" data-n="08" style="--c:#5B2E8C" tabindex="-1" aria-label="Verdict 8">08</button>
+    </div>
+  </section>
+
+  <!-- One step away: three dark pages, built by menu.js. They share the black foot strip below. -->
+  <section id="debate" class="layer" hidden aria-label="The debate"></section>
+  <section id="search" class="layer" hidden aria-label="Search the talks"></section>
+  <section id="programme" class="layer" hidden aria-label="Programme by day"></section>
+  <footer id="lfoot" hidden></footer>
+
+  <div id="splice" hidden aria-hidden="true"></div>
+  <p id="hint" class="sr">Left and right arrows change the verdict. Enter opens its debate. Start typing to search.</p>
+  <p id="live" class="sr" aria-live="polite"></p>
+</main>
+<script src="../../menu-variants/data.js"></script>
+<script src="menu.js"></script>
+</body>
+</html>

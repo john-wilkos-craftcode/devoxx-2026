@@ -1,0 +1,28 @@
+// usage (from repo root): node design/menu-variants/jshell/states.mjs <outDir> [phone]
+import { chromium } from "../../../tools/ux/node_modules/playwright-core/index.mjs";
+import os from "node:os"; import path from "node:path"; import fs from "node:fs";
+const out = process.argv[2], phone = process.argv[3] === "phone";
+fs.mkdirSync(out, { recursive: true });
+const url = "file://" + path.resolve("design/menu-variants/jshell/index.html") + (phone ? "?shape=phone" : "");
+const b = await chromium.launch({ executablePath: `${os.homedir()}/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome`, args: ["--no-sandbox"] });
+const ctx = await b.newContext({ viewport: phone ? { width: 390, height: 760 } : { width: 1100, height: 720 } });
+const page = await ctx.newPage(); const errs = [];
+page.on("console", m => m.type() === "error" && errs.push(m.text())); page.on("pageerror", e => errs.push(e.message));
+await page.goto(url); await page.waitForTimeout(1200);
+const menu = page.locator("#menu");
+const snap = async n => { await page.waitForTimeout(900); await page.screenshot({ path: `${out}/${n}.png`, clip: await menu.boundingBox() }); };
+const run = async (c) => { await page.locator(`[data-run='${c}']`).first().click(); await page.waitForTimeout(900); };
+await page.keyboard.type("valhalla", { delay: 30 }); await snap("a-type-valhalla");
+await page.keyboard.press("Escape"); await page.keyboard.type("wa", { delay: 30 }); await snap("b-type-wa");
+await page.keyboard.press("Escape"); await page.keyboard.type("debate(3", { delay: 20 }); await snap("c-type-debate");
+await page.keyboard.press("Tab"); await page.keyboard.press("Enter"); await snap("d-debate3");
+await run("watch()"); await snap("e-watch");
+await run("sort(views)"); await run("sort(likes)"); await snap("f-sort-likes");
+await run("programme(monday)"); await run("programme(tuesday)"); await snap("g-programme");
+await run("search(\"\")").catch(()=>{}); await snap("h-search-empty");
+await page.keyboard.press("Escape"); await page.keyboard.type("agents mcp", { delay: 20 }); await page.keyboard.press("Enter"); await snap("i-search-run");
+await page.locator(".trow").first().click(); await page.waitForTimeout(500); await snap("j-open-talk");
+await page.keyboard.type("debate(12)"); await page.keyboard.press("Enter"); await snap("k-error");
+await page.keyboard.type("help"); await page.keyboard.press("Enter"); await snap("l-help");
+await page.locator(".chip").nth(1).hover(); await snap("m-chip-hover");
+console.log(errs.length ? errs.join("\n") : "no errors"); await b.close();
