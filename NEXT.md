@@ -1,24 +1,26 @@
 # Where this stands (19/10, 18:45)
 
-## Next session: start here
-- **Laptop complete (20/10 03:05)** (new video set: AV1/HEVC/H.264, -s smaller, -g walks-off glimpse; publish.py): the
-  intro with the new crowd, rooms 3-10 (walk there + back + wide seat still), the wide hall still; seams.py: all
-  match except the walks there of 3-6 and 8 (their 0.3 m/s start; John: no re-render). qc.py's breathing check
-  fails on rooms 7, 9, 10 at the fast pan off the hall screen (f_0261) and at the auditorium doorway on the way back:
-  checked, smooth motion, content leaving the frame; the check is too strict for those.
-- **Crowd fix committed** (6f8381e; John 19/10: two identical women at right angles in the fly-through's slow ending):
-  EEVEE test of the ending: nearest double ~10 m apart. Side effect sent to John for review: nobody stands in front of
-  the schedule screen in the last ~2 s (the >= 2.5 m spacing for singles); John 19/10 20:05: "It all looks great"
-  (room 6 and the crowd ending). Rooms 3-6 and 8 were rendered with the old
-  crowd; the room walks start on the screen close-up, so there's no pop, only different people in the hall.
-- **Queue for tonight (20/10):** `cp scripts/photomatch/finals.sh scripts/photomatch/.finals-run.sh &&
-  scripts/photomatch/.finals-run.sh --until 07:45`. Done: laptop everything, phone rooms 3 and 4. Left: the phone
-  fly-through again (~1.5 h, the 1 cm fix), phone rooms 5-10 (~75 min each now) - about 9 h, so it should all fit.
-  Then seams.py on the phones, one last review on laptop and phone, and John's go.
-- **Re-render after the queue (20/10):** phone rooms 6 and 7's walks back whipped round (968 / 343 deg/s; room_walk
-  timing now caps turns at 270 deg/s and takes longer). Remove final/done/phone-6, phone-7 and the walk-phone-room6-back,
-  walk-phone-room7-back anim/.complete, then run the finals copy again (only the walks back re-render, ~1 h each).
+## Next session: start here (20/10, 17:00, wound down for the day)
+- **Live:** laptop complete (intro, rooms 3-10). Phone: the fly-through (re-rendered with the 1 cm fix, seam OK),
+  rooms 3, 4, 5, 6. Seat features live (1f5cf90): speed, picture in picture (P), notepad (.md export), Snake, a seek
+  bar that stays under the pointer.
+- **Renders left** (~5 h): phone rooms 7 (its walk there is done; the walk back was cut off mid-clip and will restart
+  with the turn fix), 8, 9, 10, plus phone room 6's walk back again (it whipped at 968 deg/s; room_walk now caps turns
+  at 270 deg/s, 39cc1e7; the markers are already reset). Run:
+  `cp scripts/photomatch/finals.sh scripts/photomatch/.finals-run.sh && scripts/photomatch/.finals-run.sh [--until HH:MM]`
+  Check each new phone walk's log for "turns at most ... deg/s" (should stay under ~300) and run
+  `python3 scripts/photomatch/seams.py` after publishing.
+- **Hall screen menu (John 20/10): undecided.** Round 1 (design/menu-variants) rejected as generic and too dense.
+  Round 2 (design/menu-screen: BRIEF.md, Fable's IDEAS.md, five builds, gallery index.html) plateaued at 6.0-6.8/10
+  under fresh critics; lightbox and two-voices came closest. Options put to John: pick a direction to iterate with his
+  notes, or add image generation (an API key with a spend limit, gitignored). Screens in the hall:
+  `python3 tools/ux/inhall.py <menu.png> <out.jpg> [--phone]`. Serve with `python3 -m http.server 8770` from the repo.
+- **Also waiting on John:** the laptop redesign mock-up (three questions first; scratchpad copy in
+  C:\Users\wilkojo\kino-renders\mockups\laptop-mockup.html) and "editor's picks + all three signals" for ranking
+  (fresh YouTube snapshot 20/10: 181 videos, only 32 with 20+ likes; design/menu-variants/make_data.py has the signals).
 - **Pushing:** `scripts/push.sh` (the global "ask: git push" rule stays; John 19/10).
+- **QC notes:** qc.py's breathing check misfires on fast pans and doorways, "blown" on the ceiling lights; a real pop
+  (QC "pop at f_...") is worth a look, as phone room 6's walk back showed.
 
 # Earlier notes (16/10 onwards)
 
