@@ -813,9 +813,9 @@ const loadYT = () => ytApi || (ytApi = new Promise((resolve, reject) => {
 }));
 function playerFailed(t) {
   if (!seat || seat.t !== t) return;
+  setPip(false);                         // the box would hold only the error: it goes back (and the column with it)
   seat.starting = false; seat.failed = true;
   clearTimeout(seat.readyTimer);
-  if (seat.pip) { seat.pip = false; markPip(); placeTube(); }   // the box would hold only the error: it goes back
   tube.textContent = "";
   tube.append(el("div", { class: "tube-error", role: "alert" },
     el("b", { text: "The recording won't play here" }),
@@ -926,7 +926,9 @@ function scrubber(scrub) {
     jumpTo(L ? share(e) * L : 0);
     if (!scrub.matches(":hover")) tip.hidden = true;
   });
-  scrub.addEventListener("pointercancel", () => { dragging = false; scrub.classList.remove("is-dragging"); tip.hidden = true; tick(); });
+  const cancel = () => { dragging = false; scrub.classList.remove("is-dragging"); tip.hidden = true; tick(); };
+  scrub.addEventListener("pointercancel", cancel);
+  scrub.addEventListener("lostpointercapture", () => { if (dragging) cancel(); });   // the release went elsewhere: no seek
   scrub.addEventListener("pointerleave", () => { if (!dragging) tip.hidden = true; });
 }
 // the bar's last button: into full screen from the big view, out of it in full screen
@@ -1199,8 +1201,10 @@ function pipBar() {
       const w = Math.round(Math.max(PIP_MIN, Math.min(r.width - d, stage.clientWidth - 2 * PIP_EDGE, (stage.clientHeight - 2 * PIP_EDGE) * 16 / 9)));
       pipTo(left + r.width - w, top + r.height - w * 9 / 16, w);
     };
-    bar.onpointerup = bar.onpointercancel = () => { bar.onpointermove = bar.onpointerup = bar.onpointercancel = null; tube.classList.remove("is-dragging"); };
+    // the release can be lost (P mid-drag hides the strip): any end of the capture ends the drag
+    bar.onpointerup = bar.onpointercancel = bar.onlostpointercapture = bar.endDrag;
   });
+  bar.endDrag = () => { bar.onpointermove = bar.onpointerup = bar.onpointercancel = bar.onlostpointercapture = null; tube.classList.remove("is-dragging"); };
   return bar;
 }
 // the screen it left says where it went; a click there brings it back
@@ -1208,6 +1212,7 @@ function markPip() { for (const p of [seat.cinePanel, seat.notesPanel]) if (p) p
 function setPip(on) {
   if (!seat || !seat.t.videoId || !EMBED || seat.failed || on === !!seat.pip) return;
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  const pb = tube.querySelector(".pip-bar"); if (pb) pb.endDrag();   // a drag under way ends here, not on the next hover
   if (on && !seat.player && !seat.starting) jumpTo(0);       // from the poster: it starts, in the box
   seat.pip = on;
   if (on && !tube.querySelector(".pip-bar")) tube.append(pipBar());
@@ -1473,12 +1478,15 @@ function snake() {
   board.addEventListener("click", () => { if (!running) go(); });
   board.addEventListener("focus", draw);
   board.addEventListener("blur", stop);
-  new ResizeObserver(draw).observe(board);
+  const sized = new ResizeObserver(draw);
+  sized.observe(board);
   reset();
-  return el("div", { class: "snake" },
+  const game = el("div", { class: "snake" },
     el("div", { class: "snake-head" }, el("span", {}, "Score ", scoreEl), el("span", {}, "Best ", bestEl),
       el("span", { class: "snake-hint", text: "The talk keeps playing; its keys still work." })),
     board);
+  game.dispose = () => { running = false; clearTimeout(timer); sized.disconnect(); };   // leaving the talk
+  return game;
 }
 function notesScreen(t) {
   const s = t.s || {};
@@ -1591,6 +1599,7 @@ function notesScreen(t) {
   panel.fill = fill;
   panel.toggleKeys = toggleKeys;
   panel.flush = () => pad && pad.flush();    // the notepad's last keystrokes, on leaving
+  panel.dispose = () => { panel.flush(); if (game) game.dispose(); };
   panel.ticks = (L) => {                       // the chapters marked on the scrubber, once the length is known
     if (ticks.dataset.len === String(Math.round(L)) || !L) return;
     ticks.dataset.len = String(Math.round(L));
@@ -1746,6 +1755,7 @@ function syncControls() {
   else placeLidBar();
   lidPlay.hidden = !seat.t.videoId || !EMBED;
   seatbar.hidden = zoom;                                    // full screen: the laptop's own header has the way out
+  walksBtn.hidden = zoom;                                   // and the walks chip sat on its Zoom out (no walk starts from there)
   const n = seat.notesPanel;
   if (!n) return;
   const z = n.querySelector(".notes-zoom");
@@ -1805,7 +1815,8 @@ async function setLaptop(change, ms = MOVE) {
   const opening = next.open !== seat.open;
   if (opening && ms) ms = Math.round(ms * 1.3);           // the view travels further: up to the film and back
   if (seat.notes) seat.notes.classList.add("is-off");     // the screen goes dark first
-  if (!next.open && seat.cine && seat.t.videoId && EMBED) seat.cine.classList.add("is-theatre");   // and the column leaves the film
+  closeSpeeds();                                           // (an open speed row would come back stale with the screen)
+  if (!next.open && seat.cine && seat.t.videoId && EMBED && !seat.pip) seat.cine.classList.add("is-theatre");   // and the column leaves the film
   lap.classList.add("is-moving");
   if (next.zoom !== seat.zoom && !seat.pip) tube.classList.add("is-away");   // in the corner box, it stays where it is
   await new Promise((r) => setTimeout(r, ms ? 140 : 0));
@@ -1929,7 +1940,7 @@ function hintOnce() {
 }
 function leaveSeat() {
   if (!seat) return;
-  if (seat.notesPanel) seat.notesPanel.flush();
+  if (seat.notesPanel) seat.notesPanel.dispose();
   clearInterval(seat.timer);
   clearTimeout(seat.readyTimer);
   clearTimeout(theatreTimer);
@@ -1939,7 +1950,7 @@ function leaveSeat() {
   lap.hidden = true; lidBar.hidden = lidHit.hidden = true;
   if (seat.notes) seat.notes.remove();
   for (const h of lap.querySelectorAll(".lap-hint")) h.remove();
-  seatbar.hidden = true;
+  seatbar.hidden = true; walksBtn.hidden = false;
   stage.classList.remove("is-seated", "is-leaving");
   lap.style.transition = lap.style.transform = "";
   seat = null;
@@ -1953,6 +1964,7 @@ addEventListener("pagehide", () => { if (seat && seat.notesPanel) seat.notesPane
 const LEAVE = 650;
 async function standUp() {
   if (seat) {
+    walksBtn.hidden = false;                 // on screen for the walk back, even from the zoomed laptop
     if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
     if (seat.player && seat.player.pauseVideo) seat.player.pauseVideo();
     stage.classList.add("is-leaving");

@@ -910,6 +910,7 @@ body:has(.stage.is-leaving) .seatbar { opacity: 0; transition: opacity .3s ease;
 .notes.is-pip .notes-watch .slot::after { color: #9aa1b8; font-size: .9em; }
 .cine.is-pip .slot:hover::after, .notes.is-pip .notes-watch .slot:hover::after { color: var(--ink); }
 .notes .icon.pip svg, .notes .icon.speed svg { display: block; }
+.walks[hidden] { display: none; }      /* while the laptop is zoomed: it covered Zoom out */
 /* the laptop's box is far bigger than what shows of it (with the lid closed it reaches up over the foot of the big
    picture): only its real targets take the pointer, so the recording's bar under it can be hovered and clicked */
 .lap { pointer-events: none; }
