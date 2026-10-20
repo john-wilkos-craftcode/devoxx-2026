@@ -730,8 +730,11 @@ html, body { overscroll-behavior: none; }
 .tube.is-full .tube-fs { display: none; }
 .tube-bar { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; display: none; align-items: center; gap: 14px; padding: 40px 24px 18px;
   background: linear-gradient(transparent, rgba(0, 0, 0, .75)); color: #e8ebf4; font-size: 15px; }
-.tube.is-full .tube-bar { display: flex; opacity: 0; transition: opacity .3s ease; }
-.tube.is-full.is-awake .tube-bar, .tube.is-full .tube-bar:focus-within, .tube.is-full:has(.tube-paused:not([hidden])) .tube-bar { opacity: 1; }
+/* in every seat view the bar wakes on the pointer (John 19/10); asleep it takes no clicks, so a click near the foot of
+   the picture can't seek unseen. Keyboard focus (not a mouse click's) keeps it up; full screen and the big view keep it
+   up while paused */
+.tube-bar { display: flex; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+.tube.is-awake .tube-bar, .tube .tube-bar:has(:focus-visible), .tube:is(.is-full, .is-big):has(.tube-paused:not([hidden])) .tube-bar { opacity: 1; pointer-events: auto; }
 .tube.is-full:not(.is-awake) { cursor: none; }
 .tube-bar .toggle { flex: none; width: 44px; height: 36px; border: 0; border-radius: 8px; background: var(--orange); color: var(--deep); font-size: 15px; font-weight: 800; cursor: pointer; }
 .tube-bar .scrub { position: relative; flex: 1; height: 18px; cursor: pointer; }
@@ -826,8 +829,6 @@ html, body { overscroll-behavior: none; }
 
 /* the lid closed, the view on the film: the recording's own bar (as in full screen) wakes on the mouse; the poster names
    the talk; the lid's buttons sit on the lid, beside the sticker */
-.tube.is-big .tube-bar { display: flex; opacity: 0; transition: opacity .3s ease; }
-.tube.is-big.is-awake .tube-bar, .tube.is-big .tube-bar:focus-within, .tube.is-big:has(.tube-paused:not([hidden])) .tube-bar { opacity: 1; }
 .tube.is-big .tube-fs { display: none; }
 .tube .poster-title { display: none; }
 .tube.is-big .poster-title { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; gap: 6px; padding: 26px 32px 60px; text-align: left;
@@ -839,3 +840,98 @@ html, body { overscroll-behavior: none; }
 /* standing up to walk back: the seat's things fade while the laptop goes down */
 .stage.is-leaving .overlay, .stage.is-leaving .tube, .stage.is-leaving .lid-bar, .stage.is-leaving .lap-hint, .stage.is-leaving::after { opacity: 0; transition: opacity .3s ease; pointer-events: none; }
 body:has(.stage.is-leaving) .seatbar { opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+
+/* ---------- John 19/10: speed, picture in picture, the bar on hover, the notepad and Snake ---------- */
+/* the recording's bar: compact on a small picture (the cinema screen, the corner box), the scrubber's strip all a target */
+.tube { container: tube / inline-size; }
+.tube.is-awake .tube-fs { opacity: 0; pointer-events: none; }        /* the bar has the same button */
+.tube-bar .scrub { touch-action: none; }
+.tube-bar .scrub::after { content: ""; position: absolute; left: 0; right: 0; top: -7px; bottom: -7px; }   /* ~32 px to hit, not the 6 px line */
+.tube-bar .scrub:hover::before, .tube-bar .scrub.is-dragging::before, .tube-bar .scrub:hover .scrub-fill, .tube-bar .scrub.is-dragging .scrub-fill { top: 5px; height: 8px; }
+.tube-bar .icon:disabled { opacity: .45; cursor: default; }
+.tube-bar .icon svg { display: block; }
+@container tube (max-width: 900px) {
+  .tube-bar { gap: 8px; padding: 46px 12px 10px; font-size: 13px; }
+  .tube-bar .icon { height: 30px; min-width: 34px; padding: 0 6px; }
+  .tube-bar .toggle { width: 38px; height: 30px; }
+  .tube-bar .now-text { display: none; }
+}
+@container tube (max-width: 640px) { .tube-bar .step { display: none; } }   /* the scrubber needs the room; [ and ] still step */
+@container tube (max-width: 560px) {
+  .tube-bar { gap: 6px; padding: 36px 8px 8px; }
+  .tube-bar .cc { display: none; }
+}
+@container tube (max-width: 400px) { .tube-bar .now-time, .tube-bar .mute { display: none; } }
+
+/* the time and chapter under the pointer, above the scrubber */
+.scrub-tip { position: absolute; z-index: 6; translate: -50% calc(-100% - 8px); display: flex; gap: 8px; align-items: baseline; max-width: 70%; padding: 5px 9px;
+  border-radius: 7px; background: rgba(13, 16, 28, .94); border: 1px solid rgba(174, 184, 236, .35); color: #e8ebf4; font-size: 13px; font-weight: 600;
+  white-space: nowrap; pointer-events: none; box-shadow: 0 6px 18px rgba(0, 0, 0, .45); }
+.scrub-tip[hidden] { display: none; }
+.scrub-tip b { color: var(--orange); font-variant-numeric: tabular-nums; }
+.scrub-tip span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.notes .scrub { touch-action: none; }
+.notes .scrub.is-dragging::before, .notes .scrub.is-dragging .scrub-fill { top: 4px; height: 6px; }
+
+/* speed: a row of chips above its button */
+.speed-menu { position: absolute; z-index: 6; display: flex; gap: 3px; padding: 4px; background: #1d2130; border: 1px solid #3a4054; border-radius: 9px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5); }
+.speed-menu button { min-width: 44px; height: 28px; padding: 0 8px; border: 1px solid transparent; border-radius: 6px; background: none; color: #e8ebf4;
+  font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer; }
+.speed-menu button:hover { border-color: var(--orange); }
+.speed-menu button[aria-pressed="true"] { background: var(--orange); color: var(--deep); }
+.speed-menu button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.notes.is-zoomed .speed-menu button, .tube-bar .speed-menu button { height: 32px; min-width: 50px; font-size: 14px; }
+.notes .now-time .t-rate { color: var(--orange); font-weight: 700; }
+
+/* picture in picture: the recording in a box in a corner, over everything in the seat but the page's own chrome */
+.tube.is-pip:not(.is-full) { z-index: 5; border-radius: 10px; box-shadow: 0 14px 44px rgba(0, 0, 0, .65), 0 0 0 1px rgba(174, 184, 236, .35); }
+.tube.is-pip::after { box-shadow: none; }
+.tube.is-pip .tube-fs { display: none; }
+.tube.is-pip iframe { filter: none !important; }
+.pip-bar { display: none; }
+.tube.is-pip:not(.is-full) .pip-bar { position: absolute; z-index: 4; left: 0; right: 0; top: 0; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 5px 0 0;
+  background: linear-gradient(rgba(0, 0, 0, .88), rgba(0, 0, 0, .45)); color: #e8ebf4; cursor: grab; touch-action: none; user-select: none;
+  opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+.tube.is-pip.is-awake .pip-bar, .tube.is-pip .pip-bar:has(:focus-visible), .tube.is-pip.is-dragging .pip-bar { opacity: 1; pointer-events: auto; }
+.tube.is-dragging, .tube.is-dragging .pip-bar { cursor: grabbing; }
+.pip-size { flex: none; align-self: stretch; width: 28px; cursor: nwse-resize;
+  background: no-repeat 7px 7px / 12px 12px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1 11V1h10M1 6l5-5' fill='none' stroke='%23e8ebf4' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.pip-title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 12.5px; font-weight: 600; }
+.pip-back { flex: none; display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border: 1px solid rgba(255, 255, 255, .28); border-radius: 6px;
+  background: rgba(20, 24, 36, .75); color: #e8ebf4; font-size: 12px; font-weight: 700; cursor: pointer; }
+.pip-back:hover { border-color: var(--orange); }
+.pip-back:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.pip-back kbd { margin-left: 6px; padding: 0 4px; border: 1px solid currentColor; border-bottom-width: 2px; border-radius: 4px; font: 600 10px/13px "Archivo", system-ui, sans-serif; opacity: .75; }
+/* the screens it left: where it went, and a click brings it back */
+.cine.is-pip .slot, .notes.is-pip .notes-watch .slot { display: grid; grid-template-rows: 1fr; place-items: center; padding: 0 8%; cursor: pointer; text-align: center;
+  background: #0b1030; box-shadow: inset 0 0 0 2px var(--line); }
+.cine.is-pip .slot::after, .notes.is-pip .notes-watch .slot::after { content: "Playing in the corner box. Click here to put it back"; color: var(--muted); font-size: 18px; font-weight: 600; line-height: 1.4; }
+.notes.is-pip .notes-watch .slot::after { color: #9aa1b8; font-size: .9em; }
+.cine.is-pip .slot:hover::after, .notes.is-pip .notes-watch .slot:hover::after { color: var(--ink); }
+.notes .icon.pip svg, .notes .icon.speed svg { display: block; }
+/* the laptop's box is far bigger than what shows of it (with the lid closed it reaches up over the foot of the big
+   picture): only its real targets take the pointer, so the recording's bar under it can be hovered and clicked */
+.lap { pointer-events: none; }
+.lid-hit, .lid-bar, .lap-hint { pointer-events: auto; }
+/* the folding chrome's grid track no wider than the laptop's screen: else a long chapter title (it doesn't wrap) widened
+   the transport past the edge instead of shrinking to an ellipsis, and the last buttons were cut off */
+.notes .chrome { grid-template-columns: minmax(0, 1fr); }
+
+/* the notepad and Snake fill the reading pane */
+.notes .pane.is-tool { display: flex; flex-direction: column; overflow: hidden; padding-right: 0; mask-image: none; }
+.notes .pad, .notes .snake { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.notes .pad-tools { flex: none; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.notes .pad-tools .notes-btn { white-space: nowrap; }
+.notes .pad-state { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 12px; color: #9aa1b8; }
+.notes .pad-text { flex: 1; min-height: 0; width: 100%; resize: none; padding: 8px 10px; background: #141824; border: 1px solid #2a2f3e; border-radius: 7px;
+  color: #e8ebf4; font: inherit; font-size: .95em; line-height: 1.5; scrollbar-width: thin; scrollbar-color: #4d546c #161922; }
+.notes .pad-text::placeholder { color: #737a93; }
+.notes .pad-text:focus { outline: none; border-color: var(--orange); }
+.notes .snake-head { flex: none; display: flex; align-items: baseline; gap: 14px; min-width: 0; font-size: 12.5px; color: #9aa1b8; }
+.notes .snake-head b { color: var(--orange); font-variant-numeric: tabular-nums; }
+.notes .snake-hint { margin-left: auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.notes .snake-board { flex: 1; min-height: 0; width: 100%; display: block; cursor: pointer; }
+.notes .snake-board:focus-visible { outline: none; }                 /* the board's own edge turns orange */
+.notes.is-zoomed .pad-tools .notes-btn { font-size: 14px; }
+.notes.is-zoomed .snake-head { font-size: 15px; }

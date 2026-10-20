@@ -11,6 +11,7 @@ const fTime = fmt({ hour: "2-digit", minute: "2-digit" });
 const fDayLong = fmt({ weekday: "long", day: "numeric", month: "long" });
 const fDay = fmt({ weekday: "long" });
 const fShort = fmt({ weekday: "short", day: "numeric" });
+const fYear = fmt({ year: "numeric" });   // apart: with the year in, en-GB puts a comma after the weekday
 const dayKey = (iso) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date(iso));
 const roomNo = (t) => { const m = /^Room (\d+)$/.exec(t.room || ""); return m ? Number(m[1]) : null; };
 const ytUrl = (t, sec = 0) => `https://www.youtube.com/watch?v=${t.videoId}${sec ? `&t=${sec}s` : ""}`;
@@ -814,6 +815,7 @@ function playerFailed(t) {
   if (!seat || seat.t !== t) return;
   seat.starting = false; seat.failed = true;
   clearTimeout(seat.readyTimer);
+  if (seat.pip) { seat.pip = false; markPip(); placeTube(); }   // the box would hold only the error: it goes back
   tube.textContent = "";
   tube.append(el("div", { class: "tube-error", role: "alert" },
     el("b", { text: "The recording won't play here" }),
@@ -857,12 +859,19 @@ function videoFullscreen() {
   if (!seat.player && !seat.starting) jumpTo(0);               // full screen before play: start it too
   tube.requestFullscreen().catch(() => {});
 }
+const SPEED_ICON = `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2.2 12a6 6 0 1 1 11.6 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M8 11.6l3.2-4.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+const PIP_ICON = `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="7.6" y="7.6" width="5.2" height="4.2" rx=".8" fill="currentColor"/></svg>`;
+const iconButton = (attrs, svg) => { const b = el("button", { type: "button", ...attrs }); b.innerHTML = svg; return b; };
+const speedButton = () => iconButton({ class: "icon speed", "aria-keyshortcuts": "< >", "aria-haspopup": "true", "aria-expanded": "false", "aria-label": "Playback speed",
+  onclick: (e) => openSpeeds(e.currentTarget) }, SPEED_ICON);
+const pipButton = () => iconButton({ class: "icon pip", "aria-keyshortcuts": "P", "aria-pressed": "false", "aria-label": "Picture in picture", title: "Picture in picture  P",
+  onclick: () => setPip(!seat.pip) }, PIP_ICON);
 function tubeControls() {
-  // a corner button on the picture, and the bar for full screen
+  // a corner button on the picture, and the bar that wakes on the pointer
   const scrub = el("div", { class: "scrub", role: "slider", tabindex: "0", "aria-label": "Position in the talk", "aria-valuemin": "0",
-      onclick: (e) => { const L = playerLength(), r = scrub.getBoundingClientRect(); if (L) jumpTo((e.clientX - r.left) / r.width * L); },
       onkeydown: (e) => { const d = { ArrowLeft: -10, ArrowRight: 10, PageDown: -60, PageUp: 60 }[e.key]; if (d) { e.preventDefault(); seekBy(d); } } },
     el("div", { class: "scrub-fill" }), el("div", { class: "scrub-ticks", "aria-hidden": "true" }));
+  scrubber(scrub);
   const bar = el("div", { class: "tube-bar", role: "group", "aria-label": "Recording" },
     el("button", { class: "icon step is-prev", type: "button", "aria-keyshortcuts": "[", "aria-label": "Previous chapter", onclick: () => stepChapter(-1) }, el("span", { class: "ico", "aria-hidden": "true" })),
     el("button", { class: "toggle", type: "button", "aria-keyshortcuts": "K", onclick: () => playPause() }, el("span", { class: "glyph" })),
@@ -872,11 +881,53 @@ function tubeControls() {
     el("span", { class: "now-text" }),
     el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
     el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }),
+    speedButton(), pipButton(),
     el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Leave full screen", onclick: () => videoFullscreen() }));
   fsButton(bar);
   const corner = el("button", { class: "tube-fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Video full screen", title: "Video full screen  F", onclick: () => videoFullscreen() });
   corner.innerHTML = FS_ICON;
   return [corner, bar];
+}
+// A scrubber you can press anywhere along its strip and drag (John 19/10: only a click on the thin line counted), with
+// the time and chapter under the pointer shown above it. The tip and the fill follow the pointer; the seek happens on
+// release. The tip lives in the bar (or the laptop's screen), clear of the bar's clipped strip.
+function scrubber(scrub) {
+  const tip = el("div", { class: "scrub-tip", hidden: true, "aria-hidden": "true" });
+  let dragging = false;
+  const share = (e) => { const r = scrub.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); };
+  const show = (e) => {
+    const L = playerLength(), host = scrub.closest(".tube-bar, .face.notes");
+    if (!L || !host || !seat) { tip.hidden = true; return; }
+    const sec = share(e) * L, i = seat.chapters.length ? chapterAt(sec) : -1;
+    tip.textContent = "";
+    put(tip, el("b", { text: clock(sec) }), i >= 0 ? el("span", { text: seat.chapters[i].title }) : null);
+    if (tip.parentNode !== host) host.append(tip);
+    tip.hidden = false;
+    // in the host's own px (the tube is scaled while it moves), kept inside it
+    const h = host.getBoundingClientRect(), k = h.width / host.offsetWidth || 1, r = scrub.getBoundingClientRect(), half = tip.offsetWidth / 2;
+    tip.style.left = `${Math.max(half + 4, Math.min(host.offsetWidth - half - 4, (e.clientX - h.left) / k))}px`;
+    tip.style.top = `${(r.top - h.top) / k}px`;
+    if (dragging) scrub.querySelector(".scrub-fill").style.width = `${share(e) * 100}%`;
+  };
+  scrub.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault();                      // no text selection, no sticky focus ring from the mouse
+    dragging = true;
+    scrub.setPointerCapture(e.pointerId);
+    scrub.classList.add("is-dragging");
+    show(e);
+  });
+  scrub.addEventListener("pointermove", show);
+  scrub.addEventListener("pointerup", (e) => {
+    if (!dragging) return;
+    dragging = false;
+    scrub.classList.remove("is-dragging");
+    const L = playerLength();
+    jumpTo(L ? share(e) * L : 0);
+    if (!scrub.matches(":hover")) tip.hidden = true;
+  });
+  scrub.addEventListener("pointercancel", () => { dragging = false; scrub.classList.remove("is-dragging"); tip.hidden = true; tick(); });
+  scrub.addEventListener("pointerleave", () => { if (!dragging) tip.hidden = true; });
 }
 // the bar's last button: into full screen from the big view, out of it in full screen
 function fsButton(bar = tube.querySelector(".tube-bar")) {
@@ -886,19 +937,32 @@ function fsButton(bar = tube.querySelector(".tube-bar")) {
   b.title = on ? "Leave full screen  F or Esc" : "Video full screen  F";
   b.setAttribute("aria-label", on ? "Leave full screen" : "Video full screen");
 }
+// The bar wakes on the pointer in every seat view (John 19/10: the seek bar should be there once you've moused over the
+// video) and stays while the pointer is on the picture or the bar; it goes when the pointer leaves. Where the picture
+// fills the window (full screen, the big view) a mouse resting on the picture also puts it away after 2.5 s, as before;
+// one resting on the bar never does.
 let barTimer = 0;
-tube.addEventListener("mousemove", () => {
-  if (document.fullscreenElement !== tube && !tube.classList.contains("is-big")) return;
+const fillsWindow = () => tube.classList.contains("is-full") || tube.classList.contains("is-big");
+function wake(onBar = false) {
   tube.classList.add("is-awake");
   clearTimeout(barTimer);
-  barTimer = setTimeout(() => tube.classList.remove("is-awake"), 2500);
-});
+  if (!onBar && fillsWindow()) barTimer = setTimeout(sleep, 2500);
+}
+function sleep() { clearTimeout(barTimer); tube.classList.remove("is-awake"); closeSpeeds(tube); }
+tube.addEventListener("pointermove", (e) => { if (e.pointerType !== "touch") wake(!!e.target.closest(".tube-bar, .pip-bar")); });
+tube.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") sleep(); });
+// a touch has no hover: a tap shows the bar for a while, wherever the picture is
+tube.addEventListener("pointerdown", (e) => { if (e.pointerType === "touch") { tube.classList.add("is-awake"); clearTimeout(barTimer); barTimer = setTimeout(sleep, 3500); } });
+// the bar's buttons are tab stops only where it's the only transport (full screen, the big view, the corner box with the
+// lid closed); elsewhere the laptop has the same ones, and the cinema screen would put a dozen stops before the laptop
+function barReach() {
+  const reach = fillsWindow() || (!!seat && !!seat.pip && !seat.open);
+  for (const b of tube.querySelectorAll(".tube-bar button, .tube-bar .scrub")) b.tabIndex = reach ? 0 : -1;
+}
 document.addEventListener("fullscreenchange", () => {
   tube.classList.toggle("is-full", document.fullscreenElement === tube);
   fsButton();
-  tube.classList.add("is-awake");
-  clearTimeout(barTimer);
-  barTimer = setTimeout(() => tube.classList.remove("is-awake"), 2500);
+  wake();
   setTimeout(() => { placeTube(); tick(); }, 60);
 });
 function jumpTo(sec) {
@@ -914,6 +978,8 @@ function jumpTo(sec) {
     el("div", { class: "tube-paused is-loading" }, el("button", { class: "resume", type: "button", tabindex: "-1", onclick: () => playPause() },
       el("i", { "aria-hidden": "true" }), el("span", { class: "resume-text", text: "Loading…" }))));
   const poster0 = tube.querySelector(".poster"); if (poster0) poster0.remove();
+  const pb = tube.querySelector(".pip-bar"); if (pb) tube.append(pb);   // the corner box's strip stays on top
+  barReach();
   seat.readyTimer = setTimeout(() => { if (seat && seat.t === t && !seat.ready) playerFailed(t); }, 10000);
   tick();
   loadYT().then((YT) => {
@@ -931,9 +997,11 @@ function jumpTo(sec) {
           seat.ready = true;
           clearTimeout(seat.readyTimer);
           if (seat.cc) applyCaptions();
+          applyRate();
           tick();
         },
-        onStateChange: (e) => { theatreFor(e.data); tick(); },
+        onStateChange: (e) => { if (e.data === 1) applyRate(); theatreFor(e.data); tick(); },
+        onPlaybackRateChange: () => tick(),
         onError: () => playerFailed(t),
       },
     });
@@ -954,6 +1022,56 @@ function toggleMute() {
   if (p.isMuted()) p.unMute(); else p.mute();
   setTimeout(tick, 100);
 }
+// Speed (John 19/10): 1x to 2x, only the rates YouTube offers for this recording; < and > step down and up, as on
+// YouTube. The choice is remembered in this browser, so the next talk starts at it.
+const RATES = [1, 1.25, 1.5, 1.75, 2];
+let wantRate = 1;
+try { const v = Number(localStorage.getItem("cinema-speed")); if (RATES.includes(v)) wantRate = v; } catch (e) { /* no storage: 1x */ }
+const rateText = (r) => `${r}×`;
+const playerRate = () => { const p = seat && seat.player; return p && seat.ready && p.getPlaybackRate ? p.getPlaybackRate() : 1; };
+function ratesOffered() {
+  const p = seat && seat.player, have = p && seat.ready && p.getAvailablePlaybackRates ? p.getAvailablePlaybackRates() || [] : [];
+  return RATES.filter((r) => have.includes(r));
+}
+function applyRate() {   // when the player is ready, and on play (a rate set before it plays can be dropped)
+  const p = seat && seat.player;
+  if (p && seat.ready && p.setPlaybackRate && ratesOffered().includes(wantRate) && p.getPlaybackRate() !== wantRate) p.setPlaybackRate(wantRate);
+}
+function setRate(r) {
+  wantRate = r;
+  try { localStorage.setItem("cinema-speed", String(r)); } catch (e) { /* this visit only */ }
+  applyRate();
+  setTimeout(tick, 100);
+}
+function stepRate(d) {
+  const list = ratesOffered(), now = playerRate();
+  const next = d > 0 ? list.find((r) => r > now) : [...list].reverse().find((r) => r < now);
+  if (next != null) setRate(next);
+}
+const rateNote = () => (playerRate() !== 1 ? ` · ${rateText(playerRate())}` : "");   // next to the time, only off 1x
+// the rates as a row of chips above the button, in whichever bar it is (the laptop's screen, or the recording's bar)
+function openSpeeds(btn) {
+  const host = btn.closest(".tube-bar, .face.notes"), was = host && host.querySelector(":scope > .speed-menu");
+  closeSpeeds();
+  if (!host || was) return;
+  const now = playerRate();
+  const menu = el("div", { class: "speed-menu", role: "group", "aria-label": "Playback speed" },
+    ratesOffered().map((r) => el("button", { type: "button", "aria-pressed": String(r === now), text: rateText(r),
+      onclick: () => { setRate(r); closeSpeeds(document, true); } })));
+  host.append(menu);
+  const h = host.getBoundingClientRect(), k = h.width / host.offsetWidth || 1, b = btn.getBoundingClientRect();
+  Object.assign(menu.style, { right: `${Math.max(4, (h.right - b.right) / k)}px`, bottom: `${(h.bottom - b.top) / k + 6}px` });
+  btn.setAttribute("aria-expanded", "true");
+  (menu.querySelector('[aria-pressed="true"]') || menu.firstChild)?.focus({ preventScroll: true });
+}
+function closeSpeeds(root = document, refocus = false) {
+  const open = root.querySelector(".speed[aria-expanded='true']");
+  for (const m of root.querySelectorAll(".speed-menu")) m.remove();
+  if (!open) return;
+  open.setAttribute("aria-expanded", "false");
+  if (refocus) open.focus({ preventScroll: true });
+}
+document.addEventListener("pointerdown", (e) => { if (!e.target.closest(".speed-menu, .speed")) closeSpeeds(); });
 // Captions: YouTube draws them at the foot of its frame, which the tube crops away (see .tube's --crop in the CSS), so
 // with captions on the frame is uncropped and they sit on the picture's foot. The English track, else whatever the
 // recording has (auto-generated tracks too). Asked for before the player exists, they come on when it's ready.
@@ -997,8 +1115,9 @@ function setTheatre(on) {
   if (seat.cine) seat.cine.classList.toggle("is-theatre", inTheatre());
   if (!seat.zoom) placeTube(reduceMotion ? 0 : 750);
 }
-// the lid closed with the view on the film: the picture stays big, playing or not
-const inTheatre = () => !!seat && (seat.theatre || !!seat.layout.video);
+// the lid closed with the view on the film: the picture stays big, playing or not (and with the recording in the corner
+// box, the screen keeps its column: there's no picture on it to make room for)
+const inTheatre = () => !!seat && !seat.pip && (seat.theatre || !!seat.layout.video);
 // where things on the cinema screen end up once the view has moved (read from the layout: mid-move, the DOM is not there yet)
 function theatreRect() {
   const st = stage.getBoundingClientRect(), L = seat.layout, v = L.video;
@@ -1014,12 +1133,12 @@ function onScreen(e) {
   const kx = L.w / pr.width, ky = L.h / pr.height;
   return { left: st.left + L.x + (r.left - pr.left) * kx, top: st.top + L.y + (r.top - pr.top) * ky, width: r.width * kx, height: r.height * ky };
 }
-// the tube sits over whichever slot is showing: the cinema screen's, or the laptop's when zoomed
+// the tube sits over whichever slot is showing: the cinema screen's, or the laptop's when zoomed; or in the corner box
 function placeTube(ms = 0) {
   if (!seat || tube.hidden) return;
   const host = seat.zoom ? seat.notes : seat.cine, slot = host && host.querySelector(".slot");
-  if (!slot) { tube.classList.add("is-away"); return; }
-  const r = seat.zoom ? slot.getBoundingClientRect() : inTheatre() ? theatreRect() : onScreen(slot), st = stage.getBoundingClientRect();
+  if (!slot && !seat.pip) { tube.classList.add("is-away"); return; }
+  const r = seat.pip ? pipRect() : seat.zoom ? slot.getBoundingClientRect() : inTheatre() ? theatreRect() : onScreen(slot), st = stage.getBoundingClientRect();
   const was = tube.getBoundingClientRect(), w = Math.round(r.width), h = Math.round(r.height);
   const to = `translate(${Math.round(r.left - st.left)}px, ${Math.round(r.top - st.top)}px)`;
   // moving: the new size at once, scaled from the old box back to it (a transform alone runs in step with the room's;
@@ -1034,16 +1153,75 @@ function placeTube(ms = 0) {
     tube.style.transition = `transform ${ms}ms ${EASE}, opacity .25s ease`;
     tube.style.transform = to;
   }
-  tube.classList.toggle("is-big", !seat.zoom && !!seat.layout.video);
-  tube.classList.toggle("is-on-laptop", seat.zoom);
+  tube.classList.toggle("is-big", !seat.pip && !seat.zoom && !!seat.layout.video);
+  tube.classList.toggle("is-on-laptop", !seat.pip && seat.zoom);
+  tube.classList.toggle("is-pip", !!seat.pip);
   tube.classList.remove("is-away");
+  barReach();
+}
+
+// ----- picture in picture, in the page (John 19/10): the same player moved into a box in a corner, the way it moves
+// between the cinema screen and the laptop (never reloaded). The browser's own picture-in-picture can't take a
+// cross-origin iframe, and Document Picture-in-Picture would move the iframe into another document, which reloads it.
+// The box is dragged by its top strip and sized from its top-left corner (the opposite corner stays put), always 16:9;
+// the laptop can zoom meanwhile and the recording stays in the box. P, or Put back, returns it.
+const PIP_MIN = 240, PIP_EDGE = 12;
+let pipAt = null;   // { w, fx, fy }: its width, and where it sits as a share of the room left each way (a corner stays a corner on resize)
+function pipRect() {
+  const st = stage.getBoundingClientRect(), W = st.width, H = st.height, E = PIP_EDGE;
+  if (!pipAt) {   // first time: bottom right, clear of the laptop's transport when it's zoomed
+    const w = Math.round(Math.min(480, Math.max(300, W * 0.28))), free = H - w * 9 / 16 - 2 * E;
+    pipAt = { w, fx: 1, fy: free > 0 ? Math.max(0, (free - 72) / free) : 0 };
+  }
+  const w = Math.round(Math.max(Math.min(PIP_MIN, W - 2 * E), Math.min(pipAt.w, W - 2 * E, (H - 2 * E) * 16 / 9))), h = Math.round(w * 9 / 16);
+  return { left: st.left + E + pipAt.fx * Math.max(0, W - w - 2 * E), top: st.top + E + pipAt.fy * Math.max(0, H - h - 2 * E), width: w, height: h };
+}
+function pipTo(x, y, w) {      // stage px
+  const E = PIP_EDGE, share = (v, room) => (room > 0 ? Math.max(0, Math.min(1, (v - E) / room)) : 0);
+  pipAt = { w, fx: share(x, stage.clientWidth - w - 2 * E), fy: share(y, stage.clientHeight - w * 9 / 16 - 2 * E) };
+  placeTube();
+}
+function pipBar() {
+  const grip = el("span", { class: "pip-size", title: "Drag to resize", "aria-hidden": "true" });
+  const bar = el("div", { class: "pip-bar" }, grip, el("span", { class: "pip-title", text: seat.t.title }),
+    el("button", { class: "pip-back", type: "button", "aria-keyshortcuts": "P", title: "Back to the screen  P", onclick: () => setPip(false) }, "Put back", key("P")));
+  bar.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || e.target.closest("button")) return;
+    e.preventDefault();
+    const sizing = e.target === grip, r = pipRect(), st = stage.getBoundingClientRect(), x0 = e.clientX, y0 = e.clientY;
+    const left = r.left - st.left, top = r.top - st.top;
+    bar.setPointerCapture(e.pointerId);
+    tube.classList.add("is-dragging");
+    bar.onpointermove = (m) => {
+      const dx = m.clientX - x0, dy = m.clientY - y0;
+      if (!sizing) { pipTo(left + dx, top + dy, r.width); return; }
+      const d = Math.abs(dx) > Math.abs(dy * 16 / 9) ? dx : dy * 16 / 9;   // whichever way the corner moved more
+      const w = Math.round(Math.max(PIP_MIN, Math.min(r.width - d, stage.clientWidth - 2 * PIP_EDGE, (stage.clientHeight - 2 * PIP_EDGE) * 16 / 9)));
+      pipTo(left + r.width - w, top + r.height - w * 9 / 16, w);
+    };
+    bar.onpointerup = bar.onpointercancel = () => { bar.onpointermove = bar.onpointerup = bar.onpointercancel = null; tube.classList.remove("is-dragging"); };
+  });
+  return bar;
+}
+// the screen it left says where it went; a click there brings it back
+function markPip() { for (const p of [seat.cinePanel, seat.notesPanel]) if (p) p.classList.toggle("is-pip", !!seat.pip); }
+function setPip(on) {
+  if (!seat || !seat.t.videoId || !EMBED || seat.failed || on === !!seat.pip) return;
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  if (on && !seat.player && !seat.starting) jumpTo(0);       // from the poster: it starts, in the box
+  seat.pip = on;
+  if (on && !tube.querySelector(".pip-bar")) tube.append(pipBar());
+  markPip();
+  if (seat.cine) seat.cine.classList.toggle("is-theatre", inTheatre());
+  placeTube(reduceMotion ? 0 : 450);
+  tick();
 }
 
 // ----- the cinema screen: the recording, and beside it what the talk is, who gives it and why it's worth your time
 const nb = (x) => x.replace(/ /g, " ").replace(/-/g, "‑");
 function cineScreen(t) {
   const s = t.s || {};
-  const slot = t.videoId && EMBED ? el("div", { class: "slot", "aria-hidden": "true" })
+  const slot = t.videoId && EMBED ? el("div", { class: "slot", "aria-hidden": "true", onclick: () => seat && seat.pip && setPip(false) })
     : el("div", { class: "slot is-poster" },
       t.videoId ? el("a", { class: "btn is-main", href: ytUrl(t), target: "_blank", rel: "noopener", text: "Watch on YouTube" })
         : [el("b", { text: "No recording yet" }), el("span", { text: "Devoxx puts the talks on YouTube in the weeks after the conference. Your laptop has the notes, from the abstract." }),
@@ -1147,14 +1325,171 @@ function gist(text) {
     onclick: () => { const open = p.classList.toggle("is-short"); more.textContent = open ? "more ▾" : "less ▴"; more.setAttribute("aria-expanded", String(!open)); } });
   return el("div", { class: "lead-wrap" }, p, more);
 }
+
+// The notepad (John 19/10): your own notes, one per talk, kept in this browser as you type (where storage is off, only
+// while you stay on the talk: download them). Timestamp, or Ctrl+Enter, puts in where the talk is, like [12:40];
+// downloaded as Markdown, each of those becomes a link to that moment on YouTube.
+const noteKey = (id) => `cinema-note-${id}`;
+function readNote(id) { try { return localStorage.getItem(noteKey(id)) || ""; } catch (e) { return ""; } }
+function writeNote(id, text) {
+  try { if (text.trim()) localStorage.setItem(noteKey(id), text); else localStorage.removeItem(noteKey(id)); return true; } catch (e) { return false; }
+}
+const STAMP = /\[(?:(\d+):)?(\d{1,2}):(\d{2})\](?!\()/g;          // [12:40] or [1:02:03], not one already linked
+const linked = (t, text) => (t.videoId ? text.replace(STAMP, (m, h, mm, ss) => `${m}(https://youtu.be/${t.videoId}?t=${Number(h || 0) * 3600 + Number(mm) * 60 + Number(ss)})`) : text);
+function noteMd(t, text, level = 1) {
+  const head = [`${"#".repeat(level)} ${t.title}`, "", `- Speakers: ${speakers(t, true)}`, t.room ? `- Room: ${t.room}` : null,
+    t.start ? `- Date: ${fDayLong.format(new Date(t.start))} ${fYear.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : null, t.videoId ? `- YouTube: https://youtu.be/${t.videoId}` : null];
+  return `${head.filter((x) => x != null).join("\n")}\n\n${linked(t, text.trim())}\n`;
+}
+// a file name every system takes: no path or reserved characters, no leading or trailing dots, not too long
+const mdName = (title) => `${title.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, " ").replace(/\s+/g, " ").trim().replace(/^\.+|\.+$/g, "").slice(0, 120).trim() || "Talk notes"}.md`;
+function download(name, text) {
+  const url = URL.createObjectURL(new Blob([text], { type: "text/markdown;charset=utf-8" }));
+  const a = el("a", { href: url, download: name, hidden: true });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function downloadAll() {   // one file, a section per talk with notes, in programme order
+  const mine = talks.filter((x) => readNote(x.id).trim()).sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+  if (mine.length) download("Devoxx Belgium 2026 notes.md", `# Devoxx Belgium 2026: my notes\n\n${mine.map((x) => noteMd(x, readNote(x.id), 2)).join("\n")}`);
+  return mine.length;
+}
+function notepad(t, live) {
+  const text = el("textarea", { class: "pad-text", "aria-label": "Your notes on this talk", spellcheck: "true",
+    placeholder: live ? "Your notes on this talk, kept in this browser. Timestamp (or Ctrl+Enter) puts in where the talk is, like [12:40]: in the download it links to that moment."
+      : "Your notes on this talk, kept in this browser." });
+  text.value = readNote(t.id);
+  const state = el("span", { class: "pad-state", role: "status", title: "Kept in this browser only", text: text.value ? "Saved" : "" });
+  let timer = 0, dirty = false;
+  const save = () => {
+    clearTimeout(timer);
+    if (!dirty) return;
+    dirty = false;
+    state.textContent = writeNote(t.id, text.value) ? "Saved" : "Not saved (private window?)";
+  };
+  const soon = () => { dirty = true; state.textContent = ""; clearTimeout(timer); timer = setTimeout(save, 400); };
+  const stamp = () => {
+    const sec = playerTime(), before = text.value.slice(0, text.selectionStart);
+    const s = `${before && !/\s$/.test(before) ? " " : ""}[${clock(sec || 0)}] `;
+    text.focus();
+    if (!document.execCommand("insertText", false, s)) text.setRangeText(s, text.selectionStart, text.selectionEnd, "end");   // execCommand keeps undo
+    soon();
+  };
+  text.addEventListener("input", soon);
+  text.addEventListener("blur", save);
+  text.addEventListener("keydown", (e) => {
+    e.stopPropagation();                     // typing here is writing: none of the page's keys
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && live) { e.preventDefault(); stamp(); }
+    else if (e.key === "Escape") { e.preventDefault(); text.closest(".pane").focus(); }   // out of the text; Esc again zooms out
+  });
+  const pad = el("div", { class: "pad" },
+    el("div", { class: "pad-tools" },
+      live ? el("button", { class: "notes-btn", type: "button", title: "Put in where the talk is  Ctrl+Enter", onclick: stamp }, "Timestamp", key("Ctrl+Enter")) : null,
+      state, el("span", { class: "notes-spacer" }),
+      el("button", { class: "notes-btn", type: "button", onclick: () => { save(); download(mdName(t.title), noteMd(t, text.value)); } }, "Download as .md"),
+      el("button", { class: "notes-btn", type: "button", onclick: () => { save(); if (!downloadAll()) state.textContent = "No notes yet"; } }, "Download all notes")),
+    text);
+  pad.flush = save;
+  return pad;
+}
+
+// Snake (John 19/10): something for the hands while you listen, on the laptop, never over the recording. Its keys
+// (arrows, WASD, Space) only while the board has focus, and never the player's (K [ ] F L C M Z P < > still work);
+// it pauses the moment the board loses focus, the tab changes or the lid closes. No sound: the talk is playing.
+const SNAKE = { cols: 24, rows: 12 };
+function snake() {
+  const board = el("canvas", { class: "snake-board", tabindex: "0", "aria-label": "Snake: arrow keys or WASD steer, Space pauses" });
+  const scoreEl = el("b", { text: "0" }), bestEl = el("b");
+  let best = 0;
+  try { best = Number(localStorage.getItem("cinema-snake-best")) || 0; } catch (e) { /* no storage: this visit's best */ }
+  bestEl.textContent = String(best);
+  let body, dir, turns, food, score, over, fresh = true, running = false, timer = 0;
+  const same = (a, b) => a[0] === b[0] && a[1] === b[1];
+  const drop = () => {
+    const free = [];
+    for (let x = 0; x < SNAKE.cols; x++) for (let y = 0; y < SNAKE.rows; y++) if (!body.some((b) => same(b, [x, y]))) free.push([x, y]);
+    food = free[Math.floor(Math.random() * free.length)];
+  };
+  const reset = () => { body = [[6, 6], [5, 6], [4, 6]]; dir = [1, 0]; turns = []; score = 0; over = false; scoreEl.textContent = "0"; drop(); };
+  const pace = () => Math.max(70, 140 - score * 3);
+  const keepBest = () => { if (score <= best) return; best = score; bestEl.textContent = String(best);
+    try { localStorage.setItem("cinema-snake-best", String(best)); } catch (e) { /* this visit only */ } };
+  const draw = () => {
+    const w = board.clientWidth, h = board.clientHeight, dpr = devicePixelRatio || 1;
+    if (!w || !h) return;
+    if (board.width !== Math.round(w * dpr) || board.height !== Math.round(h * dpr)) { board.width = Math.round(w * dpr); board.height = Math.round(h * dpr); }
+    const g = board.getContext("2d"), c = Math.floor(Math.min(w / SNAKE.cols, h / SNAKE.rows));
+    const ox = Math.round((w - c * SNAKE.cols) / 2), oy = Math.round((h - c * SNAKE.rows) / 2);
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, w, h);
+    g.fillStyle = "#141824"; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows);
+    g.strokeStyle = document.activeElement === board ? "#f6921e" : "#2a2f3e"; g.lineWidth = 1;
+    g.strokeRect(ox + 0.5, oy + 0.5, c * SNAKE.cols - 1, c * SNAKE.rows - 1);
+    g.fillStyle = "#f6921e";
+    g.beginPath(); g.arc(ox + (food[0] + 0.5) * c, oy + (food[1] + 0.5) * c, c * 0.34, 0, Math.PI * 2); g.fill();
+    body.forEach(([x, y], i) => { g.fillStyle = i ? "#aab0c6" : "#ffffff"; g.fillRect(ox + x * c + 1, oy + y * c + 1, c - 2, c - 2); });
+    if (running) return;
+    g.fillStyle = "rgba(15, 17, 23, .74)"; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows);
+    const size = Math.max(12, Math.min(18, Math.round(c * 0.8)));
+    g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillStyle = "#e8ebf4"; g.font = `700 ${size}px Archivo, system-ui, sans-serif`;
+    g.fillText(over ? `Game over: ${score}. Space or click to play again` : fresh ? "Click, or Space, to play" : "Paused. Space or click to go on", w / 2, h / 2 - size * 0.7);
+    g.fillStyle = "#9aa1b8"; g.font = `500 ${Math.round(size * 0.8)}px Archivo, system-ui, sans-serif`;
+    g.fillText("Arrows or WASD steer, while the board has focus", w / 2, h / 2 + size * 0.8);
+  };
+  const stop = () => { running = false; clearTimeout(timer); draw(); };
+  const step = () => {
+    // in front of you or not at all: focus elsewhere, another tab, the lid closed (the board gone) all pause it
+    if (!board.isConnected || document.activeElement !== board || document.hidden) { stop(); return; }
+    if (turns.length) dir = turns.shift();
+    const head = [body[0][0] + dir[0], body[0][1] + dir[1]], ate = same(head, food);
+    const hit = head[0] < 0 || head[1] < 0 || head[0] >= SNAKE.cols || head[1] >= SNAKE.rows || body.slice(0, ate ? body.length : -1).some((b) => same(b, head));
+    if (hit) { over = true; keepBest(); stop(); return; }
+    body.unshift(head);
+    if (ate) { score++; scoreEl.textContent = String(score); keepBest(); drop(); } else body.pop();
+    draw();
+    timer = setTimeout(step, pace());
+  };
+  const go = () => {
+    if (running) return;
+    if (over) reset();
+    if (document.activeElement !== board) board.focus({ preventScroll: true });
+    running = true; fresh = false;
+    draw();
+    timer = setTimeout(step, pace());
+  };
+  const steer = (d) => {   // queued, so two quick turns both count, but never straight back into itself
+    const last = turns.length ? turns[turns.length - 1] : dir;
+    if ((d[0] === -last[0] && d[1] === -last[1]) || same(d, last) || turns.length > 1) return;
+    turns.push(d);
+  };
+  const DIRS = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] };
+  board.addEventListener("keydown", (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const d = DIRS[e.key.length === 1 ? e.key.toLowerCase() : e.key];
+    if (d) { e.preventDefault(); if (!over) steer(d); go(); }                       // preventDefault: the page leaves them alone
+    else if (e.key === " " || e.key === "Enter") { e.preventDefault(); if (running) stop(); else go(); }
+  });
+  board.addEventListener("click", () => { if (!running) go(); });
+  board.addEventListener("focus", draw);
+  board.addEventListener("blur", stop);
+  new ResizeObserver(draw).observe(board);
+  reset();
+  return el("div", { class: "snake" },
+    el("div", { class: "snake-head" }, el("span", {}, "Score ", scoreEl), el("span", {}, "Best ", bestEl),
+      el("span", { class: "snake-hint", text: "The talk keeps playing; its keys still work." })),
+    board);
+}
 function notesScreen(t) {
   const s = t.s || {};
   const chapters = chaptersOf(t);
   const live = EMBED && t.videoId;
   // first: the gist and the chapters to jump to (when there are chapters)
-  const tabs = [["overview", "Overview"], ["summary", "Summary"], ["points", "Key points"], ["monday", "To try"]]
+  // then your own: the notepad and Snake (John 19/10), after the talk's
+  const tabs = [["overview", "Overview"], ["summary", "Summary"], ["points", "Key points"], ["monday", "To try"], ["notepad", "My notes"], ["snake", "Snake"]]
     .filter(([id]) => (id === "overview" && chapters.length) || id === "summary" || (id === "points" && s.keyPoints && s.keyPoints.length)
-      || (id === "monday" && s.takeaways && s.takeaways.length));
+      || (id === "monday" && s.takeaways && s.takeaways.length) || id === "notepad" || id === "snake");
+  let pad = null, game = null;               // built once, so the text (and its undo) and a paused game survive a tab change
   const pane = el("div", { class: "pane scroller", tabindex: "0", "aria-label": "Notes" });
   const tabRow = el("div", { class: "tabs", role: "group", "aria-label": "Notes" });
   // reading: scrolling down puts the header, the tabs and the bar away; scrolling up, the top, or the pointer at an
@@ -1190,6 +1525,9 @@ function notesScreen(t) {
     if (id === "summary") put(pane, el("div", { class: "reading" }, s.tldr ? el("p", { class: "in-short" }, el("b", { text: "In short " }), s.tldr) : null, readable(t, s, live)));
     if (id === "points") put(pane, el("ul", { class: "reading" }, s.keyPoints.map((p) => el("li", { text: p }))));
     if (id === "monday") put(pane, el("ol", { class: "reading" }, s.takeaways.map((p) => el("li", { text: p }))));
+    if (id === "notepad") put(pane, pad || (pad = notepad(t, live)));
+    if (id === "snake") put(pane, game || (game = snake()));
+    pane.classList.toggle("is-tool", id === "notepad" || id === "snake");   // they fill the pane, it doesn't scroll
     pane.scrollTop = 0;
     chrome(true);
     for (const b of tabRow.children) b.setAttribute("aria-pressed", String(b.dataset.tab === id));
@@ -1200,9 +1538,9 @@ function notesScreen(t) {
   const menu = el("div", { class: "chapter-menu scroller", hidden: true, role: "dialog", "aria-label": "Chapters" }, chapters.length ? chapterList() : null);
   const ticks = el("div", { class: "scrub-ticks", "aria-hidden": "true" });
   const scrub = el("div", { class: "scrub", role: "slider", tabindex: "0", "aria-label": "Position in the talk", "aria-valuemin": "0", "aria-valuemax": "0", "aria-valuenow": "0",
-      onclick: (e) => { const L = playerLength(), r = scrub.getBoundingClientRect(); if (L) jumpTo((e.clientX - r.left) / r.width * L); else jumpTo(0); },
       onkeydown: (e) => { const d = { ArrowLeft: -10, ArrowRight: 10, PageDown: -60, PageUp: 60 }[e.key]; if (d) { e.preventDefault(); seekBy(d); } } },
     el("div", { class: "scrub-fill" }), ticks);
+  scrubber(scrub);
   const now = live ? el("div", { class: "now" }, scrub,
     el("div", { class: "now-row" },
       el("div", { class: "transport", role: "group", "aria-label": "Recording" },
@@ -1216,12 +1554,13 @@ function notesScreen(t) {
       el("button", { class: "notes-btn retry", type: "button", text: "Try again", onclick: () => retryPlayer() }),
       el("button", { class: "icon cc", type: "button", "aria-keyshortcuts": "C", "aria-pressed": "false", "aria-label": "Captions", onclick: () => toggleCaptions() }, "CC"),
       el("button", { class: "icon mute", type: "button", "aria-keyshortcuts": "M", "aria-label": "Mute", onclick: () => toggleMute() }),
+      speedButton(), pipButton(),
       (() => { const b = el("button", { class: "icon fs", type: "button", "aria-keyshortcuts": "F", "aria-label": "Video full screen", title: "Video full screen  F", onclick: () => videoFullscreen() }); b.innerHTML = FS_ICON; return b; })())) : null;
   const keysSheet = el("div", { class: "keys-sheet", hidden: true, role: "note" },
     el("b", { text: "Keys" }),
-    el("dl", {}, [["K", "Play or pause"], ["[  ]", "Previous or next chapter"], ["← →", "Back or on 10 seconds"], ["C  M", "Captions, sound"],
-      ["F", "Video full screen"], ["Z", "Zoom in on the laptop"], ["L", "Close or open the lid"], ["Esc", "Zoom out, or leave full screen"], ["?", "These keys"]]
-      .filter(([k]) => live || !/^(K|\[|←|C)/.test(k)).map(([k, d]) => [el("dt", { text: k }), el("dd", { text: d })])),
+    el("dl", {}, [["K", "Play or pause"], ["[  ]", "Previous or next chapter"], ["← →", "Back or on 10 seconds"], ["<  >", "Slower or faster"], ["C  M", "Captions, sound"],
+      ["F", "Video full screen"], ["P", "Picture in picture"], ["Z", "Zoom in on the laptop"], ["L", "Close or open the lid"], ["Esc", "Zoom out, or leave full screen"], ["?", "These keys"]]
+      .filter(([k]) => live || !/^(K|\[|←|<|C|P)/.test(k)).map(([k, d]) => [el("dt", { text: k }), el("dd", { text: d })])),
     live ? el("p", { text: "Or double-click the picture for a full-screen video." }) : null);
   const keysBtn = el("button", { class: "notes-btn notes-keys", type: "button", "aria-label": "Keyboard shortcuts", "aria-expanded": "false", "aria-keyshortcuts": "?",
     onclick: () => toggleKeys() }, "Keys", key("?"));
@@ -1237,7 +1576,7 @@ function notesScreen(t) {
     el("div", { class: "notes-body" },
       el("div", { class: "notes-read" }, el("div", { class: "chrome is-tabs" }, tabRow), el("div", { class: "pane-wrap" }, pane)),
       el("aside", { class: "notes-watch" }, live ? el("div", { class: "watch-head is-top", text: "The talk, moved here from the big screen" }) : null,
-        live ? el("div", { class: "slot", "aria-hidden": "true" }) : null,
+        live ? el("div", { class: "slot", "aria-hidden": "true", onclick: () => seat && seat.pip && setPip(false) }) : null,
         chapters.length ? el("div", { class: "watch-head", text: "Chapters" }) : null,
         chapters.length ? el("div", { class: "pane-wrap is-list" }, el("div", { class: "scroller watch-list" }, chapterList())) : null)),
     menu, now ? el("div", { class: "chrome is-bottom" }, now) : null,
@@ -1251,6 +1590,7 @@ function notesScreen(t) {
   panel.addEventListener("focusin", (e) => { if (e.target.closest(".chrome")) chrome(true); });
   panel.fill = fill;
   panel.toggleKeys = toggleKeys;
+  panel.flush = () => pad && pad.flush();    // the notepad's last keystrokes, on leaving
   panel.ticks = (L) => {                       // the chapters marked on the scrubber, once the length is known
     if (ticks.dataset.len === String(Math.round(L)) || !L) return;
     ticks.dataset.len = String(Math.round(L));
@@ -1294,10 +1634,11 @@ function tick() {
     const Lb = playerLength(), sb = tb.querySelector(".scrub");
     tb.querySelector(".glyph").textContent = playing ? "❚❚" : "▶";
     tb.querySelector(".toggle").setAttribute("aria-label", playing ? "Pause" : "Play");
-    tb.querySelector(".now-time").textContent = Lb ? `${clock(sec || 0)} / ${clock(Lb)}` : "";
+    tb.querySelector(".now-time").textContent = Lb ? `${clock(sec || 0)} / ${clock(Lb)}${rateNote()}` : "";
     tb.querySelector(".now-text").textContent = i >= 0 ? `${i + 1}/${ch.length}  ${ch[i].title}` : "";
+    syncExtras(tb);
     if (Lb) {
-      tb.querySelector(".scrub-fill").style.width = `${Math.min(100, (sec || 0) / Lb * 100)}%`;
+      if (!sb.classList.contains("is-dragging")) tb.querySelector(".scrub-fill").style.width = `${Math.min(100, (sec || 0) / Lb * 100)}%`;
       const tk = sb.querySelector(".scrub-ticks");
       if (tk.dataset.len !== String(Lb)) { tk.dataset.len = String(Lb); tk.textContent = ""; for (const c of ch.slice(1)) tk.append(el("i", { style: `left:${c.sec / Lb * 100}%` })); }
       sb.setAttribute("aria-valuemax", String(Lb)); sb.setAttribute("aria-valuenow", String(Math.round(sec || 0)));
@@ -1356,12 +1697,13 @@ function tick() {
   toggle.querySelector(".glyph").textContent = seat.starting && !seat.ready ? "Loading…" : playing ? "❚❚ Pause" : "▶ Play";
   toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
   time.textContent = "";
-  if (L) put(time, el("span", { text: clock(sec || 0) }), el("span", { class: "t-len", text: ` / ${clock(L)}` }));
+  if (L) put(time, el("span", { text: clock(sec || 0) }), el("span", { class: "t-len", text: ` / ${clock(L)}` }), rateNote() ? el("span", { class: "t-rate", text: rateNote() }) : null);
+  syncExtras(now);
   const scrub = now.querySelector(".scrub");
   scrub.classList.toggle("is-ready", !!L);
   if (L) {
     n.ticks(L);
-    now.querySelector(".scrub-fill").style.width = `${Math.min(100, (sec || 0) / L * 100)}%`;
+    if (!scrub.classList.contains("is-dragging")) now.querySelector(".scrub-fill").style.width = `${Math.min(100, (sec || 0) / L * 100)}%`;
     const pf = n.querySelector(".peek-fill"); if (pf) pf.style.width = `${Math.min(100, (sec || 0) / L * 100)}%`;
     scrub.setAttribute("aria-valuemax", String(Math.round(L)));
     scrub.setAttribute("aria-valuenow", String(Math.round(sec || 0)));
@@ -1378,6 +1720,20 @@ function tick() {
   mute.setAttribute("aria-label", muted ? "Sound off: turn it on" : "Mute");
   cc.setAttribute("aria-pressed", String(!!seat.cc));
   for (const b of [mute, cc]) { b.disabled = !seat.ready; b.title = seat.ready ? "" : "Once the talk plays"; }
+}
+// the speed and picture-in-picture buttons of a bar, as things stand
+function syncExtras(bar) {
+  const r = playerRate(), can = ratesOffered().length > 1;
+  for (const b of bar.querySelectorAll(".speed")) {
+    b.disabled = !can;
+    b.setAttribute("aria-label", `Playback speed: ${rateText(r)}`);
+    b.title = can ? `Speed: ${rateText(r)}  < >` : "Speed: once the talk plays";
+  }
+  for (const b of bar.querySelectorAll(".pip")) {
+    b.setAttribute("aria-pressed", String(!!seat.pip));
+    b.setAttribute("aria-label", seat.pip ? "Put the recording back" : "Picture in picture");
+    b.title = seat.pip ? "Put the recording back  P" : "Picture in picture  P";
+  }
 }
 
 // ----- open, close, zoom
@@ -1451,7 +1807,7 @@ async function setLaptop(change, ms = MOVE) {
   if (seat.notes) seat.notes.classList.add("is-off");     // the screen goes dark first
   if (!next.open && seat.cine && seat.t.videoId && EMBED) seat.cine.classList.add("is-theatre");   // and the column leaves the film
   lap.classList.add("is-moving");
-  if (next.zoom !== seat.zoom) tube.classList.add("is-away");
+  if (next.zoom !== seat.zoom && !seat.pip) tube.classList.add("is-away");   // in the corner box, it stays where it is
   await new Promise((r) => setTimeout(r, ms ? 140 : 0));
   Object.assign(seat, { open: next.open, zoom: next.zoom });
   seat.layout = seatLayout(seat);
@@ -1503,6 +1859,9 @@ addEventListener("keydown", (e) => {
   else if (k === "]") stepChapter(1);
   else if (k === "ArrowLeft" && free) seekBy(-10);
   else if (k === "ArrowRight" && free) seekBy(10);
+  else if (k === "<") stepRate(-1);
+  else if (k === ">") stepRate(1);
+  else if (k === "p") setPip(!seat.pip);
   else if (k === "c") toggleCaptions();
   else if (k === "m") toggleMute();
   else if (k === "?" && n && seat.open) n.toggleKeys();
@@ -1534,8 +1893,8 @@ async function sitDown(t, n, key, withWalk) {
   room = n; current = t;
   warmClip(backClip(n));
   seat = { t, n, key, open: true, zoom: false, layout: null, cine: null, notes: null, notesPanel: null, cinePanel: null, player: null, timer: 0,
-    chapters: chaptersOf(t), lastChapter: null, starting: false, startAt: 0 };
-  tube.classList.remove("is-cc");
+    chapters: chaptersOf(t), lastChapter: null, starting: false, startAt: 0, pip: false };
+  tube.classList.remove("is-cc", "is-pip", "is-awake");
   seat.layout = seatLayout(seat);
   preloadLid();
   lapArt.src = LAP.open.src;
@@ -1570,11 +1929,13 @@ function hintOnce() {
 }
 function leaveSeat() {
   if (!seat) return;
+  if (seat.notesPanel) seat.notesPanel.flush();
   clearInterval(seat.timer);
   clearTimeout(seat.readyTimer);
   clearTimeout(theatreTimer);
+  sleep();
   if (seat.player && seat.player.destroy) seat.player.destroy();
-  tube.textContent = ""; tube.hidden = true;
+  tube.textContent = ""; tube.hidden = true; tube.classList.remove("is-pip");
   lap.hidden = true; lidBar.hidden = lidHit.hidden = true;
   if (seat.notes) seat.notes.remove();
   for (const h of lap.querySelectorAll(".lap-hint")) h.remove();
@@ -1584,6 +1945,8 @@ function leaveSeat() {
   seat = null;
   resetRoom();
 }
+// closing the tab keeps what was typed in the notepad's last 400 ms
+addEventListener("pagehide", () => { if (seat && seat.notesPanel) seat.notesPanel.flush(); });
 
 // leaving: the laptop goes down and the view comes back up to the walk's framing (phones: the zoom on the door totem
 // eases back out), so the walk back starts on exactly what's showing
@@ -1688,6 +2051,7 @@ addEventListener("popstate", () => {
 addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   if (skipWalk) skipWalk();
+  else if (document.querySelector(".speed-menu")) closeSpeeds(document, true);
   else if (seat && seat.notesPanel && seat.notesPanel.querySelector(".keys-sheet:not([hidden]), .chapter-menu:not([hidden])")) {
     for (const p of seat.notesPanel.querySelectorAll(".keys-sheet, .chapter-menu")) p.hidden = true;
   }
