@@ -171,6 +171,8 @@ EASE_IN, EASE_OUT = 5.0, 4.0     # m/s^2: the acceleration from the start and th
 OMEGA_MAX = math.radians(90.0)   # rad/s: the view never swings faster (at 10 s the turns off the screen and into the
 #                                  room's door whipped, 17/10); the straights take up the time
 STRAIGHT_UP = 1.25               # ... at most this much faster than without the turn limit (else the limit gives)
+TURN_UP_MAX = 3.0                # ... and the turn limit at most this many times OMEGA_MAX: the phone walk back from room 6's
+#                                  door totem fitted its 8.8 s by turning at 968 deg/s, a 40 deg jump in one frame (20/10)
 
 
 def speeds(pts):
@@ -256,6 +258,11 @@ def timing(pts, step, target=WALK_T, caps=None):
     if run(k_max, 1.0)[-1] <= target:
         return run(bisect_on(lambda kk: run(kk, 1.0)[-1], 0.2, k_max), 1.0)
     c = bisect_on(lambda cc: run(k_max, cc)[-1], 1.0, 20.0)
+    if c > TURN_UP_MAX:                                # past that it whips: the walk takes longer instead
+        out = run(k_max, TURN_UP_MAX)
+        print(f"ROOMWALK timing: turns capped at {math.degrees(OMEGA_MAX) * TURN_UP_MAX:.0f} deg/s, {out[-1]:.1f} s "
+              f"instead of {target:.1f} s (it needed {math.degrees(OMEGA_MAX) * c:.0f})", flush=True)
+        return out
     print(f"ROOMWALK timing: turns up to {math.degrees(OMEGA_MAX) * c:.0f} deg/s to fit {target:.1f} s", flush=True)
     return run(k_max, c)
 
