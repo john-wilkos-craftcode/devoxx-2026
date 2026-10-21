@@ -1,15 +1,17 @@
 # Where this stands (19/10, 18:45)
 
-## Next session: start here (20/10, 17:00, wound down for the day)
-- **Live:** laptop complete (intro, rooms 3-10). Phone: the fly-through (re-rendered with the 1 cm fix, seam OK),
-  rooms 3, 4, 5, 6. Seat features live (1f5cf90): speed, picture in picture (P), notepad (.md export), Snake, a seek
-  bar that stays under the pointer.
-- **Renders left** (~5 h): phone rooms 7 (its walk there is done; the walk back was cut off mid-clip and will restart
-  with the turn fix), 8, 9, 10, plus phone room 6's walk back again (it whipped at 968 deg/s; room_walk now caps turns
-  at 270 deg/s, 39cc1e7; the markers are already reset). Run:
-  `cp scripts/photomatch/finals.sh scripts/photomatch/.finals-run.sh && scripts/photomatch/.finals-run.sh [--until HH:MM]`
-  Check each new phone walk's log for "turns at most ... deg/s" (should stay under ~300) and run
-  `python3 scripts/photomatch/seams.py` after publishing.
+## Next session: start here (21/10, 06:00: all renders done)
+- **Live:** everything, laptop and phone (intro/fly-through, rooms 3-10 there and back, stills). The queue finished
+  21/10 05:53 (21 jobs). Seat features live (1f5cf90): speed, picture in picture (P), notepad (.md export), Snake, a
+  seek bar that stays under the pointer.
+- **Turn fix held:** phone walks' turns peak at 151-314 deg/s (room 6 back was 1014 needed, now capped at 270 and
+  1.4 s longer). QC "breathing" flags on the phone walks are fast pans and doorways (checked by eye: smooth blur, no
+  pops); "blown" is the ceiling lights.
+- **Seams (seams.py, 21/10):** every walk end matches its still. Walk starts sit ~1 px off their still on the phone
+  (all), on laptop rooms 3-6 and 8 (John 19/10: no re-render), and on the phone walks back of rooms 3, 5, 8, 9, 10
+  (rooms 4, 6, 7 match). Same 1 px class John accepted; fix only if he sees it.
+- **Queue command** (for any future re-render): `cp scripts/photomatch/finals.sh scripts/photomatch/.finals-run.sh &&
+  scripts/photomatch/.finals-run.sh [--until HH:MM]`; markers in kino-renders/photomatch/final/done/.
 - **Hall screen menu (John 20/10): undecided.** Round 1 (design/menu-variants) rejected as generic and too dense.
   Round 2 (design/menu-screen: BRIEF.md, Fable's IDEAS.md, five builds, gallery index.html) plateaued at 6.0-6.8/10
   under fresh critics; lightbox and two-voices came closest. Options put to John: pick a direction to iterate with his
