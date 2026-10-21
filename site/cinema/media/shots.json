@@ -1372,5 +1372,24 @@
    "hevc",
    "h264"
   ]
+ },
+ "back-phone-8": {
+  "kind": "clip",
+  "frames": 191,
+  "fps": 24,
+  "px": [
+   810,
+   1754
+  ],
+  "small": [
+   486,
+   1052
+  ],
+  "glimpse": 12,
+  "codecs": [
+   "av1",
+   "hevc",
+   "h264"
+  ]
  }
 }
