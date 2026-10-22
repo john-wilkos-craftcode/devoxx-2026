@@ -3,7 +3,11 @@
    where you were. WATCH IT on a talk's card calls watch(id); walks(id) says whether that talk has a seat to walk to. */
 const made = new Map();
 export function inksMenu({ phone, watch, walks, textHref }) {
-  if (made.has(phone)) return made.get(phone);
+  if (made.has(phone)) {
+    const root = made.get(phone);
+    root.style.animation = "";   // the cinema fades a screen off with an inline animation before a walk; the kept sheet must come back on
+    return root;
+  }
   const root = make({ phone, watch, walks, textHref });
   made.set(phone, root);
   return root;
