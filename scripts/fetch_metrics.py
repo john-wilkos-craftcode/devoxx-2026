@@ -393,14 +393,43 @@ def main():
     matched = [t for t in talks if t["video"]]
     if matched and all(t["video"].get("views") is None for t in matched):
         sys.exit("YouTube layout changed: no view count found on any watch page.")
-    blank = [t for t in matched if t["video"].get("views") is None]
-    if len(blank) > max(3, len(matched) // 20):
-        sys.exit(f"Incomplete: {len(blank)} of {len(matched)} watch pages gave no view count "
+    # From a datacenter (GitHub's runners) YouTube leaves the counts off a good share of watch pages. Ask those
+    # again, slower, after a pause.
+    for again in (1, 2):
+        blank = [t for t in matched if t["video"].get("views") is None]
+        if not blank:
+            break
+        print(f"{len(blank)} watch pages gave no view count; asking again in {60 * again} s, slower...")
+        time.sleep(60 * again)
+        global PAUSE
+        PAUSE = 3.0 * again
+        read(blank)
+    fresh = sum(1 for t in matched if t["video"].get("views") is not None)
+    if fresh < len(matched) * 0.3:
+        sys.exit(f"Incomplete: only {fresh} of {len(matched)} watch pages gave a view count "
                  "(rate limited or layout changed); nothing written.")
 
-    taken = datetime.now(timezone.utc)
     out_dir = Path(__file__).resolve().parent.parent / "data" / "metrics" / args.event
     out_dir.mkdir(parents=True, exist_ok=True)
+    # The rest keep their last known counts (counts only grow, so they are a day or so behind), marked "carried".
+    earlier = sorted(out_dir.glob("*.json"))
+    carried = 0
+    if earlier:
+        before = {t["talkId"]: t for t in json.loads(earlier[-1].read_text(encoding="utf-8"))["talks"]}
+        for talk in matched:
+            old = (before.get(talk["talkId"]) or {}).get("video") or {}
+            if talk["video"].get("views") is None and old.get("id") == talk["video"]["id"] and old.get("views") is not None:
+                for key in ("views", "likes", "comments", "published", "lengthSeconds"):
+                    if talk["video"].get(key) is None:
+                        talk["video"][key] = old.get(key)
+                talk["video"]["carried"] = old.get("carried") or earlier[-1].stem
+                carried += 1
+    blank = [t for t in matched if t["video"].get("views") is None]
+    if len(blank) > max(3, len(matched) // 20):
+        sys.exit(f"Incomplete: {len(blank)} of {len(matched)} talks have no view count, fresh or carried; nothing written.")
+    print(f"{fresh} fresh view counts, {carried} carried from the previous snapshot, {len(blank)} without")
+
+    taken = datetime.now(timezone.utc)
     out = out_dir / (taken.astimezone().strftime("%Y-%m-%d_%H%M") + ".json")  # local time (UTC on CI)
     rated = ratings(args.event)
     for talk in talks:
