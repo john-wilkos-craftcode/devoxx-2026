@@ -1,6 +1,22 @@
 # Where this stands (19/10, 18:45)
 
-## Next session: start here (21/10, 06:00: all renders done)
+## Next session: start here (22/10, 17:25: John paused)
+- **Live (pushed):** the Three Inks menu on the cinema hall screen, laptop and phone (42e7aba). A talk opens its card,
+  and WATCH IT walks you there. Fixed: the menu stayed invisible after a walk back (a5f4a68). Design history:
+  design/menu-round3/three-inks/LOG.md. To test the integrated menu, use tools/ux/inks-harness.html (header says how).
+- **Metrics refresh daily** (.github/workflows/metrics.yml, 04:30 UTC: scripts/fetch_metrics.py, build_menu.py,
+  stamp_assets.py, commit, redeploy). The first run on GitHub failed: YouTube gave no view count for 71/182 watch
+  pages from the runner. 4ed0df6 retries blank pages and carries the previous snapshot's counts forward; its test run
+  (39803195911) was still going at the pause, so check it with `gh run view 39803195911`. If runners stay blocked, ask
+  John for a YouTube Data API key as a repo secret. "Best rated" appears by itself once the CFP publishes
+  /ratings/top (empty for dvbe26 on 22/10).
+- **In progress, NOT committed:** a restyle of the rest of the cinema UI (seat, laptop notes, tube controls, chips,
+  loading, talk screens) to the Three Inks look. It is in the working tree (site/cinema/cinema.css, cinema.js,
+  index.html, tools/ux/overflow.mjs) and the before/after shots are in the session scratchpad. Review the diff and
+  screenshots with John before pushing; `git stash` drops it if it's bad.
+- The Watch first picks are recomputed from the metrics, so they can change day to day ("editor's picks" still open).
+
+## Earlier: 21/10, 06:00 (all renders done)
 - **Live:** everything, laptop and phone (intro/fly-through, rooms 3-10 there and back, stills). The queue finished
   21/10 05:53 (21 jobs). Seat features live (1f5cf90): speed, picture in picture (P), notepad (.md export), Snake, a
   seek bar that stays under the pointer.
