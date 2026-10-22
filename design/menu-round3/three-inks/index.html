@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three Inks: Devoxx Belgium 2026, the week as a risograph proof</title>
+<script>if (/[?&]shape=phone/.test(location.search)) document.documentElement.classList.add("phone");</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://i.ytimg.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Archivo:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=7">
+</head>
+<body>
+<main id="menu" class="sheet printing" aria-label="Devoxx Belgium 2026: 205 talks, summarised in eight verdicts. The week printed in three inks.">
+
+  <!-- pink: the coding-agents story (63 talks, a third of the sheet). The headline is its title. -->
+  <section class="band band-pink" id="band-pink">
+    <p class="eyebrow">Devoxx Belgium 2026 &middot; 205 talks, summarised</p>
+    <h1 class="bh"><button class="band-open" data-story="pink" aria-label="Coding agents took a third of the week: 63 talks. Open the coding agents story, 4 verdicts (key 1)"><span class="headline" id="headline">Coding agents took <br>a third of the week.</span><span class="count">4 verdicts</span></button></h1>
+  </section>
+
+  <!-- the paper foot is one row: search, the programme, the first move. In Tab order they come straight after the headline -->
+  <div class="tools">
+    <label class="search sheet-search" for="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>
+      <input id="search" type="search" placeholder="Search talks, speakers, topics" aria-label="Search 205 talks (key /)" autocomplete="off" spellcheck="false" enterkeyhint="search">
+    </label>
+    <button class="prog" id="prog" data-act="programme" aria-label="Programme: the talks day by day (key P)"><span>Programme</span></button>
+    <button class="watch" id="watch" data-act="picks" aria-label="Watch first: eight talks, one per verdict (key W)"><span class="wt">Watch first</span><span class="ws">8 picks</span></button>
+  </div>
+
+  <!-- blue: the Java platform (39 talks) -->
+  <section class="band band-blue" id="band-blue">
+    <h2 class="bh"><button class="band-open" data-story="blue" aria-label="Java: leaner and faster, 39 talks. Open the Java story, 2 verdicts (key 2)"><span class="title">Java</span><span class="find">Leaner and faster.</span><span class="count">2 verdicts</span></button></h2>
+  </section>
+
+  <!-- yellow: architecture, practices and people (61 talks) -->
+  <section class="band band-yellow" id="band-yellow">
+    <h2 class="bh"><button class="band-open" data-story="yellow" aria-label="Architecture and people: clear boundaries, kept skills, 61 talks. Open the story, 2 verdicts (key 3)"><span class="title">Architecture &amp; people</span><span class="find">Clear boundaries, kept skills.</span><span class="count">2 verdicts</span></button></h2>
+  </section>
+
+  <!-- bare paper: the foot the tools sit on -->
+  <footer class="band band-paper" id="foot"></footer>
+  <a class="textlink" href="../../../site/index.html">Text version</a>
+
+  <!-- opened states print here -->
+  <section id="opened" hidden aria-live="polite"></section>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div class="grain" aria-hidden="true"></div>
+</main>
+<p class="hint"><kbd>Tab</kbd> move &middot; <kbd>Enter</kbd> open &middot; <kbd>Esc</kbd> back &middot; <kbd>/</kbd> search &middot; <kbd>W</kbd> watch first &middot; <kbd>P</kbd> programme &middot; <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> the three stories &middot; <kbd>&larr;</kbd><kbd>&rarr;</kbd> previous / next</p>
+<script src="../../menu-variants/data.js"></script>
+<script src="app.js?v=7"></script>
+</body>
+</html>

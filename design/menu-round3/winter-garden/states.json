@@ -1,0 +1,605 @@
+[
+ {
+  "name": "rest-labels",
+  "shape": "laptop",
+  "steps": [
+   {
+    "wait": 200
+   },
+   {
+    "expectText": "8 verdicts, one per bed"
+   },
+   {
+    "expectText": "Harness over model"
+   },
+   {
+    "expectText": "Review bottleneck"
+   },
+   {
+    "expectText": "Judging code"
+   },
+   {
+    "expectText": "Walk the 8 verdicts"
+   },
+   {
+    "expectVisible": "#text-version[href$='site/index.html']"
+   }
+  ]
+ },
+ {
+  "name": "story-open",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#walk"
+   },
+   {
+    "wait": 600
+   },
+   {
+    "expectText": "The harness outweighs the model"
+   },
+   {
+    "expectText": "Review is the new bottleneck"
+   },
+   {
+    "expectText": "Treat coding agents as untrusted code"
+   },
+   {
+    "expectText": "AI-found CVEs force faster patching"
+   },
+   {
+    "expectText": "The JVM gets leaner and faster"
+   },
+   {
+    "expectText": "Java reaches native code and GPUs"
+   },
+   {
+    "expectText": "Boundaries before services"
+   },
+   {
+    "expectText": "From writing code to judging it"
+   },
+   {
+    "expectText": "Mon 5"
+   },
+   {
+    "expectText": "Fri 9"
+   },
+   {
+    "expectVisible": "#days .slab-label[data-day='4']"
+   }
+  ]
+ },
+ {
+  "name": "sun-right",
+  "shape": "laptop",
+  "steps": [
+   {
+    "mouse": [
+     880,
+     300
+    ]
+   },
+   {
+    "wait": 900
+   }
+  ]
+ },
+ {
+  "name": "bed-hover",
+  "shape": "laptop",
+  "steps": [
+   {
+    "hover": "#garden .bed[data-i='4'] .hit"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "The JVM gets leaner and faster"
+   }
+  ]
+ },
+ {
+  "name": "verdict-faced",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#garden .bed[data-i='0'] .hit"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "Should coding agents reach tools through MCP servers or plain CLIs?"
+   },
+   {
+    "expectText": "CLIs and bash are lighter"
+   },
+   {
+    "expectText": "MCP pays off for current documentation"
+   },
+   {
+    "expectText": "Tugdual Grall"
+   },
+   {
+    "expectText": "James Ward"
+   },
+   {
+    "expectText": "rules that matter belong in executable checks"
+   },
+   {
+    "expectText": "State of Agentic Coding"
+   }
+  ]
+ },
+ {
+  "name": "verdict-three-sides",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#garden .bed[data-i='1'] .hit"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "How much human code review"
+   },
+   {
+    "expectText": "None as a separate step"
+   },
+   {
+    "expectText": "A human must still own it"
+   },
+   {
+    "expectText": "Bert Jan Schrijver"
+   }
+  ]
+ },
+ {
+  "name": "verdict-talks-sorted",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#garden .bed[data-i='0'] .hit"
+   },
+   {
+    "wait": 300
+   },
+   {
+    "click": "#face .list-talks"
+   },
+   {
+    "wait": 400
+   },
+   {
+    "expectText": "talks cited"
+   },
+   {
+    "expectText": "views"
+   },
+   {
+    "expectVisible": "#list .sorts button[data-by='likeRate']"
+   }
+  ]
+ },
+ {
+  "name": "watch-first",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#watch-first"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "State of Agentic Coding"
+   },
+   {
+    "expectText": "Daniela Petruzalek"
+   },
+   {
+    "expectText": "Toxic Flows in MCP Servers and Skills"
+   },
+   {
+    "expectText": "Agentic Engineering Reconversion"
+   },
+   {
+    "expectText": "You already use coding agents daily"
+   },
+   {
+    "expectText": "Taming Microservice Overload"
+   },
+   {
+    "expectText": "Quixotic: Pure Java Inference"
+   }
+  ]
+ },
+ {
+  "name": "search-valhalla",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#q"
+   },
+   {
+    "type": "valhalla"
+   },
+   {
+    "wait": 600
+   },
+   {
+    "expectText": "Will Valhalla Fix Tony"
+   },
+   {
+    "expectText": "views"
+   }
+  ]
+ },
+ {
+  "name": "search-typed-anywhere",
+  "shape": "laptop",
+  "steps": [
+   {
+    "press": "Tab"
+   },
+   {
+    "type": "ward"
+   },
+   {
+    "wait": 600
+   },
+   {
+    "expectText": "James Ward"
+   }
+  ]
+ },
+ {
+  "name": "search-empty",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#q"
+   },
+   {
+    "type": "zzqx"
+   },
+   {
+    "wait": 600
+   },
+   {
+    "expectText": "No talk matches"
+   }
+  ]
+ },
+ {
+  "name": "sort-like-rate",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#brand"
+   },
+   {
+    "wait": 300
+   },
+   {
+    "click": "#list .sorts button[data-by='likeRate']"
+   },
+   {
+    "wait": 400
+   },
+   {
+    "expectText": "likes per 100 views"
+   },
+   {
+    "expectText": "few votes"
+   }
+  ]
+ },
+ {
+  "name": "sort-hearts",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#brand"
+   },
+   {
+    "wait": 300
+   },
+   {
+    "click": "#list .sorts button[data-by='hearts']"
+   },
+   {
+    "wait": 400
+   },
+   {
+    "expectText": "hearts before the talk"
+   }
+  ]
+ },
+ {
+  "name": "day-wednesday",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#walk"
+   },
+   {
+    "wait": 400
+   },
+   {
+    "click": "#days .slab-label[data-day='2']"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "Wednesday 7 October"
+   },
+   {
+    "expectText": "Welcome to Devoxx"
+   },
+   {
+    "expectText": "09:30"
+   }
+  ]
+ },
+ {
+  "name": "day-by-keys",
+  "shape": "laptop",
+  "steps": [
+   {
+    "press": "ArrowDown"
+   },
+   {
+    "press": "ArrowDown"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "Tue 6"
+   }
+  ]
+ },
+ {
+  "name": "walk-to-friday",
+  "shape": "laptop",
+  "steps": [
+   {
+    "press": "ArrowDown"
+   },
+   {
+    "press": "ArrowDown"
+   },
+   {
+    "press": "ArrowDown"
+   },
+   {
+    "press": "ArrowDown"
+   },
+   {
+    "press": "ArrowDown"
+   },
+   {
+    "wait": 600
+   },
+   {
+    "expectText": "Fri 9"
+   },
+   {
+    "expectText": "Boundaries before services"
+   }
+  ]
+ },
+ {
+  "name": "open-talk-toast",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#watch-first"
+   },
+   {
+    "wait": 300
+   },
+   {
+    "click": "#list .row[data-id='25671']"
+   },
+   {
+    "wait": 300
+   },
+   {
+    "expectText": "Walking to Room 3"
+   }
+  ]
+ },
+ {
+  "name": "open-talk-no-seat",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#q"
+   },
+   {
+    "type": "who will build software"
+   },
+   {
+    "wait": 600
+   },
+   {
+    "click": "#list .row[data-id='10046']"
+   },
+   {
+    "wait": 300
+   },
+   {
+    "expectText": "Opening the summary"
+   }
+  ]
+ },
+ {
+  "name": "text-version",
+  "shape": "laptop",
+  "steps": [
+   {
+    "expectVisible": "#text-version[href$='site/index.html']"
+   },
+   {
+    "hover": "#text-version"
+   }
+  ]
+ },
+ {
+  "name": "keyboard-face",
+  "shape": "laptop",
+  "steps": [
+   {
+    "press": "Tab"
+   },
+   {
+    "press": "Tab"
+   },
+   {
+    "press": "Tab"
+   },
+   {
+    "press": "Tab"
+   },
+   {
+    "press": "Tab"
+   },
+   {
+    "press": "ArrowRight"
+   },
+   {
+    "press": "ArrowRight"
+   },
+   {
+    "press": "Enter"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "Treat coding agents as untrusted code"
+   },
+   {
+    "expectText": "THE DEBATE"
+   }
+  ]
+ },
+ {
+  "name": "escape-home",
+  "shape": "laptop",
+  "steps": [
+   {
+    "click": "#garden .bed[data-i='2'] .hit"
+   },
+   {
+    "wait": 300
+   },
+   {
+    "press": "Escape"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectVisible": "#walk"
+   }
+  ]
+ },
+ {
+  "name": "phone-story",
+  "shape": "phone",
+  "steps": [
+   {
+    "click": "#walk"
+   },
+   {
+    "wait": 600
+   },
+   {
+    "expectText": "The harness outweighs the model"
+   },
+   {
+    "expectText": "From writing code to judging it"
+   }
+  ]
+ },
+ {
+  "name": "phone-verdict",
+  "shape": "phone",
+  "steps": [
+   {
+    "click": "#walk"
+   },
+   {
+    "wait": 300
+   },
+   {
+    "click": "#list .row.verdict[data-i='1']"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "How much human code review"
+   },
+   {
+    "expectText": "Sander Hoogendoorn"
+   }
+  ]
+ },
+ {
+  "name": "phone-search",
+  "shape": "phone",
+  "steps": [
+   {
+    "click": "#q"
+   },
+   {
+    "type": "spring"
+   },
+   {
+    "wait": 600
+   },
+   {
+    "expectText": "Spring"
+   }
+  ]
+ },
+ {
+  "name": "phone-watch-first",
+  "shape": "phone",
+  "steps": [
+   {
+    "click": "#watch-first"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "State of Agentic Coding"
+   }
+  ]
+ },
+ {
+  "name": "phone-day",
+  "shape": "phone",
+  "steps": [
+   {
+    "click": "#days .slab-label[data-day='3']"
+   },
+   {
+    "wait": 500
+   },
+   {
+    "expectText": "Thursday 8 October"
+   }
+  ]
+ }
+]

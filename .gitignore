@@ -17,3 +17,6 @@ data/models/
 # design explorations: screenshots stay local (tens of MB)
 design/**/shots/
 design/menu-variants/_crosscheck/
+
+# menu round 3: review captures stay local (hundreds of MB)
+design/menu-round3/*/reviews/

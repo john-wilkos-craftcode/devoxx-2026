@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devoxx 2026: who holds the strings</title>
+<script>
+  (() => { const p = new URLSearchParams(location.search), d = document.documentElement;
+    if (p.get("shape") === "phone") d.classList.add("phone"); })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,600..900,100;1,9..144,600..900,100&family=Archivo:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="menu" data-mode="rest" aria-label="Devoxx Belgium 2026: 205 talks, told as a shadow play">
+  <canvas id="cloth" width="980" height="613" aria-hidden="true"></canvas>
+
+  <!-- what this is, and the story in one line -->
+  <p class="kicker" id="kicker"><span class="devoxx">DEVO<span class="x">X</span>X</span> Belgium 2026<span class="k2"><span class="sep"> · </span>205 talks <span class="sep">·</span> 8 verdicts</span></p>
+  <h1 class="headline" id="headline">Less what agents <em>can do</em> than <strong>who holds the strings.</strong></h1>
+
+  <!-- the control bar: eight strings, one per verdict (the story). Each peg is one tag: its number on the knob where the
+       string is tied, its name on the plate above it. app.js moves each peg with the bar, so number and name never part -->
+  <nav id="bar" class="bar" aria-label="The eight verdicts of the week: pull a string to open one">
+    <button type="button" class="peg" data-i="0" data-n="1" aria-label="Verdict 1: The harness outweighs the model, 23 talks"><span class="med" aria-hidden="true">1</span><span class="name" aria-hidden="true">Harness<br>over model</span></button>
+    <button type="button" class="peg" data-i="1" data-n="2" aria-label="Verdict 2: Review is the new bottleneck, 20 talks"><span class="med" aria-hidden="true">2</span><span class="name" aria-hidden="true">Review: the<br>bottleneck</span></button>
+    <button type="button" class="peg" data-i="2" data-n="3" aria-label="Verdict 3: Treat coding agents as untrusted code, 16 talks"><span class="med" aria-hidden="true">3</span><span class="name" aria-hidden="true">Untrusted<br>agents</span></button>
+    <button type="button" class="peg" data-i="3" data-n="4" aria-label="Verdict 4: AI-found CVEs force faster patching, 14 talks"><span class="med" aria-hidden="true">4</span><span class="name" aria-hidden="true">Faster CVE<br>patching</span></button>
+    <button type="button" class="peg" data-i="4" data-n="5" aria-label="Verdict 5: The JVM gets leaner and faster, 21 talks"><span class="med" aria-hidden="true">5</span><span class="name" aria-hidden="true">Leaner,<br>faster JVM</span></button>
+    <button type="button" class="peg" data-i="5" data-n="6" aria-label="Verdict 6: Java reaches native code and GPUs, 12 talks"><span class="med" aria-hidden="true">6</span><span class="name" aria-hidden="true">Native Java<br>&amp; GPUs</span></button>
+    <button type="button" class="peg" data-i="6" data-n="7" aria-label="Verdict 7: Boundaries before services, 18 talks"><span class="med" aria-hidden="true">7</span><span class="name" aria-hidden="true">Boundaries<br>first</span></button>
+    <button type="button" class="peg" data-i="7" data-n="8" aria-label="Verdict 8: From writing code to judging it, 21 talks"><span class="med" aria-hidden="true">8</span><span class="name" aria-hidden="true">Judging,<br>not writing</span></button>
+  </nav>
+
+  <!-- under the headline: the first move, and the string being pulled (hover, focus or the idle demonstration) -->
+  <div class="band" id="band" aria-hidden="true"><p class="band-hint"><span class="arrow">↖</span>Pull a string to open its verdict</p></div>
+
+  <div id="tag" class="tag" hidden></div>
+
+  <nav class="cards" aria-label="Watch first and programme">
+    <button type="button" class="card" id="btnPicks" aria-keyshortcuts="w">Watch first</button>
+    <button type="button" class="card" id="btnDays" aria-keyshortcuts="d">Programme</button>
+  </nav>
+
+  <form class="slot" role="search" id="slot" autocomplete="off">
+    <svg class="lens" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+    <input id="q" type="text" placeholder="Search 205 talks" aria-label="Search 205 talks by title, speaker, company or topic" enterkeyhint="search" spellcheck="false" autocomplete="off">
+  </form>
+
+  <button type="button" class="close" id="close" hidden aria-label="Let the string go (Escape)"><b aria-hidden="true">✕</b>let go</button>
+  <section id="panel" class="panel" hidden aria-live="polite">
+    <div class="sheet" id="scroll" tabindex="-1"></div>
+  </section>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- silhouettes drawn by the canvas; kept in the document so the page waits for them -->
+  <div class="hold" aria-hidden="true" id="hold"></div>
+</main>
+<p class="keys" aria-hidden="true"><b>1</b>–<b>8</b> pull a string · <b>W</b> watch first · <b>D</b> programme · <b>/</b> search · <b>←→</b> tilt the bar · <b>Esc</b> let go</p>
+
+<script src="../../menu-variants/data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

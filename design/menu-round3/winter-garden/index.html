@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Winter Garden: Devoxx Belgium 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,700..900,0..100,0..1&family=Shantell+Sans:wght@500..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/garden.css">
+</head>
+<body>
+<div id="stage">
+  <main id="menu" class="laptop" aria-label="Devoxx Belgium 2026: 205 talks, summarised. The week's story as a winter garden." tabindex="-1">
+
+    <div id="walker">
+      <button id="back" type="button" aria-label="Walk back one step">‹</button>
+      <button id="walk" type="button" aria-label="Walk one step down the path: the story of the week">
+        <span class="fwd">Walk the 8 verdicts<i>›</i></span><span class="back">Walk on<i>›</i></span>
+      </button>
+    </div>
+
+    <aside id="post-right" class="post" aria-label="Watch first">
+      <button id="watch-first" class="chalk-btn" type="button"><b>✿</b>Watch first</button>
+    </aside>
+
+    <aside id="post-left" class="post" aria-label="Search">
+      <form id="search" role="search" autocomplete="off">
+        <label class="sr-only" for="q">Search the 205 talks</label>
+        <svg class="lens" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <input id="q" type="search" placeholder="Search talks" aria-label="Search the 205 talks: title, speaker, company, topic" enterkeyhint="search">
+      </form>
+    </aside>
+
+    <header id="glass">
+      <a id="brand" href="#all" title="Every talk, sorted by a signal"><b>DEVO<i>X</i>X</b><span>Belgium 2026 · 205 talks</span></a>
+      <h1 id="headline">The trellis shapes the vine <span class="br"></span>more than the seed does.</h1>
+      <p id="stand">8 verdicts, one per bed. The first: the harness outweighs the model.</p>
+    </header>
+
+    <div id="world">
+      <div id="scene">
+        <img id="plate" src="assets/plate-wide.webp" alt="" draggable="false">
+        <div id="vault" aria-hidden="true"></div>
+        <svg id="garden" viewBox="0 0 980 613" aria-label="Eight beds, one per verdict of the week" role="group"></svg>
+      </div>
+    </div>
+    <div id="days" aria-label="The programme, day by day" role="group"></div>
+
+    <canvas id="light" width="980" height="613" aria-hidden="true"></canvas>
+    <canvas id="beads" width="980" height="613" aria-hidden="true"></canvas>
+    <div id="slates" aria-hidden="true"></div>
+
+    <section id="list" hidden aria-live="polite"></section>
+    <section id="face" hidden aria-live="polite"></section>
+
+    <a id="text-version" href="../../../site/index.html" title="The text version of every talk">Text version</a>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+  </main>
+  <p id="hint"><b>↓ ↑</b> walk the path &nbsp;·&nbsp; <b>← →</b> or <b>1–8</b> beds &nbsp;·&nbsp; <b>Enter</b> face a bed &nbsp;·&nbsp; <b>Esc</b> back to the entrance &nbsp;·&nbsp; just type to search &nbsp;·&nbsp; the pointer carries the sun (left alone, it drifts)</p>
+</div>
+<script src="../../menu-variants/data.js"></script>
+<script src="js/garden.js"></script>
+</body>
+</html>

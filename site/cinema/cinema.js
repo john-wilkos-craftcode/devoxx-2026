@@ -5,6 +5,8 @@
 // viewports get the phone shots (a schedule totem in the hall, the middle of the cinema screen from the seat). What
 // stands in front of the cinema screen (the "#DEVOXX" letters, the seats) is a separate cut-out laid over the talk.
 
+import { inksMenu } from "./menu.js?v=e0eb26be35";
+
 const TZ = "Europe/Brussels";
 const fmt = (o) => new Intl.DateTimeFormat("en-GB", { timeZone: TZ, ...o });
 const fTime = fmt({ hour: "2-digit", minute: "2-digit" });
@@ -203,7 +205,7 @@ function mount(panel, key, overlayName) {
   // laptops: a fixed canvas, like a real display; phones: laid out 1:1 for the width the totem takes on this screen
   let w = canvasFor(key);
   if (seat && key === seat.key) w = seat.layout.panelW;   // laid out for the screen as seen with the lid open: closed, it only grows   // the seat on laptops: laid out 1:1 for the screen's size
-  else if (key.includes("phone")) {
+  else if (key.includes("phone") && !panel.classList.contains("inks")) {   // the menu keeps its 340 px design canvas
     const { iw, ih, s } = fit(key);
     const [tl, tr] = ordered(shots[key].overlay[overlayName]);
     w = Math.max(280, Math.round(Math.hypot((tr[0] - tl[0]) * iw * s, (tr[1] - tl[1]) * ih * s)));
@@ -1999,7 +2001,7 @@ async function toHall(withWalk) {
   room = null; current = null;
   await showStill(shotKey("hall"));
   hideClip();
-  mount(programme(shape === "phone"), shotKey("hall"), "programme");
+  mount(hallMenu(), shotKey("hall"), "programme");
   if (dipped) dip(false);
 }
 
@@ -2036,6 +2038,11 @@ async function toOffFloor(t) {   // no seat to walk to (BOFs downstairs): the su
   mount(talkScreen(t, shape === "phone", false), shotKey("hall"), "programme");
 }
 
+// the hall screen: the Three Inks menu (menu.js). A talk's card asks first; WATCH IT walks you there
+const byTalk = new Map(talks.map((t) => [t.id, t]));
+const hallMenu = () => inksMenu({ phone: shape === "phone", textHref: "../",
+  walks: (id) => byTalk.has(id) && walkable.has(roomNo(byTalk.get(id))),
+  watch: (id) => { const t = byTalk.get(id); if (t) goTalk(t); } });
 const open = (t, withWalk) => (walkable.has(roomNo(t)) ? toSeat(t, withWalk) : toOffFloor(t));
 function rerender() { if (current) open(current, false); else toHall(false); }
 

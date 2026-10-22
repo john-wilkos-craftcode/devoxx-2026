@@ -1,0 +1,47 @@
+name: Refresh talk metrics
+
+on:
+  schedule:
+    - cron: "30 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: metrics
+  cancel-in-progress: false
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch metrics (fails, writing nothing, if YouTube's layout changed)
+        run: python scripts/fetch_metrics.py
+      - name: Build menu data
+        run: python scripts/build_menu.py
+      - name: Stamp asset versions (so browsers fetch the new menu.js at once)
+        run: cd scripts && python stamp_assets.py
+      - name: Commit and redeploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes"
+            exit 0
+          fi
+          stamp=$(date -u +%Y-%m-%d_%H%M)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/metrics site/menu.js site/index.html site/cinema/index.html site/cinema/cinema.js
+          git commit -m "Metrics: snapshot $stamp"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          # Pushes made with GITHUB_TOKEN do not trigger other workflows.
+          gh workflow run pages.yml --ref main
