@@ -304,6 +304,57 @@ def api_stats(video_ids):
     return out
 
 
+def api_json(path):
+    return json.loads(fetch(f"{API}/{path}&key={API_KEY}"))
+
+
+def api_channel():
+    """The channel's id and its uploads playlist."""
+    item = api_json(f"channels?part=contentDetails&forHandle={CHANNEL.lstrip('@')}")["items"][0]
+    return item["id"], item["contentDetails"]["relatedPlaylists"]["uploads"]
+
+
+def api_find_playlist(channel_id, name):
+    """Id of the channel playlist whose title equals name, or None (playlists.list, 1 unit a page)."""
+    token = ""
+    while True:
+        reply = api_json(f"playlists?part=snippet&maxResults=50&channelId={channel_id}" + (f"&pageToken={token}" if token else ""))
+        for item in reply.get("items", []):
+            if item["snippet"]["title"].strip().lower() == name.strip().lower():
+                return item["id"]
+        token = reply.get("nextPageToken")
+        if not token:
+            return None
+
+
+def api_listing(playlist_id, limit=None):
+    """The videos of a playlist in its order (playlistItems.list, 50 a page, 1 unit a page); private and deleted
+    entries are left out."""
+    videos, token = [], ""
+    while limit is None or len(videos) < limit:
+        reply = api_json(f"playlistItems?part=snippet&maxResults=50&playlistId={playlist_id}" + (f"&pageToken={token}" if token else ""))
+        for item in reply.get("items", []):
+            sn = item["snippet"]
+            if sn.get("title") in ("Private video", "Deleted video"):
+                continue
+            videos.append({"id": sn["resourceId"]["videoId"], "title": sn["title"]})
+        token = reply.get("nextPageToken")
+        if not token:
+            break
+    return videos[:limit]
+
+
+def site_videos():
+    """{talkId: videoId} for the recordings the site plays (site/data.js). The metrics follow these, so a talk
+    Devoxx uploaded twice is counted on the copy the page shows (John 23/10: two talks had two uploads)."""
+    path = Path(__file__).resolve().parent.parent / "site" / "data.js"
+    if not path.exists():
+        return {}
+    text = path.read_text(encoding="utf-8")
+    data = json.loads(text[text.index("{"):text.rindex("}") + 1])
+    return {t["id"]: t["videoId"] for t in data["talks"] if t.get("videoId")}
+
+
 # ----------------------------------------------------------------- matching
 
 def words(text):
@@ -345,7 +396,7 @@ def match(talks, videos):
                 pairs.append((-score, talk["start"] or "", -video["position"], talk["talkId"], video["id"]))
     by_talk = {t["talkId"]: t for t in talks}
     by_video = {v["id"]: v for v in videos}
-    used = set()
+    used = {t["video"]["id"] for t in talks if t["video"]}   # videos already pinned to a talk
     for neg_score, _, _, talk_id, video_id in sorted(pairs):
         talk = by_talk[talk_id]
         if talk["video"] is None and video_id not in used:
@@ -371,17 +422,22 @@ def main():
     meta, talks = programme(args.event, [d.lower() for d in args.days])
     print(f"{meta.get('name')}: {len(talks)} talks in the programme")
 
-    playlist = args.playlist or find_playlist(meta.get("name") or "")
+    if API_KEY:
+        channel_id, uploads_playlist = api_channel()
+    playlist = args.playlist or (api_find_playlist(channel_id, meta.get("name") or "") if API_KEY
+                                 else find_playlist(meta.get("name") or ""))
     if not playlist:
         sys.exit(f"No playlist named '{meta.get('name')}' on {CHANNEL}; pass --playlist.")
-    videos = listing(f"{YOUTUBE}/playlist?list={playlist}", "playlist")
+    videos = api_listing(playlist) if API_KEY else listing(f"{YOUTUBE}/playlist?list={playlist}", "playlist")
     if not videos:
         sys.exit("YouTube layout changed: the playlist page listed no videos.")
     in_playlist = {v["id"] for v in videos}
     # The playlist lags behind the channel: some published talks are not in it yet.
     uploads = []
     if args.uploads:
-        uploads = [v for v in listing(f"{YOUTUBE}/{CHANNEL}/videos", "channel videos", args.uploads)
+        recent = (api_listing(uploads_playlist, args.uploads) if API_KEY
+                  else listing(f"{YOUTUBE}/{CHANNEL}/videos", "channel videos", args.uploads))
+        uploads = [v for v in recent
                    if v["id"] not in in_playlist]
     for group in (videos, uploads):
         for position, video in enumerate(group):
@@ -405,6 +461,17 @@ def main():
                 print(f"  {number}/{len(batch)}")
 
     # The event's own playlist first; uploads only for the talks it leaves open.
+    # The recordings the site already plays come first (by id, not by title), then title matching for the rest.
+    titles = {v["id"]: v["title"] for v in videos + uploads}
+    pinned = 0
+    if args.event == "dvbe26":
+        on_site = site_videos()
+        for talk in talks:
+            vid = on_site.get(talk["talkId"]) if talk["video"] is None else None
+            if vid:
+                talk["video"] = {"id": vid, "title": titles.get(vid, ""), "matchScore": None, "fromSite": True}
+                pinned += 1
+        print(f"{pinned} talks pinned to the recording the site plays")
     unmatched = match(talks, videos)
     matched = [t for t in talks if t["video"]]
     print(f"matched {len(matched)} talks in the playlist; reading their watch pages...")

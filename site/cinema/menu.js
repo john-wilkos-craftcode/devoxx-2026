@@ -98,12 +98,12 @@ function make({ phone, watch, walks, textHref }) {
   const speakers = (t) => t.speakers.map((s) => s.name).join(", ");
   const shown = (t) => !S.hide[inkOf(t)];
   const talkOfSpeaker = (name, ids) => ids.map((id) => byId.get(id)).find((t) => t && t.speakers.some((s) => s.name === name));
-  // the talk's real YouTube thumbnail in its own colours, laid on a torn scrap of its story's construction paper
+  // the talk's real YouTube thumbnail in its own colours (1280x720 for the big ones, the 480x360 one if a video has none), laid on a torn scrap of its story's construction paper
   // (paper/scrap-<ink>-<1|2>.webp, scripts/make_paper.py; John 23/10). Other tracks get no scrap.
   const thumb = (t, ink, big) => {
     const scrap = ink !== "paper" ? `<span class="scrap" aria-hidden="true" style="background-image:url(${PAPER}scrap-${ink}-${(t.id % 2) + 1}.webp)"></span>` : "";
     return t.videoId
-      ? `<span class="thumb ${ink}">${scrap}<img src="https://i.ytimg.com/vi/${esc(t.videoId)}/${big ? "hq" : "mq"}default.jpg" alt="" width="160" height="90" decoding="async" onerror="this.parentNode.classList.add('none')"></span>`
+      ? `<span class="thumb ${ink}">${scrap}<img src="https://i.ytimg.com/vi/${esc(t.videoId)}/${big ? "maxres" : "mq"}default.jpg" alt="" width="160" height="90" decoding="async" onerror="${big ? `if(!this.dataset.hq){this.dataset.hq=1;this.src='https://i.ytimg.com/vi/${esc(t.videoId)}/hqdefault.jpg'}else ` : ""}this.parentNode.classList.add('none')"></span>`
       : `<span class="thumb ${ink} none">${scrap}</span>`;
   };
   const SEARCH_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>`;
@@ -449,6 +449,6 @@ function make({ phone, watch, walks, textHref }) {
   // ---- the print-in at load is CSS; hand control back to transitions once the plates are in register
   setTimeout(() => menu.classList.remove("printing"), REDUCED ? 0 : 900);
   // the eight picks' thumbnails are fetched once the sheet is printed, so Watch first prints them at once
-  setTimeout(() => M.picks.forEach((p) => { const t = byId.get(p.talkId); if (t && t.videoId) { const i = new Image(); i.src = `https://i.ytimg.com/vi/${t.videoId}/hqdefault.jpg`; } }), 1200);
+  setTimeout(() => M.picks.forEach((p) => { const t = byId.get(p.talkId); if (t && t.videoId) { const i = new Image(); i.src = `https://i.ytimg.com/vi/${t.videoId}/maxresdefault.jpg`; } }), 1200);
   return root;
 }
