@@ -11,10 +11,8 @@ const TZ = "Europe/Brussels";
 const fmt = (o) => new Intl.DateTimeFormat("en-GB", { timeZone: TZ, ...o });
 const fTime = fmt({ hour: "2-digit", minute: "2-digit" });
 const fDayLong = fmt({ weekday: "long", day: "numeric", month: "long" });
-const fDay = fmt({ weekday: "long" });
 const fShort = fmt({ weekday: "short", day: "numeric" });
 const fYear = fmt({ year: "numeric" });   // apart: with the year in, en-GB puts a comma after the weekday
-const dayKey = (iso) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date(iso));
 const roomNo = (t) => { const m = /^Room (\d+)$/.exec(t.room || ""); return m ? Number(m[1]) : null; };
 const ytUrl = (t, sec = 0) => `https://www.youtube.com/watch?v=${t.videoId}${sec ? `&t=${sec}s` : ""}`;
 const EMBED = window.self === window.top;      // YouTube can't be embedded inside the artifact sandbox
@@ -42,7 +40,6 @@ const capital = (name) => name.replace(/^\p{Ll}/u, (c) => c.toUpperCase());   //
 const talks = window.DEVOXX.talks.filter((t) => t.type !== "Keynote Overflow").map((t) => ({
   ...t, title: clean(t.title), speakers: t.speakers.map((sp) => ({ ...sp, name: capital(clean(sp.name)) })) }));
 const speakers = (t, withCompany) => t.speakers.map((sp) => withCompany && sp.company ? `${sp.name} (${sp.company})` : sp.name).join(", ");
-const when = (t) => t.start ? `${fDay.format(new Date(t.start))} ${fTime.format(new Date(t.start))}` : null;
 const whenShort = (t) => t.start ? `${fShort.format(new Date(t.start))} Oct, ${fTime.format(new Date(t.start))}` : null;
 const whenLong = (t) => t.start ? `${fDayLong.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : null;
 // a plain talk needs no label; the rest in sentence case ("Hands-on lab"), BOF stays an acronym
@@ -217,8 +214,7 @@ function mount(panel, key, overlayName) {
   overlay.append(panel);
   face = { el: panel, key, overlayName, w, h };
   place();
-  fitCards(panel);
-  for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s);
+  for (const s of panel.querySelectorAll(".scroller")) watchScroll(s);
 }
 const unmount = () => { if (face) { face.el.remove(); face = null; } front.hidden = true; if (zoomed) zoomTo("hall", false); leaveSeat(); };
 let resizeTimer = 0;
@@ -239,31 +235,13 @@ addEventListener("resize", () => {
   }, 180);
 });
 
-// a card's text must fit its fixed height: shorten the title, then the speakers, a line at a time until it does
-function fitCards(root) {
-  const lines = (e) => (e && parseInt(getComputedStyle(e).webkitLineClamp, 10)) || 0;
-  for (const c of root.querySelectorAll(".card")) {
-    const title = c.querySelector(".title"), who = c.querySelector(".who");
-    for (let i = 0; i < 4 && c.scrollHeight > c.clientHeight + 1; i++) {
-      if (lines(title) > 2) title.style.webkitLineClamp = lines(title) - 1;
-      else if (lines(who) > 1) who.style.webkitLineClamp = 1;
-      else break;
-    }
-  }
-}
-
-// fade the edge of anything that scrolls, on the side where there's more
+// fade the foot of anything that scrolls while there's more below
 function watchScroll(s) {
-  const update = () => {
-    if (s.classList.contains("strip")) {
-      s.classList.toggle("more-l", s.scrollLeft > 4);
-      s.classList.toggle("more-r", s.scrollLeft + s.clientWidth < s.scrollWidth - 4);
-    } else s.classList.toggle("more-b", s.scrollTop + s.clientHeight < s.scrollHeight - 12);
-  };
+  const update = () => s.classList.toggle("more-b", s.scrollTop + s.clientHeight < s.scrollHeight - 12);
   s.addEventListener("scroll", update, { passive: true });
   requestAnimationFrame(update);
 }
-// one tab stop per group of chips (days, times, tabs): Tab lands on the chosen one, the arrow keys move along
+// one tab stop per group of chips (the tabs): Tab lands on the chosen one, the arrow keys move along
 function rove(group) {
   const items = [...group.querySelectorAll("button")];
   const on = items.find((b) => b.getAttribute("aria-pressed") === "true") || items[0];
@@ -276,11 +254,6 @@ function rove(group) {
     items[i].tabIndex = -1; items[j].tabIndex = 0; items[j].focus();
   };
 }
-function centre(strip) {   // bring the pressed chip into view without scrolling the page
-  const on = strip.querySelector('[aria-pressed="true"]');
-  if (on) strip.scrollLeft = on.offsetLeft - (strip.clientWidth - on.offsetWidth) / 2;
-}
-
 // A still wider than its walk (inner: the laptop stills render wider than 16:9 so ultrawide windows fill, John 19/10)
 // is moved from where object-fit puts it to where framing() frames it, so the walk's frame lines up and the rest fills
 // the window; the seat then moves on from there (frameRoom)
@@ -315,8 +288,8 @@ const showStill = (key) => new Promise((resolve) => {
 });
 
 // fetch a walk just before it's likely wanted, so the click plays at once without every walk being downloaded up
-// front (a lot on a phone's data plan): a room's walk when its card is pointed at or focused, the walk back once you
-// sit down. The file is the one that will play (walks off: the glimpse).
+// front (a lot on a phone's data plan): the walk back once you sit down. The file is the one that will play (walks
+// off: the glimpse).
 const warmed = new Set();
 function warmClip(name) {
   const src = name && shots[name] ? clipSrc(name, !walksOn) : null;
@@ -334,7 +307,6 @@ function warmStill(key) {
     new Image().src = src;
   }
 }
-const warm = (n) => { if (walkable.has(n)) { warmClip(walkClip(n)); warmStill(shotKey(`seat-${n}`)); } };
 
 // Walks on or off (John 19/10: the quick, swooping walk can make people queasy). Off: only a glimpse of each walk, its
 // first and last half second with a dip through black between, so you still see where you set off and where you
@@ -479,119 +451,26 @@ const dip = (on) => new Promise((resolve) => {
 });
 const say = (text) => { statusBox.textContent = text || ""; statusBox.hidden = !text; };
 
-// ---------- the programme ----------
-const days = [...new Set(talks.filter((t) => t.start).map((t) => dayKey(t.start)))].sort();
-const startsOn = (d) => [...new Set(talks.filter((t) => t.start && dayKey(t.start) === d).map((t) => t.start))].sort();
-const inSlot = (s) => talks.filter((t) => t.start === s).sort((a, b) => (roomNo(a) || 99) - (roomNo(b) || 99));
-let day = days.includes("2026-10-07") ? "2026-10-07" : days[0];
-let slot = startsOn(day)[0];                                   // the day from its start
-let query = "";
-const blob = (t) => [t.title, ...t.speakers.map((s) => s.name), t.room, t.track, t.s && t.s.tldr, ...((t.s && t.s.tech) || []), ...(t.keywords || [])]
-  .join(" ").toLowerCase();
-
-// where a search term was found, as a short highlighted snippet (title matches need none)
-function why(t, terms) {
-  if (terms.every((w) => t.title.toLowerCase().includes(w))) return null;
-  const s = t.s || {};
-  const fields = [["Speaker", speakers(t)], ["Summary", [s.tldr, ...(s.summary || [])].filter(Boolean).join(" ")], ["Abstract", (t.abstract || []).join(" ")],
-    ["Mentions", (s.tech || []).join(", ")], ["Topics", (t.keywords || []).join(", ")]];
-  for (const [name, text] of fields) {
-    const lower = text.toLowerCase(), w = terms.find((x) => lower.includes(x));
-    if (!w) continue;
-    const i = lower.indexOf(w);
-    const a = i;                                                     // start at the match, so it's always in view
-    if (name === "Mentions" || name === "Topics" || name === "Speaker") {        // lists: the matching item first, then whole items
-      const items = text.split(/,\s*/), hit = items.find((x) => x.toLowerCase().includes(w));
-      const more = items.length - 1;
-      return el("span", { class: "why" }, el("b", { text: `${name}: ` }), el("mark", { text: hit }), more > 0 && name !== "Speaker" ? `, plus ${more}\u00a0other ${name === "Topics" ? "topics" : "tools"}` : "");
-    }
-    // a sentence from the summary: a few words before the match, the match, the rest of the line
-    const word = text.slice(i).match(/^\S+/)[0].replace(/[,.;:)]$/, "");
-    let from = Math.max(0, text.lastIndexOf(" ", Math.max(0, i - 24)));
-    if (i - from > 30) from = i;
-    return el("span", { class: "why is-quote" }, from > 0 ? "…" : "", text.slice(from, i).trimStart(), el("mark", { text: word }), text.slice(i + word.length, i + word.length + 90));
-  }
-  return null;
-}
-function card(t, { when: showWhen = null, terms = null } = {}) {
-  const n = roomNo(t), on = walkable.has(n);
-  const label = showWhen === "day" ? `${fShort.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}` : showWhen === "time" ? fTime.format(new Date(t.start))
-    : /^BOF/.test(t.room || "") ? "Downstairs" : typeLabel(t);
-  const hint = terms && why(t, terms);
-  return el("button", { class: `card${on ? "" : " is-off"}`, type: "button", onclick: () => goTalk(t), onpointerenter: () => warm(n), onfocus: () => warm(n),
-      "aria-label": [t.title, speakers(t), t.room, showWhen ? when(t) : null, on ? "walks you to your seat" : null].filter(Boolean).join(", ") },
-    el("span", { class: "room" }, n ? el("span", { class: "where" }, el("small", { text: "Room" }), el("b", { text: String(n) })) : el("span", { class: "where" }, ...(/^(\S+) (\d+)$/.test(t.room || "") ? [el("small", { text: t.room.split(" ")[0] }), el("b", { text: t.room.split(" ")[1] })] : [el("b", { class: "is-text", text: t.room || "Room TBC" })])),
-      el("span", { class: "label", text: label })),
-    el("span", { class: "title", text: t.title }),
-    el("span", { class: "who", text: speakers(t) }),
-    hint);
-}
-
-function programme(tall) {
-  const search = el("input", { class: "search", type: "search", placeholder: tall ? "Search talks, speakers, topics" : "Search talks", "aria-label": "Search all talks", value: query });
-  const dayRow = el("div", { class: "strip days", role: "group", "aria-label": "Day" });
-  const timeRow = el("div", { class: "strip times", role: "group", "aria-label": "Start time" });
-  const nav = el("div", { class: "nav" }, tall ? dayRow : null, timeRow);
-  const body = el("div", { class: "slot" });
-  const panel = el("section", { class: `face prog is-lcd${tall ? " is-tall" : ""}`, "aria-label": "Programme" },
-    el("div", { class: "prog-head" },
-      el("h1", { class: "brand", "aria-label": "Devoxx Belgium 2026, 5 to 9 October" }, el("span", {}, "DEVOX", el("span", { class: "x", text: "X" })),
-        el("small", { text: `Belgium 2026: ${window.DEVOXX.talks.length} talks, summarised` })),
-      tall ? null : dayRow,
-      search),
-    nav, body,
-    el("div", { class: "prog-foot" }, el("a", { class: "textlink is-foot", href: "../", text: "Text version of every talk" })));
-
-  function draw() {
-    dayRow.textContent = ""; timeRow.textContent = ""; body.textContent = "";
-    const terms = query.split(/\s+/).filter(Boolean);
-    nav.hidden = terms.length > 0;
-    if (terms.length) {
-      const hits = talks.filter((t) => terms.every((w) => blob(t).includes(w))).sort((a, b) => (a.start || "").localeCompare(b.start || ""));
-      put(body, el("div", { class: "slot-head is-plain" },
-          el("span", { text: `${hits.length} ${hits.length === 1 ? "talk matches" : "talks match"} “${query}”, in programme order` })),
-        hits.length ? el("div", { class: "cards scroller", tabindex: "0", "aria-label": "Search results" }, hits.map((t) => card(t, { when: "day", terms })))
-          : el("p", { class: "empty", text: "Nothing matches. Try a speaker's surname or a tool, like Kotlin or Quarkus." }));
-      if (face) { for (const s of panel.querySelectorAll(".scroller")) watchScroll(s); requestAnimationFrame(() => fitCards(panel)); }
-      return;
-    }
-    for (const d of days) {
-      dayRow.append(el("button", { class: "pill", type: "button", text: fShort.format(new Date(startsOn(d)[0])), "aria-pressed": String(d === day),
-        onclick: () => { day = d; slot = startsOn(d)[0]; draw(); } }));
-    }
-    for (const s of startsOn(day)) {
-      timeRow.append(el("button", { class: "pill", type: "button", text: fTime.format(new Date(s)), "aria-pressed": String(s === slot),
-        onclick: () => { slot = s; draw(); } }));
-    }
-    const here = inSlot(slot);
-    // a short slot leaves room for what's on next: fill the screen with the following talks, each with its time
-    const later = talks.filter((t) => t.start && dayKey(t.start) === day && t.start > slot).sort((a, b) => a.start.localeCompare(b.start) || (roomNo(a) || 99) - (roomNo(b) || 99));
-    // laptops: one full row of four after the slot's own row, so nothing is cut at the bottom of the screen
-    const fill = here.length < (tall ? 4 : 4) ? later.slice(0, tall ? 6 - here.length : 4) : [];
-    const cards = el("div", { class: `cards scroller${tall ? "" : fill.length ? " is-packed" : " is-exact"}`, tabindex: "-1" },
-      here.map((t) => {
-        const c = card(t, { when: fill.length ? "time" : null });
-        if (fill.length) c.classList.add(here.length === 1 ? "is-now-wide" : "is-now");   // a lone talk takes the whole row
-        if (fill.length && here.length === 1 && t.s && t.s.tldr) c.append(el("span", { class: "gist", text: t.s.tldr }));
-        return c;
-      }),
-      fill.length ? el("div", { class: "later", text: "Later that day" }) : null,
-      fill.map((t) => { const c = card(t, { when: "time" }); c.classList.add("is-later"); return c; }));
-    put(body, el("div", { class: "slot-head" }, el("b", { text: fTime.format(new Date(slot)) }),
-        el("span", { text: tall ? `${here.length} ${here.length === 1 ? "session" : "sessions"}, ${fShort.format(new Date(slot))} Oct`
-          : `${fDayLong.format(new Date(slot))}, ${here.length} ${here.length === 1 ? "session. Choose it to read its summary." : "sessions. Pick one to read its summary."}` })),
-      cards);
-    rove(dayRow); rove(timeRow);
-    requestAnimationFrame(() => { fitCards(panel); centre(timeRow); if (tall) centre(dayRow); for (const s of panel.querySelectorAll(".strip, .scroller")) watchScroll(s); });
-  }
-  search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); draw(); });
-  draw();
-  return panel;
+// ---------- the inks ----------
+// The hall menu prints the week in three inks (menu.js, Three Inks); a talk's ink is its category, the same map as
+// menu.js TRACK_INK. Everything about a talk away from the menu takes its accents from it: the strip at the head of the
+// talk screen and the laptop's notes, the bars, the scrubber's fill, the Play buttons. Set on the root as --t-ink (the
+// ink as a fill), --t-on (type on it: paper on blue) and --t-mark (the ink as a mark on paper: black for "paper" talks,
+// which have no ink); cleared in the hall.
+const TRACK_INK = {
+  "Agentic Engineering & Tooling": "pink",
+  "Java Language & Platform": "blue",
+  "Architecture & Modernization": "yellow", "Development Practices": "yellow", "People, Practices & Career": "yellow",
+};
+const inkOf = (t) => TRACK_INK[t.track] || "paper";
+function setInk(t) {
+  if (t) document.documentElement.dataset.ink = inkOf(t);
+  else delete document.documentElement.dataset.ink;
 }
 
 // ---------- the talk ----------
 const toSeconds = (at) => { const [m, sec] = String(at).split(":").map(Number); return (m || 0) * 60 + (sec || 0); };
-function talkScreen(t, tall, onFloor, doorRoom = null) {
+function talkScreen(t, tall, onFloor) {
   const s = t.s || {};
   // the short summary is in the header; the tabs are the reading, the same on every device
   const tabs = [["points", "Key points"], ["monday", "To try"], ["chapters", "Chapters"], ["story", "Summary"]]
@@ -628,20 +507,17 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
   const intro = () => {
     main.textContent = "";
     put(main,
-      el("div", { class: "meta", text: [!onFloor && /^BOF/.test(t.room || "") ? `${t.room} (small room downstairs)` : t.room,
-        whenShort(t), typeLabel(t), t.videoId ? null : "no recording yet"].filter(Boolean).map((x) => x.replace(/ /g, "\u00a0").replace(/-/g, "\u2011")).join(", ") }),
-      el("h2", { text: t.title, style: `--title:${onFloor ? titleSize(t.title, 40, 30) : titleSize(t.title, 34, 26)}px;--title-s:${titleSize(t.title, 23, 19)}px` }),
+      el("h2", { text: t.title, style: `--title:${titleSize(t.title, 46, 32)}px;--title-s:${titleSize(t.title, 34, 25)}px` }),
       el("div", { class: "who-l", text: speakers(t, true) }),
       // laptops: the summary scrolls if it's long, so the buttons stay on the screen
       el("div", { class: "intro scroller" },
         s.tldr ? el("p", { class: "tldr", text: s.tldr }) : null,
-        s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth it if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null),
+        s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth it if" }), `${s.watchIf.replace(/\.$/, "")}.`) : null),
       actions());
     for (const sc of main.querySelectorAll(".scroller")) watchScroll(sc);
   };
   function actions() {
-    return el("div", { class: "actions" }, watch(), tall ? null : el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }),
-      null);
+    return el("div", { class: "actions" }, watch(), tall ? null : el("button", { class: "btn is-back", type: "button", text: "Back to the programme", onclick: () => goHall() }));
   }
   playAt = (sec) => {
     const at = tall ? main : pane;                               // laptops: the recording takes the reading area
@@ -651,14 +527,17 @@ function talkScreen(t, tall, onFloor, doorRoom = null) {
       el("div", { class: "player" }, el("iframe", { src: `https://www.youtube-nocookie.com/embed/${t.videoId}?autoplay=1&rel=0&start=${sec}`, title: t.title,
         allow: "autoplay; encrypted-media; picture-in-picture; fullscreen", allowfullscreen: true })),
       el("div", { class: "actions" }, el("button", { class: "btn", type: "button", text: "Close the recording", onclick: () => (tall ? intro() : fill(tabs[0][0])) }),
-        tall ? el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() }) : null));
+        tall ? el("button", { class: "btn is-back", type: "button", text: "Back to the programme", onclick: () => goHall() }) : null));
   };
   intro();
   fill(tabs[0][0]);
-  return el("section", { class: `face talk ${onFloor && !tall ? "is-projected" : "is-lcd"}${tall ? " is-tall" : ""}`, "aria-label": t.title },
+  // the head of the sheet: a strip in the talk's ink with where and when, as on the menu's talk card
+  const where = [t.room, !onFloor && /^BOF/.test(t.room || "") ? "small room downstairs" : null, whenShort(t), typeLabel(t), t.videoId ? null : "no recording yet"];
+  return el("section", { class: `face talk paper${tall ? " is-tall" : ""}`, "aria-label": t.title },
+    el("div", { class: "talk-strip meta" }, where.filter(Boolean).map((x) => x.replace(/ /g, "\u00a0").replace(/-/g, "\u2011")).join(" \u00b7 ")),
     main, el("div", { class: "talk-side" }, tall ? tabRow : sideHead, pane),
-    tall ? el("div", { class: "foot" }, el("span", { "aria-hidden": "true" }, "DEVOX", el("span", { class: "x", text: "X" })),
-      el("button", { type: "button", text: "Back to the programme", onclick: () => goHall() })) : null);
+    tall ? el("div", { class: "foot" }, el("span", { class: "foot-mark", "aria-hidden": "true" }, "Devoxx", el("span", { class: "be", text: " Belgium" }), " 2026"),
+      el("button", { type: "button", class: "is-back", text: "Programme", "aria-label": "Back to the programme", onclick: () => goHall() })) : null);
 }
 
 // ---------- the seat, on laptops: the recording on the cinema screen, your notes on a laptop in your lap ----------
@@ -823,8 +702,8 @@ function playerFailed(t) {
     el("b", { text: "The recording won't play here" }),
     el("span", { text: "Something (a content blocker, or the network) kept YouTube's player from loading. The chapters on your laptop open on YouTube instead." }),
     el("div", { class: "actions" },
-      el("button", { class: "btn", type: "button", text: "Try again", onclick: () => retryPlayer() }),
-      el("a", { class: "btn is-main", href: ytUrl(t, Math.floor(seat.startAt || 0)), target: "_blank", rel: "noopener", text: "Watch on YouTube ↗" }))));
+      el("button", { class: "btn is-retry", type: "button", text: "Try again", onclick: () => retryPlayer() }),
+      el("a", { class: "btn is-main", href: ytUrl(t, Math.floor(seat.startAt || 0)), target: "_blank", rel: "noopener", text: "Watch on YouTube" }))));
   if (seat.notesPanel) seat.notesPanel.classList.add("is-failed");
   for (const l of document.querySelectorAll(".notes .jump-label")) l.textContent = "Jump to a part: it opens on YouTube";
   tick();
@@ -1232,13 +1111,13 @@ function cineScreen(t) {
     : el("div", { class: "slot is-poster" },
       t.videoId ? el("a", { class: "btn is-main", href: ytUrl(t), target: "_blank", rel: "noopener", text: "Watch on YouTube" })
         : [el("b", { text: "No recording yet" }), el("span", { text: "Devoxx puts the talks on YouTube in the weeks after the conference. Your laptop has the notes, from the abstract." }),
-          el("button", { class: "btn", type: "button", text: "Back to the programme", onclick: () => goHall() })]);
+          el("button", { class: "btn is-back", type: "button", text: "Back to the programme", onclick: () => goHall() })]);
   return el("section", { class: "face cine is-projected", "aria-label": `${t.title}: the cinema screen` },
     el("div", { class: "cine-info" },
-      el("div", { class: "meta", text: [t.room, whenShort(t), typeLabel(t)].filter(Boolean).map(nb).join(" · ") }),
+      el("div", { class: "meta" }, el("span", { text: [t.room, whenShort(t), typeLabel(t)].filter(Boolean).map(nb).join(" · ") })),
       el("h2", { text: t.title }),
       el("p", { class: "who-l", text: speakers(t, true) }),
-      s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth your time if " }), `${s.watchIf.replace(/^\p{Lu}/u, (c) => c.toLowerCase()).replace(/\.$/, "")}.`) : null),
+      s.watchIf ? el("p", { class: "verdict" }, el("b", { text: "Worth your time if" }), `${s.watchIf.replace(/\.$/, "")}.`) : null),
     slot);
 }
 // the whole title and the reason always show: the type steps down until the column holds them
@@ -1252,11 +1131,12 @@ function fitCine(panel) {
   const sh = Math.floor(Math.min(ah, (aw - Math.max(290, aw * 0.3)) * 9 / 16));
   if (slot.classList.contains("is-poster")) Object.assign(slot.style, { height: "auto", width: `${Math.round(Math.max(300, aw * 0.5))}px` });
   else Object.assign(slot.style, { height: `${sh}px`, width: `${Math.round(sh * 16 / 9)}px` });
-  let size = Math.min(36, Math.max(24, Math.round(info.clientWidth / 10.5))), v = 16;
+  // (the title is set in the menu's condensed display face: it starts bigger than a text face would)
+  let size = Math.min(46, Math.max(30, Math.round(info.clientWidth / 7.5))), v = 16;
   h2.style.fontSize = `${size}px`;
   if (verdict) verdict.style.fontSize = "";
-  while (over() && size > 24) h2.style.fontSize = `${--size}px`;          // the title keeps the lead...
-  while (verdict && over() && v > 14) verdict.style.fontSize = `${--v}px`;   // ...the reason gives way first
+  while (over() && size > 30) h2.style.fontSize = `${--size}px`;          // the title keeps the lead...
+  while (verdict && over() && v > 13) verdict.style.fontSize = `${--v}px`;   // ...the reason gives way first
   while (over() && size > 18) h2.style.fontSize = `${--size}px`;
 }
 
@@ -1429,20 +1309,22 @@ function snake() {
     const ox = Math.round((w - c * SNAKE.cols) / 2), oy = Math.round((h - c * SNAKE.rows) / 2);
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.clearRect(0, 0, w, h);
-    g.fillStyle = "#141824"; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows);
-    g.strokeStyle = document.activeElement === board ? "#f6921e" : "#2a2f3e"; g.lineWidth = 1;
-    g.strokeRect(ox + 0.5, oy + 0.5, c * SNAKE.cols - 1, c * SNAKE.rows - 1);
-    g.fillStyle = "#f6921e";
-    g.beginPath(); g.arc(ox + (food[0] + 0.5) * c, oy + (food[1] + 0.5) * c, c * 0.34, 0, Math.PI * 2); g.fill();
-    body.forEach(([x, y], i) => { g.fillStyle = i ? "#aab0c6" : "#ffffff"; g.fillRect(ox + x * c + 1, oy + y * c + 1, c - 2, c - 2); });
+    // printed on the notes' paper: a white board in a black rule, the snake in black, the food in the talk's ink
+    const ink = getComputedStyle(board).getPropertyValue("--t-mark").trim() || "#111111", focused = document.activeElement === board;
+    g.fillStyle = "#FAFBF8"; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows);
+    g.strokeStyle = focused ? "#111111" : "rgba(17, 17, 17, .45)"; g.lineWidth = focused ? 3 : 1.5;
+    g.strokeRect(ox + g.lineWidth / 2, oy + g.lineWidth / 2, c * SNAKE.cols - g.lineWidth, c * SNAKE.rows - g.lineWidth);
+    g.fillStyle = ink; g.strokeStyle = "#111111"; g.lineWidth = 1.5;
+    g.beginPath(); g.arc(ox + (food[0] + 0.5) * c, oy + (food[1] + 0.5) * c, c * 0.34, 0, Math.PI * 2); g.fill(); g.stroke();
+    body.forEach(([x, y], i) => { g.fillStyle = i ? "#3b3d3a" : "#111111"; g.fillRect(ox + x * c + 1, oy + y * c + 1, c - 2, c - 2); });
     if (running) return;
-    g.fillStyle = "rgba(15, 17, 23, .74)"; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows);
-    const size = Math.max(12, Math.min(18, Math.round(c * 0.8)));
+    g.fillStyle = "rgba(238, 240, 236, .86)"; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows);
+    const size = Math.max(14, Math.min(24, Math.round(c * 1.05)));
     g.textAlign = "center"; g.textBaseline = "middle";
-    g.fillStyle = "#e8ebf4"; g.font = `700 ${size}px Archivo, system-ui, sans-serif`;
-    g.fillText(over ? `Game over: ${score}. Space or click to play again` : fresh ? "Click, or Space, to play" : "Paused. Space or click to go on", w / 2, h / 2 - size * 0.7);
-    g.fillStyle = "#9aa1b8"; g.font = `500 ${Math.round(size * 0.8)}px Archivo, system-ui, sans-serif`;
-    g.fillText("Arrows or WASD steer, while the board has focus", w / 2, h / 2 + size * 0.8);
+    g.fillStyle = "#111111"; g.font = `800 ${size}px "Big Shoulders Display", "Archivo Narrow", Impact, sans-serif`;
+    g.fillText((over ? `Game over: ${score}. Space or click to play again` : fresh ? "Click, or Space, to play" : "Paused. Space or click to go on").toUpperCase(), w / 2, h / 2 - size * 0.6);
+    g.fillStyle = "#3b3d3a"; g.font = `500 ${Math.max(12, Math.round(size * 0.62))}px Archivo, system-ui, sans-serif`;
+    g.fillText("Arrows or WASD steer, while the board has focus", w / 2, h / 2 + size * 0.75);
   };
   const stop = () => { running = false; clearTimeout(timer); draw(); };
   const step = () => {
@@ -1793,7 +1675,7 @@ function mountNotes() {
   syncControls();
   if (seat.zoom) fitWatch(panel);
   seat.remounted = true;
-  for (const sc of panel.querySelectorAll(".strip, .scroller")) watchScroll(sc);
+  for (const sc of panel.querySelectorAll(".scroller")) watchScroll(sc);
   seat.lastChapter = null;
   tick();
 }
@@ -1999,6 +1881,7 @@ async function toHall(withWalk) {
   if (dipped) await dip(true);
   unmount();
   room = null; current = null;
+  setInk(null);
   await showStill(shotKey("hall"));
   hideClip();
   mount(hallMenu(), shotKey("hall"), "programme");
@@ -2028,7 +1911,7 @@ async function toSeat(t, withWalk) {
   say("");
   room = n; current = t;
   warmClip(backClip(n));
-  mount(talkScreen(t, shape === "phone", true, n), shotKey(`seat-${n}`), "screen");
+  mount(talkScreen(t, shape === "phone", true), shotKey(`seat-${n}`), "screen");
 }
 
 async function toOffFloor(t) {   // no seat to walk to (BOFs downstairs): the summary stays on the hall screen
@@ -2043,7 +1926,7 @@ const byTalk = new Map(talks.map((t) => [t.id, t]));
 const hallMenu = () => inksMenu({ phone: shape === "phone", textHref: "../",
   walks: (id) => byTalk.has(id) && walkable.has(roomNo(byTalk.get(id))),
   watch: (id) => { const t = byTalk.get(id); if (t) goTalk(t); } });
-const open = (t, withWalk) => (walkable.has(roomNo(t)) ? toSeat(t, withWalk) : toOffFloor(t));
+const open = (t, withWalk) => { setInk(t); return walkable.has(roomNo(t)) ? toSeat(t, withWalk) : toOffFloor(t); };
 function rerender() { if (current) open(current, false); else toHall(false); }
 
 async function goTalk(t) {
