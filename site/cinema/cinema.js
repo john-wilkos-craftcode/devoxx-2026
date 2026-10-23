@@ -467,6 +467,12 @@ function setInk(t) {
   if (t) document.documentElement.dataset.ink = inkOf(t);
   else delete document.documentElement.dataset.ink;
 }
+// The theatre is dark (John 23/10): at a seat (and walking to it) everything is printed on black stock; the hall, and a
+// talk shown on the hall's screen, stay paper (cinema.css :root[data-room="theatre"])
+function setRoom(theatre) {
+  if (theatre) document.documentElement.dataset.room = "theatre";
+  else delete document.documentElement.dataset.room;
+}
 
 // ---------- the talk ----------
 const toSeconds = (at) => { const [m, sec] = String(at).split(":").map(Number); return (m || 0) * 60 + (sec || 0); };
@@ -1309,21 +1315,24 @@ function snake() {
     const ox = Math.round((w - c * SNAKE.cols) / 2), oy = Math.round((h - c * SNAKE.rows) / 2);
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.clearRect(0, 0, w, h);
-    // printed on the notes' paper: a white board in a black rule, the snake in black, the food in the talk's ink
-    const ink = getComputedStyle(board).getPropertyValue("--t-mark").trim() || "#111111", focused = document.activeElement === board;
-    g.fillStyle = "#FAFBF8"; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows);
-    g.strokeStyle = focused ? "#111111" : "rgba(17, 17, 17, .45)"; g.lineWidth = focused ? 3 : 1.5;
+    // printed on the notes' stock (cinema.css tokens: paper in the hall, black in the theatre): the board a card in a
+    // rule, the snake in the type's colour, the food in the talk's ink
+    const cs = getComputedStyle(board), tok = (n, d) => cs.getPropertyValue(n).trim() || d;
+    const fg = tok("--fg", "#111111"), fg2 = tok("--fg-2", "#3b3d3a"), raised = tok("--raised", "#FAFBF8"), line = tok("--line", "#111111");
+    const ink = tok("--t-mark", "#111111"), focused = document.activeElement === board;
+    g.fillStyle = raised; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows);
+    g.strokeStyle = focused ? fg : line; g.lineWidth = focused ? 3 : 1.5;
     g.strokeRect(ox + g.lineWidth / 2, oy + g.lineWidth / 2, c * SNAKE.cols - g.lineWidth, c * SNAKE.rows - g.lineWidth);
-    g.fillStyle = ink; g.strokeStyle = "#111111"; g.lineWidth = 1.5;
+    g.fillStyle = ink; g.strokeStyle = fg; g.lineWidth = 1.5;
     g.beginPath(); g.arc(ox + (food[0] + 0.5) * c, oy + (food[1] + 0.5) * c, c * 0.34, 0, Math.PI * 2); g.fill(); g.stroke();
-    body.forEach(([x, y], i) => { g.fillStyle = i ? "#3b3d3a" : "#111111"; g.fillRect(ox + x * c + 1, oy + y * c + 1, c - 2, c - 2); });
+    body.forEach(([x, y], i) => { g.fillStyle = i ? fg2 : fg; g.fillRect(ox + x * c + 1, oy + y * c + 1, c - 2, c - 2); });
     if (running) return;
-    g.fillStyle = "rgba(238, 240, 236, .86)"; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows);
+    g.fillStyle = raised; g.globalAlpha = 0.86; g.fillRect(ox, oy, c * SNAKE.cols, c * SNAKE.rows); g.globalAlpha = 1;
     const size = Math.max(14, Math.min(24, Math.round(c * 1.05)));
     g.textAlign = "center"; g.textBaseline = "middle";
-    g.fillStyle = "#111111"; g.font = `800 ${size}px "Big Shoulders Display", "Archivo Narrow", Impact, sans-serif`;
+    g.fillStyle = fg; g.font = `800 ${size}px "Big Shoulders Display", "Archivo Narrow", Impact, sans-serif`;
     g.fillText((over ? `Game over: ${score}. Space or click to play again` : fresh ? "Click, or Space, to play" : "Paused. Space or click to go on").toUpperCase(), w / 2, h / 2 - size * 0.6);
-    g.fillStyle = "#3b3d3a"; g.font = `500 ${Math.max(12, Math.round(size * 0.62))}px Archivo, system-ui, sans-serif`;
+    g.fillStyle = fg2; g.font = `500 ${Math.max(12, Math.round(size * 0.62))}px Archivo, system-ui, sans-serif`;
     g.fillText("Arrows or WASD steer, while the board has focus", w / 2, h / 2 + size * 0.75);
   };
   const stop = () => { running = false; clearTimeout(timer); draw(); };
@@ -1881,7 +1890,7 @@ async function toHall(withWalk) {
   if (dipped) await dip(true);
   unmount();
   room = null; current = null;
-  setInk(null);
+  setInk(null); setRoom(false);
   await showStill(shotKey("hall"));
   hideClip();
   mount(hallMenu(), shotKey("hall"), "programme");
@@ -1926,7 +1935,7 @@ const byTalk = new Map(talks.map((t) => [t.id, t]));
 const hallMenu = () => inksMenu({ phone: shape === "phone", textHref: "../",
   walks: (id) => byTalk.has(id) && walkable.has(roomNo(byTalk.get(id))),
   watch: (id) => { const t = byTalk.get(id); if (t) goTalk(t); } });
-const open = (t, withWalk) => { setInk(t); return walkable.has(roomNo(t)) ? toSeat(t, withWalk) : toOffFloor(t); };
+const open = (t, withWalk) => { setInk(t); setRoom(walkable.has(roomNo(t))); return walkable.has(roomNo(t)) ? toSeat(t, withWalk) : toOffFloor(t); };
 function rerender() { if (current) open(current, false); else toHall(false); }
 
 async function goTalk(t) {
