@@ -5,7 +5,7 @@
 // viewports get the phone shots (a schedule totem in the hall, the middle of the cinema screen from the seat). What
 // stands in front of the cinema screen (the "#DEVOXX" letters, the seats) is a separate cut-out laid over the talk.
 
-import { inksMenu } from "./menu.js?v=25520f439f";
+import { inksMenu } from "./menu.js?v=0db5ec20f9";
 
 const TZ = "Europe/Brussels";
 const fmt = (o) => new Intl.DateTimeFormat("en-GB", { timeZone: TZ, ...o });

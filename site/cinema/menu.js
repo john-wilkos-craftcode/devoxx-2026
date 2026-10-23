@@ -97,7 +97,6 @@ function make({ phone, watch, walks, textHref }) {
   const when = (t) => `${fDayShort.format(new Date(t.start))}, ${fTime.format(new Date(t.start))}`;
   const speakers = (t) => t.speakers.map((s) => s.name).join(", ");
   const shown = (t) => !S.hide[inkOf(t)];
-  const talkOfSpeaker = (name, ids) => ids.map((id) => byId.get(id)).find((t) => t && t.speakers.some((s) => s.name === name));
   // the talk's real YouTube thumbnail in its own colours (1280x720 for the big ones, the 480x360 one if a video has none), laid on a torn scrap of its story's construction paper
   // (paper/scrap-<ink>-<1|2>.webp, scripts/make_paper.py; John 23/10). Other tracks get no scrap.
   const thumb = (t, ink, big) => {
@@ -106,6 +105,26 @@ function make({ phone, watch, walks, textHref }) {
       ? `<span class="thumb ${ink}">${scrap}<img src="https://i.ytimg.com/vi/${esc(t.videoId)}/${big ? "maxres" : "mq"}default.jpg" alt="" width="160" height="90" decoding="async" onerror="${big ? `if(!this.dataset.hq){this.dataset.hq=1;this.src='https://i.ytimg.com/vi/${esc(t.videoId)}/hqdefault.jpg'}else ` : ""}this.parentNode.classList.add('none')"></span>`
       : `<span class="thumb ${ink} none">${scrap}</span>`;
   };
+  // one small icon per signal; the same icon marks its sort, its column and its number everywhere
+  const ico = (d) => `<svg class="ico" viewBox="0 0 16 16" aria-hidden="true">${d}</svg>`;
+  const ICON = {
+    views: ico('<path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="2.1" fill="currentColor"/>'),
+    likeRate: ico('<path d="M5 7.2 7.6 2.3c1 .1 1.6.9 1.4 1.9L8.6 6.3h4.1c.9 0 1.5.8 1.3 1.6l-1.1 4.6c-.2.7-.8 1.2-1.5 1.2H5z" fill="currentColor"/><rect x="1.6" y="7" width="2.4" height="7" rx=".5" fill="currentColor"/>'),
+    hearts: ico('<path d="M4 1.8h8v12.6l-4-3-4 3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>'),
+    rating: ico('<path d="m8 1.4 2 4.3 4.6.5-3.4 3.1 1 4.6L8 11.6l-4.2 2.3 1-4.6L1.4 6.2 6 5.7z" fill="currentColor"/>'),
+  };
+  const compact = new Intl.NumberFormat("en-GB", { notation: "compact", maximumFractionDigits: 1 });
+  // a talk's signals as icon + number (the words go in the tooltip and for screen readers)
+  function statIcons(t, keys) {
+    const one = (k) => {
+      if (k === "rating") return t.rating == null ? "" : `<span class="st" title="${t.rating.toFixed(2)} stars from ${nf.format(t.numRatings)} attendees">${ICON.rating}${t.rating.toFixed(1)}<span class="sr"> stars</span></span>`;
+      if (k === "hearts") return `<span class="st" title="${nf.format(t.hearts)} attendees saved it in their schedule">${ICON.hearts}${compact.format(t.hearts)}<span class="sr"> schedule saves</span></span>`;
+      if (t.views == null) return k === "views" ? `<span class="st none" title="No recording yet">no video</span>` : "";
+      if (k === "views") return `<span class="st" title="${nf.format(t.views)} views on YouTube">${ICON.views}${compact.format(t.views)}<span class="sr"> views</span></span>`;
+      return `<span class="st" title="${t.likeRate} likes per 100 views${t.thin ? " (few votes)" : ""}">${ICON.likeRate}${t.likeRate}<span class="sr"> likes per 100 views</span></span>`;
+    };
+    return (keys || ["rating", "views", "likeRate", "hearts"]).map(one).join("");
+  }
   const SEARCH_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>`;
 
   function sorted(list) {
@@ -132,12 +151,13 @@ function make({ phone, watch, walks, textHref }) {
     const time = o.time ? `<span class="tm">${fTime.format(new Date(t.start))}</span>` : "";
     return `<li><button class="row ${inkOf(t)}${o.time ? " timed" : ""}" data-talk="${t.id}" title="${esc(t.title)}" aria-label="${esc(t.title)}, ${esc(INK_NAME[inkOf(t)])}">${time}<span class="bar" aria-hidden="true"></span><span class="t">${esc(t.title)}</span><span class="m">${pickIds.has(t.id) ? '<span class="wf">Watch first</span>' : ""}${esc(meta)}</span><span class="s">${signal(t)}</span></button></li>`;
   }
-  const sortbar = () => `<div class="sortbar" role="group" aria-label="Sort the talks"><span>Sort</span>` +
+  // the sorts: each with its signal's icon; the arrow says which one orders the list (highest first)
+  const sortbar = () => `<div class="sortbar" role="group" aria-label="Sort the talks">` +
     [...(RATED ? [["rating", "Best rated", "Average star rating by attendees in the Devoxx app"]] : []), ["views", "Most watched", "YouTube views of the recording"], ["likeRate", "Best liked", "YouTube likes per 100 views"],
       ["hearts", "Most anticipated", "How many attendees saved the talk in their schedule before the conference"]].map(([k, l, d]) =>
-      `<button data-sort="${k}" aria-pressed="${S.sort === k}" title="${d}">${l}</button>`).join("") + `</div>`;
+      `<button data-sort="${k}" aria-pressed="${S.sort === k}" title="${d}">${ICON[k]}${l}<span class="dir" aria-hidden="true">${S.sort === k ? "\u2193" : "\u2195"}</span></button>`).join("") + `</div>`;
   // the head: the count, the sort, and over the number column its unit, as a column head
-  const listhead = (count, lead) => `<div class="listhead">${lead || ""}<h3>${count}</h3>${lead ? "" : sortbar()}<span class="unit">${UNIT[S.sort]}</span></div>`;
+  const listhead = (count, lead) => `<div class="listhead">${lead || ""}<h3>${count}</h3>${lead ? "" : sortbar()}<span class="unit">${ICON[S.sort]}${UNIT[S.sort]}</span></div>`;
   // the one filter: the colour key under every list. Each ink is a switch; switch one off and its talks leave the lists.
   const keyline = () => `<div class="key" role="group" aria-label="Colour key: click an ink to hide its talks"><span class="kcap">Show</span>` +
     ["pink", "blue", "yellow", "paper"].map((k) => `<button class="ink ${k}" data-ink="${k}" aria-pressed="${!S.hide[k]}"><span class="sw" aria-hidden="true"></span>${esc(INK_NAME[k])}</button>`).join("") +
@@ -168,10 +188,13 @@ function make({ phone, watch, walks, textHref }) {
     const v = M.recap.trends[i], ink = storyOfVerdict(i), list = STORIES[ink].verdicts, at = list.indexOf(i);
     // each side is its own card: a letter, its claim (the stance's first sentence), who argued it; VS between the cards
     const sides = v.debate.sides.map((s, k) => {
-      const who = s.who.map((name) => { const t = talkOfSpeaker(name, s.talkIds); return t ? `<button data-talk="${t.id}">${esc(name)}</button>` : `<span>${esc(name)}</span>`; }).join("");
+      // the talks that argued it: each a small print on its paper, its title, who gave it and its signals as icons
+      const ts = s.talkIds.map((id) => byId.get(id)).filter(Boolean);
+      const who = ts.map((t) => `<button class="tile" data-talk="${t.id}" title="${esc(t.title)} (${esc(speakers(t))})">${thumb(t, inkOf(t))}<span class="tt">${esc(t.title)}</span>` +
+        `<span class="tm">${esc(speakers(t))}</span><span class="ts">${statIcons(t, ["views", "likeRate", "hearts"])}</span></button>`).join("");
       const m = /^(.*?[.!?])\s+(.*)$/s.exec(s.stance);
       const claim = (CLAIM[i] && CLAIM[i][k]) || (m ? m[1] : s.stance);
-      return `<div class="side" title="${esc(s.stance)}"><span class="sl" aria-hidden="true">${"ABC"[k]}</span><p class="stance">${esc(claim)}</p><div class="who"><span class="by">Argued by</span>${who}</div></div>`;
+      return `<div class="side" title="${esc(s.stance)}"><span class="sl" aria-hidden="true">${"ABC"[k]}</span><p class="stance">${esc(claim)}</p><div class="who"><span class="by">Argued in</span>${who}</div></div>`;
     }).join("");
     const n = v.talkIds.filter((id) => byId.has(id)).length;
     const prev = at > 0 ? list[at - 1] : null, next = at < list.length - 1 ? list[at + 1] : null;
@@ -193,7 +216,7 @@ function make({ phone, watch, walks, textHref }) {
   function pickDetail(n) {
     const p = M.picks[n]; if (!p) return "";
     const { ink, t } = pickOf(p); if (!t) return "";
-    return `${thumb(t, ink, true)}<p class="dv"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}</p><h3 class="dt">${esc(t.title)}</h3>` +
+    return `<button class="thumbbtn" data-talk="${t.id}" aria-label="Open the card for ${esc(t.title)}">${thumb(t, ink, true)}</button><p class="dv"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}</p><h3 class="dt">${esc(t.title)}</h3>` +
       `<p class="dm">${esc(speakers(t))} &middot; ${esc(t.room)} &middot; ${esc(when(t))}</p><p class="dw">${esc(p.why)}</p>` +
       `<button class="primary" data-talk="${t.id}">Watch it</button>`;
   }
@@ -204,7 +227,7 @@ function make({ phone, watch, walks, textHref }) {
     if (PHONE) {
       const cells = page.map((p) => {
         const { ink, t } = pickOf(p); if (!t) return "";
-        return `<li class="pk ${ink}">${thumb(t, ink)}<div class="pkt"><span class="v"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}</span><button class="pt" data-talk="${t.id}">${esc(t.title)}</button><span class="pm">${esc(speakers(t))} &middot; ${esc(t.room)} &middot; ${esc(when(t))}</span><span class="pw">${esc(p.why)}</span></div></li>`;
+        return `<li class="pk ${ink}"><button class="thumbbtn" data-talk="${t.id}" aria-label="Open the card for ${esc(t.title)}">${thumb(t, ink)}</button><div class="pkt"><span class="v"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}</span><button class="pt" data-talk="${t.id}">${esc(t.title)}</button><span class="pm">${esc(speakers(t))} &middot; ${esc(t.room)} &middot; ${esc(when(t))}</span><span class="pw">${esc(p.why)}</span></div></li>`;
       }).join("");
       return `<ol class="picks" start="${a + 1}">${cells}</ol>${pager}`;
     }
@@ -349,13 +372,11 @@ function make({ phone, watch, walks, textHref }) {
   const LEVEL = { BEGINNER: "Beginner", INTERMEDIATE: "Intermediate", ADVANCED: "Advanced" };
   function peekHTML(t) {
     const ink = inkOf(t);
-    const stars = t.rating != null ? `<span><b>${t.rating.toFixed(2)}</b> stars from ${nf.format(t.numRatings)} attendees</span>` : "";
-    const stats = t.views == null ? `${stars}<span>No recording yet</span>`
-      : `${stars}<span><b>${nf.format(t.views)}</b> views</span><span><b>${t.likeRate}</b> likes per 100 views${t.thin ? " (few votes)" : ""}</span><span><b>${nf.format(t.hearts)}</b> schedule saves</span>`;
+    const stats = statIcons(t);
     return `<div class="scrim" data-act="unpeek"></div><div class="tcard ${ink}" role="dialog" aria-modal="true" aria-labelledby="peek-t">` +
       `<div class="ph"><span class="ty">${esc(t.type)} &middot; ${dur(t.minutes)} &middot; ${esc(LEVEL[t.level] || t.level)}</span>${pickIds.has(t.id) ? '<span class="wf">Watch first</span>' : ""}</div>` +
       `<div class="pin"><div class="pm1"><div class="pid"><h3 id="peek-t">${esc(t.title)}</h3><p class="by">${t.speakers.map((s) => `${esc(s.name)}${s.company ? ` <span>${esc(s.company)}</span>` : ""}`).join(", ")}</p>` +
-      `<p class="where">${esc(t.room)} &middot; ${esc(when(t))}</p></div>${thumb(t, ink, true)}</div>` +
+      `<p class="where">${esc(t.room)} &middot; ${esc(when(t))}</p></div><button class="thumbbtn go" data-talk="${t.id}" data-go="1" aria-label="Watch it: ${esc(t.title)}">${thumb(t, ink, true)}<span class="play" aria-hidden="true"></span></button></div>` +
       `<p class="sum">${esc(t.tldr)}</p><p class="if"><b>Watch if</b>${esc(t.watchIf)}</p><div class="stats">${stats}</div>` +
       `<div class="pact"><button class="primary" data-talk="${t.id}" data-go="1">Watch it</button><span class="gonote">${walks(t.id) ? `Walks you to ${esc(t.room)}` : "Opens the summary"}</span>` +
       `<button class="pg close" data-act="unpeek">Close<kbd>Esc</kbd></button></div></div></div>`;
@@ -390,7 +411,7 @@ function make({ phone, watch, walks, textHref }) {
     if (!el || !menu.contains(el)) return;
     if (el.dataset.act === "unpeek") { hidePeek(false, true); return; }
     if (el.dataset.talk) {
-      if (!el.dataset.go && !el.closest(".pdetail")) { showPeek(el); return; }   // a talk opens its card first; WATCH IT confirms
+      if (!el.dataset.go && (!el.closest(".pdetail") || el.classList.contains("thumbbtn"))) { showPeek(el); return; }   // a talk opens its card first; WATCH IT confirms
       hidePeek(false, true); openTalk(el.dataset.talk); return;
     }
     if (el.dataset.sort) { S.sort = el.dataset.sort; rerender(`[data-sort="${S.sort}"]`); return; }
