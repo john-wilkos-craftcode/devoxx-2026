@@ -530,3 +530,14 @@
 .inks .thumbbtn .play::after { content: ""; position: absolute; left: 18px; top: 14px; border-style: solid; border-width: 9px 0 9px 14px; border-color: transparent transparent transparent var(--paper); }
 .inks .thumbbtn.go:hover .play, .inks .thumbbtn.go:focus-visible .play { opacity: 1; transform: none; }
 .inks .pdetail .thumbbtn { align-self: flex-start; width: 100%; }
+
+/* how fresh the numbers are: small, grey, out of the way */
+.inks .fresh { display: inline-flex; align-items: center; gap: 5px; font: 400 12.5px/1 var(--text); color: var(--grey); opacity: .8; white-space: nowrap; }
+.inks .fresh .ico { width: 13px; height: 13px; }
+.inks .lfoot .fresh { margin-left: 14px; }
+.inks .lfoot .below:empty + .fresh { margin-left: auto; }
+.inks .vfoot .fresh { margin-left: auto; }
+.inks .vfoot .fresh + .vpos { margin-left: 14px; }
+.inks #peek .stats .fresh { margin-left: auto; align-self: center; font-weight: 400; font-size: 12.5px; }
+.inks #peek .stats .fresh .ico { width: 13px; height: 13px; }
+.inks.is-phone .vfoot .fresh { flex: 1 1 100%; order: 5; margin: 0; }

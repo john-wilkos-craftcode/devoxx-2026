@@ -125,6 +125,16 @@ function make({ phone, watch, walks, textHref }) {
     };
     return (keys || ["rating", "views", "likeRate", "hearts"]).map(one).join("");
   }
+  // how fresh the signals are: the snapshot the daily metrics job took (scripts/fetch_metrics.py, twice a day)
+  const TAKEN = M.signals && M.signals.snapshot ? new Date(M.signals.snapshot) : null;
+  const fTaken = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  function freshness() {
+    if (!TAKEN || isNaN(TAKEN)) return "";
+    const min = Math.max(0, Math.round((Date.now() - TAKEN) / 60000));
+    const ago = min < 2 ? "just now" : min < 60 ? `${min} min ago` : min < 36 * 60 ? `${Math.round(min / 60)} h ago` : `${Math.round(min / 1440)} days ago`;
+    return `<span class="fresh" title="Views, likes and schedule saves as of ${fTaken.format(TAKEN)} (Brussels time). They refresh twice a day.">` +
+      `<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.6V8l2.4 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Updated ${ago}</span>`;
+  }
   const SEARCH_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>`;
 
   function sorted(list) {
@@ -163,7 +173,7 @@ function make({ phone, watch, walks, textHref }) {
     ["pink", "blue", "yellow", "paper"].map((k) => `<button class="ink ${k}" data-ink="${k}" aria-pressed="${!S.hide[k]}"><span class="sw" aria-hidden="true"></span>${esc(INK_NAME[k])}</button>`).join("") +
     `</div>`;
   // a list is a window: about six rows, the rest scroll; the foot says how many wait below
-  const listWrap = (items) => `<div class="win"><ul class="list" tabindex="-1">${items}</ul></div><div class="lfoot">${keyline()}<span class="below" aria-hidden="true"></span></div>`;
+  const listWrap = (items) => `<div class="win"><ul class="list" tabindex="-1">${items}</ul></div><div class="lfoot">${keyline()}<span class="below" aria-hidden="true"></span>${freshness()}</div>`;
 
   // ---- views
   function headHTML(title) {
@@ -200,7 +210,7 @@ function make({ phone, watch, walks, textHref }) {
     const prev = at > 0 ? list[at - 1] : null, next = at < list.length - 1 ? list[at + 1] : null;
     return `<div class="iverdict"><div class="vtop"><h2 class="vh">${esc(v.title)}</h2><p class="consensus">${esc(v.consensus)}</p></div>` +
       `<div class="debate"><p class="lbl">The debate</p><p class="question">${esc(v.debate.question)}</p><div class="sides n${v.debate.sides.length}">${sides}</div></div>` +
-      `<div class="vfoot"><button class="primary" data-act="talks">See its ${n} talks</button><span class="vpos">Verdict ${i + 1} of 8</span>` +
+      `<div class="vfoot"><button class="primary" data-act="talks">See its ${n} talks</button>${freshness()}<span class="vpos">Verdict ${i + 1} of 8</span>` +
       `<span class="pager">${prev != null ? `<button class="pg prev" data-verdict="${prev}" aria-label="Previous verdict: ${esc(M.recap.trends[prev].title)}">Previous</button>` : ""}` +
       `${next != null ? `<button class="pg next" data-verdict="${next}" aria-label="Next verdict: ${esc(M.recap.trends[next].title)}">Next verdict</button>` : ""}</span></div></div>`;
   }
@@ -377,7 +387,7 @@ function make({ phone, watch, walks, textHref }) {
       `<div class="ph"><span class="ty">${esc(t.type)} &middot; ${dur(t.minutes)} &middot; ${esc(LEVEL[t.level] || t.level)}</span>${pickIds.has(t.id) ? '<span class="wf">Watch first</span>' : ""}</div>` +
       `<div class="pin"><div class="pm1"><div class="pid"><h3 id="peek-t">${esc(t.title)}</h3><p class="by">${t.speakers.map((s) => `${esc(s.name)}${s.company ? ` <span>${esc(s.company)}</span>` : ""}`).join(", ")}</p>` +
       `<p class="where">${esc(t.room)} &middot; ${esc(when(t))}</p></div><button class="thumbbtn go" data-talk="${t.id}" data-go="1" aria-label="Watch it: ${esc(t.title)}">${thumb(t, ink, true)}<span class="play" aria-hidden="true"></span></button></div>` +
-      `<p class="sum">${esc(t.tldr)}</p><p class="if"><b>Watch if</b>${esc(t.watchIf)}</p><div class="stats">${stats}</div>` +
+      `<p class="sum">${esc(t.tldr)}</p><p class="if"><b>Watch if</b>${esc(t.watchIf)}</p><div class="stats">${stats}${freshness()}</div>` +
       `<div class="pact"><button class="primary" data-talk="${t.id}" data-go="1">Watch it</button><span class="gonote">${walks(t.id) ? `Walks you to ${esc(t.room)}` : "Opens the summary"}</span>` +
       `<button class="pg close" data-act="unpeek">Close<kbd>Esc</kbd></button></div></div></div>`;
   }
