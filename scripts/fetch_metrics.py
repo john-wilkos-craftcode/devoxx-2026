@@ -7,9 +7,13 @@ views, likes and the comment count from each video's public watch page. Also rea
 ratings). Writes one dated JSON file per run to data/metrics/<event>/ in the
 repo; scripts/build_menu.py turns the newest one into site/menu.js.
 
-No API key and no login: only pages an anonymous browser can open. YouTube's
-page layout is not a stable interface, so when a parse step finds nothing the
-script stops with a message instead of writing an empty snapshot.
+With YT_API_KEY in the environment (a YouTube Data API v3 key; the metrics
+workflow passes the repo secret), the counts come from the API's videos.list,
+50 videos per call, about 4 quota units a run: reliable from GitHub's runners,
+where YouTube leaves the counts off many watch pages. Without it, the counts are
+read from the public watch pages. YouTube's page layout is not a stable
+interface, so when a parse step finds nothing the script stops with a message
+instead of writing an empty snapshot.
 
     python scripts/fetch_metrics.py                    # Devoxx Belgium 2026, all days
     python scripts/fetch_metrics.py --days monday      # one day only
@@ -26,7 +30,11 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import os
+
 CFP ="https://{event}.cfp.dev/api/public"
+API_KEY = os.environ.get("YT_API_KEY", "").strip()
+API = "https://www.googleapis.com/youtube/v3"
 YOUTUBE = "https://www.youtube.com"
 CHANNEL = "@DevoxxForever"
 # The consent cookie skips YouTube's EU consent redirect, which would otherwise
@@ -268,6 +276,34 @@ def video_stats(video_id):
     }
 
 
+def iso_seconds(duration):
+    """'PT1H2M3S' as 3723."""
+    m = re.fullmatch(r"P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?", duration or "")
+    if not m:
+        return None
+    d, h, mi, se = (int(x or 0) for x in m.groups())
+    return ((d * 24 + h) * 60 + mi) * 60 + se
+
+
+def api_stats(video_ids):
+    """Counts for many videos from the YouTube Data API (videos.list, 50 ids a call, 1 quota unit each)."""
+    out = {}
+    for i in range(0, len(video_ids), 50):
+        batch = video_ids[i:i + 50]
+        url = (f"{API}/videos?part=statistics,contentDetails,snippet&maxResults=50"
+               f"&id={','.join(batch)}&key={API_KEY}")
+        for item in json.loads(fetch(url)).get("items", []):
+            st, sn = item.get("statistics", {}), item.get("snippet", {})
+            out[item["id"]] = {
+                "views": int(st["viewCount"]) if "viewCount" in st else None,
+                "likes": int(st["likeCount"]) if "likeCount" in st else None,
+                "comments": int(st["commentCount"]) if "commentCount" in st else None,
+                "published": sn.get("publishedAt"),
+                "lengthSeconds": iso_seconds(item.get("contentDetails", {}).get("duration")),
+            }
+    return out
+
+
 # ----------------------------------------------------------------- matching
 
 def words(text):
@@ -353,6 +389,12 @@ def main():
     print(f"playlist {playlist}: {len(videos)} videos, plus {len(uploads)} recent uploads that are not in it")
 
     def read(batch):
+        if API_KEY:
+            stats = api_stats([t["video"]["id"] for t in batch])
+            for talk in batch:
+                talk["video"].update(stats.get(talk["video"]["id"]) or {})
+            print(f"  {len(stats)}/{len(batch)} from the YouTube Data API")
+            return
         for number, talk in enumerate(batch, 1):
             time.sleep(PAUSE)
             try:
@@ -395,7 +437,7 @@ def main():
         sys.exit("YouTube layout changed: no view count found on any watch page.")
     # From a datacenter (GitHub's runners) YouTube leaves the counts off a good share of watch pages. Ask those
     # again, slower, after a pause.
-    for again in (1, 2):
+    for again in ((1, 2) if not API_KEY else ()):
         blank = [t for t in matched if t["video"].get("views") is None]
         if not blank:
             break

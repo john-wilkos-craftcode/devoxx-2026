@@ -2,7 +2,10 @@ name: Refresh talk metrics
 
 on:
   schedule:
-    - cron: "30 4 * * *"
+    # GitHub runs schedules best-effort and skipped the first 04:30 run (23/10): a second time a day as a backup
+    # (a run that finds nothing new commits nothing)
+    - cron: "17 4 * * *"
+    - cron: "47 15 * * *"
   workflow_dispatch:
 
 permissions:
@@ -23,6 +26,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Fetch metrics (fails, writing nothing, if YouTube's layout changed)
+        env:
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}   # YouTube Data API v3; without it the counts come from watch pages
         run: python scripts/fetch_metrics.py
       - name: Build menu data
         run: python scripts/build_menu.py
