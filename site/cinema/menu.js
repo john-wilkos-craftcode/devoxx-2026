@@ -14,6 +14,7 @@ export function inksMenu({ phone, watch, walks, textHref }) {
 }
 function make({ phone, watch, walks, textHref }) {
   const M = window.MENU;
+  const PAPER = new URL("paper/", import.meta.url).href;   // the construction papers, next to this module
   const clean = (s) => String(s || "").replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "").replace(/\s{2,}/g, " ").trim();
   const TALKS = M.talks.filter((t) => t.type !== "Keynote Overflow").map((t) => ({ ...t, title: clean(t.title) }));
   const N = TALKS.length;
@@ -97,10 +98,14 @@ function make({ phone, watch, walks, textHref }) {
   const speakers = (t) => t.speakers.map((s) => s.name).join(", ");
   const shown = (t) => !S.hide[inkOf(t)];
   const talkOfSpeaker = (name, ids) => ids.map((id) => byId.get(id)).find((t) => t && t.speakers.some((s) => s.name === name));
-  // the talk's real YouTube thumbnail as a two-colour print (black and the story's ink); a flat ink block if it never arrives
-  const thumb = (t, ink, big) => t.videoId
-    ? `<span class="thumb ${ink}"><img src="https://i.ytimg.com/vi/${esc(t.videoId)}/${big ? "hq" : "mq"}default.jpg" alt="" width="160" height="90" decoding="async" onerror="this.parentNode.classList.add('none')"></span>`
-    : `<span class="thumb ${ink} none"></span>`;
+  // the talk's real YouTube thumbnail in its own colours, laid on a torn scrap of its story's construction paper
+  // (paper/scrap-<ink>-<1|2>.webp, scripts/make_paper.py; John 23/10). Other tracks get no scrap.
+  const thumb = (t, ink, big) => {
+    const scrap = ink !== "paper" ? `<span class="scrap" aria-hidden="true" style="background-image:url(${PAPER}scrap-${ink}-${(t.id % 2) + 1}.webp)"></span>` : "";
+    return t.videoId
+      ? `<span class="thumb ${ink}">${scrap}<img src="https://i.ytimg.com/vi/${esc(t.videoId)}/${big ? "hq" : "mq"}default.jpg" alt="" width="160" height="90" decoding="async" onerror="this.parentNode.classList.add('none')"></span>`
+      : `<span class="thumb ${ink} none">${scrap}</span>`;
+  };
   const SEARCH_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>`;
 
   function sorted(list) {
