@@ -1,0 +1,6266 @@
+{
+ "event": "dvbe26",
+ "eventName": "Devoxx Belgium 2026",
+ "takenAt": "2026-10-23T09:32:42+00:00",
+ "days": "all",
+ "playlist": "PLKlmOVksNGoE",
+ "ratingsAvailable": false,
+ "talks": [
+  {
+   "talkId": 17763,
+   "title": "Solving Multimodal and Long-Context Challenges",
+   "day": "monday",
+   "start": "2026-10-05T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 67,
+   "speakers": [
+    {
+     "id": 18062,
+     "name": "Laurent Picard"
+    }
+   ],
+   "video": {
+    "id": "VTxhxCy_2lE",
+    "title": "Solving Multimodal and Long Context Challenges by Laurent Picard",
+    "matchScore": 1.15,
+    "views": 3219,
+    "likes": 24,
+    "comments": 0,
+    "published": "2026-10-12T16:13:23Z",
+    "lengthSeconds": 10737
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17786,
+   "title": "Agent Loops, Decoded: Fundamentals to Agentic Patterns in Spring AI",
+   "day": "monday",
+   "start": "2026-10-05T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 216,
+   "speakers": [
+    {
+     "id": 18070,
+     "name": "Christian Tzolov"
+    }
+   ],
+   "video": {
+    "id": "Q91obeWeWNQ",
+    "title": "Agent Loops, Decoded: Fundamentals to Agentic Patterns in Spring AI  by  Christian Tzolov",
+    "matchScore": 1.15,
+    "views": 2565,
+    "likes": 33,
+    "comments": 0,
+    "published": "2026-10-06T05:32:11Z",
+    "lengthSeconds": 9719
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10020,
+   "title": "From AI to Agent: A Field Guide to Agentic Patterns in LangChain4j",
+   "day": "monday",
+   "start": "2026-10-05T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 118,
+   "speakers": [
+    {
+     "id": 5809,
+     "name": "Loïc Magnette"
+    }
+   ],
+   "video": {
+    "id": "IXcQYp51PLM",
+    "title": "From AI to Agent: A Field Guide to Agentic Patterns in LangChain4j  by  Loïc Magnette",
+    "matchScore": 1.15,
+    "views": 1795,
+    "likes": 13,
+    "comments": 0,
+    "published": "2026-10-06T05:32:16Z",
+    "lengthSeconds": 8633
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23529,
+   "title": "From Autocomplete to Autopilot: How AI Is Changing the Developer Experience",
+   "day": "monday",
+   "start": "2026-10-05T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 386,
+   "speakers": [
+    {
+     "id": 23042,
+     "name": "Tugdual Grall"
+    }
+   ],
+   "video": {
+    "id": "pMv_39iSXVA",
+    "title": "From Autocomplete to Autopilot: How AI Is Changing the Developer Experience by Tugdual Grall",
+    "matchScore": 1.15,
+    "views": 1381,
+    "likes": 6,
+    "comments": 0,
+    "published": "2026-10-06T05:32:03Z",
+    "lengthSeconds": 10923
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7006,
+   "title": "Prompt It Right: Spring Boot Testing in the AI Era",
+   "day": "monday",
+   "start": "2026-10-05T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Deep Dive",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 168,
+   "speakers": [
+    {
+     "id": 5840,
+     "name": "Philip Riecks"
+    }
+   ],
+   "video": {
+    "id": "d6D8nef-32c",
+    "title": "Prompt It Right: Spring Boot Testing in the AI Era by Philip Riecks",
+    "matchScore": 1.15,
+    "views": 1654,
+    "likes": 12,
+    "comments": 0,
+    "published": "2026-10-06T05:32:06Z",
+    "lengthSeconds": 9188
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17800,
+   "title": "🚀 From Java to AI: Build Your First Intelligent Agent System!",
+   "day": "monday",
+   "start": "2026-10-05T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "Hands-on Lab",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 91,
+   "speakers": [
+    {
+     "id": 5813,
+     "name": "Emmanuel Hugonnet"
+    },
+    {
+     "id": 18064,
+     "name": "Antoine Sabot-Durand"
+    },
+    {
+     "id": 18083,
+     "name": "yann Blazart"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22914,
+   "title": "Java is for Data Science, Too: Building an End-to-End ML Pipeline Without Leaving the JVM",
+   "day": "monday",
+   "start": "2026-10-05T08:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "Hands-on Lab",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 50,
+   "speakers": [
+    {
+     "id": 7633,
+     "name": "Sven Reimers"
+    },
+    {
+     "id": 23009,
+     "name": "Zoran Sevarac"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 50108,
+   "title": "Introduction to Spring AI",
+   "day": "monday",
+   "start": "2026-10-05T10:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Lunch Talk",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 143,
+   "speakers": [
+    {
+     "id": 7606,
+     "name": "Timo Salm"
+    }
+   ],
+   "video": {
+    "id": "JzFelLDiVJQ",
+    "title": "Introduction to Spring AI by Timo Salm",
+    "matchScore": 1.15,
+    "views": 1113,
+    "likes": 9,
+    "comments": 0,
+    "published": "2026-10-06T05:31:49Z",
+    "lengthSeconds": 2563
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7012,
+   "title": "Destructoring is the future of Javas Encapsulation",
+   "day": "monday",
+   "start": "2026-10-05T10:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Lunch Talk",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 180,
+   "speakers": [
+    {
+     "id": 5839,
+     "name": "Richard Gross"
+    }
+   ],
+   "video": {
+    "id": "wcghmWdu-HY",
+    "title": "Destructoring is the future of Javas Encapsulation  by  Richard Gross",
+    "matchScore": 1.15,
+    "views": 1282,
+    "likes": 10,
+    "comments": 0,
+    "published": "2026-10-06T05:31:53Z",
+    "lengthSeconds": 2191
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10045,
+   "title": "Java, LEGO & AI: Teaching the Next Generation to Build, Not Just Prompt",
+   "day": "monday",
+   "start": "2026-10-05T10:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Lunch Talk",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 131,
+   "speakers": [
+    {
+     "id": 10179,
+     "name": "Eddy Vos"
+    }
+   ],
+   "video": {
+    "id": "_VZg6dxlGaM",
+    "title": "Java, LEGO & AI: Teaching the Next Generation to Build, Not Just Prompt  by Eddy Vos",
+    "matchScore": 1.15,
+    "views": 1655,
+    "likes": 6,
+    "comments": 0,
+    "published": "2026-10-06T05:32:28Z",
+    "lengthSeconds": 1412
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17765,
+   "title": "Can AI Build a Jakarta EE Runtime? The Vidocq Experiment",
+   "day": "monday",
+   "start": "2026-10-05T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 24,
+   "speakers": [
+    {
+     "id": 18064,
+     "name": "Antoine Sabot-Durand"
+    },
+    {
+     "id": 18083,
+     "name": "yann Blazart"
+    },
+    {
+     "id": 21521,
+     "name": "Sebastien Blanc"
+    }
+   ],
+   "video": {
+    "id": "dq5rueVhiIM",
+    "title": "Can AI Build a Jakarta EE Runtime? The Vidocq Experiment by Antoine Sabot Durand, yann Blazart, Seba",
+    "matchScore": 1.15,
+    "views": 747,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-06T05:31:46Z",
+    "lengthSeconds": 8682
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23524,
+   "title": "Modern Java in Practice - The Features That Matter",
+   "day": "monday",
+   "start": "2026-10-05T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Deep Dive",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 364,
+   "speakers": [
+    {
+     "id": 23037,
+     "name": "Nicolai Parlog"
+    },
+    {
+     "id": 23040,
+     "name": "Falk Sippach"
+    }
+   ],
+   "video": {
+    "id": "zC2tbq7S5UE",
+    "title": "Modern Java in Practice   The Features That Matter by   Nicolai Parlog, Falk Sippach",
+    "matchScore": 1.15,
+    "views": 3592,
+    "likes": 48,
+    "comments": 0,
+    "published": "2026-10-06T05:31:08Z",
+    "lengthSeconds": 9654
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 25027,
+   "title": "Codepocalypse Now: LangChain4j vs JetBrains Koog",
+   "day": "monday",
+   "start": "2026-10-05T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 52,
+   "speakers": [
+    {
+     "id": 9605,
+     "name": "Viktor Gamov"
+    },
+    {
+     "id": 9606,
+     "name": "Baruch Sadogursky"
+    }
+   ],
+   "video": {
+    "id": "GGEmc6eR8c4",
+    "title": "Codepocalypse Now: LangChain4j vs JetBrains Koog  by Viktor Gamov, Baruch Sadogursky",
+    "matchScore": 1.15,
+    "views": 694,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-06T05:31:03Z",
+    "lengthSeconds": 10813
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4098,
+   "title": "From Developer to Builder: A Spec-Driven Development Deep Dive",
+   "day": "monday",
+   "start": "2026-10-05T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 536,
+   "speakers": [
+    {
+     "id": 3912,
+     "name": "Simon Martinelli"
+    }
+   ],
+   "video": {
+    "id": "z8lal-Yt_04",
+    "title": "From Developer to Builder: A Spec Driven Development Deep Dive by Simon Martinelli",
+    "matchScore": 1.15,
+    "views": 3016,
+    "likes": 44,
+    "comments": 2,
+    "published": "2026-10-06T05:31:27Z",
+    "lengthSeconds": 9391
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5537,
+   "title": "The Quarkus advantage: Turning build-time metaprogramming into runtime performances",
+   "day": "monday",
+   "start": "2026-10-05T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Deep Dive",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 80,
+   "speakers": [
+    {
+     "id": 3932,
+     "name": "Mario Fusco"
+    },
+    {
+     "id": 3945,
+     "name": "Georgios Andrianakis"
+    },
+    {
+     "id": 5826,
+     "name": "Francesco Nigro"
+    }
+   ],
+   "video": {
+    "id": "SgK0zMNayq0",
+    "title": "The Quarkus advantage: Turning build time metaprogramming into runtime performances by Mario Fusco,",
+    "matchScore": 1.15,
+    "views": 1133,
+    "likes": 19,
+    "comments": 0,
+    "published": "2026-10-06T05:31:33Z",
+    "lengthSeconds": 8874
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22920,
+   "title": "Using Structured Concurrency and Scoped Values to Create a Virtual Threads Based Asynchronous Application",
+   "day": "monday",
+   "start": "2026-10-05T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "Hands-on Lab",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 75,
+   "speakers": [
+    {
+     "id": 5830,
+     "name": "Ana-Maria Mihalceanu"
+    },
+    {
+     "id": 15304,
+     "name": "José Paumard"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24229,
+   "title": "Building Autonomous AI Agents with Spring",
+   "day": "monday",
+   "start": "2026-10-05T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "Hands-on Lab",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 117,
+   "speakers": [
+    {
+     "id": 7606,
+     "name": "Timo Salm"
+    },
+    {
+     "id": 7617,
+     "name": "Sandra Ahlgrimm"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24227,
+   "title": "Expanding Vector Search Beyond Similarity",
+   "day": "monday",
+   "start": "2026-10-05T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Tools-in-Action",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 90,
+   "speakers": [
+    {
+     "id": 19772,
+     "name": "Alina Yurenko"
+    }
+   ],
+   "video": {
+    "id": "EnHPYkSAaCo",
+    "title": "Expanding Vector Search Beyond Similarity by Alina Yurenko",
+    "matchScore": 1.15,
+    "views": 1043,
+    "likes": 9,
+    "comments": 0,
+    "published": "2026-10-06T05:30:38Z",
+    "lengthSeconds": 1861
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21654,
+   "title": "Your AI Agent Trusts Strangers. Let Me Show You.",
+   "day": "monday",
+   "start": "2026-10-05T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Tools-in-Action",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 199,
+   "speakers": [
+    {
+     "id": 8671,
+     "name": "Elder Moraes"
+    }
+   ],
+   "video": {
+    "id": "j3aEB0i3Up8",
+    "title": "Your AI Agent Trusts Strangers  Let Me Show You   by  Elder Moraes",
+    "matchScore": 1.15,
+    "views": 665,
+    "likes": 8,
+    "comments": 2,
+    "published": "2026-10-06T05:30:23Z",
+    "lengthSeconds": 1757
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10034,
+   "title": "The day we stopped publishing Kafka event from our API...",
+   "day": "monday",
+   "start": "2026-10-05T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Tools-in-Action",
+   "track": "Architecture & Modernization",
+   "level": "BEGINNER",
+   "hearts": 104,
+   "speakers": [
+    {
+     "id": 10165,
+     "name": "Virginie Zinck"
+    }
+   ],
+   "video": {
+    "id": "YEy7AgRO7As",
+    "title": "The day we stopped publishing Kafka event from our API     by Virginie Zinck",
+    "matchScore": 1.15,
+    "views": 741,
+    "likes": 11,
+    "comments": 0,
+    "published": "2026-10-06T05:30:33Z",
+    "lengthSeconds": 1802
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7011,
+   "title": "Secure Your Coding Agent Like It’s Malware",
+   "day": "monday",
+   "start": "2026-10-05T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Tools-in-Action",
+   "track": "Security, Trust & Compliance",
+   "level": "BEGINNER",
+   "hearts": 335,
+   "speakers": [
+    {
+     "id": 5839,
+     "name": "Richard Gross"
+    }
+   ],
+   "video": {
+    "id": "GLJGhkxMdgU",
+    "title": "Secure Your Coding Agent Like It’s Malware by Richard Gross",
+    "matchScore": 1.15,
+    "views": 932,
+    "likes": 9,
+    "comments": 0,
+    "published": "2026-10-06T05:31:22Z",
+    "lengthSeconds": 1831
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5516,
+   "title": "Wiring Up the AI Mesh: Building A2A-Compliant Java Agents",
+   "day": "monday",
+   "start": "2026-10-05T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "Hands-on Lab",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 42,
+   "speakers": [
+    {
+     "id": 5813,
+     "name": "Emmanuel Hugonnet"
+    },
+    {
+     "id": 3932,
+     "name": "Mario Fusco"
+    },
+    {
+     "id": 5843,
+     "name": "Kevin Dubois"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 20651,
+   "title": "From Install to Insight: A Hands-On GPU Lab for Java Developers",
+   "day": "monday",
+   "start": "2026-10-05T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "Hands-on Lab",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 31,
+   "speakers": [
+    {
+     "id": 7649,
+     "name": "Thanos Stratikopoulos"
+    },
+    {
+     "id": 19779,
+     "name": "Christos Kotselidis"
+    },
+    {
+     "id": 49105,
+     "name": "Mary Xekalaki"
+    },
+    {
+     "id": 19768,
+     "name": "Michalis Papadimitriou"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 25654,
+   "title": "Beyond Code: The Intent-Driven IDE for the Agentic Age",
+   "day": "monday",
+   "start": "2026-10-05T15:35:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Tools-in-Action",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 88,
+   "speakers": [
+    {
+     "id": 3933,
+     "name": "Bruno Borges"
+    }
+   ],
+   "video": {
+    "id": "sexe_tnhAOI",
+    "title": "Beyond Code: The Intent Driven IDE for the Agentic Age by Bruno Borges",
+    "matchScore": 1.15,
+    "views": 4350,
+    "likes": 20,
+    "comments": 0,
+    "published": "2026-10-06T07:37:07Z",
+    "lengthSeconds": 2092
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23533,
+   "title": "Teaching a New Dog Old Tricks: Give the Agent a Debugger",
+   "day": "monday",
+   "start": "2026-10-05T15:35:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Tools-in-Action",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 186,
+   "speakers": [
+    {
+     "id": 5831,
+     "name": "Anton Arhipov"
+    }
+   ],
+   "video": {
+    "id": "rk22mStXsGU",
+    "title": "Teaching a New Dog Old Tricks: Give the Agent a Debugger  by  Anton Arhipov",
+    "matchScore": 1.15,
+    "views": 1050,
+    "likes": 14,
+    "comments": 0,
+    "published": "2026-10-06T05:30:20Z",
+    "lengthSeconds": 2092
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 25652,
+   "title": "In the loop, not in the dark: staying in control in the era of dark software factories",
+   "day": "monday",
+   "start": "2026-10-05T15:35:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Tools-in-Action",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 125,
+   "speakers": [
+    {
+     "id": 24199,
+     "name": "Alex Gavrilescu"
+    }
+   ],
+   "video": {
+    "id": "_dcauZC9ST8",
+    "title": "In the loop, not in the dark: staying in control in the era of dark software factories  by Alex Gavr",
+    "matchScore": 1.0,
+    "views": 816,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-06T05:30:28Z",
+    "lengthSeconds": 1731
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5507,
+   "title": "Stopping AI-Generated Architectural Drift: Deterministic Guardrails for Agentic Coding",
+   "day": "monday",
+   "start": "2026-10-05T15:35:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Tools-in-Action",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 268,
+   "speakers": [
+    {
+     "id": 5807,
+     "name": "Sasha Podlesniuk"
+    }
+   ],
+   "video": {
+    "id": "K3kD89Y1YCk",
+    "title": "Stopping AI Generated Architectural Drift: Deterministic Guardrails for Agentic Coding by Sasha Podl",
+    "matchScore": 1.0,
+    "views": 903,
+    "likes": 9,
+    "comments": 2,
+    "published": "2026-10-06T05:30:56Z",
+    "lengthSeconds": 1439
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17783,
+   "title": "Building the Trusted Agent Ecosystem",
+   "day": "monday",
+   "start": "2026-10-05T16:20:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Tools-in-Action",
+   "track": "Security, Trust & Compliance",
+   "level": "INTERMEDIATE",
+   "hearts": 87,
+   "speakers": [
+    {
+     "id": 14656,
+     "name": "Ivan Petrov"
+    },
+    {
+     "id": 13554,
+     "name": "Patrick McGrath"
+    }
+   ],
+   "video": {
+    "id": "dWF5HMkKiLg",
+    "title": "Building the Trusted Agent Ecosystem by Ivan Petrov, Patrick McGrath",
+    "matchScore": 1.15,
+    "views": 675,
+    "likes": 9,
+    "comments": 0,
+    "published": "2026-10-06T05:30:12Z",
+    "lengthSeconds": 2098
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22911,
+   "title": "One tool to rule them all: bash, a tiny LLM, and the birth of a coding agent",
+   "day": "monday",
+   "start": "2026-10-05T16:20:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Tools-in-Action",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 160,
+   "speakers": [
+    {
+     "id": 18086,
+     "name": "Philippe Charrière"
+    }
+   ],
+   "video": {
+    "id": "wWfj4AJahlQ",
+    "title": "One tool to rule them all: bash, a tiny LLM, and the birth of a coding agent  by  Philippe Charrièr",
+    "matchScore": 1.0,
+    "views": 1241,
+    "likes": 8,
+    "comments": 0,
+    "published": "2026-10-06T05:30:08Z",
+    "lengthSeconds": 1809
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8196,
+   "title": "Testing Architecture Made Simple",
+   "day": "monday",
+   "start": "2026-10-05T16:20:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Tools-in-Action",
+   "track": "Architecture & Modernization",
+   "level": "BEGINNER",
+   "hearts": 174,
+   "speakers": [
+    {
+     "id": 8673,
+     "name": "Gunter Rotsaert"
+    }
+   ],
+   "video": {
+    "id": "asAxisu6EQ0",
+    "title": "Testing Architecture Made Simple by Gunter Rotsaert",
+    "matchScore": 1.15,
+    "views": 1351,
+    "likes": 15,
+    "comments": 1,
+    "published": "2026-10-06T05:30:16Z",
+    "lengthSeconds": 1404
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 13753,
+   "title": "Hi, Belgian Java Community, we want to meet you!",
+   "day": "monday",
+   "start": "2026-10-05T17:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "BOF",
+   "track": "People, Practices & Career",
+   "level": "BEGINNER",
+   "hearts": 31,
+   "speakers": [
+    {
+     "id": 13552,
+     "name": "Frank Delporte"
+    },
+    {
+     "id": 13555,
+     "name": "Tom Cools"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 16435,
+   "title": "LangChain4j Community BOF",
+   "day": "monday",
+   "start": "2026-10-05T17:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "BOF",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 26,
+   "speakers": [
+    {
+     "id": 10167,
+     "name": "Dimitris Andreadis"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17751,
+   "title": "Cheaper or Better? The Strategic Choice Behind AI Adoption",
+   "day": "tuesday",
+   "start": "2026-10-06T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Deep Dive",
+   "track": "Mind the Geek",
+   "level": "INTERMEDIATE",
+   "hearts": 129,
+   "speakers": [
+    {
+     "id": 16386,
+     "name": "Miriam Sasse"
+    }
+   ],
+   "video": {
+    "id": "Ycdt7IT7Kdw",
+    "title": "Cheaper or Better? The Strategic Choice Behind AI Adoption  by Miriam Sasse",
+    "matchScore": 1.15,
+    "views": 493,
+    "likes": 4,
+    "comments": 0,
+    "published": "2026-10-07T05:58:03Z",
+    "lengthSeconds": 9007
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9752,
+   "title": "Learning modern Java the playful way",
+   "day": "tuesday",
+   "start": "2026-10-06T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Deep Dive",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 189,
+   "speakers": [
+    {
+     "id": 3913,
+     "name": "Marit van Dijk"
+    },
+    {
+     "id": 16384,
+     "name": "Piotr Przybyl"
+    }
+   ],
+   "video": {
+    "id": "QBQ11aL2aZc",
+    "title": "Learning modern Java the playful way  by Marit van Dijk, Piotr Przybyl",
+    "matchScore": 1.15,
+    "views": 824,
+    "likes": 5,
+    "comments": 6,
+    "published": "2026-10-07T05:58:16Z",
+    "lengthSeconds": 10737
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24247,
+   "title": "Building AI Agents from First Principles",
+   "day": "tuesday",
+   "start": "2026-10-06T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 119,
+   "speakers": [
+    {
+     "id": 24178,
+     "name": "Adib Saikali"
+    }
+   ],
+   "video": {
+    "id": "SC5nO6iadsU",
+    "title": "Building AI Agents from First Principles  by Adib Saikali",
+    "matchScore": 1.15,
+    "views": 3702,
+    "likes": 36,
+    "comments": 0,
+    "published": "2026-10-07T05:58:00Z",
+    "lengthSeconds": 8991
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22912,
+   "title": "Loop Engineering, beyond prompt, context, and harness engineering",
+   "day": "tuesday",
+   "start": "2026-10-06T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 439,
+   "speakers": [
+    {
+     "id": 2951,
+     "name": "Guillaume Laforge"
+    },
+    {
+     "id": 24160,
+     "name": "Wietse Venema"
+    }
+   ],
+   "video": {
+    "id": "A7ZIf8LkSvE",
+    "title": "Loop Engineering, beyond prompt, context, and harness engineering  by  Guillaume Laforge, Wietse Ven",
+    "matchScore": 1.15,
+    "views": 1071,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-07T05:57:54Z",
+    "lengthSeconds": 8964
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 15354,
+   "title": "Will Valhalla Fix Tony's Billion-Dollar Mistake?",
+   "day": "tuesday",
+   "start": "2026-10-06T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Deep Dive",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 187,
+   "speakers": [
+    {
+     "id": 15304,
+     "name": "José Paumard"
+    },
+    {
+     "id": 18075,
+     "name": "Remi Forax"
+    }
+   ],
+   "video": {
+    "id": "vLDbzmiT7Xs",
+    "title": "Will Valhalla Fix Tony's Billion Dollar Mistake? by José Paumard, Remi Forax",
+    "matchScore": 1.15,
+    "views": 2327,
+    "likes": 39,
+    "comments": 4,
+    "published": "2026-10-07T05:57:50Z",
+    "lengthSeconds": 9660
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4079,
+   "title": "👩‍💻 Developing with AI: What if it were as simple as adding a library? 🧑‍💻",
+   "day": "tuesday",
+   "start": "2026-10-06T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "Hands-on Lab",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 49,
+   "speakers": [
+    {
+     "id": 3925,
+     "name": "Stéphane Philippart"
+    },
+    {
+     "id": 3928,
+     "name": "Matthieu Vincent"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10022,
+   "title": "From code to control: master deployments with Feature Flagging and OpenFeature",
+   "day": "tuesday",
+   "start": "2026-10-06T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "Hands-on Lab",
+   "track": "Architecture & Modernization",
+   "level": "BEGINNER",
+   "hearts": 67,
+   "speakers": [
+    {
+     "id": 3949,
+     "name": "Alexandre Touret"
+    },
+    {
+     "id": 10157,
+     "name": "Philippe Duval"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5526,
+   "title": "From Developer to Story Builder: Engineering a Novel, an ARG, and a Transmedia World with AI",
+   "day": "tuesday",
+   "start": "2026-10-06T10:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Lunch Talk",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 62,
+   "speakers": [
+    {
+     "id": 1801,
+     "name": "Raphael Semeteys"
+    }
+   ],
+   "video": {
+    "id": "496nv8jsWhQ",
+    "title": "From Developer to Story Builder: Engineering a Novel, an ARG, and a Transmedia World with AI  by Rap",
+    "matchScore": 1.0,
+    "views": 2142,
+    "likes": 10,
+    "comments": 0,
+    "published": "2026-10-07T05:58:08Z",
+    "lengthSeconds": 2403
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21152,
+   "title": "Beyond system.out.println: Applying a Debugging Mindset at Scale",
+   "day": "tuesday",
+   "start": "2026-10-06T10:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Lunch Talk",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 141,
+   "speakers": [
+    {
+     "id": 16354,
+     "name": "Cees Bos"
+    }
+   ],
+   "video": {
+    "id": "5VjB4t8aFWE",
+    "title": "Beyond system out println: Applying a Debugging Mindset at Scale  by  Cees Bos",
+    "matchScore": 1.15,
+    "views": 581,
+    "likes": 3,
+    "comments": 1,
+    "published": "2026-10-07T05:58:19Z",
+    "lengthSeconds": 2188
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10016,
+   "title": "Measuring the Unmeasurable: Evaluating Generative AI in Practice",
+   "day": "tuesday",
+   "start": "2026-10-06T10:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Lunch Talk",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 185,
+   "speakers": [
+    {
+     "id": 8657,
+     "name": "Erin Pacquetet"
+    }
+   ],
+   "video": {
+    "id": "Qdn-I3q50Ww",
+    "title": "Measuring the Unmeasurable: Evaluating Generative AI in Practice  by Erin Pacquetet",
+    "matchScore": 1.15,
+    "views": 653,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-07T05:58:11Z",
+    "lengthSeconds": 2436
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7032,
+   "title": "Don’t burn your fingers in the heat of the AI (r)evolution. (And get an OpenClaw).",
+   "day": "tuesday",
+   "start": "2026-10-06T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 59,
+   "speakers": [
+    {
+     "id": 5802,
+     "name": "Maarten Vandeperre"
+    }
+   ],
+   "video": {
+    "id": "zDqS1U5Gnk8",
+    "title": "Don’t burn your fingers in the heat of the AI revolution  And get an OpenClaw   by Maarten Vandeperr",
+    "matchScore": 0.82,
+    "views": 509,
+    "likes": 2,
+    "comments": 2,
+    "published": "2026-10-07T05:58:23Z",
+    "lengthSeconds": 7794
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 16439,
+   "title": "AI Security Deep Dive, Securing Agents and AI Applications",
+   "day": "tuesday",
+   "start": "2026-10-06T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Deep Dive",
+   "track": "Security, Trust & Compliance",
+   "level": "INTERMEDIATE",
+   "hearts": 292,
+   "speakers": [
+    {
+     "id": 8695,
+     "name": "Brian Vermeer"
+    }
+   ],
+   "video": {
+    "id": "5AaJ3H9fG6M",
+    "title": "AI Security Deep Dive, Securing Agents and AI Applications  by  Brian Vermeer",
+    "matchScore": 1.15,
+    "views": 900,
+    "likes": 10,
+    "comments": 1,
+    "published": "2026-10-07T05:58:29Z",
+    "lengthSeconds": 9013
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 19714,
+   "title": "Specialized AI Agents: from concept to production",
+   "day": "tuesday",
+   "start": "2026-10-06T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 85,
+   "speakers": [
+    {
+     "id": 19756,
+     "name": "David Gageot"
+    }
+   ],
+   "video": {
+    "id": "npSWywhFDHo",
+    "title": "Specialized AI Agents: from concept to production  by David Gageot",
+    "matchScore": 1.15,
+    "views": 608,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-07T05:58:26Z",
+    "lengthSeconds": 8332
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 31452,
+   "title": "Responsibly Dimming the Lights in the Software Factory",
+   "day": "tuesday",
+   "start": "2026-10-06T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Deep Dive",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 502,
+   "speakers": [
+    {
+     "id": 30506,
+     "name": "Victor Rentea"
+    }
+   ],
+   "video": {
+    "id": "C10mZ3pCnGo",
+    "title": "Responsibly Dimming the Lights in the Software Factory  by Victor Rentea",
+    "matchScore": 1.15,
+    "views": 3417,
+    "likes": 47,
+    "comments": 4,
+    "published": "2026-10-07T05:58:38Z",
+    "lengthSeconds": 9990
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8194,
+   "title": "Write Java Code Like a Seasoned Hacker: 2026 Edition",
+   "day": "tuesday",
+   "start": "2026-10-06T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Deep Dive",
+   "track": "Security, Trust & Compliance",
+   "level": "ADVANCED",
+   "hearts": 263,
+   "speakers": [
+    {
+     "id": 8669,
+     "name": "Soroosh Khodami"
+    }
+   ],
+   "video": {
+    "id": "Upd5ZqUn1qY",
+    "title": "Write Java Code Like a Seasoned Hacker: 2026 Edition  by Soroosh Khodami",
+    "matchScore": 1.15,
+    "views": 3350,
+    "likes": 26,
+    "comments": 0,
+    "published": "2026-10-07T05:59:34Z",
+    "lengthSeconds": 10007
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8190,
+   "title": "Technical Workshop on AI-Native Tooling for Java Development",
+   "day": "tuesday",
+   "start": "2026-10-06T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "Hands-on Lab",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 83,
+   "speakers": [
+    {
+     "id": 5848,
+     "name": "Juan Antonio Breña 🇪🇸🇪🇺"
+    },
+    {
+     "id": 8667,
+     "name": "Leandro Loureiro"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23520,
+   "title": "Beyond the Chatbox: Ship On-Device AI in Your Browser",
+   "day": "tuesday",
+   "start": "2026-10-06T11:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "Hands-on Lab",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "INTERMEDIATE",
+   "hearts": 24,
+   "speakers": [
+    {
+     "id": 12002,
+     "name": "Marcel Bagemihl"
+    },
+    {
+     "id": 23035,
+     "name": "Stefan Ludwig"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 19732,
+   "title": "Tap into the NVIDIA Ecosystem from Java with TornadoVM's Hybrid API",
+   "day": "tuesday",
+   "start": "2026-10-06T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Tools-in-Action",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 48,
+   "speakers": [
+    {
+     "id": 7649,
+     "name": "Thanos Stratikopoulos"
+    },
+    {
+     "id": 19768,
+     "name": "Michalis Papadimitriou"
+    },
+    {
+     "id": 49105,
+     "name": "Mary Xekalaki"
+    }
+   ],
+   "video": {
+    "id": "6SPnBmQrYEk",
+    "title": "Tap into the NVIDIA Ecosystem from Java with TornadoVM's Hybrid API  by Thanos Stratikopoulos, Micha",
+    "matchScore": 1.15,
+    "views": 620,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-07T05:58:34Z",
+    "lengthSeconds": 1611
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 16418,
+   "title": "Solving Distributed Transactions with the Saga Pattern and Temporal",
+   "day": "tuesday",
+   "start": "2026-10-06T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Tools-in-Action",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 145,
+   "speakers": [
+    {
+     "id": 16359,
+     "name": "Andrei Sulyz"
+    }
+   ],
+   "video": {
+    "id": "c45C2wNSZFc",
+    "title": "Solving Distributed Transactions with the Saga Pattern and Temporal  by Andrei Sulyz",
+    "matchScore": 1.15,
+    "views": 2297,
+    "likes": 23,
+    "comments": 2,
+    "published": "2026-10-07T05:58:45Z",
+    "lengthSeconds": 1734
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22933,
+   "title": "30 minutes to build your first Vidocq app, the 100% European Sovereign Java stack with zero external dependencies",
+   "day": "tuesday",
+   "start": "2026-10-06T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Tools-in-Action",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 56,
+   "speakers": [
+    {
+     "id": 21521,
+     "name": "Sebastien Blanc"
+    }
+   ],
+   "video": {
+    "id": "U9pOWsERF6o",
+    "title": "30 minutes to build your first Vidocq app, the 100% European Sovereign Java stack with zero external",
+    "matchScore": 0.94,
+    "views": 894,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-07T05:59:05Z",
+    "lengthSeconds": 1844
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5051,
+   "title": "🧰 Dev Containers: the ultimate toolbox for developers?",
+   "day": "tuesday",
+   "start": "2026-10-06T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Tools-in-Action",
+   "track": "Mind the Geek",
+   "level": "INTERMEDIATE",
+   "hearts": 320,
+   "speakers": [
+    {
+     "id": 3925,
+     "name": "Stéphane Philippart"
+    }
+   ],
+   "video": {
+    "id": "eyJ5LO-Kyuw",
+    "title": "🧰 Dev Containers: the ultimate toolbox for developers?  by Stéphane Philippart",
+    "matchScore": 1.15,
+    "views": 3979,
+    "likes": 26,
+    "comments": 0,
+    "published": "2026-10-07T05:58:53Z",
+    "lengthSeconds": 1417
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 11558,
+   "title": "BootUI, the missing developer console for Spring Boot and Quarkus",
+   "day": "tuesday",
+   "start": "2026-10-06T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Tools-in-Action",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 95,
+   "speakers": [
+    {
+     "id": 12008,
+     "name": "Julien Dubois"
+    }
+   ],
+   "video": {
+    "id": "NkstzPeo400",
+    "title": "BootUI, the missing developer console for Spring Boot and Quarkus  by Julien Dubois",
+    "matchScore": 1.15,
+    "views": 3181,
+    "likes": 42,
+    "comments": 1,
+    "published": "2026-10-07T05:59:27Z",
+    "lengthSeconds": 1772
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 15360,
+   "title": "Analyze and Optimize Your Applications with JFR",
+   "day": "tuesday",
+   "start": "2026-10-06T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "Hands-on Lab",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 101,
+   "speakers": [
+    {
+     "id": 5830,
+     "name": "Ana-Maria Mihalceanu"
+    },
+    {
+     "id": 15304,
+     "name": "José Paumard"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7036,
+   "title": "Building Production-Ready Agentic Systems with LangChain4j and Quarkus",
+   "day": "tuesday",
+   "start": "2026-10-06T14:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "Hands-on Lab",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 48,
+   "speakers": [
+    {
+     "id": 3932,
+     "name": "Mario Fusco"
+    },
+    {
+     "id": 3945,
+     "name": "Georgios Andrianakis"
+    },
+    {
+     "id": 5843,
+     "name": "Kevin Dubois"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17558,
+   "title": "From Laptop to Lakehouse: Analytical SQL with DuckDB",
+   "day": "tuesday",
+   "start": "2026-10-06T15:35:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Tools-in-Action",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "BEGINNER",
+   "hearts": 54,
+   "speakers": [
+    {
+     "id": 16391,
+     "name": "Oliver Geisser"
+    }
+   ],
+   "video": {
+    "id": "B5-4mDLrWjM",
+    "title": "From Laptop to Lakehouse: Analytical SQL with DuckDB  by Oliver Geisser",
+    "matchScore": 1.15,
+    "views": 936,
+    "likes": 8,
+    "comments": 0,
+    "published": "2026-10-07T05:58:41Z",
+    "lengthSeconds": 1733
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5519,
+   "title": "The Magic of OpenTelemetry: Rewriting Your App in Production",
+   "day": "tuesday",
+   "start": "2026-10-06T15:35:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Tools-in-Action",
+   "track": "Java Language & Platform",
+   "level": "ADVANCED",
+   "hearts": 197,
+   "speakers": [
+    {
+     "id": 5818,
+     "name": "Bruce Bujon"
+    }
+   ],
+   "video": {
+    "id": "Lf_m5dIjjqw",
+    "title": "The Magic of OpenTelemetry: Rewriting Your App in Production   by Bruce Bujon",
+    "matchScore": 1.15,
+    "views": 1832,
+    "likes": 14,
+    "comments": 0,
+    "published": "2026-10-07T05:58:49Z",
+    "lengthSeconds": 1790
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9024,
+   "title": "Beyond assertEquals: Probabilistic Security and Bias Testing for Java LLM Applications",
+   "day": "tuesday",
+   "start": "2026-10-06T15:35:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Tools-in-Action",
+   "track": "Security, Trust & Compliance",
+   "level": "INTERMEDIATE",
+   "hearts": 67,
+   "speakers": [
+    {
+     "id": 8682,
+     "name": "Iryna Dohndorf"
+    }
+   ],
+   "video": {
+    "id": "MmSvjJhZl3A",
+    "title": "Beyond assertEquals: Probabilistic Security and Bias Testing for Java LLM Applications  by Iryna Doh",
+    "matchScore": 1.0,
+    "views": 799,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-07T05:59:12Z",
+    "lengthSeconds": 2190
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24234,
+   "title": "AsyncAPI in action: OpenAPI for event-driven applications",
+   "day": "tuesday",
+   "start": "2026-10-06T15:35:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Tools-in-Action",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 195,
+   "speakers": [
+    {
+     "id": 24169,
+     "name": "Michel Schudel"
+    }
+   ],
+   "video": {
+    "id": "A_fp7RaG5UY",
+    "title": "AsyncAPI in action: OpenAPI for event driven applications  by Michel Schudel",
+    "matchScore": 1.15,
+    "views": 2575,
+    "likes": 22,
+    "comments": 0,
+    "published": "2026-10-07T05:59:41Z",
+    "lengthSeconds": 1799
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 50101,
+   "title": "The Java Story | The Official Documentary",
+   "day": "tuesday",
+   "start": "2026-10-06T15:35:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Documentary",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 98,
+   "speakers": [
+    {
+     "id": 50051,
+     "name": "Georges Saab"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4077,
+   "title": "Do We Need a Build Language? Java Builds Java",
+   "day": "tuesday",
+   "start": "2026-10-06T16:20:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Tools-in-Action",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 47,
+   "speakers": [
+    {
+     "id": 3936,
+     "name": "Rafael Winterhalter"
+    }
+   ],
+   "video": {
+    "id": "y9JjxyKc6gU",
+    "title": "Do We Need a Build Language? Java Builds Java  by Rafael Winterhalter",
+    "matchScore": 1.15,
+    "views": 1336,
+    "likes": 13,
+    "comments": 0,
+    "published": "2026-10-07T05:59:19Z",
+    "lengthSeconds": 1836
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10021,
+   "title": "Java Script (No, Not That One): Modern Automation with Java",
+   "day": "tuesday",
+   "start": "2026-10-06T16:20:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Tools-in-Action",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 103,
+   "speakers": [
+    {
+     "id": 5809,
+     "name": "Loïc Magnette"
+    }
+   ],
+   "video": {
+    "id": "pgVJWp-SjxI",
+    "title": "Java Script No, Not That One: Modern Automation with Java  by Loïc Magnette",
+    "matchScore": 1.15,
+    "views": 2325,
+    "likes": 22,
+    "comments": 0,
+    "published": "2026-10-07T05:59:23Z",
+    "lengthSeconds": 1772
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21690,
+   "title": "Exquisite Evals for Skills & MCPs",
+   "day": "tuesday",
+   "start": "2026-10-06T16:20:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Tools-in-Action",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 96,
+   "speakers": [
+    {
+     "id": 18070,
+     "name": "Christian Tzolov"
+    },
+    {
+     "id": 21535,
+     "name": "James Ward"
+    }
+   ],
+   "video": {
+    "id": "mebPFAKSpzw",
+    "title": "Exquisite Evals for Skills & MCPs  by Christian Tzolov, James Ward",
+    "matchScore": 1.15,
+    "views": 1432,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-07T05:59:38Z",
+    "lengthSeconds": 1934
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7017,
+   "title": "The Importance of HITL to Avoid Chaos and EU Regulations for AI",
+   "day": "tuesday",
+   "start": "2026-10-06T16:20:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Tools-in-Action",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 98,
+   "speakers": [
+    {
+     "id": 5848,
+     "name": "Juan Antonio Breña 🇪🇸🇪🇺"
+    }
+   ],
+   "video": {
+    "id": "t9e9FtHB-48",
+    "title": "The Importance of HITL to Avoid Chaos and EU Regulations for AI  by Juan Antonio Breña 🇪🇸🇪🇺",
+    "matchScore": 1.15,
+    "views": 634,
+    "likes": 3,
+    "comments": 0,
+    "published": "2026-10-07T05:59:16Z",
+    "lengthSeconds": 1193
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10037,
+   "title": "Quarkus Community BOF",
+   "day": "tuesday",
+   "start": "2026-10-06T17:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "BOF",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 22,
+   "speakers": [
+    {
+     "id": 10167,
+     "name": "Dimitris Andreadis"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10046,
+   "title": "Who will build software after AI?",
+   "day": "tuesday",
+   "start": "2026-10-06T17:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "BOF",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 46,
+   "speakers": [
+    {
+     "id": 10179,
+     "name": "Eddy Vos"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 52105,
+   "title": "Keynote overflow room",
+   "day": "wednesday",
+   "start": "2026-10-07T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Keynote Overflow",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 43,
+   "speakers": [
+    {
+     "id": 30503,
+     "name": "Stephan Janssen"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 31451,
+   "title": "Welcome to Devoxx",
+   "day": "wednesday",
+   "start": "2026-10-07T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Keynote",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 539,
+   "speakers": [
+    {
+     "id": 30503,
+     "name": "Stephan Janssen"
+    }
+   ],
+   "video": {
+    "id": "aup9tNzQu7c",
+    "title": "Welcome to Devoxx Belgium 2026 by Stephan Janssen",
+    "matchScore": 0.75,
+    "views": 2598,
+    "likes": 24,
+    "comments": 0,
+    "published": "2026-10-08T06:44:09Z",
+    "lengthSeconds": 1584
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 50102,
+   "title": "From Brainless to Brilliant — Giving an Open-Source Robot a Mind of Its Own",
+   "day": "wednesday",
+   "start": "2026-10-07T07:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Keynote",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 431,
+   "speakers": [
+    {
+     "id": 7632,
+     "name": "Jan Van Wassenhove"
+    }
+   ],
+   "video": {
+    "id": "ZDocIlx7Zvg",
+    "title": "From Brainless to Brilliant — Giving an Open Source Robot a Mind of Its Own  by Jan Van Wassenhove",
+    "matchScore": 1.15,
+    "views": 1401,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-08T06:44:09Z",
+    "lengthSeconds": 992
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 31455,
+   "title": "Half of a billion Idle GPUs: The Case for On-Device AI",
+   "day": "wednesday",
+   "start": "2026-10-07T08:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Keynote",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 445,
+   "speakers": [
+    {
+     "id": 16387,
+     "name": "Prince Canuma"
+    }
+   ],
+   "video": {
+    "id": "qFTuteOEtsE",
+    "title": "Half of a billion Idle GPUs: The Case for On Device AI  by Prince Canuma",
+    "matchScore": 1.15,
+    "views": 615,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-08T06:44:09Z",
+    "lengthSeconds": 1192
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 48301,
+   "title": "A Fleet of AI Agents, Each in Its Own Sandbox: Inside Docker's Agentic Platform",
+   "day": "wednesday",
+   "start": "2026-10-07T08:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Keynote",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 481,
+   "speakers": [
+    {
+     "id": 47852,
+     "name": "Jean-Laurent de Morlhon"
+    }
+   ],
+   "video": {
+    "id": "mnoUXIT4nMY",
+    "title": "A Fleet of AI Agents, Each in Its Own Sandbox: Inside Docker's Agentic Platform  by Jean Laurent de",
+    "matchScore": 1.0,
+    "views": 1064,
+    "likes": 10,
+    "comments": 0,
+    "published": "2026-10-08T06:44:09Z",
+    "lengthSeconds": 1253
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 49251,
+   "title": "The Year of the Runtime",
+   "day": "wednesday",
+   "start": "2026-10-07T08:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Keynote",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 457,
+   "speakers": [
+    {
+     "id": 49102,
+     "name": "Ron Pressler"
+    }
+   ],
+   "video": {
+    "id": "tle2mA7EwWU",
+    "title": "The Year of the Runtime  by Ron Pressler",
+    "matchScore": 1.15,
+    "views": 820,
+    "likes": 16,
+    "comments": 0,
+    "published": "2026-10-08T06:44:09Z",
+    "lengthSeconds": 888
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 51951,
+   "title": "Agentic Engineering Reconversion",
+   "day": "wednesday",
+   "start": "2026-10-07T09:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Keynote",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 559,
+   "speakers": [
+    {
+     "id": 30506,
+     "name": "Victor Rentea"
+    }
+   ],
+   "video": {
+    "id": "vAfQ4f8wIVI",
+    "title": "Agentic Engineering Reconversion  by Victor Rentea",
+    "matchScore": 1.15,
+    "views": 6426,
+    "likes": 56,
+    "comments": 4,
+    "published": "2026-10-08T06:44:12Z",
+    "lengthSeconds": 1306
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24233,
+   "title": "Build the Builder: A Java Coding Agent in Your IDE with ACP",
+   "day": "wednesday",
+   "start": "2026-10-07T10:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 398,
+   "speakers": [
+    {
+     "id": 10158,
+     "name": "Vadim Briliantov"
+    }
+   ],
+   "video": {
+    "id": "y4F1XBtQeDw",
+    "title": "Build the Builder: A Java Coding Agent in Your IDE with ACP  by Vadim Briliantov",
+    "matchScore": 1.15,
+    "views": 1526,
+    "likes": 10,
+    "comments": 1,
+    "published": "2026-10-08T06:44:12Z",
+    "lengthSeconds": 2982
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7022,
+   "title": "Emergent DevEx: The Good, the Bad, and the Legacy",
+   "day": "wednesday",
+   "start": "2026-10-07T10:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "BEGINNER",
+   "hearts": 200,
+   "speakers": [
+    {
+     "id": 5847,
+     "name": "Makan Sepehrifar"
+    },
+    {
+     "id": 8669,
+     "name": "Soroosh Khodami"
+    }
+   ],
+   "video": {
+    "id": "9MPYPejgTGo",
+    "title": "Emergent DevEx: The Good, the Bad, and the Legacy  by Makan Sepehrifar, Soroosh Khodami",
+    "matchScore": 1.15,
+    "views": 583,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 2877
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 29351,
+   "title": "Structured Concurrency Looms",
+   "day": "wednesday",
+   "start": "2026-10-07T10:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 299,
+   "speakers": [
+    {
+     "id": 28801,
+     "name": "Alan Bateman"
+    },
+    {
+     "id": 23049,
+     "name": "Viktor Klang"
+    }
+   ],
+   "video": {
+    "id": "aow56RgptLA",
+    "title": "Structured Concurrency Looms  by Alan Bateman, Viktor Klang",
+    "matchScore": 1.15,
+    "views": 1361,
+    "likes": 15,
+    "comments": 0,
+    "published": "2026-10-08T06:44:09Z",
+    "lengthSeconds": 3056
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8156,
+   "title": "I Hired a Real Robot as My Junior Dev — and Now My Kids Don't Want to Learn Java Anymore",
+   "day": "wednesday",
+   "start": "2026-10-07T10:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "INTERMEDIATE",
+   "hearts": 304,
+   "speakers": [
+    {
+     "id": 7632,
+     "name": "Jan Van Wassenhove"
+    }
+   ],
+   "video": {
+    "id": "P14Fy05Gs38",
+    "title": "I Hired a Real Robot as My Junior Dev — and Now My Kids Don't Want to Learn Java Anymore  by Jan Van",
+    "matchScore": 1.0,
+    "views": 582,
+    "likes": 2,
+    "comments": 1,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 2881
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24224,
+   "title": "Post-Quantum Today: How Your Passwords Will Be Safe in a Quantum Future",
+   "day": "wednesday",
+   "start": "2026-10-07T10:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Security, Trust & Compliance",
+   "level": "ADVANCED",
+   "hearts": 262,
+   "speakers": [
+    {
+     "id": 24164,
+     "name": "Julian Burr"
+    }
+   ],
+   "video": {
+    "id": "yUMnuh5U5k4",
+    "title": "Post Quantum Today: How Your Passwords Will Be Safe in a Quantum Future  by Julian Burr",
+    "matchScore": 1.15,
+    "views": 472,
+    "likes": 3,
+    "comments": 0,
+    "published": "2026-10-08T06:42:27Z",
+    "lengthSeconds": 2184
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22923,
+   "title": "Fun with Flags: How OpenFeature Solves Your Feature Flag Headaches",
+   "day": "wednesday",
+   "start": "2026-10-07T10:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 283,
+   "speakers": [
+    {
+     "id": 47051,
+     "name": "Simon Schrottner"
+    }
+   ],
+   "video": {
+    "id": "Ij5RsREpjBg",
+    "title": "Fun with Flags: How OpenFeature Solves Your Feature Flag Headaches  by Simon Schrottner",
+    "matchScore": 1.15,
+    "views": 638,
+    "likes": 12,
+    "comments": 0,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 3067
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21691,
+   "title": "MCP 2.0 - Stateless, New Auth (CIMD), and Exciting Extensions",
+   "day": "wednesday",
+   "start": "2026-10-07T10:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 351,
+   "speakers": [
+    {
+     "id": 21535,
+     "name": "James Ward"
+    }
+   ],
+   "video": {
+    "id": "fShgG3jtkXQ",
+    "title": "MCP 2 0   Stateless, New Auth CIMD, and Exciting Extensions  by James Ward",
+    "matchScore": 1.15,
+    "views": 1439,
+    "likes": 20,
+    "comments": 1,
+    "published": "2026-10-08T06:44:09Z",
+    "lengthSeconds": 3047
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7040,
+   "title": "Wrap, Reshape, or Redesign: Retrofitting Your APIs for a World of Agents",
+   "day": "wednesday",
+   "start": "2026-10-07T10:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 254,
+   "speakers": [
+    {
+     "id": 7620,
+     "name": "Horacio Gonzalez"
+    }
+   ],
+   "video": {
+    "id": "ymLlOAB8h_c",
+    "title": "Wrap, Reshape, or Redesign: Retrofitting Your APIs for a World of Agents  by Horacio Gonzalez Zaal 1",
+    "matchScore": 1.15,
+    "views": 997,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-08T06:44:12Z",
+    "lengthSeconds": 2857
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 49254,
+   "title": "Mission Possible: The 45-Minute Path to Bullet-Proof Java Container Images",
+   "day": "wednesday",
+   "start": "2026-10-07T11:05:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Lunch Talk",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 199,
+   "speakers": [
+    {
+     "id": 7634,
+     "name": "Pasha Finkelshtein"
+    }
+   ],
+   "video": {
+    "id": "1yndLHw9mbo",
+    "title": "Mission Possible: The 45 Minute Path to Bullet Proof Java Container Images  by Pasha Finkelshtein",
+    "matchScore": 1.15,
+    "views": 563,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 2575
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10038,
+   "title": "Eval Driven Development: Why you need it to make your Agentic Application survive Production",
+   "day": "wednesday",
+   "start": "2026-10-07T11:05:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Lunch Talk",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 263,
+   "speakers": [
+    {
+     "id": 10171,
+     "name": "Urs Peter"
+    }
+   ],
+   "video": {
+    "id": "4qeUklTLyTs",
+    "title": "Eval Driven Development: Why you need it to make your Agentic Application survive Production  by  Ur",
+    "matchScore": 1.0,
+    "views": 649,
+    "likes": 4,
+    "comments": 0,
+    "published": "2026-10-08T06:41:52Z",
+    "lengthSeconds": 2417
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 50106,
+   "title": "From User Prompt to JPA Query: Comparing Tool Calling, Structured Output & Hybrid Approach",
+   "day": "wednesday",
+   "start": "2026-10-07T11:05:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Lunch Talk",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 73,
+   "speakers": [
+    {
+     "id": 19764,
+     "name": "Sebastian Kühnau"
+    }
+   ],
+   "video": {
+    "id": "-2vEfnB2mRw",
+    "title": "From User Prompt to JPA Query: Comparing Tool Calling, Structured Output & Hybrid Approach  by Sebas",
+    "matchScore": 1.0,
+    "views": 564,
+    "likes": 4,
+    "comments": 1,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 2346
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 49253,
+   "title": "Engineering for the Long Haul: Operating Open Source at Scale",
+   "day": "wednesday",
+   "start": "2026-10-07T11:05:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Lunch Talk",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 36,
+   "speakers": [
+    {
+     "id": 49103,
+     "name": "Sven Sellen"
+    }
+   ],
+   "video": {
+    "id": "Pg5kS8l9CpI",
+    "title": "Engineering for the Long Haul: Operating Open Source at Scale  by Sven Sellen",
+    "matchScore": 1.15,
+    "views": 375,
+    "likes": 0,
+    "comments": 0,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 1954
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 25657,
+   "title": "Safety, speed, and governance in the agentic era",
+   "day": "wednesday",
+   "start": "2026-10-07T11:05:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Lunch Talk",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 192,
+   "speakers": [
+    {
+     "id": 10176,
+     "name": "Oleg Šelajev"
+    }
+   ],
+   "video": {
+    "id": "N3VyoNNLDqQ",
+    "title": "Safety, speed, and governance in the agentic era  by Oleg Šelajev",
+    "matchScore": 1.15,
+    "views": 417,
+    "likes": 1,
+    "comments": 1,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 2485
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4100,
+   "title": "Life in the Ivory Tower: Confessions of a Former Developer Who Turned Into an Architect",
+   "day": "wednesday",
+   "start": "2026-10-07T11:05:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Lunch Talk",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 499,
+   "speakers": [
+    {
+     "id": 5001,
+     "name": "Robin Custers"
+    }
+   ],
+   "video": {
+    "id": "nhVRKv8VHKU",
+    "title": "Life in the Ivory Tower   Confessions of a Former Developer Who Turned Into an Architect by Robin cu",
+    "matchScore": 1.0,
+    "views": 545,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-08T06:44:09Z",
+    "lengthSeconds": 2095
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23519,
+   "title": "AI Doesn’t Click Buttons: Building APIs for the Agentic Age",
+   "day": "wednesday",
+   "start": "2026-10-07T11:05:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Lunch Talk",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 163,
+   "speakers": [
+    {
+     "id": 23033,
+     "name": "Kim Lauwers"
+    }
+   ],
+   "video": {
+    "id": "QvyIzP4-OvM",
+    "title": "AI Doesn’t Click Buttons :APIs for the Agentic Age  by Kim Lauwers",
+    "matchScore": 1.06,
+    "views": 552,
+    "likes": 5,
+    "comments": 1,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 2281
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 50103,
+   "title": "Let's dance! – Teaching your robot some moves with reinforcement learning",
+   "day": "wednesday",
+   "start": "2026-10-07T11:05:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Lunch Talk",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 114,
+   "speakers": [
+    {
+     "id": 50052,
+     "name": "Thomas Endres"
+    },
+    {
+     "id": 51201,
+     "name": "Martin F."
+    },
+    {
+     "id": 52452,
+     "name": "Tobias Lübbe"
+    }
+   ],
+   "video": {
+    "id": "gPtWq_LHL8o",
+    "title": "Let's dance! – Teaching your robot some moves with reinforcement learning  by Thomas Endres, Martin",
+    "matchScore": 1.15,
+    "views": 538,
+    "likes": 0,
+    "comments": 0,
+    "published": "2026-10-08T06:44:09Z",
+    "lengthSeconds": 2476
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 31454,
+   "title": "Run Frontier Open Models on consumer hardware",
+   "day": "wednesday",
+   "start": "2026-10-07T12:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 324,
+   "speakers": [
+    {
+     "id": 16387,
+     "name": "Prince Canuma"
+    }
+   ],
+   "video": {
+    "id": "DseVLPC4Qjs",
+    "title": "Run Frontier Open Models on consumer hardware  by Prince Canuma",
+    "matchScore": 1.15,
+    "views": 423,
+    "likes": 0,
+    "comments": 0,
+    "published": "2026-10-08T06:41:16Z",
+    "lengthSeconds": 2988
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4096,
+   "title": "Deterministic by Design - Achieving Reproducible Builds with Maven",
+   "day": "wednesday",
+   "start": "2026-10-07T12:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 149,
+   "speakers": [
+    {
+     "id": 3927,
+     "name": "Maarten Mulders"
+    }
+   ],
+   "video": {
+    "id": "9vtYvAI2Dtk",
+    "title": "Deterministic by Design   Achieving Reproducible Builds with Maven  by Maarten Mulders",
+    "matchScore": 1.15,
+    "views": 408,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-08T06:41:49Z",
+    "lengthSeconds": 2894
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4087,
+   "title": "Harness Engineering: Building the System Around Your AI Coding Agent",
+   "day": "wednesday",
+   "start": "2026-10-07T12:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 605,
+   "speakers": [
+    {
+     "id": 46151,
+     "name": "JI Darwish"
+    }
+   ],
+   "video": {
+    "id": "6N6qFqn1_Uo",
+    "title": "Harness Engineering: Building the System Around Your AI Coding Agent   by JI Darwish",
+    "matchScore": 1.15,
+    "views": 2321,
+    "likes": 13,
+    "comments": 0,
+    "published": "2026-10-08T06:42:08Z",
+    "lengthSeconds": 2394
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8164,
+   "title": "The pizza party of the future 🍕 software teams and product value in the age of coding agents",
+   "day": "wednesday",
+   "start": "2026-10-07T12:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "BEGINNER",
+   "hearts": 291,
+   "speakers": [
+    {
+     "id": 5803,
+     "name": "Katie Clark"
+    },
+    {
+     "id": 7602,
+     "name": "Simon Rohrer"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9008,
+   "title": "G1, ZGC, Shenandoah, ... with all these GCs in Java, which one do I choose?",
+   "day": "wednesday",
+   "start": "2026-10-07T12:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 151,
+   "speakers": [
+    {
+     "id": 8679,
+     "name": "Antoine DESSAIGNE"
+    }
+   ],
+   "video": {
+    "id": "8nY-kqwoD_A",
+    "title": "G1, ZGC, Shenandoah,     with all these GCs in Java, which one do I choose?  by Antoine DESSAIGNE",
+    "matchScore": 1.15,
+    "views": 527,
+    "likes": 9,
+    "comments": 1,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 2925
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7018,
+   "title": "A Year of Agentic AI Evolution: Lessons Learned Building Production-grade Agentic Systems",
+   "day": "wednesday",
+   "start": "2026-10-07T12:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 549,
+   "speakers": [
+    {
+     "id": 3932,
+     "name": "Mario Fusco"
+    },
+    {
+     "id": 5843,
+     "name": "Kevin Dubois"
+    }
+   ],
+   "video": {
+    "id": "nEW0kosJjc8",
+    "title": "A Year of Agentic AI Evolution by Mario Fusco & Kevin Dubois",
+    "matchScore": 0.65,
+    "views": 950,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-08T06:42:03Z",
+    "lengthSeconds": 3099
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24228,
+   "title": "Java, Raspberry Pi, and the Art of Overengineering Everyday Life",
+   "day": "wednesday",
+   "start": "2026-10-07T12:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 230,
+   "speakers": [
+    {
+     "id": 24156,
+     "name": "Matti Tahvonen"
+    }
+   ],
+   "video": {
+    "id": "5W4o_aYOaIY",
+    "title": "java raspberry Pi and the art of by Matti Tahvonen",
+    "matchScore": 0.85,
+    "views": 448,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-08T06:44:05Z",
+    "lengthSeconds": 2636
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22909,
+   "title": "What rules the virtual? How our systems obey physical laws.",
+   "day": "wednesday",
+   "start": "2026-10-07T12:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "INTERMEDIATE",
+   "hearts": 113,
+   "speakers": [
+    {
+     "id": 21546,
+     "name": "Marianne Hoornenborg"
+    }
+   ],
+   "video": {
+    "id": "yB6FIQPgsWE",
+    "title": "What rules the virtual? How our systems obey physical laws   by Marianne Hoornenborg",
+    "matchScore": 1.15,
+    "views": 838,
+    "likes": 4,
+    "comments": 1,
+    "published": "2026-10-08T06:41:59Z",
+    "lengthSeconds": 2938
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8166,
+   "title": "Integration patterns for distributed systems",
+   "day": "wednesday",
+   "start": "2026-10-07T13:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "ADVANCED",
+   "hearts": 441,
+   "speakers": [
+    {
+     "id": 7643,
+     "name": "Dirk Fröhner"
+    },
+    {
+     "id": 16353,
+     "name": "Sabarish Sekar"
+    }
+   ],
+   "video": {
+    "id": "_CtnBnmYQC0",
+    "title": "Integration patterns for distributed systems  by Dirk Fröhner, Sabarish Sekar",
+    "matchScore": 1.15,
+    "views": 492,
+    "likes": 8,
+    "comments": 0,
+    "published": "2026-10-08T06:41:21Z",
+    "lengthSeconds": 2957
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21666,
+   "title": "Teaching an Old Handle New Tricks: From Core Reflection to FFM",
+   "day": "wednesday",
+   "start": "2026-10-07T13:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "ADVANCED",
+   "hearts": 150,
+   "speakers": [
+    {
+     "id": 21513,
+     "name": "Maurizio Cimadamore"
+    },
+    {
+     "id": 23049,
+     "name": "Viktor Klang"
+    }
+   ],
+   "video": {
+    "id": "4ck-T2gaMQ4",
+    "title": "Teaching an Old Handle New Tricks: From Core Reflection to FFM  by Maurizio Cimadamore, Viktor Klang",
+    "matchScore": 1.15,
+    "views": 4507,
+    "likes": 28,
+    "comments": 2,
+    "published": "2026-10-10T09:54:57Z",
+    "lengthSeconds": 3094
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7008,
+   "title": "How to survive and thrive as a dev (team) in the exponential age of AI. Real-world AI adoption, smarter ways of working, and lessons from the front lines",
+   "day": "wednesday",
+   "start": "2026-10-07T13:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 714,
+   "speakers": [
+    {
+     "id": 5844,
+     "name": "Sander Hoogendoorn"
+    }
+   ],
+   "video": {
+    "id": "BLBwQpczk7M",
+    "title": "How to survive and thrive as a dev team in the exponential age of AI  Real world AI adoption, smarte",
+    "matchScore": 0.69,
+    "views": 810,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-08T06:41:13Z",
+    "lengthSeconds": 3117
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22942,
+   "title": "Why Documentation Won’t Write Itself—and AI Won’t Save You",
+   "day": "wednesday",
+   "start": "2026-10-07T13:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 209,
+   "speakers": [
+    {
+     "id": 23018,
+     "name": "Christian Heitzmann"
+    }
+   ],
+   "video": {
+    "id": "A8TBUalnfdc",
+    "title": "Why Documentation Won’t Write Itself—and AI Won’t Save You  by Christian Heitzmann",
+    "matchScore": 1.15,
+    "views": 435,
+    "likes": 7,
+    "comments": 1,
+    "published": "2026-10-08T06:41:55Z",
+    "lengthSeconds": 3064
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4051,
+   "title": "CRAcking Compliance - The EU Cyber Resilience Act",
+   "day": "wednesday",
+   "start": "2026-10-07T13:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Security, Trust & Compliance",
+   "level": "BEGINNER",
+   "hearts": 175,
+   "speakers": [
+    {
+     "id": 3651,
+     "name": "Christian Schabetsberger"
+    }
+   ],
+   "video": {
+    "id": "QQcsZNf0eWs",
+    "title": "CRAcking Compliance   The EU Cyber Resilience Act  by Christian Schabetsberger",
+    "matchScore": 1.15,
+    "views": 379,
+    "likes": 3,
+    "comments": 0,
+    "published": "2026-10-08T06:41:44Z",
+    "lengthSeconds": 2703
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 19733,
+   "title": "Bootiful Spring Boot 4",
+   "day": "wednesday",
+   "start": "2026-10-07T13:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "BEGINNER",
+   "hearts": 516,
+   "speakers": [
+    {
+     "id": 14654,
+     "name": "Josh Long"
+    }
+   ],
+   "video": {
+    "id": "1PtdpItmzTo",
+    "title": "Bootiful Spring Boot 4  by Josh Long",
+    "matchScore": 1.15,
+    "views": 1897,
+    "likes": 17,
+    "comments": 0,
+    "published": "2026-10-08T06:41:30Z",
+    "lengthSeconds": 2960
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8171,
+   "title": "0 to 350 Engineers on Claude Code: What Could Go Wrong?",
+   "day": "wednesday",
+   "start": "2026-10-07T13:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "BEGINNER",
+   "hearts": 385,
+   "speakers": [
+    {
+     "id": 7648,
+     "name": "Nicolas Martignole"
+    }
+   ],
+   "video": {
+    "id": "HzbNrEDZkYU",
+    "title": "0 to 350 Engineers on Claude Code: What Could Go Wrong?  by Nicolas Martignole",
+    "matchScore": 1.15,
+    "views": 839,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-08T06:41:41Z",
+    "lengthSeconds": 2672
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4097,
+   "title": "Pragmatic multi-cloud architecture: designing for resilience and portability beyond the hype",
+   "day": "wednesday",
+   "start": "2026-10-07T13:10:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "INTERMEDIATE",
+   "hearts": 68,
+   "speakers": [
+    {
+     "id": 3949,
+     "name": "Alexandre Touret"
+    }
+   ],
+   "video": {
+    "id": "mOmuF5fDiUM",
+    "title": "Pragmatic multi cloud architecture: designing for resilience and portability beyond the hype   by Al",
+    "matchScore": 1.0,
+    "views": 323,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-08T06:41:38Z",
+    "lengthSeconds": 2098
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 11562,
+   "title": "Surviving the \"AI Slopageddon\": How AI shakes the foundations of Open Source",
+   "day": "wednesday",
+   "start": "2026-10-07T14:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 140,
+   "speakers": [
+    {
+     "id": 1801,
+     "name": "Raphael Semeteys"
+    }
+   ],
+   "video": {
+    "id": "vN9jWqSvJNE",
+    "title": "Surviving the \"AI Slopageddon\": How AI shakes the foundations of Open Source  by Raphael Semeteys",
+    "matchScore": 1.15,
+    "views": 342,
+    "likes": 6,
+    "comments": 0,
+    "published": "2026-10-08T06:40:46Z",
+    "lengthSeconds": 2938
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24212,
+   "title": "GraalVM Next: Layers, Crema, and WebAssembly in Action",
+   "day": "wednesday",
+   "start": "2026-10-07T14:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 120,
+   "speakers": [
+    {
+     "id": 19772,
+     "name": "Alina Yurenko"
+    }
+   ],
+   "video": {
+    "id": "OLQ98Ko4p3Q",
+    "title": "GraalVM Next: Layers, Crema, and WebAssembly in Action  by Alina Yurenko",
+    "matchScore": 1.15,
+    "views": 903,
+    "likes": 19,
+    "comments": 0,
+    "published": "2026-10-08T06:40:27Z",
+    "lengthSeconds": 2839
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17791,
+   "title": "Consistency Patterns in Event-Driven Architecture",
+   "day": "wednesday",
+   "start": "2026-10-07T14:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 408,
+   "speakers": [
+    {
+     "id": 18092,
+     "name": "Emanuel Trandafir"
+    }
+   ],
+   "video": {
+    "id": "8JuQaWFKk4w",
+    "title": "Consistency Patterns in Event Driven Architecture  by Emanuel Trandafir",
+    "matchScore": 1.15,
+    "views": 560,
+    "likes": 6,
+    "comments": 0,
+    "published": "2026-10-08T06:40:55Z",
+    "lengthSeconds": 2712
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 49252,
+   "title": "Big Runtimes Make Efficient Programs",
+   "day": "wednesday",
+   "start": "2026-10-07T14:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 141,
+   "speakers": [
+    {
+     "id": 49102,
+     "name": "Ron Pressler"
+    }
+   ],
+   "video": {
+    "id": "vhDwy1eCXbs",
+    "title": "Big Runtimes Make Efficient Programs  by Ron Pressler",
+    "matchScore": 1.15,
+    "views": 710,
+    "likes": 26,
+    "comments": 5,
+    "published": "2026-10-08T06:40:50Z",
+    "lengthSeconds": 3006
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 50107,
+   "title": "Building an Agent Ready Platform",
+   "day": "wednesday",
+   "start": "2026-10-07T14:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 120,
+   "speakers": [
+    {
+     "id": 7606,
+     "name": "Timo Salm"
+    }
+   ],
+   "video": {
+    "id": "q58Y2tyRdCE",
+    "title": "Building an Agent Ready Platform  by Timo Salm",
+    "matchScore": 1.15,
+    "views": 362,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-08T06:41:02Z",
+    "lengthSeconds": 2942
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 31453,
+   "title": "Architecture Observability and Guardrails",
+   "day": "wednesday",
+   "start": "2026-10-07T14:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 855,
+   "speakers": [
+    {
+     "id": 30506,
+     "name": "Victor Rentea"
+    }
+   ],
+   "video": {
+    "id": "BOcNjR2lBus",
+    "title": "Architecture Observability and Guardrails  by Victor Rentea",
+    "matchScore": 1.15,
+    "views": 2214,
+    "likes": 33,
+    "comments": 0,
+    "published": "2026-10-08T06:40:35Z",
+    "lengthSeconds": 3124
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4086,
+   "title": "AI Made Building Cheap. Now Decisions Are the Bottleneck.",
+   "day": "wednesday",
+   "start": "2026-10-07T14:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "ADVANCED",
+   "hearts": 326,
+   "speakers": [
+    {
+     "id": 3940,
+     "name": "Dave Sammut"
+    },
+    {
+     "id": 3943,
+     "name": "João Rosa"
+    }
+   ],
+   "video": {
+    "id": "2pSyF44THEc",
+    "title": "AI Made Building Cheap  Now Decisions Are the Bottleneck   by Dave Sammut, João Rosa",
+    "matchScore": 1.15,
+    "views": 324,
+    "likes": 0,
+    "comments": 0,
+    "published": "2026-10-08T06:40:42Z",
+    "lengthSeconds": 2539
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 19730,
+   "title": "Building LLM Inference Engines in Java with TornadoVM and the NVIDIA Ecosystem",
+   "day": "wednesday",
+   "start": "2026-10-07T14:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 59,
+   "speakers": [
+    {
+     "id": 7649,
+     "name": "Thanos Stratikopoulos"
+    },
+    {
+     "id": 19768,
+     "name": "Michalis Papadimitriou"
+    },
+    {
+     "id": 49104,
+     "name": "Orion Papadakis"
+    }
+   ],
+   "video": {
+    "id": "HO5CpETzywk",
+    "title": "Building LLM Inference Engines in Java with TornadoVM and the NVIDIA Ecosystem  by Thanos Stratikopo",
+    "matchScore": 1.0,
+    "views": 388,
+    "likes": 10,
+    "comments": 0,
+    "published": "2026-10-08T06:40:32Z",
+    "lengthSeconds": 2673
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10802,
+   "title": "A Deserter Returns: What the Java community helped me rediscover",
+   "day": "wednesday",
+   "start": "2026-10-07T15:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 50,
+   "speakers": [
+    {
+     "id": 10180,
+     "name": "Thierry Chantier"
+    }
+   ],
+   "video": {
+    "id": "i_VXe0mNicY",
+    "title": "A Deserter Returns: What the Java community helped me rediscover  by Thierry Chantier",
+    "matchScore": 1.15,
+    "views": 431,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-08T06:40:05Z",
+    "lengthSeconds": 2518
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 16426,
+   "title": "No Country For Old APIs. Wrapping legacy Java services as MCP tools without rewriting them.",
+   "day": "wednesday",
+   "start": "2026-10-07T15:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 184,
+   "speakers": [
+    {
+     "id": 16365,
+     "name": "Željko Kozina"
+    }
+   ],
+   "video": {
+    "id": "a5cQAl0g2AM",
+    "title": "No Country For Old APIs  Wrapping legacy Java services as MCP tools without rewriting them   by Žel",
+    "matchScore": 1.0,
+    "views": 364,
+    "likes": 3,
+    "comments": 0,
+    "published": "2026-10-08T06:40:12Z",
+    "lengthSeconds": 2672
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9046,
+   "title": "rm -rf self-doubt: Debugging Impostor Syndrome for Developers",
+   "day": "wednesday",
+   "start": "2026-10-07T15:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "INTERMEDIATE",
+   "hearts": 288,
+   "speakers": [
+    {
+     "id": 9608,
+     "name": "Vincent Mayers"
+    }
+   ],
+   "video": {
+    "id": "Tfrt19d3TEA",
+    "title": "rm  rf self doubt: Debugging Impostor Syndrome for Developers  by Vincent Mayers",
+    "matchScore": 1.15,
+    "views": 316,
+    "likes": 6,
+    "comments": 0,
+    "published": "2026-10-08T06:40:24Z",
+    "lengthSeconds": 2322
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 14463,
+   "title": "When benchmarks go bad - what we learned from measuring performance wrong",
+   "day": "wednesday",
+   "start": "2026-10-07T15:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 248,
+   "speakers": [
+    {
+     "id": 5826,
+     "name": "Francesco Nigro"
+    },
+    {
+     "id": 14657,
+     "name": "Holly Cummins"
+    }
+   ],
+   "video": {
+    "id": "yePre1hOvHE",
+    "title": "When benchmarks go bad   what we learned from measuring performance wrong  by Francesco Nigro, Holly",
+    "matchScore": 1.15,
+    "views": 464,
+    "likes": 4,
+    "comments": 0,
+    "published": "2026-10-08T06:40:15Z",
+    "lengthSeconds": 3241
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 16401,
+   "title": "Beyond encryption at rest: computing on encrypted data",
+   "day": "wednesday",
+   "start": "2026-10-07T15:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Security, Trust & Compliance",
+   "level": "BEGINNER",
+   "hearts": 124,
+   "speakers": [
+    {
+     "id": 16351,
+     "name": "Andrea Iacono"
+    }
+   ],
+   "video": {
+    "id": "ePQyy9sLmsY",
+    "title": "Beyond encryption at rest: computing on encrypted data  by Andrea Iacono",
+    "matchScore": 1.15,
+    "views": 567,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-08T06:40:20Z",
+    "lengthSeconds": 3045
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17759,
+   "title": "Kubernetes for Developers",
+   "day": "wednesday",
+   "start": "2026-10-07T15:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "INTERMEDIATE",
+   "hearts": 326,
+   "speakers": [
+    {
+     "id": 18056,
+     "name": "Alain Regnier"
+    }
+   ],
+   "video": {
+    "id": "AxhLQZqZdIg",
+    "title": "Kubernetes for Developers  by Alain Regnier",
+    "matchScore": 1.15,
+    "views": 646,
+    "likes": 9,
+    "comments": 0,
+    "published": "2026-10-08T06:40:02Z",
+    "lengthSeconds": 2836
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 19713,
+   "title": "Create your own AI Agents without code",
+   "day": "wednesday",
+   "start": "2026-10-07T15:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 263,
+   "speakers": [
+    {
+     "id": 19756,
+     "name": "David Gageot"
+    }
+   ],
+   "video": {
+    "id": "EJv0TMNSUjw",
+    "title": "Create your own AI Agents without code  by David Gageot",
+    "matchScore": 1.15,
+    "views": 409,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-08T06:40:08Z",
+    "lengthSeconds": 2722
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5510,
+   "title": "Quarkus Meets Leyden at the JVM Performance Edge",
+   "day": "wednesday",
+   "start": "2026-10-07T15:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 89,
+   "speakers": [
+    {
+     "id": 3945,
+     "name": "Georgios Andrianakis"
+    },
+    {
+     "id": 5830,
+     "name": "Ana-Maria Mihalceanu"
+    }
+   ],
+   "video": {
+    "id": "cbSl8UVdMVg",
+    "title": "Quarkus Meets Leyden at the JVM Performance Edge  by Georgios Andrianakis, Ana Maria Mihalceanu",
+    "matchScore": 1.15,
+    "views": 480,
+    "likes": 16,
+    "comments": 0,
+    "published": "2026-10-08T06:39:57Z",
+    "lengthSeconds": 3573
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24206,
+   "title": "GraalVM Community BOF",
+   "day": "wednesday",
+   "start": "2026-10-07T16:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "BOF",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 36,
+   "speakers": [
+    {
+     "id": 16383,
+     "name": "Thomas Wuerthinger"
+    },
+    {
+     "id": 18057,
+     "name": "Fabio Niephaus"
+    },
+    {
+     "id": 19772,
+     "name": "Alina Yurenko"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 19707,
+   "title": "Getting started with speaking: Your first conference talk",
+   "day": "wednesday",
+   "start": "2026-10-07T16:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "BOF",
+   "track": "People, Practices & Career",
+   "level": "BEGINNER",
+   "hearts": 93,
+   "speakers": [
+    {
+     "id": 19753,
+     "name": "Bert Jan Schrijver"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9023,
+   "title": "Rewriting the rules: How AI transforms engineering and inspiring young minds",
+   "day": "thursday",
+   "start": "2026-10-08T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 148,
+   "speakers": [
+    {
+     "id": 8683,
+     "name": "Ayoub Hammou Ahabchane"
+    },
+    {
+     "id": 8684,
+     "name": "Kamel Zaraoui"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 25048,
+   "title": "Java on Kubernetes Without Container Images: The WebAssembly Way",
+   "day": "thursday",
+   "start": "2026-10-08T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "INTERMEDIATE",
+   "hearts": 223,
+   "speakers": [
+    {
+     "id": 3933,
+     "name": "Bruno Borges"
+    }
+   ],
+   "video": {
+    "id": "fszyRIZXjQM",
+    "title": "Java on Kubernetes Without Container Images: The WebAssembly Way By Bruno Borges",
+    "matchScore": 1.15,
+    "views": 5640,
+    "likes": 60,
+    "comments": 7,
+    "published": "2026-10-09T08:57:59Z",
+    "lengthSeconds": 3168
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 16414,
+   "title": "From vibe coding to harness engineering: modernizing a regulated environment with AI",
+   "day": "thursday",
+   "start": "2026-10-08T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 537,
+   "speakers": [
+    {
+     "id": 16361,
+     "name": "Anyul Rivas"
+    }
+   ],
+   "video": {
+    "id": "zEUSFvDOiCo",
+    "title": "From vibe coding to harness engineering: modernizing a regulated environment with AI by Anyul Rivas",
+    "matchScore": 1.15,
+    "views": 3601,
+    "likes": 23,
+    "comments": 1,
+    "published": "2026-10-09T08:57:59Z",
+    "lengthSeconds": 2436
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9035,
+   "title": "Toxic Flows in MCP Servers and Skills: What Your Agent Blindly Trusts",
+   "day": "thursday",
+   "start": "2026-10-08T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Security, Trust & Compliance",
+   "level": "INTERMEDIATE",
+   "hearts": 357,
+   "speakers": [
+    {
+     "id": 8695,
+     "name": "Brian Vermeer"
+    }
+   ],
+   "video": {
+    "id": "c4F7Iy3XqaY",
+    "title": "Toxic Flows in MCP Servers and Skills: What Your Agent Blindly Trusts by Brian Vermeer",
+    "matchScore": 1.15,
+    "views": 1285,
+    "likes": 16,
+    "comments": 2,
+    "published": "2026-10-09T08:57:58Z",
+    "lengthSeconds": 2977
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 19748,
+   "title": "Snake in 10 Lines: Learning More by Coding Less",
+   "day": "thursday",
+   "start": "2026-10-08T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 162,
+   "speakers": [
+    {
+     "id": 19777,
+     "name": "Guus de Wit"
+    }
+   ],
+   "video": {
+    "id": "LD2tKMpToYg",
+    "title": "Snake in 10 Lines: Learning More by Coding Less  by Guus de Wit",
+    "matchScore": 1.15,
+    "views": 15968,
+    "likes": 72,
+    "comments": 10,
+    "published": "2026-10-09T08:57:59Z",
+    "lengthSeconds": 2910
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 11556,
+   "title": "223 Pull Requests in 11 Days: The Recipe for Building Real Software with AI Agents",
+   "day": "thursday",
+   "start": "2026-10-08T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 626,
+   "speakers": [
+    {
+     "id": 12008,
+     "name": "Julien Dubois"
+    }
+   ],
+   "video": {
+    "id": "0A2jqCqSIjg",
+    "title": "223 Pull Requests in 11 Days: The Recipe for Building Real Software with AI Agents  by Julien Dubois",
+    "matchScore": 1.15,
+    "views": 2924,
+    "likes": 20,
+    "comments": 3,
+    "published": "2026-10-09T08:57:58Z",
+    "lengthSeconds": 3028
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5503,
+   "title": "AI without spaghetti: Clean architecture in the age of AI",
+   "day": "thursday",
+   "start": "2026-10-08T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 262,
+   "speakers": [
+    {
+     "id": 5802,
+     "name": "Maarten Vandeperre"
+    },
+    {
+     "id": 8653,
+     "name": "Lutske van der Meer"
+    }
+   ],
+   "video": {
+    "id": "E--oDq3X74E",
+    "title": "AI without spaghetti: Clean architecture in these of AI  by Maarten Vandeperre en Lutske van der Mee",
+    "matchScore": 0.85,
+    "views": 3386,
+    "likes": 15,
+    "comments": 1,
+    "published": "2026-10-09T08:57:58Z",
+    "lengthSeconds": 2754
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23527,
+   "title": "Project Detroit: From Foreign Libraries to Foreign Language Runtimes",
+   "day": "thursday",
+   "start": "2026-10-08T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 106,
+   "speakers": [
+    {
+     "id": 21513,
+     "name": "Maurizio Cimadamore"
+    }
+   ],
+   "video": {
+    "id": "JWFZY0aJTjg",
+    "title": "Project Detroit: From Foreign Libraries to Foreign Language Runtimes  by Maurizio Cimadamore",
+    "matchScore": 1.15,
+    "views": 2762,
+    "likes": 14,
+    "comments": 0,
+    "published": "2026-10-09T08:57:59Z",
+    "lengthSeconds": 3006
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 52102,
+   "title": "Hey Belfius! Meet our new bank AI assistant—and discover how we’re building and securing AI across Belfius.",
+   "day": "thursday",
+   "start": "2026-10-08T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 126,
+   "speakers": [
+    {
+     "id": 52451,
+     "name": "Nicolas Goosse"
+    }
+   ],
+   "video": {
+    "id": "4hXQoN8co80",
+    "title": "Hey Belfius! Meet our new bank AI assistant—and discover how we’re building and securing AI across B",
+    "matchScore": 0.94,
+    "views": 483,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-09T07:44:21Z",
+    "lengthSeconds": 2544
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21657,
+   "title": "Reflect, Transform, Accelerate: Bringing GPU Computing to Java",
+   "day": "thursday",
+   "start": "2026-10-08T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 131,
+   "speakers": [
+    {
+     "id": 21504,
+     "name": "Juan Fumero"
+    }
+   ],
+   "video": {
+    "id": "0-1IGpVrFLQ",
+    "title": "Reflect, Transform, Accelerate: Bringing GPU Computing to Java By Juan Fumero",
+    "matchScore": 1.15,
+    "views": 753,
+    "likes": 19,
+    "comments": 0,
+    "published": "2026-10-09T07:44:21Z",
+    "lengthSeconds": 3028
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 14457,
+   "title": "Coder, Coach, Catalyst - using questions to make people grow",
+   "day": "thursday",
+   "start": "2026-10-08T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "INTERMEDIATE",
+   "hearts": 410,
+   "speakers": [
+    {
+     "id": 14652,
+     "name": "Martin Mazur"
+    }
+   ],
+   "video": {
+    "id": "yhk1qvy6A_4",
+    "title": "Coder, Coach, Catalyst   using questions to make people grow  by Martin Mazur",
+    "matchScore": 1.15,
+    "views": 713,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-09T07:44:29Z",
+    "lengthSeconds": 3106
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8169,
+   "title": "How to Architect Green Software",
+   "day": "thursday",
+   "start": "2026-10-08T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 212,
+   "speakers": [
+    {
+     "id": 7644,
+     "name": "Ioannis Kolaxis"
+    }
+   ],
+   "video": {
+    "id": "bqwtnKLU35E",
+    "title": "How to Architect Green Software by Ioannis Kolaxis",
+    "matchScore": 1.15,
+    "views": 618,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-09T07:44:26Z",
+    "lengthSeconds": 2990
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22947,
+   "title": "High-Performance Java-Native AI with CUDA and the Vector API",
+   "day": "thursday",
+   "start": "2026-10-08T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "ADVANCED",
+   "hearts": 130,
+   "speakers": [
+    {
+     "id": 23009,
+     "name": "Zoran Sevarac"
+    }
+   ],
+   "video": {
+    "id": "8NURE3I4AJQ",
+    "title": "High Performance Java Native AI with CUDA and the Vector API  by Zoran Sevarac",
+    "matchScore": 1.15,
+    "views": 1661,
+    "likes": 15,
+    "comments": 1,
+    "published": "2026-10-09T08:57:58Z",
+    "lengthSeconds": 2964
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9032,
+   "title": "Agents With Seatbelts: Practical Ways to Keep AI Code Gen Under Control",
+   "day": "thursday",
+   "start": "2026-10-08T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 672,
+   "speakers": [
+    {
+     "id": 8693,
+     "name": "Jonathan Vila López"
+    }
+   ],
+   "video": {
+    "id": "d1SJXp9QeWE",
+    "title": "Agents With Seatbelts: Practical Ways to Keep AI Code Gen Under Control  by Jonathan Vila López",
+    "matchScore": 1.15,
+    "views": 771,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-09T07:44:26Z",
+    "lengthSeconds": 3069
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22905,
+   "title": "When ORM Becomes OMG: Performance Pitfalls in JPA and Friends",
+   "day": "thursday",
+   "start": "2026-10-08T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "INTERMEDIATE",
+   "hearts": 268,
+   "speakers": [
+    {
+     "id": 21540,
+     "name": "Jos Roseboom"
+    }
+   ],
+   "video": {
+    "id": "ePBmAdRYl10",
+    "title": "When ORM Becomes OMG: Performance Pitfalls in JPA and Friends  by Jos Roseboom",
+    "matchScore": 1.15,
+    "views": 719,
+    "likes": 11,
+    "comments": 2,
+    "published": "2026-10-09T07:44:26Z",
+    "lengthSeconds": 3048
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5541,
+   "title": "Dream Machines & Walled Gardens",
+   "day": "thursday",
+   "start": "2026-10-08T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 101,
+   "speakers": [
+    {
+     "id": 5829,
+     "name": "Anders Norås"
+    }
+   ],
+   "video": {
+    "id": "am8adCMJQzk",
+    "title": "Dream Machines & Walled Gardens  by Anders Norås",
+    "matchScore": 1.15,
+    "views": 685,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-09T07:44:26Z",
+    "lengthSeconds": 2938
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 25671,
+   "title": "State of Agentic Coding",
+   "day": "thursday",
+   "start": "2026-10-08T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 545,
+   "speakers": [
+    {
+     "id": 24186,
+     "name": "Daniela Petruzalek"
+    }
+   ],
+   "video": {
+    "id": "nHRSwiFNQ9E",
+    "title": "State of Agentic Coding  by Daniela Petruzalek",
+    "matchScore": 1.15,
+    "views": 3428,
+    "likes": 20,
+    "comments": 0,
+    "published": "2026-10-09T07:44:29Z",
+    "lengthSeconds": 2883
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 14452,
+   "title": "Quixotic: Pure Java Inference at Native Speed",
+   "day": "thursday",
+   "start": "2026-10-08T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 78,
+   "speakers": [
+    {
+     "id": 1802,
+     "name": "Alfonso² Peterssen"
+    }
+   ],
+   "video": {
+    "id": "S7x4DxwRnk4",
+    "title": "Quixotic: Pure Java Inference at Native Speed  by Alfonso² Peterssen",
+    "matchScore": 1.15,
+    "views": 1841,
+    "likes": 29,
+    "comments": 5,
+    "published": "2026-10-09T07:44:21Z",
+    "lengthSeconds": 2868
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23543,
+   "title": "The Yearly Java Performance Update for 2026",
+   "day": "thursday",
+   "start": "2026-10-08T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 367,
+   "speakers": [
+    {
+     "id": 23047,
+     "name": "Per-Ake Minborg"
+    }
+   ],
+   "video": {
+    "id": "rNOzf12RORI",
+    "title": "The Yearly Java Performance Update for 2026 by Per Ake Minborg",
+    "matchScore": 1.15,
+    "views": 1675,
+    "likes": 18,
+    "comments": 0,
+    "published": "2026-10-09T07:44:29Z",
+    "lengthSeconds": 2502
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21671,
+   "title": "The Rise of Agent Enablement: Coding Agents Don't Scale Themselves. Neither Do Your Teams.",
+   "day": "thursday",
+   "start": "2026-10-08T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "BEGINNER",
+   "hearts": 264,
+   "speakers": [
+    {
+     "id": 21519,
+     "name": "Patrick Debois"
+    }
+   ],
+   "video": {
+    "id": "wxNQRGPnJ24",
+    "title": "The Rise of Agent Enablement: Coding Agents Don't Scale Themselves  Neither Do Your Teams  by Patric",
+    "matchScore": 1.0,
+    "views": 989,
+    "likes": 11,
+    "comments": 0,
+    "published": "2026-10-09T07:44:29Z",
+    "lengthSeconds": 2836
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 16443,
+   "title": "Say Goodbye to LLM API keys with Workload Identity Federation",
+   "day": "thursday",
+   "start": "2026-10-08T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Security, Trust & Compliance",
+   "level": "INTERMEDIATE",
+   "hearts": 95,
+   "speakers": [
+    {
+     "id": 16379,
+     "name": "Siarhei Biarozkin"
+    }
+   ],
+   "video": {
+    "id": "xEAYnXyt3L4",
+    "title": "Say Goodbye to LLM API keys with Workload Identity Federation  by Siarhei Biarozkin",
+    "matchScore": 1.15,
+    "views": 634,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-09T07:44:29Z",
+    "lengthSeconds": 2611
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8153,
+   "title": "Taming Microservice Overload: Our Journey to Modular Monoliths",
+   "day": "thursday",
+   "start": "2026-10-08T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 513,
+   "speakers": [
+    {
+     "id": 7629,
+     "name": "Mario Klaver"
+    }
+   ],
+   "video": {
+    "id": "v86SfHA5ISw",
+    "title": "Taming Microservice Overload: Our Journey to Modular Monoliths  by Mario Klaver",
+    "matchScore": 1.15,
+    "views": 23541,
+    "likes": 135,
+    "comments": 4,
+    "published": "2026-10-09T07:44:29Z",
+    "lengthSeconds": 2986
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24245,
+   "title": "Making sense of vector databases",
+   "day": "thursday",
+   "start": "2026-10-08T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "INTERMEDIATE",
+   "hearts": 273,
+   "speakers": [
+    {
+     "id": 24177,
+     "name": "Balkrishna Rawool"
+    }
+   ],
+   "video": {
+    "id": "knE4uy7IYXY",
+    "title": "Making sense of vector databases  by Balkrishna Rawool",
+    "matchScore": 1.15,
+    "views": 706,
+    "likes": 4,
+    "comments": 0,
+    "published": "2026-10-09T07:44:26Z",
+    "lengthSeconds": 2869
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17556,
+   "title": "SIMD for Java: how Elasticsearch already benefits from the Panama Vector API",
+   "day": "thursday",
+   "start": "2026-10-08T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "INTERMEDIATE",
+   "hearts": 69,
+   "speakers": [
+    {
+     "id": 16384,
+     "name": "Piotr Przybyl"
+    }
+   ],
+   "video": {
+    "id": "adFS-_sCTQ4",
+    "title": "SIMD for Java: how Elasticsearch already benefits from the Panama Vector API  by Piotr Przybyl",
+    "matchScore": 1.15,
+    "views": 753,
+    "likes": 8,
+    "comments": 0,
+    "published": "2026-10-09T07:44:26Z",
+    "lengthSeconds": 3147
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 50104,
+   "title": "Engineering Lessons from Working on Software Older Than Me",
+   "day": "thursday",
+   "start": "2026-10-08T10:55:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Lunch Talk",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 114,
+   "speakers": [
+    {
+     "id": 50054,
+     "name": "Guust Ysebie"
+    }
+   ],
+   "video": {
+    "id": "VaT7DgmVSms",
+    "title": "Engineering Lessons from Working on Software Older Than Me  by Guust Ysebie",
+    "matchScore": 1.15,
+    "views": 481,
+    "likes": 4,
+    "comments": 0,
+    "published": "2026-10-09T07:44:20Z",
+    "lengthSeconds": 2064
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 41302,
+   "title": "\"You May Now Optimize the Wedding\": Optimizing the Seating, Bachelor Party, and Honeymoon with Constraint AI",
+   "day": "thursday",
+   "start": "2026-10-08T10:55:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Lunch Talk",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 138,
+   "speakers": [
+    {
+     "id": 10175,
+     "name": "Geoffrey De Smet"
+    },
+    {
+     "id": 13555,
+     "name": "Tom Cools"
+    }
+   ],
+   "video": {
+    "id": "9ARcNYC-eVk",
+    "title": "\"You May Now Optimize the Wedding\": Optimizing the Seating, Bachelor Party, and Honeymoon with Const",
+    "matchScore": 0.81,
+    "views": 265,
+    "likes": 0,
+    "comments": 0,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 2217
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 44601,
+   "title": "Agents Shouldn't Control Control Flow",
+   "day": "thursday",
+   "start": "2026-10-08T10:55:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Lunch Talk",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 101,
+   "speakers": [
+    {
+     "id": 9607,
+     "name": "Jeremy Adams"
+    }
+   ],
+   "video": {
+    "id": "oey2TbFvfWE",
+    "title": "Agents Shouldn't Control Control Flow by Jeremy Adams",
+    "matchScore": 1.15,
+    "views": 766,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-09T07:44:29Z",
+    "lengthSeconds": 2428
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24244,
+   "title": "Green Maven builds: sustainable CI in practice",
+   "day": "thursday",
+   "start": "2026-10-08T10:55:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Lunch Talk",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 173,
+   "speakers": [
+    {
+     "id": 24175,
+     "name": "Jan Boonen"
+    }
+   ],
+   "video": {
+    "id": "Mdu5_gndYn0",
+    "title": "Green Maven builds: sustainable CI in practice by Jan Boonen",
+    "matchScore": 1.15,
+    "views": 490,
+    "likes": 4,
+    "comments": 0,
+    "published": "2026-10-09T07:44:21Z",
+    "lengthSeconds": 2416
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 50109,
+   "title": "Keeping Spring Applications Secure in the Age of AI",
+   "day": "thursday",
+   "start": "2026-10-08T10:55:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Lunch Talk",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 170,
+   "speakers": [
+    {
+     "id": 50058,
+     "name": "Neven Cvetkovic"
+    }
+   ],
+   "video": {
+    "id": "-LMWT5OCneA",
+    "title": "Keeping Spring Applications Secure in the Age of AI  by Neven Cvetkovic",
+    "matchScore": 1.15,
+    "views": 580,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-09T07:44:21Z",
+    "lengthSeconds": 2450
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17782,
+   "title": "Is the IDE dead ?",
+   "day": "thursday",
+   "start": "2026-10-08T10:55:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Lunch Talk",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 432,
+   "speakers": [
+    {
+     "id": 18082,
+     "name": "Martin Lippert"
+    }
+   ],
+   "video": {
+    "id": "jFxR6YYWdmI",
+    "title": "Is the IDE dead ?  by Martin Lippert",
+    "matchScore": 1.15,
+    "views": 1879,
+    "likes": 15,
+    "comments": 0,
+    "published": "2026-10-09T07:44:26Z",
+    "lengthSeconds": 2089
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7020,
+   "title": "Who to blame? The AI, The Programmer, or The Prompt?",
+   "day": "thursday",
+   "start": "2026-10-08T10:55:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Lunch Talk",
+   "track": "Security, Trust & Compliance",
+   "level": "BEGINNER",
+   "hearts": 195,
+   "speakers": [
+    {
+     "id": 5847,
+     "name": "Makan Sepehrifar"
+    }
+   ],
+   "video": {
+    "id": "VmPMUGImB-M",
+    "title": "Who to blame? The AI, The Programmer, or The Prompt?  by Makan Sepehrifar",
+    "matchScore": 1.15,
+    "views": 406,
+    "likes": 0,
+    "comments": 0,
+    "published": "2026-10-09T07:44:20Z",
+    "lengthSeconds": 2394
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 52103,
+   "title": "The Devoxx Robot Games",
+   "day": "thursday",
+   "start": "2026-10-08T10:55:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Lunch Talk",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 179,
+   "speakers": [
+    {
+     "id": 30503,
+     "name": "Stephan Janssen"
+    }
+   ],
+   "video": {
+    "id": "NT0wyPM58G8",
+    "title": "The Devoxx Robot Games  by Stephan Janssen",
+    "matchScore": 1.15,
+    "views": 512,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-09T07:44:21Z",
+    "lengthSeconds": 2432
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 50105,
+   "title": "Building, Shipping and Governing AI Agents on Kubernetes",
+   "day": "thursday",
+   "start": "2026-10-08T11:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 132,
+   "speakers": [
+    {
+     "id": 50055,
+     "name": "Tom O'Rourke"
+    },
+    {
+     "id": 50057,
+     "name": "Ep Heijting"
+    }
+   ],
+   "video": {
+    "id": "OCCOIgkCnjE",
+    "title": "Building, Shipping and Governing AI Agents on Kubernetes  by Tom O'Rourke, Ep Heijting",
+    "matchScore": 1.15,
+    "views": 710,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-09T07:44:21Z",
+    "lengthSeconds": 3092
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5502,
+   "title": "Taming the Chaos: Security and Predictability in LLM-Powered Applications",
+   "day": "thursday",
+   "start": "2026-10-08T11:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Security, Trust & Compliance",
+   "level": "ADVANCED",
+   "hearts": 172,
+   "speakers": [
+    {
+     "id": 5002,
+     "name": "Rustam Mehmandarov"
+    }
+   ],
+   "video": {
+    "id": "vNeyNkeU4ms",
+    "title": "Taming the Chaos: Security and Predictability in LLM Powered Applications  by Rustam Mehmandarov",
+    "matchScore": 1.15,
+    "views": 432,
+    "likes": 1,
+    "comments": 1,
+    "published": "2026-10-09T07:43:15Z",
+    "lengthSeconds": 2917
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 19706,
+   "title": "Software engineering in the age of AI agents: who’s in control?",
+   "day": "thursday",
+   "start": "2026-10-08T11:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 585,
+   "speakers": [
+    {
+     "id": 19753,
+     "name": "Bert Jan Schrijver"
+    }
+   ],
+   "video": {
+    "id": "Z64CjgCO5gk",
+    "title": "Software engineering in the age of AI agents: who’s in control? by Bert Jan Schrijver",
+    "matchScore": 1.15,
+    "views": 986,
+    "likes": 11,
+    "comments": 0,
+    "published": "2026-10-09T07:44:21Z",
+    "lengthSeconds": 2902
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24218,
+   "title": "Conquest, time travel and explosions using Git",
+   "day": "thursday",
+   "start": "2026-10-08T11:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 316,
+   "speakers": [
+    {
+     "id": 10163,
+     "name": "Alexander Chatzizacharias"
+    }
+   ],
+   "video": {
+    "id": "wbzpP0T9w6I",
+    "title": "Conquest, time travel and explosions using Git by Alexander Chatzizacharias",
+    "matchScore": 1.15,
+    "views": 823,
+    "likes": 10,
+    "comments": 0,
+    "published": "2026-10-09T07:43:16Z",
+    "lengthSeconds": 2800
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23536,
+   "title": "Ask the Architects",
+   "day": "thursday",
+   "start": "2026-10-08T11:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 160,
+   "speakers": [
+    {
+     "id": 21503,
+     "name": "Gavin Bierman"
+    },
+    {
+     "id": 21513,
+     "name": "Maurizio Cimadamore"
+    },
+    {
+     "id": 23047,
+     "name": "Per-Ake Minborg"
+    },
+    {
+     "id": 23049,
+     "name": "Viktor Klang"
+    },
+    {
+     "id": 28801,
+     "name": "Alan Bateman"
+    },
+    {
+     "id": 50051,
+     "name": "Georges Saab"
+    }
+   ],
+   "video": {
+    "id": "ewCPBgOrLAE",
+    "title": "Ask the Architects  by Gavin Bierman, Maurizio Cimadamore, Per Ake Minborg, Viktor Klang, Alan Batem",
+    "matchScore": 1.15,
+    "views": 707,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-09T07:43:05Z",
+    "lengthSeconds": 3032
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8186,
+   "title": "The Hexagonal Hangover",
+   "day": "thursday",
+   "start": "2026-10-08T11:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 513,
+   "speakers": [
+    {
+     "id": 8665,
+     "name": "Ties van de Ven"
+    }
+   ],
+   "video": {
+    "id": "m9viRAIRAUQ",
+    "title": "The Hexagonal Hangover  by Ties van de Ven",
+    "matchScore": 1.15,
+    "views": 3785,
+    "likes": 64,
+    "comments": 2,
+    "published": "2026-10-09T07:44:29Z",
+    "lengthSeconds": 2933
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22916,
+   "title": "Java and the Next Generation of Programming Models",
+   "day": "thursday",
+   "start": "2026-10-08T11:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "ADVANCED",
+   "hearts": 251,
+   "speakers": [
+    {
+     "id": 5830,
+     "name": "Ana-Maria Mihalceanu"
+    }
+   ],
+   "video": {
+    "id": "kuUeHD_k5fs",
+    "title": "Java and the Next Generation of Programming Models  by Ana Maria Mihalceanu",
+    "matchScore": 1.15,
+    "views": 1041,
+    "likes": 6,
+    "comments": 0,
+    "published": "2026-10-09T07:44:26Z",
+    "lengthSeconds": 2398
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23522,
+   "title": "Hardwood: Building a Parquet Parser From Scratch (With a Little Help From AI)",
+   "day": "thursday",
+   "start": "2026-10-08T11:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "INTERMEDIATE",
+   "hearts": 42,
+   "speakers": [
+    {
+     "id": 23036,
+     "name": "Gunnar Morling"
+    }
+   ],
+   "video": {
+    "id": "6mzvcPr30kg",
+    "title": "Hardwood: Building a Parquet Parser From Scratch With a Little Help From AI  by Gunnar Morling",
+    "matchScore": 1.15,
+    "views": 869,
+    "likes": 6,
+    "comments": 0,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 3118
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 49255,
+   "title": "Modernizing legacy code with AI: hands-on examples & lessons learned",
+   "day": "thursday",
+   "start": "2026-10-08T13:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 527,
+   "speakers": [
+    {
+     "id": 49108,
+     "name": "Koen Vanderkimpen"
+    },
+    {
+     "id": 49101,
+     "name": "Wim Lambrecht"
+    }
+   ],
+   "video": {
+    "id": "FvVe9J0Abjg",
+    "title": "Modernizing legacy code with AI: hands on examples & lessons learned  by Koen Vanderkimpen, Wim Lamb",
+    "matchScore": 1.15,
+    "views": 750,
+    "likes": 3,
+    "comments": 2,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 3037
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 24202,
+   "title": "Beyond the Pod: Architecting and Scaling AI Agents on Kubernetes",
+   "day": "thursday",
+   "start": "2026-10-08T13:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Cloud Native, Data & Infrastructure",
+   "level": "BEGINNER",
+   "hearts": 122,
+   "speakers": [
+    {
+     "id": 24151,
+     "name": "Abdellfetah SGHIOUAR"
+    }
+   ],
+   "video": {
+    "id": "3bIiAoYtAPs",
+    "title": "Beyond the Pod: Architecting and Scaling AI Agents on Kubernetes  by Abdellfetah SGHIOUAR",
+    "matchScore": 1.15,
+    "views": 500,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 2601
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5530,
+   "title": "Kill All Mutants! (Intro to Mutation Testing)",
+   "day": "thursday",
+   "start": "2026-10-08T13:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "ADVANCED",
+   "hearts": 294,
+   "speakers": [
+    {
+     "id": 5824,
+     "name": "Dave Aronson"
+    }
+   ],
+   "video": {
+    "id": "AsVt_dzTmN4",
+    "title": "Kill All Mutants! Intro to Mutation Testing by Dave Aronson",
+    "matchScore": 1.15,
+    "views": 339,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 2981
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 27453,
+   "title": "Build a private cluster for the office",
+   "day": "thursday",
+   "start": "2026-10-08T13:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 181,
+   "speakers": [
+    {
+     "id": 27402,
+     "name": "John Davies"
+    }
+   ],
+   "video": {
+    "id": "rv2KpWgb0Mw",
+    "title": "Build a private cluster for the office by John Davies",
+    "matchScore": 1.15,
+    "views": 395,
+    "likes": 3,
+    "comments": 0,
+    "published": "2026-10-09T07:43:16Z",
+    "lengthSeconds": 2840
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 16444,
+   "title": "Faster Development with Java, Python, and Micronaut",
+   "day": "thursday",
+   "start": "2026-10-08T13:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 108,
+   "speakers": [
+    {
+     "id": 16381,
+     "name": "Graeme Rocher"
+    },
+    {
+     "id": 16383,
+     "name": "Thomas Wuerthinger"
+    }
+   ],
+   "video": {
+    "id": "zo6L7bxn4OY",
+    "title": "Faster Development with Java, Python, and Micronaut  by Graeme Rocher, Thomas Wuerthinger",
+    "matchScore": 1.15,
+    "views": 769,
+    "likes": 19,
+    "comments": 0,
+    "published": "2026-10-09T07:43:15Z",
+    "lengthSeconds": 2863
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10031,
+   "title": "The Dark Secrets of Computer Science",
+   "day": "thursday",
+   "start": "2026-10-08T13:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "INTERMEDIATE",
+   "hearts": 580,
+   "speakers": [
+    {
+     "id": 10164,
+     "name": "Fabien Marsaud"
+    }
+   ],
+   "video": {
+    "id": "2Yh7LKt8YNw",
+    "title": "The Dark Secrets of Computer Science  by Fabien Marsaud",
+    "matchScore": 1.15,
+    "views": 431,
+    "likes": 9,
+    "comments": 0,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 2924
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22932,
+   "title": "Why Java Is Perfect for AI - Just Not the AI You’re Thinking Of",
+   "day": "thursday",
+   "start": "2026-10-08T13:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 259,
+   "speakers": [
+    {
+     "id": 7646,
+     "name": "Trisha Gee"
+    },
+    {
+     "id": 8651,
+     "name": "Andrey Santrosyan"
+    }
+   ],
+   "video": {
+    "id": "hHu3rLsbYog",
+    "title": "Why Java Is Perfect for AI   Just Not the AI You’re Thinking Of  by Trisha Gee, Andrey Santrosyan",
+    "matchScore": 1.15,
+    "views": 446,
+    "likes": 4,
+    "comments": 0,
+    "published": "2026-10-09T07:43:10Z",
+    "lengthSeconds": 2749
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5549,
+   "title": "Underneath the Black Marker: AI Techniques for Detecting and Reversing Redactions",
+   "day": "thursday",
+   "start": "2026-10-08T13:00:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Security, Trust & Compliance",
+   "level": "INTERMEDIATE",
+   "hearts": 64,
+   "speakers": [
+    {
+     "id": 5837,
+     "name": "David vonThenen"
+    }
+   ],
+   "video": {
+    "id": "wJ7R4qkVs8Y",
+    "title": "Underneath the Black Marker: AI Techniques for Detecting and Reversing Redactions  by David vonThene",
+    "matchScore": 1.0,
+    "views": 274,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-09T07:43:15Z",
+    "lengthSeconds": 2998
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 41301,
+   "title": "Owning the inference layer: When and how to run your own models",
+   "day": "thursday",
+   "start": "2026-10-08T14:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 170,
+   "speakers": [
+    {
+     "id": 5802,
+     "name": "Maarten Vandeperre"
+    },
+    {
+     "id": 7616,
+     "name": "Camille Nigon"
+    }
+   ],
+   "video": {
+    "id": "QbA-rs7XLEk",
+    "title": "Owning the inference layer: When and how to run your own models  by Maarten Vandeperre, Camille Nigo",
+    "matchScore": 1.15,
+    "views": 384,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-09T07:43:05Z",
+    "lengthSeconds": 3080
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 12758,
+   "title": "Knocking on the Wrong Door: The Six Developers You’ll Meet in Security",
+   "day": "thursday",
+   "start": "2026-10-08T14:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "BEGINNER",
+   "hearts": 137,
+   "speakers": [
+    {
+     "id": 12611,
+     "name": "Enrique Larios Vargas"
+    }
+   ],
+   "video": {
+    "id": "qrtd6svRUnk",
+    "title": "Knocking on the Wrong Door: The Six Developers You’ll Meet in Security  by Enrique Larios Vargas",
+    "matchScore": 1.15,
+    "views": 302,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-09T07:43:05Z",
+    "lengthSeconds": 2487
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 25042,
+   "title": "Owning the Code You Didn't Type",
+   "day": "thursday",
+   "start": "2026-10-08T14:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 371,
+   "speakers": [
+    {
+     "id": 24197,
+     "name": "Renato Guerra Cavalcanti"
+    }
+   ],
+   "video": {
+    "id": "SQUrHzMie3o",
+    "title": "Owning the Code You Didn't Type by Renato Guerra Cavalcanti",
+    "matchScore": 1.15,
+    "views": 381,
+    "likes": 4,
+    "comments": 0,
+    "published": "2026-10-09T07:43:05Z",
+    "lengthSeconds": 3023
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23539,
+   "title": "Everyday JSON",
+   "day": "thursday",
+   "start": "2026-10-08T14:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "INTERMEDIATE",
+   "hearts": 227,
+   "speakers": [
+    {
+     "id": 23049,
+     "name": "Viktor Klang"
+    },
+    {
+     "id": 28801,
+     "name": "Alan Bateman"
+    }
+   ],
+   "video": {
+    "id": "5y_82lCevHg",
+    "title": "Everyday JSON by Viktor Klang, Alan Bateman",
+    "matchScore": 1.15,
+    "views": 616,
+    "likes": 10,
+    "comments": 0,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 3082
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 19708,
+   "title": "Choose your own adventure in agentic design patterns",
+   "day": "thursday",
+   "start": "2026-10-08T14:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "ADVANCED",
+   "hearts": 309,
+   "speakers": [
+    {
+     "id": 2951,
+     "name": "Guillaume Laforge"
+    }
+   ],
+   "video": {
+    "id": "U7Z9fZn7rFg",
+    "title": "Choose your own adventure in agentic design patterns  by Guillaume Laforge",
+    "matchScore": 1.15,
+    "views": 403,
+    "likes": 1,
+    "comments": 0,
+    "published": "2026-10-09T07:43:05Z",
+    "lengthSeconds": 3107
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 49256,
+   "title": "ADRs: The Why and How",
+   "day": "thursday",
+   "start": "2026-10-08T14:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 671,
+   "speakers": [
+    {
+     "id": 49109,
+     "name": "Venkat Subramaniam"
+    }
+   ],
+   "video": {
+    "id": "wzN6qq08w0U",
+    "title": "ADRs: The Why and How  by Venkat Subramaniam",
+    "matchScore": 1.15,
+    "views": 1245,
+    "likes": 17,
+    "comments": 0,
+    "published": "2026-10-09T07:43:16Z",
+    "lengthSeconds": 3000
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 12751,
+   "title": "Microservices Without the Distributed Mess",
+   "day": "thursday",
+   "start": "2026-10-08T14:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "ADVANCED",
+   "hearts": 237,
+   "speakers": [
+    {
+     "id": 3910,
+     "name": "Steven Hillaert"
+    }
+   ],
+   "video": {
+    "id": "eFSEg54mwVU",
+    "title": "Microservices Without the Distributed Mess  by Steven Hillaert",
+    "matchScore": 1.15,
+    "views": 466,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-09T07:43:05Z",
+    "lengthSeconds": 2744
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 25661,
+   "title": "Introducing Agent Control Theory: The System Runs the Model",
+   "day": "thursday",
+   "start": "2026-10-08T14:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 10",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 79,
+   "speakers": [
+    {
+     "id": 25502,
+     "name": "Mark Pollack"
+    }
+   ],
+   "video": {
+    "id": "KwQ76IvU59M",
+    "title": "Introducing Agent Control Theory: The System Runs the Model  by Mark Pollack",
+    "matchScore": 1.15,
+    "views": 601,
+    "likes": 7,
+    "comments": 0,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 3095
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 51601,
+   "title": "Production-Ready Java Containers: Smaller, Faster, Smarter",
+   "day": "thursday",
+   "start": "2026-10-08T15:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 3",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 188,
+   "speakers": [
+    {
+     "id": 51551,
+     "name": "Albert Attard"
+    }
+   ],
+   "video": {
+    "id": "LPhGSgO5eKE",
+    "title": "Production Ready Java Containers: Smaller, Faster, Smarter  by Albert Attard",
+    "matchScore": 1.15,
+    "views": 526,
+    "likes": 8,
+    "comments": 0,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 2900
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9029,
+   "title": "From a startup stack to 5 microseconds: inside a crypto trading engine",
+   "day": "thursday",
+   "start": "2026-10-08T15:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "ADVANCED",
+   "hearts": 140,
+   "speakers": [
+    {
+     "id": 8689,
+     "name": "Oleg Lobanov"
+    }
+   ],
+   "video": {
+    "id": "vcL6eCAwLwY",
+    "title": "From a startup stack to 5 microseconds: inside a crypto trading engine  by Oleg Lobanov",
+    "matchScore": 1.15,
+    "views": 401,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-09T07:43:15Z",
+    "lengthSeconds": 2720
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 4090,
+   "title": "Help! I hate my team mate!",
+   "day": "thursday",
+   "start": "2026-10-08T15:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "BEGINNER",
+   "hearts": 326,
+   "speakers": [
+    {
+     "id": 3942,
+     "name": "Jessica Siewert"
+    }
+   ],
+   "video": {
+    "id": "sWP9osLV45I",
+    "title": "Help! I hate my team mate! by Jessica Siewert",
+    "matchScore": 1.15,
+    "views": 460,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-09T07:43:15Z",
+    "lengthSeconds": 3100
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9017,
+   "title": "AI in the Dark: Running LLMs in Air-Gapped Production Environments",
+   "day": "thursday",
+   "start": "2026-10-08T15:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 129,
+   "speakers": [
+    {
+     "id": 3903,
+     "name": "Mihaela Gheorghe-Roman"
+    }
+   ],
+   "video": {
+    "id": "kaT6UpLrzhU",
+    "title": "AI in the Dark: Running LLMs in Air Gapped Production Environments by Mihaela Gheorghe Roman",
+    "matchScore": 1.15,
+    "views": 460,
+    "likes": 5,
+    "comments": 0,
+    "published": "2026-10-09T07:43:05Z",
+    "lengthSeconds": 3050
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 22946,
+   "title": "Decoding the Cosmos: Voyager's 1970s Algorithms Meet Today's Cutting-Edge Tech",
+   "day": "thursday",
+   "start": "2026-10-08T15:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 7",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "INTERMEDIATE",
+   "hearts": 189,
+   "speakers": [
+    {
+     "id": 23024,
+     "name": "Pieter van der Meer"
+    }
+   ],
+   "video": {
+    "id": "CuvV3Aud3Q0",
+    "title": "Decoding the Cosmos: Voyager's 1970s Algorithms Meet Today's Cutting Edge Tech  by Pieter van der Me",
+    "matchScore": 1.0,
+    "views": 411,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-09T07:43:00Z",
+    "lengthSeconds": 2483
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 14459,
+   "title": "Bootiful Security",
+   "day": "thursday",
+   "start": "2026-10-08T15:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Security, Trust & Compliance",
+   "level": "BEGINNER",
+   "hearts": 367,
+   "speakers": [
+    {
+     "id": 7619,
+     "name": "Daniel Garnier-Moiroux"
+    },
+    {
+     "id": 14654,
+     "name": "Josh Long"
+    }
+   ],
+   "video": {
+    "id": "W-OKVLMtPAw",
+    "title": "Bootiful Security  by Daniel Garnier Moiroux, Josh Long",
+    "matchScore": 1.15,
+    "views": 571,
+    "likes": 17,
+    "comments": 1,
+    "published": "2026-10-09T07:43:05Z",
+    "lengthSeconds": 3078
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 7035,
+   "title": "Their API Went Down. So Why Is My App on Fire?",
+   "day": "thursday",
+   "start": "2026-10-08T15:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 153,
+   "speakers": [
+    {
+     "id": 7604,
+     "name": "Ines Panker"
+    }
+   ],
+   "video": {
+    "id": "PGpKfdXZrpc",
+    "title": "Their API Went Down  So Why Is My App on Fire?  by Ines Panker",
+    "matchScore": 1.15,
+    "views": 330,
+    "likes": 3,
+    "comments": 0,
+    "published": "2026-10-09T07:43:06Z",
+    "lengthSeconds": 2752
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10043,
+   "title": "What Does it Print? The Java Quiz (Hard Edition 🤯)",
+   "day": "thursday",
+   "start": "2026-10-08T16:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 1",
+   "format": "BOF",
+   "track": "Java Language & Platform",
+   "level": "ADVANCED",
+   "hearts": 95,
+   "speakers": [
+    {
+     "id": 3653,
+     "name": "Clément de Tastes"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 8167,
+   "title": "Open Source in the Age of AI: Where's the value?",
+   "day": "thursday",
+   "start": "2026-10-08T16:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "BOF 2",
+   "format": "BOF",
+   "track": "Development Practices",
+   "level": "ADVANCED",
+   "hearts": 112,
+   "speakers": [
+    {
+     "id": 7646,
+     "name": "Trisha Gee"
+    }
+   ],
+   "video": null,
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 49751,
+   "title": "F*ck The System, and other bad ideas for the future",
+   "day": "thursday",
+   "start": "2026-10-08T16:55:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Closing Keynote",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 376,
+   "speakers": [
+    {
+     "id": 49701,
+     "name": "Jo Caudron"
+    }
+   ],
+   "video": {
+    "id": "wUyQmRriCng",
+    "title": "F*ck The System, and other bad ideas for the future by Jo Caudron",
+    "matchScore": 1.15,
+    "views": 4975,
+    "likes": 40,
+    "comments": 2,
+    "published": "2026-10-09T07:43:15Z",
+    "lengthSeconds": 3562
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 52104,
+   "title": "In the loop, not in the dark: staying in control in the era of dark software factories",
+   "day": "friday",
+   "start": "2026-10-09T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "BEGINNER",
+   "hearts": 377,
+   "speakers": [
+    {
+     "id": 24199,
+     "name": "Alex Gavrilescu"
+    }
+   ],
+   "video": {
+    "id": "jhvT8hVYSvQ",
+    "title": "In the loop , not in the dark: Staying in controlling the era dark software factories   By Alex Gavr",
+    "matchScore": 0.75,
+    "views": 2782,
+    "likes": 11,
+    "comments": 2,
+    "published": "2026-10-13T16:45:25Z",
+    "lengthSeconds": 2692
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 17794,
+   "title": "Escaping Java's Allocation Gravity with Value Classes",
+   "day": "friday",
+   "start": "2026-10-09T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "ADVANCED",
+   "hearts": 285,
+   "speakers": [
+    {
+     "id": 3653,
+     "name": "Clément de Tastes"
+    },
+    {
+     "id": 18075,
+     "name": "Remi Forax"
+    }
+   ],
+   "video": {
+    "id": "lUB15M3mMLs",
+    "title": "Escaping Java's Allocation Gravity with Value Classes By Clément de Tastes, Remi Forax",
+    "matchScore": 1.15,
+    "views": 4475,
+    "likes": 39,
+    "comments": 4,
+    "published": "2026-10-13T16:45:25Z",
+    "lengthSeconds": 3074
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21694,
+   "title": "Why it takes 3000 commits to bring Valhalla's value objects to the JDK",
+   "day": "friday",
+   "start": "2026-10-09T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 183,
+   "speakers": [
+    {
+     "id": 21537,
+     "name": "David Simms"
+    }
+   ],
+   "video": {
+    "id": "D_AmK8-UnZg",
+    "title": "Why it takes 3000 commits to bring Valhalla's value objects to the JDK by David Simms",
+    "matchScore": 1.15,
+    "views": 6350,
+    "likes": 59,
+    "comments": 7,
+    "published": "2026-10-13T16:45:20Z",
+    "lengthSeconds": 3069
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21675,
+   "title": "All you need to know about Maven 4!",
+   "day": "friday",
+   "start": "2026-10-09T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "BEGINNER",
+   "hearts": 394,
+   "speakers": [
+    {
+     "id": 3924,
+     "name": "Matthias Bünger"
+    }
+   ],
+   "video": {
+    "id": "TgkY2UmWtBo",
+    "title": "All you need to know about Maven 4!  by Matthias Bünger",
+    "matchScore": 1.15,
+    "views": 5551,
+    "likes": 47,
+    "comments": 7,
+    "published": "2026-10-13T16:45:20Z",
+    "lengthSeconds": 2833
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9025,
+   "title": "The Quantum Tech Lead: Hands-On and Abstract at the Same Time",
+   "day": "friday",
+   "start": "2026-10-09T07:30:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "People, Practices & Career",
+   "level": "INTERMEDIATE",
+   "hearts": 237,
+   "speakers": [
+    {
+     "id": 8687,
+     "name": "Cristian Schuszter"
+    }
+   ],
+   "video": {
+    "id": "Spxl1eDQJKs",
+    "title": "The Quantum Tech Lead: Hands On and Abstract at the Same Time  by Cristian Schuszter",
+    "matchScore": 1.15,
+    "views": 799,
+    "likes": 4,
+    "comments": 0,
+    "published": "2026-10-13T16:45:20Z",
+    "lengthSeconds": 2831
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 49257,
+   "title": "Embabel Agent v1.5",
+   "day": "friday",
+   "start": "2026-10-09T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "INTERMEDIATE",
+   "hearts": 194,
+   "speakers": [
+    {
+     "id": 49107,
+     "name": "Rod Johnson"
+    }
+   ],
+   "video": {
+    "id": "DniA37kVfvI",
+    "title": "Embabel Agent v1 5 By Rod Johnson",
+    "matchScore": 1.15,
+    "views": 1335,
+    "likes": 14,
+    "comments": 0,
+    "published": "2026-10-13T16:45:20Z",
+    "lengthSeconds": 3073
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 15359,
+   "title": "Is AI killing XP practices? (Or are we letting it?)",
+   "day": "friday",
+   "start": "2026-10-09T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 300,
+   "speakers": [
+    {
+     "id": 15309,
+     "name": "Nacho Cougil"
+    }
+   ],
+   "video": {
+    "id": "wrV4f83UMWI",
+    "title": "Is AI killing XP practices? Or are we letting it? By Nacho Cougil",
+    "matchScore": 1.15,
+    "views": 2151,
+    "likes": 10,
+    "comments": 0,
+    "published": "2026-10-13T16:45:25Z",
+    "lengthSeconds": 2956
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21655,
+   "title": "What’s happening with Project Amber?",
+   "day": "friday",
+   "start": "2026-10-09T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "ADVANCED",
+   "hearts": 193,
+   "speakers": [
+    {
+     "id": 21503,
+     "name": "Gavin Bierman"
+    }
+   ],
+   "video": {
+    "id": "Go76-9Q51wU",
+    "title": "What’s happening with Project Amber? By Gavin Bierman",
+    "matchScore": 1.15,
+    "views": 3587,
+    "likes": 27,
+    "comments": 1,
+    "published": "2026-10-13T16:45:20Z",
+    "lengthSeconds": 3101
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 10023,
+   "title": "You thought technical debt was bad? Meet design debt!",
+   "day": "friday",
+   "start": "2026-10-09T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 509,
+   "speakers": [
+    {
+     "id": 10159,
+     "name": "Julien Topçu"
+    },
+    {
+     "id": 10160,
+     "name": "Josian Chevalier"
+    }
+   ],
+   "video": {
+    "id": "SoWgxHeAPGU",
+    "title": "You thought technical debt was bad? Meet design debt!  by Julien Topçu, Josian Chevalier",
+    "matchScore": 1.15,
+    "views": 1097,
+    "likes": 13,
+    "comments": 0,
+    "published": "2026-10-13T16:45:20Z",
+    "lengthSeconds": 2996
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 16408,
+   "title": "10 Billion Records vs. The Regulator: An Architectural Post-Mortem of an 11TB Exadata Failure",
+   "day": "friday",
+   "start": "2026-10-09T08:40:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "ADVANCED",
+   "hearts": 213,
+   "speakers": [
+    {
+     "id": 15901,
+     "name": "Martin Ladecky"
+    }
+   ],
+   "video": {
+    "id": "TB45qqp-OxM",
+    "title": "10 Billion Records vs The Regulator: An Architectural Post Mortem of an 11TB Exadata Failure",
+    "matchScore": 1.0,
+    "views": 3661,
+    "likes": 9,
+    "comments": 1,
+    "published": "2026-10-13T16:51:18Z",
+    "lengthSeconds": 2922
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 9036,
+   "title": "My old trains have a second life, with TinyGo!",
+   "day": "friday",
+   "start": "2026-10-09T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 4",
+   "format": "Conference",
+   "track": "Mind the Geek",
+   "level": "BEGINNER",
+   "hearts": 79,
+   "speakers": [
+    {
+     "id": 8696,
+     "name": "Florian FORESTIER"
+    },
+    {
+     "id": 8697,
+     "name": "Justine Bachelard"
+    }
+   ],
+   "video": {
+    "id": "LIGVpEuIrrY",
+    "title": "My old trains have a second life, with TinyGo! By Florian FORESTIER, Justine Bachelard",
+    "matchScore": 1.15,
+    "views": 707,
+    "likes": 2,
+    "comments": 0,
+    "published": "2026-10-13T16:45:20Z",
+    "lengthSeconds": 2403
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 21687,
+   "title": "10 boring reasons why Java is the best ecosystem for agentic development",
+   "day": "friday",
+   "start": "2026-10-09T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 5",
+   "format": "Conference",
+   "track": "Agentic Engineering & Tooling",
+   "level": "ADVANCED",
+   "hearts": 267,
+   "speakers": [
+    {
+     "id": 21534,
+     "name": "Ed Burns"
+    }
+   ],
+   "video": {
+    "id": "Qg7Uu_XBvpI",
+    "title": "10 boring reasons why Java is the best ecosystem for agentic development By Ed Burns",
+    "matchScore": 1.15,
+    "views": 988,
+    "likes": 6,
+    "comments": 0,
+    "published": "2026-10-13T16:45:20Z",
+    "lengthSeconds": 2989
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 52101,
+   "title": "Java Next - From Valhalla to Leyden, from Babylon to Panama, from Amber to Detroit",
+   "day": "friday",
+   "start": "2026-10-09T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 6",
+   "format": "Conference",
+   "track": "Java Language & Platform",
+   "level": "BEGINNER",
+   "hearts": 355,
+   "speakers": [
+    {
+     "id": 23037,
+     "name": "Nicolai Parlog"
+    }
+   ],
+   "video": {
+    "id": "ufhs9THbYZI",
+    "title": "Java Next   From Valhalla to Leyden, from Babylon to Panama, from Amber to Detroit By Nicolai Parlog",
+    "matchScore": 1.15,
+    "views": 6106,
+    "likes": 44,
+    "comments": 2,
+    "published": "2026-10-13T16:45:25Z",
+    "lengthSeconds": 3096
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 5538,
+   "title": "Strangling the dragon: modernizing legacy systems with the Strangler Fig pattern",
+   "day": "friday",
+   "start": "2026-10-09T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 8",
+   "format": "Conference",
+   "track": "Architecture & Modernization",
+   "level": "INTERMEDIATE",
+   "hearts": 303,
+   "speakers": [
+    {
+     "id": 5828,
+     "name": "Daniel Raneland"
+    }
+   ],
+   "video": {
+    "id": "AmL_OCs5F4E",
+    "title": "Strangling the dragon: modernizing legacy systems with the Strangler Fig pattern   by Daniel Ranela",
+    "matchScore": 1.0,
+    "views": 1425,
+    "likes": 7,
+    "comments": 2,
+    "published": "2026-10-13T16:45:20Z",
+    "lengthSeconds": 2123
+   },
+   "rating": null,
+   "numRatings": null
+  },
+  {
+   "talkId": 23531,
+   "title": "We created our own AI orchestrator and it became so much more!",
+   "day": "friday",
+   "start": "2026-10-09T09:50:00Z",
+   "timezone": "Europe/Brussels",
+   "room": "Room 9",
+   "format": "Conference",
+   "track": "Development Practices",
+   "level": "INTERMEDIATE",
+   "hearts": 284,
+   "speakers": [
+    {
+     "id": 21529,
+     "name": "Ricky van Rijn"
+    }
+   ],
+   "video": {
+    "id": "niBYuCuViGw",
+    "title": "We created our own AI orchestrator and it became so much more!  by Ricky van Rijn",
+    "matchScore": 1.15,
+    "views": 4487,
+    "likes": 24,
+    "comments": 1,
+    "published": "2026-10-13T16:45:25Z",
+    "lengthSeconds": 3093
+   },
+   "rating": null,
+   "numRatings": null
+  }
+ ],
+ "unmatchedVideos": [
+  {
+   "id": "Qw6845LaSGw",
+   "title": "An Architectural Post-Mortem of an 11TB Exadata Failure"
+  },
+  {
+   "id": "-Aub1KMjMFM",
+   "title": "Devoxx the mini series: The Attendee"
+  },
+  {
+   "id": "eSSPOCeoF0c",
+   "title": "How AI transforms engineering and inspiring young minds – Ayoub Hammou Ahabchane & Kamel Zaraoui"
+  },
+  {
+   "id": "lsvVJaigNp8",
+   "title": "\"You May Now Optimize the Wedding\": Optimizing the Seating, Bachelor Party, and Honeymoon with Const"
+  },
+  {
+   "id": "w2RTFWet_6c",
+   "title": "Choose your own adventure in agentic design patterns  by Guillaume Laforge"
+  },
+  {
+   "id": "lW1faHx-guk",
+   "title": "Devoxx: ThankYou"
+  },
+  {
+   "id": "FFRdupUFpL0",
+   "title": "Devoxx the mini series: Kinepolis in 2170"
+  },
+  {
+   "id": "9Uz6lyElOL0",
+   "title": "Devoxx the mini series: Inside the singularity"
+  },
+  {
+   "id": "CscMBNKvQA8",
+   "title": "Devoxx the mini series: The Rebellion"
+  },
+  {
+   "id": "Tc2RFLa0ip8",
+   "title": "The pizza party of the future 🍕 by Katie Clark and Simon Rohrer"
+  },
+  {
+   "id": "GkcE1X1BJRI",
+   "title": "The games are in. It’s your turn to play! 🎮 🕹️"
+  },
+  {
+   "id": "nma5a_sbX5E",
+   "title": "Speaking next week at Devoxx Belgium?"
+  },
+  {
+   "id": "2D72Qlr1ATw",
+   "title": "Devoxx Belgium is Next Week!"
+  },
+  {
+   "id": "j9dhCtfjLVk",
+   "title": "Devoxx Belgium 2026 Tickets – 2nd Batch available"
+  }
+ ],
+ "rejectedMatches": [
+  {
+   "talkId": 24229,
+   "id": "okdgOPcFCqw",
+   "title": "Building AI Agents with Spring & MCP by James Ward, Josh Long",
+   "published": "2026-04-08T20:16:29Z"
+  }
+ ]
+}
