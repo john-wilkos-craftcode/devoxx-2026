@@ -1876,12 +1876,23 @@ async function standUp() {
 // ---------- moving between the hall and a seat ----------
 let room = null, current = null, busy = false;
 
+// a walk starts with the screen switching off: faded, not gone in a frame, then out of the way of the walk
+async function switchOff() {
+  if (!face) return;
+  if (!reduceMotion) {
+    face.el.style.animation = "off .25s ease-in both";     // (an inline opacity loses to the entrance animation's fill)
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  face.el.remove(); face = null;
+}
+
 async function toHall(withWalk) {
   // the way back: the walk back to the hall where it's rendered (it starts on the still you're looking at), else a fade
   // through black
   const back = withWalk && room ? backClip(room) : null;
   if (back) {
     say("Walking back to the hall");
+    await switchOff();                       // the talk leaves the totem/screen before the walk, not after it
     await standUp();
     await playClip(back, { arrive: shotKey("hall") });
     say("");
@@ -1899,10 +1910,7 @@ async function toHall(withWalk) {
 
 async function toSeat(t, withWalk) {
   const n = roomNo(t), key = shotKey(`seat-${n}`);
-  if (withWalk && face && !reduceMotion) {      // the programme fades off the screen first, not gone in a frame
-    face.el.style.animation = "off .25s ease-in both";     // (an inline opacity loses to the entrance animation's fill)
-    await new Promise((r) => setTimeout(r, 250));
-  }
+  if (withWalk) await switchOff();
   unmount();
   if (shape === "laptop") return sitDown(t, n, key, withWalk);
   // phones: the walk pushes in on the door totem and the zoom carries on from it until the totem's screen fills the
