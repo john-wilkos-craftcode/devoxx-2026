@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """The data for the site's cinema menu (site/menu.js): every talk with its summary fields and its
-public signals, the conference recap (headline, verdicts, debates) and provisional "watch first" picks. Inputs:
+public signals, the conference recap (headline, verdicts, debates) and the "watch first" picks (John's editor's picks
+where he has one for a verdict, the rest from the signals). Inputs:
 site/data.js (talks, summaries, recap) and the newest snapshot in data/metrics/dvbe26/ (written by fetch_metrics.py:
 YouTube views and likes, Devoxx hearts, attendee ratings when Devoxx publishes them).
   python3 scripts/build_menu.py   ->  site/menu.js  (window.MENU)
@@ -12,6 +13,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SNAP = ROOT / "data/metrics/dvbe26"
 THIN = 20                                       # under this many likes the like rate is noise (talk-metrics note)
+EDITOR = {                                      # John's editor's picks (27/10): each takes its verdict's pick
+    5507: "Stopping AI-Generated Architectural Drift (Sasha Podlesniuk): his best talk of Monday",
+    31452: "Responsibly Dimming the Lights in the Software Factory (Victor Rentea, Tuesday)",
+}
 
 src = (ROOT / "site/data.js").read_text()
 site = json.loads(src[src.index("{"):src.rindex("}") + 1])
@@ -66,14 +71,17 @@ picks = []
 for tr in site["recap"]["trends"]:
     ids = [i for i in tr["talkIds"] if i in by_id and by_id[i]["views"]]
     if ids:
-        best = max(ids, key=lambda i: score(by_id[i]))
-        picks.append({"verdict": tr["title"], "talkId": best, "why": by_id[best]["watchIf"]})
+        ed = [i for i in ids if i in EDITOR]
+        best = ed[0] if ed else max(ids, key=lambda i: score(by_id[i]))
+        picks.append({"verdict": tr["title"], "talkId": best, "why": by_id[best]["watchIf"], "editor": bool(ed)})
+missing = set(EDITOR) - {p["talkId"] for p in picks}
+assert not missing, f"editor's picks under no verdict (or without a video): {missing}"
 
 out = {
     "event": "Devoxx Belgium 2026", "dates": "5-9 October 2026", "venue": "Kinepolis Antwerp",
     "signals": {"snapshot": snap_json["takenAt"], "hasRatings": has_ratings, "avgLikeRate": round(avg * 100, 2), "thinBelowLikes": THIN,
                 "note": "views = reach; likes per 100 views = approval, noise under 20 likes; hearts = interest before the talk"},
-    "recap": site["recap"], "picks": picks, "picksNote": "provisional, from the signals; editor's picks to follow",
+    "recap": site["recap"], "picks": picks, "picksNote": "editor's picks where marked, the rest from the signals",
     "talks": talks,
 }
 (ROOT / "site/menu.js").write_text("window.MENU = " + json.dumps(out, ensure_ascii=False) + ";\n")

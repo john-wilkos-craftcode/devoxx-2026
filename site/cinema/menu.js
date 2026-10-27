@@ -73,6 +73,9 @@ function make({ phone, watch, walks, textHref }) {
   const storyOfVerdict = (i) => INKS.find((k) => STORIES[k].verdicts.includes(i));
   const byId = new Map(TALKS.map((t) => [t.id, t]));
   const pickIds = new Set(M.picks.map((p) => p.talkId));
+  const edIds = new Set(M.picks.filter((p) => p.editor).map((p) => p.talkId));   // John's own picks, the rest come from the signals
+  const pickTag = (id) => edIds.has(id) ? "Editor&rsquo;s pick" : "Watch first";
+  const edTag = (p) => p.editor ? '<span class="ed">Editor&rsquo;s pick</span>' : "";
   const PAGE = 4;   // watch first shows four picks at a time
   // the programme's five days (the sheet no longer carries them: one Programme button opens Monday with these as tabs)
   const DAYS = [["2026-10-05", "Mon 5", "Monday 5 October"], ["2026-10-06", "Tue 6", "Tuesday 6 October"], ["2026-10-07", "Wed 7", "Wednesday 7 October"],
@@ -159,7 +162,7 @@ function make({ phone, watch, walks, textHref }) {
     const o = opts || {};
     const meta = [speakers(t), t.room, o.noDate ? null : when(t)].filter(Boolean).join(" · ");
     const time = o.time ? `<span class="tm">${fTime.format(new Date(t.start))}</span>` : "";
-    return `<li><button class="row ${inkOf(t)}${o.time ? " timed" : ""}" data-talk="${t.id}" title="${esc(t.title)}" aria-label="${esc(t.title)}, ${esc(INK_NAME[inkOf(t)])}">${time}<span class="bar" aria-hidden="true"></span><span class="t">${esc(t.title)}</span><span class="m">${pickIds.has(t.id) ? '<span class="wf">Watch first</span>' : ""}${esc(meta)}</span><span class="s">${signal(t)}</span></button></li>`;
+    return `<li><button class="row ${inkOf(t)}${o.time ? " timed" : ""}" data-talk="${t.id}" title="${esc(t.title)}" aria-label="${esc(t.title)}, ${esc(INK_NAME[inkOf(t)])}">${time}<span class="bar" aria-hidden="true"></span><span class="t">${esc(t.title)}</span><span class="m">${pickIds.has(t.id) ? `<span class="wf">${pickTag(t.id)}</span>` : ""}${esc(meta)}</span><span class="s">${signal(t)}</span></button></li>`;
   }
   // the sorts: each with its signal's icon; the arrow says which one orders the list (highest first)
   const sortbar = () => `<div class="sortbar" role="group" aria-label="Sort the talks">` +
@@ -226,7 +229,7 @@ function make({ phone, watch, walks, textHref }) {
   function pickDetail(n) {
     const p = M.picks[n]; if (!p) return "";
     const { ink, t } = pickOf(p); if (!t) return "";
-    return `<button class="thumbbtn" data-talk="${t.id}" aria-label="Open the card for ${esc(t.title)}">${thumb(t, ink, true)}</button><p class="dv"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}</p><h3 class="dt">${esc(t.title)}</h3>` +
+    return `<button class="thumbbtn" data-talk="${t.id}" aria-label="Open the card for ${esc(t.title)}">${thumb(t, ink, true)}</button><p class="dv"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}${edTag(p)}</p><h3 class="dt">${esc(t.title)}</h3>` +
       `<p class="dm">${esc(speakers(t))} &middot; ${esc(t.room)} &middot; ${esc(when(t))}</p><p class="dw">${esc(p.why)}</p>` +
       `<button class="primary" data-talk="${t.id}">Watch it</button>`;
   }
@@ -237,14 +240,14 @@ function make({ phone, watch, walks, textHref }) {
     if (PHONE) {
       const cells = page.map((p) => {
         const { ink, t } = pickOf(p); if (!t) return "";
-        return `<li class="pk ${ink}"><button class="thumbbtn" data-talk="${t.id}" aria-label="Open the card for ${esc(t.title)}">${thumb(t, ink)}</button><div class="pkt"><span class="v"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}</span><button class="pt" data-talk="${t.id}">${esc(t.title)}</button><span class="pm">${esc(speakers(t))} &middot; ${esc(t.room)} &middot; ${esc(when(t))}</span><span class="pw">${esc(p.why)}</span></div></li>`;
+        return `<li class="pk ${ink}"><button class="thumbbtn" data-talk="${t.id}" aria-label="Open the card for ${esc(t.title)}">${thumb(t, ink)}</button><div class="pkt"><span class="v"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}${edTag(p)}</span><button class="pt" data-talk="${t.id}">${esc(t.title)}</button><span class="pm">${esc(speakers(t))} &middot; ${esc(t.room)} &middot; ${esc(when(t))}</span><span class="pw">${esc(p.why)}</span></div></li>`;
       }).join("");
       return `<ol class="picks" start="${a + 1}">${cells}</ol>${pager}`;
     }
     if (S.sel < a || S.sel >= b) S.sel = a;
     const rows = page.map((p, k) => {
       const { ink, t } = pickOf(p); if (!t) return "";
-      return `<li><button class="prow pt ${ink}" data-talk="${t.id}" data-pick="${a + k}"${a + k === S.sel ? ' aria-current="true"' : ""}><span class="v"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}</span><span class="ptt">${esc(t.title)}</span></button></li>`;
+      return `<li><button class="prow pt ${ink}" data-talk="${t.id}" data-pick="${a + k}"${a + k === S.sel ? ' aria-current="true"' : ""}><span class="v"><span class="sw" aria-hidden="true"></span>${esc(p.verdict)}${edTag(p)}</span><span class="ptt">${esc(t.title)}</span></button></li>`;
     }).join("");
     return `<div class="pgrid"><ol class="picks plist" start="${a + 1}">${rows}</ol><div class="pdetail" aria-live="polite">${pickDetail(S.sel)}</div></div>${pager}`;
   }
@@ -384,7 +387,7 @@ function make({ phone, watch, walks, textHref }) {
     const ink = inkOf(t);
     const stats = statIcons(t);
     return `<div class="scrim" data-act="unpeek"></div><div class="tcard ${ink}" role="dialog" aria-modal="true" aria-labelledby="peek-t">` +
-      `<div class="ph"><span class="ty">${esc(t.type)} &middot; ${dur(t.minutes)} &middot; ${esc(LEVEL[t.level] || t.level)}</span>${pickIds.has(t.id) ? '<span class="wf">Watch first</span>' : ""}</div>` +
+      `<div class="ph"><span class="ty">${esc(t.type)} &middot; ${dur(t.minutes)} &middot; ${esc(LEVEL[t.level] || t.level)}</span>${pickIds.has(t.id) ? `<span class="wf">${pickTag(t.id)}</span>` : ""}</div>` +
       `<div class="pin"><div class="pm1"><div class="pid"><h3 id="peek-t">${esc(t.title)}</h3><p class="by">${t.speakers.map((s) => `${esc(s.name)}${s.company ? ` <span>${esc(s.company)}</span>` : ""}`).join(", ")}</p>` +
       `<p class="where">${esc(t.room)} &middot; ${esc(when(t))}</p></div><button class="thumbbtn go" data-talk="${t.id}" data-go="1" aria-label="Watch it: ${esc(t.title)}">${thumb(t, ink, true)}<span class="play" aria-hidden="true"></span></button></div>` +
       `<p class="sum">${esc(t.tldr)}</p><p class="if"><b>Watch if</b>${esc(t.watchIf)}</p><div class="stats">${stats}${freshness()}</div>` +
