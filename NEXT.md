@@ -1,20 +1,34 @@
-# Where this stands (19/10, 18:45)
+# Where this stands (27/10)
 
-## Next session: start here (22/10, 17:25: John paused)
-- **Live (pushed):** the Three Inks menu on the cinema hall screen, laptop and phone (42e7aba). A talk opens its card,
-  and WATCH IT walks you there. Fixed: the menu stayed invisible after a walk back (a5f4a68). Design history:
-  design/menu-round3/three-inks/LOG.md. To test the integrated menu, use tools/ux/inks-harness.html (header says how).
-- **Metrics refresh daily** (.github/workflows/metrics.yml, 04:30 UTC: scripts/fetch_metrics.py, build_menu.py,
-  stamp_assets.py, commit, redeploy). The first run on GitHub failed: YouTube gave no view count for 71/182 watch
-  pages from the runner. 4ed0df6 retries blank pages and carries the previous snapshot's counts forward; its test run
-  (39803195911) was still going at the pause, so check it with `gh run view 39803195911`. If runners stay blocked, ask
-  John for a YouTube Data API key as a repo secret. "Best rated" appears by itself once the CFP publishes
-  /ratings/top (empty for dvbe26 on 22/10).
-- **In progress, NOT committed:** a restyle of the rest of the cinema UI (seat, laptop notes, tube controls, chips,
-  loading, talk screens) to the Three Inks look. It is in the working tree (site/cinema/cinema.css, cinema.js,
-  index.html, tools/ux/overflow.mjs) and the before/after shots are in the session scratchpad. Review the diff and
-  screenshots with John before pushing; `git stash` drops it if it's bad.
-- The Watch first picks are recomputed from the metrics, so they can change day to day ("editor's picks" still open).
+## Next session: start here (27/10)
+- **Live (pushed), nothing uncommitted:** the cinema page, laptop and phone: fly-through, walks to rooms 3-10 and back,
+  seat stills, and the Three Inks menu on the hall screen. The rest of the UI is in the same look (73d0d64), the hall is
+  construction paper with torn scraps under the thumbnails (097f4d6), the theatre is dark (0c31220). On phones the talk
+  leaves the door totem before the walk back (48eb60f, 26/10).
+- **Editor's picks (27/10, John):** Watch first pins John's picks where he has one for a verdict: "Stopping
+  AI-Generated Architectural Drift" (Sasha Podlesniuk, Mon 5/10, his best talk of the day) for "The harness outweighs
+  the model", and Victor Rentea's "Responsibly Dimming the Lights in the Software Factory" (Tue 6/10) for "Review is the
+  new bottleneck". They carry an "Editor's pick" tag. The other six are still computed from the metrics and can change
+  day to day. To add or change one, edit `EDITOR` in scripts/build_menu.py, then run build_menu.py and stamp_assets.py
+  (the build fails if a pick sits under no verdict).
+- **Metrics:** .github/workflows/metrics.yml at 04:17 and 15:47 UTC, through the YouTube Data API (repo secret
+  `YT_API_KEY`); every run since 23/10 has passed. "Best rated" appears by itself once the CFP publishes /ratings/top.
+- **Dropped (John 26/10):** the laptop redesign mock-up (the three questions first on the laptop screen) was rejected;
+  the page stays as it is. The other items on the 26/10 list were skipped too.
+- **Accepted, fix only if John sees them:** walk starts ~1 px off their stills, the ~3-frame lurch before the seat, walks
+  22-31 s (16 s was asked). No re-renders (John 19/10).
+- **Never done (older plans, nobody asked for them since):** the auditorium remodel from the four new photos, and
+  slide-by-slide navigation (scripts/detect_slides.py works).
+- **Testing the menu:** port 8770 is taken by another server (404s on everything), so serve the repo on 8771:
+  `python3 -m http.server 8771`, then
+  `CAPTURE_URL=http://localhost:8771/tools/ux/inks-harness.html node tools/ux/menu-capture.mjs design/menu-round3/three-inks <out> --no-hall`
+  (110 checks; the one console 404 is the harness's favicon). The cinema page itself needs `node tools/ux/serve.mjs 8766`.
+- **Pushing:** `scripts/push.sh` (the global "ask: git push" rule stays; John 19/10).
+
+## Earlier: 22/10, 17:25 (John paused)
+- Live: the Three Inks menu (42e7aba) and its fix after a walk back (a5f4a68). Design history:
+  design/menu-round3/three-inks/LOG.md. The restyle then in the working tree went live 23/10 (73d0d64). The first
+  metrics runs from GitHub's runners lost 71/182 view counts, which is why the workflow moved to the API key.
 
 ## Earlier: 21/10, 06:00 (all renders done)
 - **Live:** everything, laptop and phone (intro/fly-through, rooms 3-10 there and back, stills). The queue finished
@@ -28,12 +42,12 @@
   (rooms 4, 6, 7 match). Same 1 px class John accepted; fix only if he sees it.
 - **Queue command** (for any future re-render): `cp scripts/photomatch/finals.sh scripts/photomatch/.finals-run.sh &&
   scripts/photomatch/.finals-run.sh [--until HH:MM]`; markers in kino-renders/photomatch/final/done/.
-- **Hall screen menu (John 20/10): undecided.** Round 1 (design/menu-variants) rejected as generic and too dense.
+- **Hall screen menu (John 20/10): undecided** (settled 22/10: Three Inks). Round 1 (design/menu-variants) rejected as generic and too dense.
   Round 2 (design/menu-screen: BRIEF.md, Fable's IDEAS.md, five builds, gallery index.html) plateaued at 6.0-6.8/10
   under fresh critics; lightbox and two-voices came closest. Options put to John: pick a direction to iterate with his
   notes, or add image generation (an API key with a spend limit, gitignored). Screens in the hall:
   `python3 tools/ux/inhall.py <menu.png> <out.jpg> [--phone]`. Serve with `python3 -m http.server 8770` from the repo.
-- **Also waiting on John:** the laptop redesign mock-up (three questions first; scratchpad copy in
+- **Also waiting on John** (both settled: the mock-up was rejected 26/10, editor's picks went in 27/10): the laptop redesign mock-up (three questions first; scratchpad copy in
   C:\Users\wilkojo\kino-renders\mockups\laptop-mockup.html) and "editor's picks + all three signals" for ranking
   (fresh YouTube snapshot 20/10: 181 videos, only 32 with 20+ likes; design/menu-variants/make_data.py has the signals).
 - **Pushing:** `scripts/push.sh` (the global "ask: git push" rule stays; John 19/10).
