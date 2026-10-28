@@ -4,7 +4,7 @@ public signals, the conference recap (headline, verdicts, debates) and the "watc
 where he has one for a verdict, the rest from the signals) and the cutting edge (seven ideas, data/cutting_edge.json,
 John 28/10). Inputs: site/data.js (talks, summaries, recap), data/cutting_edge.json and the newest snapshot in data/metrics/dvbe26/ (written by fetch_metrics.py:
 YouTube views and likes, Devoxx hearts, attendee ratings when Devoxx publishes them).
-  python3 scripts/build_menu.py   ->  site/menu.js  (window.MENU)
+  python3 scripts/build_menu.py   ->  site/menu.js  (window.MENU), site/edge.js  (window.EDGE, the cutting edge for the text version)
 """
 import json
 import statistics
@@ -90,4 +90,5 @@ out = {
     "talks": talks,
 }
 (ROOT / "site/menu.js").write_text("window.MENU = " + json.dumps(out, ensure_ascii=False) + ";\n")
+(ROOT / "site/edge.js").write_text("window.EDGE = " + json.dumps(out["edge"], ensure_ascii=False) + ";\n")   # the text version (/slop/) needs only this
 print(f"{len(talks)} talks, {len(picks)} picks, {len(edge['ideas'])} edge ideas, snapshot {snap_json['takenAt']}, ratings {has_ratings}")

@@ -15,7 +15,7 @@
   CodeConnect notes (codeconnect-oct-2026/devoxx-slot/cutting-edge.md): one row per idea with its talks' thumbnails on
   green scraps, and per idea one card per talk with one plain fact. "Few saved it" marks talks in the bottom quarter for
   schedule saves (computed live). Text in data/cutting_edge.json (build_menu.py checks the talk IDs), the green paper
-  from `make_paper.py --edge`. Not in the text version (/slop/).
+  from `make_paper.py --edge`. The text version (/slop/) shows it too, as text, from site/edge.js (written by build_menu.py).
 - **Metrics:** .github/workflows/metrics.yml at 04:17 and 15:47 UTC, through the YouTube Data API (repo secret
   `YT_API_KEY`); every run since 23/10 has passed. "Best rated" appears by itself once the CFP publishes /ratings/top.
 - **Dropped (John 26/10):** the laptop redesign mock-up (the three questions first on the laptop screen) was rejected;

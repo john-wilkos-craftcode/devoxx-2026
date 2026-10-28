@@ -8,5 +8,5 @@ from build_site import stamp_assets
 
 ROOT = Path(__file__).resolve().parents[1]
 stamp_assets(ROOT / "site" / "cinema.js", ("./inks.js",))          # the module import, first: it changes cinema.js
-stamp_assets(ROOT / "site" / "slop" / "index.html", ("styles.css", "app.js", "../data.js"))
+stamp_assets(ROOT / "site" / "slop" / "index.html", ("styles.css", "app.js", "../data.js", "../edge.js"))
 stamp_assets(ROOT / "site" / "index.html", ("cinema.css", "inks.css", "cinema.js", "data.js", "menu.js"))

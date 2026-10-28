@@ -154,6 +154,30 @@
     document.querySelector('.topbar a[href="#recap"]').remove();
   }
 
+  // ---------- the cutting edge (data/cutting_edge.json via ../edge.js, John 28/10): seven ideas, one fact per talk ----------
+  const EDGE = window.EDGE;
+  if (EDGE && EDGE.ideas && EDGE.ideas.length) {
+    $("#edge").hidden = false;
+    $("#edge-intro").textContent = EDGE.standfirst;
+    $("#edge-stakes").textContent = EDGE.tableStakes;
+    // "few saved it": a talk in the bottom quarter for bookmarks (schedule saves), counted from the bottom (1 = fewest)
+    const fewest = (t) => talks.filter((x) => x.favourites < t.favourites).length + 1;
+    const nth = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
+    $("#ideas").append(...EDGE.ideas.map((idea, i) => el("li", { class: "idea", id: `idea-${i + 1}` },
+      el("h3", { text: idea.title }),
+      el("p", { class: "idea-line", text: idea.line }),
+      el("ul", { class: "idea-talks" }, idea.talks.map((x) => {
+        const t = byId.get(x.id); if (!t) return null;
+        const f = fewest(t);
+        return el("li", {}, el("a", { href: `#talk-${t.id}` },
+          el("span", { class: "idea-fact", text: x.fact }),
+          el("span", { class: "idea-who" }, el("span", { class: "idea-title", text: t.title }), `, ${speakerNames(t)}`),
+          f <= talks.length / 4 ? el("span", { class: "idea-few", text: `Few saved it: ${nth(f)} fewest of ${talks.length}` }) : null));
+      })))));
+  } else {
+    document.querySelector('.topbar a[href="#edge"]').remove();
+  }
+
   // ---------- favourites ----------
   const favs = [...talks].sort((a, b) => b.favourites - a.favourites).slice(0, 10);
   $("#fav-list").append(...favs.map((t) => el("li", {},

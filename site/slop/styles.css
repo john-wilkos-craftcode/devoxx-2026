@@ -186,7 +186,7 @@ button, input, select { font: inherit; color: inherit; }
   font: 800 clamp(34px, 5vw, 60px)/1 var(--display); margin: 0 0 12px; letter-spacing: .005em;
 }
 .section-intro { color: var(--muted); margin: 0 0 32px; max-width: 40em; }
-.recap, .favourites, .missing { padding: clamp(40px, 6vw, 72px) 0; border-top: 1px solid var(--line); }
+.recap, .edge, .favourites, .missing { padding: clamp(40px, 6vw, 72px) 0; border-top: 1px solid var(--line); }
 
 /* Trends: the recap */
 .trends { display: grid; gap: 56px; }
@@ -237,6 +237,29 @@ button, input, select { font: inherit; color: inherit; }
 .trend-talks a { color: var(--muted); text-decoration: none; display: block; padding-left: 16px; position: relative; }
 .trend-talks a::before { content: ""; position: absolute; left: 0; top: .62em; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 .trend-talks a:hover { color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); }
+
+/* The cutting edge (John 28/10): seven numbered ideas, each with its talks as one plain fact apiece. Green is this
+   section's accent, as on the cinema's hall menu */
+.edge { --edge: #A6D13A; --edge-ink: #17122B; }
+:root[data-theme="light"] .edge { --edge: #5C8A00; --edge-ink: #FFFFFF; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .edge { --edge: #5C8A00; --edge-ink: #FFFFFF; } }
+.ideas { list-style: none; padding: 0; margin: 0; counter-reset: idea; display: grid; gap: 40px; }
+.idea { counter-increment: idea; display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 18px; border-top: 1px solid var(--line); padding-top: 22px; scroll-margin-top: 140px; }
+.idea::before { content: counter(idea); grid-row: 1 / span 3; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 8px; background: var(--edge); color: var(--edge-ink); font: 900 28px/1 var(--display); }
+.idea h3 { font: 800 clamp(26px, 3vw, 34px)/1.05 var(--display); margin: 0; }
+.idea-line { color: var(--muted); margin: 6px 0 16px; max-width: 46em; }
+.idea-talks { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 14px 22px; }
+.idea-talks a { display: flex; flex-direction: column; gap: 6px; height: 100%; box-sizing: border-box; background: var(--surface); border-radius: 12px; border-left: 4px solid var(--edge); padding: 14px 18px; text-decoration: none; }
+.idea-fact { font-size: 18px; line-height: 1.45; }
+.idea-who { color: var(--muted); font-size: 14px; line-height: 1.35; margin-top: auto; }
+.idea-title { font-style: italic; }
+.idea-talks a:hover .idea-title { color: var(--text); text-decoration: underline; text-decoration-color: var(--edge); }
+.idea-few { align-self: flex-start; font: 700 14px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; background: var(--edge); color: var(--edge-ink); padding: 4px 7px 3px; border-radius: 3px; }
+.edge-stakes { color: var(--muted); margin: 40px 0 0; padding-top: 18px; border-top: 1px solid var(--line); max-width: 46em; font-style: italic; }
+@media (max-width: 760px) {
+  .idea { grid-template-columns: 1fr; }
+  .idea::before { grid-row: auto; margin-bottom: 10px; }
+}
 
 /* Favourites: a ranking, so numbered */
 .fav-list { list-style: none; padding: 0; margin: 0; counter-reset: fav; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 0 40px; }
