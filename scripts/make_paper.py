@@ -4,8 +4,11 @@ scraps of them to lay under thumbnails. Source: "Construction paper backgrounds"
 (https://opengameart.org/content/construction-paper-backgrounds, conppr.tar.gz), unpacked into --src.
   python3 scripts/make_paper.py --src <dir with conppr_*.jpg>   ->  site/paper/*.webp
   python3 scripts/make_paper.py --paper                          ->  site/paper/{scrap-paper-1,2,swatch-paper}.webp
+  python3 scripts/make_paper.py --edge                           ->  site/paper/{edge,scrap-edge-1,2,swatch-edge}.webp
 (--paper: the fourth stock, the menu's bare newsprint (#EEF0EC), for talks outside the three inks; its fibre is read
 back from fibre.webp, so it needs no scan. In the dark theatre these pale scraps are what a "paper" talk's tag is.)
+(--edge: the cutting edge's accent (John 28/10), blue 50 % over yellow, the overprint green, the way Watch first's
+orange is pink over yellow; its fibre is read back from fibre.webp at full strength.)
 Fibre is taken from each scan's own colour as detail around its mean (so the fibres keep their real light/dark
 pattern) and laid onto the exact ink; tiles are made seamless by cross-fading with a half-offset copy.
 """
@@ -129,10 +132,25 @@ def paper_pieces():
     scrap("paper", d, 24, 24, 10, (True, True, True, True)).save(OUT / "swatch-paper.webp", quality=90, method=6)
 
 
+def edge_pieces():
+    """the cutting edge's green: a tile, two scraps and a swatch, with the fibre of fibre.webp"""
+    g = np.asarray(Image.open(OUT / "fibre.webp").convert("L")).astype(np.float32) / 255
+    d = np.repeat((1 + (g - 0.5) / 1.4)[..., None], 3, axis=2)
+    INKS["edge"] = (0x80, 0xAB, 0x00)
+    Image.fromarray((tile("edge", d) * 255).astype(np.uint8)).save(OUT / "edge.webp", quality=82, method=6)
+    for n, (w, h, seed, torn) in enumerate([(180, 104, 3, (True, True, True, False)), (180, 104, 11, (True, False, True, True))]):
+        scrap("edge", d, w, h, seed + 4, torn).save(OUT / f"scrap-edge-{n + 1}.webp", quality=88, method=6)
+    scrap("edge", d, 24, 24, 9, (True, True, True, True), pad=5).save(OUT / "swatch-edge.webp", quality=90, method=6)
+
+
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--src"); ap.add_argument("--paper", action="store_true"); a = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument("--src"); ap.add_argument("--paper", action="store_true"); ap.add_argument("--edge", action="store_true")
+    a = ap.parse_args()
     if a.paper:
         paper_pieces()
+        return
+    if a.edge:
+        edge_pieces()
         return
     if not a.src: ap.error("--src is needed (or --paper)")
     src = Path(a.src); OUT.mkdir(parents=True, exist_ok=True)

@@ -9,11 +9,13 @@
   --blue: #0078BF;
   --yellow: #FFE800;
   --orange: #FF9400;   /* pink 50 % over yellow: the overprint, used only for Watch first */
+  --edge: #80AB00;     /* blue 50 % over yellow: the overprint, used only for the cutting edge (John 28/10) */
   /* the opened fields: each ink as a light screen on the paper, so the big areas are calm and every word is black */
   --pink-t: #F7CDE3;
   --blue-t: #C6DCEA;
   --yellow-t: #F6EFAE;
   --orange-t: #F9DDB4;
+  --edge-t: #DCE6B4;
   --grey: #3b3d3a;     /* secondary text and the search placeholder: 10:1 on white, 9:1 on paper */
   --display: "Big Shoulders Display", "Archivo Narrow", Impact, sans-serif;
   --text: "Archivo", "Helvetica Neue", Arial, sans-serif;
@@ -24,6 +26,7 @@
   --pink-paper: url(paper/pink.webp) 0 0 / 384px, var(--pink);
   --blue-paper: url(paper/blue.webp) 0 0 / 384px, var(--blue);
   --yellow-paper: url(paper/yellow.webp) 0 0 / 384px, var(--yellow);
+  --edge-paper: url(paper/edge.webp) 0 0 / 384px, var(--edge);
   --fibre: url(paper/fibre.webp) 0 0 / 384px;
 }
 .inks.is-phone { --y-blue: 180px; --y-yellow: 292px; --y-foot: 466px; --pad: 16px; }
@@ -142,6 +145,8 @@
 .inks.printing .band-blue::before { animation: printin 260ms var(--ease) 110ms both; }
 .inks.printing .band-yellow::before { animation: printin 260ms var(--ease) 220ms both; }
 .inks.printing .watch { animation: inkin 200ms 420ms both; }
+.inks.printing .edgestk { animation: stick 260ms var(--ease) 520ms both; }
+@keyframes stick { from { opacity: 0; transform: rotate(-3deg) scale(1.25); } to { opacity: 1; transform: rotate(-3deg); } }
 
 /* ---------- opened states: the title bar in the full ink, the field below a light screen of it ---------- */
 .inks #opened { position: absolute; inset: 0; z-index: 20; background: var(--paper); display: flex; flex-direction: column; }
@@ -150,6 +155,7 @@
 .inks #opened.ink-pink { background: var(--fibre), var(--pink-t); background-blend-mode: soft-light; }
 .inks #opened.ink-blue { background: var(--fibre), var(--blue-t); background-blend-mode: soft-light; }
 .inks #opened.ink-yellow { background: var(--fibre), var(--yellow-t); background-blend-mode: soft-light; }
+.inks #opened.ink-edge { background: var(--fibre), var(--edge-t); background-blend-mode: soft-light; }
 @keyframes flood { 0% { transform: translateX(100%); } 70% { transform: translateX(-3px); } 100% { transform: none; } }
 .inks #opened.flood { animation: flood 280ms var(--ease) both; }
 @keyframes register { from { text-shadow: 6px 3px 0 rgba(17,17,17,.38); transform: translate(-3px, 0); } to { text-shadow: 0 0 0 rgba(17,17,17,0); transform: none; } }
@@ -158,6 +164,7 @@
 .inks .ohead.pink { background: var(--pink-paper); }
 .inks .ohead.blue { background: var(--blue-paper); color: var(--paper); }
 .inks .ohead.yellow { background: var(--yellow-paper); }
+.inks .ohead.edge { background: var(--edge-paper); }
 .inks .ohead.orange { background: var(--fibre), var(--orange); background-blend-mode: soft-light; }
 .inks .ohead .back { flex: none; display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px 0 12px; background: var(--white); color: var(--black); border: 2px solid var(--black); font: 700 16px/1 var(--text); white-space: nowrap; }
 .inks .ohead .back::before { content: "\2190"; font-size: 18px; }
@@ -543,3 +550,76 @@
 .inks #peek .stats .fresh { margin-left: auto; align-self: center; font-weight: 400; font-size: 12.5px; }
 .inks #peek .stats .fresh .ico { width: 13px; height: 13px; }
 .inks.is-phone .vfoot .fresh { flex: 1 1 100%; order: 5; margin: 0; }
+
+/* ---------- the cutting edge (John 28/10): a sticker on the coding agents band, in the green overprint ---------- */
+.inks .edgestk {
+  position: absolute; z-index: 6; right: calc(var(--pad) + 36px); top: 50px; display: flex; align-items: baseline; gap: 14px;
+  padding: 9px 16px 8px 18px; background: var(--edge-paper); border: 3px solid var(--black); box-shadow: 4px 4px 0 var(--black);
+  transform: rotate(-3deg); transition: transform 140ms var(--ease), box-shadow 140ms var(--ease);
+}
+.inks .edgestk .et { font: 800 30px/1 var(--display); letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+.inks .edgestk .es { display: inline-flex; align-items: center; gap: 8px; font: 700 16px/1 var(--text); white-space: nowrap; }
+.inks .edgestk .es::after { content: "\2192"; font-size: 20px; transition: transform 160ms var(--ease); }
+.inks .edgestk:hover, .inks .edgestk:focus-visible { transform: rotate(-3deg) translate(-2px, -2px); box-shadow: 6px 6px 0 var(--black); }
+.inks .edgestk:hover .es::after, .inks .edgestk:focus-visible .es::after { transform: translateX(4px); }
+.inks .edgestk:active { transform: rotate(-3deg) translate(2px, 2px); box-shadow: 1px 1px 0 var(--black); }
+.inks .edgestk:focus-visible { outline: 4px solid var(--black); outline-offset: 5px; box-shadow: 4px 4px 0 var(--black), 0 0 0 5px var(--paper); }
+
+/* the seven ideas: one row each, its number, the idea and its line; its talks' pictures on green scraps to the right */
+.inks .erows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; flex: 1; min-height: 0; border-top: 3px solid var(--black); }
+.inks .erows li { flex: 1; min-height: 0; display: flex; align-items: center; gap: 18px; }
+.inks .erows li + li { border-top: 1.5px solid rgba(17,17,17,.2); }
+.inks .erow { flex: 1; min-width: 0; align-self: stretch; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 2px 16px; align-content: center; align-items: center; padding: 0 10px 0 0; transition: background-color 120ms; }
+.inks .erow .vn { grid-row: 1 / span 2; width: 40px; height: 40px; display: grid; place-items: center; background: var(--black); color: var(--paper); font: 800 26px/1 var(--display); }
+.inks .erow .vt { font: 800 27px/1 var(--display); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inks .erow .vq { grid-column: 2; font: 400 15.5px/1.25 var(--text); color: var(--grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inks .erow:hover .vt, .inks .erow:focus-visible .vt { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.inks .erow:hover, .inks .erow:focus-visible { background: rgba(250,251,248,.45); }
+.inks #opened .erow:focus-visible { outline-offset: -4px; }
+.inks .epics { flex: none; width: 314px; display: flex; gap: 18px; padding-right: 8px; }
+.inks .epics .thumb { width: 62px; margin: 0; }
+.inks .epics .thumb .scrap { filter: drop-shadow(1px 1px 1px rgba(0,0,0,.3)); }
+.inks .epics .thumb img { box-shadow: 0 0 0 1.5px var(--white), 1px 1px 2px rgba(0,0,0,.3); }
+.inks .erows ~ .stakes, .inks .standfirst:has(+ .erows) { max-width: none; }
+.inks .stakes { flex: none; margin: 10px 0 0; padding-top: 10px; border-top: 3px solid var(--black); font: 400 15px/1.3 var(--text); color: var(--grey); }
+
+/* an idea: its line, then one card per talk: the picture on green, the fact big, whose talk it was small */
+.inks .idea { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.inks .ecards { list-style: none; margin: 0; padding: 0 5px 5px 0; flex: 1; min-height: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0 22px; }
+.inks .ecards li { display: flex; min-height: 0; }
+.inks .ecard { width: 100%; display: flex; flex-direction: column; gap: 3px; min-height: 0; overflow: hidden; padding: 14px 14px 11px; background: var(--white); border: 3px solid var(--black); box-shadow: 5px 5px 0 var(--black); transition: transform 140ms var(--ease), box-shadow 140ms var(--ease); }
+.inks .ecard .thumb { width: 70%; margin: 4px 0 13px 12%; }
+.inks .ecard .ef { font: 700 16px/1.26 var(--text); margin-bottom: auto; padding-bottom: 4px; }
+.inks .ecard .tt { flex: none; font: 700 13px/1.2 var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.inks .ecard .tm, .inks .ecard .few, .inks .ecard .ts { flex: none; }
+.inks .ecard .tm { font: 400 12.5px/1.2 var(--text); color: var(--grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inks .ecard .few { align-self: flex-start; margin-top: 3px; font: 800 13px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; background: var(--edge); padding: 3px 6px 2px; }
+.inks .ecard .ts { display: flex; gap: 12px; margin-top: 3px; font: 600 12.5px/1.2 var(--text); color: var(--grey); }
+.inks .ecard:hover, .inks .ecard:focus-visible { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--black); }
+.inks .ecard:hover .thumb img, .inks .ecard:focus-visible .thumb img { transform: translateY(-2px) rotate(-.6deg); }
+.inks .ecard .thumb img { transition: transform 140ms var(--ease); }
+.inks .idea .vfoot .fresh { margin-left: 0; }
+.inks .idea .vfoot .vpos { margin-left: auto; }
+.inks #peek .ph .wf.edge { background: var(--edge); }
+.inks #peek .ph .wf + .wf.edge { margin-left: 0; }
+
+.inks.is-phone .edgestk { right: auto; left: var(--pad); top: 106px; padding: 6px 10px 5px 12px; gap: 8px; min-height: 40px; align-items: center; }
+.inks.is-phone .edgestk .et { font-size: 24px; }
+.inks.is-phone .edgestk .es { font-size: 0; gap: 0; }   /* the count goes on the phone: the sticker must clear the band's verdicts */
+.inks.is-phone .edgestk .es::after { font-size: 18px; }
+.inks.is-phone .erows li { flex: none; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px 0 14px; }
+.inks.is-phone .erow { gap: 3px 12px; padding: 0; }
+.inks.is-phone .erow .vt { font-size: 24px; white-space: normal; line-height: .98; }
+.inks.is-phone .erow .vq { grid-column: 1 / span 2; white-space: normal; font-size: 15px; }
+.inks.is-phone .epics { width: auto; padding: 6px 0 4px 10px; gap: 16px; }
+.inks.is-phone .epics .thumb { width: 60px; }
+.inks.is-phone .ecards { grid-auto-flow: row; grid-auto-columns: auto; gap: 14px; }
+.inks.is-phone .ecard { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 3px 14px; padding: 12px; }
+.inks.is-phone .ecard .thumb { grid-column: 1; grid-row: 1 / span 2; width: 84px; margin: 8px 0 8px 6px; align-self: start; }
+.inks.is-phone .ecard .tt { grid-column: 2; grid-row: 1; align-self: end; }
+.inks.is-phone .ecard .tm { grid-column: 2; grid-row: 2; align-self: start; }
+.inks.is-phone .ecard .ef { grid-column: 1 / -1; grid-row: 3; font-size: 16px; margin: 6px 0 0; padding-bottom: 4px; }
+.inks.is-phone .ecard .few, .inks.is-phone .ecard .ts { grid-column: 1 / -1; }
+.inks.is-phone .ecard .few { justify-self: start; }
+.inks.is-phone .ecard .few { font-size: 12px; }
+.inks.is-phone .idea .vfoot .vpos { margin-left: 0; }

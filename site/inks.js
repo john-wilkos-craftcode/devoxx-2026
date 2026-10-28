@@ -27,6 +27,7 @@ function make({ phone, watch, walks, textHref }) {
     <p class="eyebrow">Devoxx Belgium 2026 &middot; ${N} talks, summarised</p>
     <h1 class="bh"><button class="band-open" data-story="pink" aria-label="Coding agents took a third of the week: 63 talks. Open the coding agents story, 4 verdicts (key 1)"><span class="headline" id="headline">Coding agents took <br>a third of the week.</span><span class="count">4 verdicts</span></button></h1>
   </section>
+  <button class="edgestk" id="edgestk" data-act="edge" aria-label="Cutting edge: the ${M.edge.ideas.length} ideas that were genuinely new (key E)"><span class="et">Cutting edge</span><span class="es">${M.edge.ideas.length} ideas</span></button>
   <div class="tools">
     <label class="isearch sheet-search" for="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>
@@ -76,6 +77,12 @@ function make({ phone, watch, walks, textHref }) {
   const edIds = new Set(M.picks.filter((p) => p.editor).map((p) => p.talkId));   // John's own picks, the rest come from the signals
   const pickTag = (id) => edIds.has(id) ? "Editor&rsquo;s pick" : "Watch first";
   const edTag = (p) => p.editor ? '<span class="ed">Editor&rsquo;s pick</span>' : "";
+  // the cutting edge (data/cutting_edge.json, John 28/10): seven ideas that were genuinely new, each with its talks and
+  // one plain fact per talk. Its talks print on the accent paper, the green overprint, wherever this section shows them.
+  const EDGE = M.edge, edgeIds = new Set(EDGE.ideas.flatMap((i) => i.talks.map((x) => x.id)));
+  // "few saved it": a talk in the bottom quarter for schedule saves, counted from the bottom (1 = fewest)
+  const fewest = (t) => TALKS.filter((x) => x.hearts < t.hearts).length + 1;
+  const nth = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
   const PAGE = 4;   // watch first shows four picks at a time
   // the programme's five days (the sheet no longer carries them: one Programme button opens Monday with these as tabs)
   const DAYS = [["2026-10-05", "Mon 5", "Monday 5 October"], ["2026-10-06", "Tue 6", "Tuesday 6 October"], ["2026-10-07", "Wed 7", "Wednesday 7 October"],
@@ -257,6 +264,31 @@ function make({ phone, watch, walks, textHref }) {
     const d = $(".pdetail", opened); if (d) d.innerHTML = pickDetail(n);
     $$(".prow", opened).forEach((r) => r.toggleAttribute("aria-current", Number(r.dataset.pick) === n));
   }
+  // the cutting edge: one row per idea (its number, the idea, its line), its talks' pictures on the accent paper beside it
+  function edgeBody() {
+    const rows = EDGE.ideas.map((idea, i) => {
+      const pics = idea.talks.map((x) => byId.get(x.id)).filter(Boolean).map((t) =>
+        `<button class="thumbbtn" data-talk="${t.id}" title="${esc(t.title)} (${esc(speakers(t))})" aria-label="Open the card for ${esc(t.title)}">${thumb(t, "edge")}</button>`).join("");
+      return `<li><button class="erow" data-idea="${i}"><span class="vn">${i + 1}</span><span class="vt">${esc(idea.title)}</span><span class="vq">${esc(idea.line)}</span></button><span class="epics">${pics}</span></li>`;
+    }).join("");
+    return `<p class="standfirst">${esc(EDGE.standfirst)}</p><ol class="erows">${rows}</ol><p class="stakes">${esc(EDGE.tableStakes)}</p>`;
+  }
+  // an idea: its line, then each talk as a card: the picture on the accent paper, the one fact, whose talk it was
+  function ideaBody(i) {
+    const idea = EDGE.ideas[i];
+    const cards = idea.talks.map((x) => {
+      const t = byId.get(x.id); if (!t) return "";
+      const f = fewest(t), few = f <= N / 4 ? `<span class="few" title="${nf.format(t.hearts)} schedule saves, the ${nth(f)} fewest of ${N} talks">Few saved it: ${nth(f)} fewest</span>` : "";
+      return `<li><button class="ecard" data-talk="${t.id}" title="${esc(t.title)} (${esc(speakers(t))})">${thumb(t, "edge", true)}<span class="ef">${esc(x.fact)}</span>` +
+        `<span class="tt">${esc(t.title)}</span><span class="tm">${esc(speakers(t))}</span>${few}<span class="ts">${statIcons(t, ["views", "hearts"])}</span></button></li>`;
+    }).join("");
+    const prev = i > 0 ? i - 1 : null, next = i < EDGE.ideas.length - 1 ? i + 1 : null;
+    return `<div class="idea"><div class="vtop"><h2 class="vh">${esc(idea.title)}</h2><p class="consensus">${esc(idea.line)}</p></div>` +
+      `<ol class="ecards n${idea.talks.length}">${cards}</ol>` +
+      `<div class="vfoot">${freshness()}<span class="vpos">Idea ${i + 1} of ${EDGE.ideas.length}</span>` +
+      `<span class="pager">${prev != null ? `<button class="pg prev" data-idea="${prev}" aria-label="Previous idea: ${esc(EDGE.ideas[prev].title)}">Previous</button>` : ""}` +
+      `${next != null ? `<button class="pg next" data-idea="${next}" aria-label="Next idea: ${esc(EDGE.ideas[next].title)}">Next idea</button>` : ""}</span></div></div>`;
+  }
   function hay(t) {
     return [t.title, t.speakers.map((s) => s.name + " " + (s.company || "")).join(" "), (t.keywords || []).join(" "), (t.themes || []).join(" "), t.tldr || "", t.track || ""].join(" ").toLowerCase();
   }
@@ -279,6 +311,7 @@ function make({ phone, watch, walks, textHref }) {
     if (S.view === "verdict") return esc(STORIES[storyOfVerdict(S.verdict)].word);
     if (S.view === "talks") return esc(M.recap.trends[S.verdict].title);
     if (S.view === "picks") return "Watch first";
+    if (S.view === "edge" || S.view === "idea") return "Cutting edge";
     if (S.view === "index") return "Search";
     if (S.view === "day") return (PHONE ? fDayShort : fDayLong).format(new Date(S.day + "T12:00:00Z")) + (PHONE ? " Oct" : "");
     return "";
@@ -288,6 +321,8 @@ function make({ phone, watch, walks, textHref }) {
     if (S.view === "verdict") return verdictBody(S.verdict);
     if (S.view === "talks") return talksBody(S.verdict);
     if (S.view === "picks") return picksBody();
+    if (S.view === "edge") return edgeBody();
+    if (S.view === "idea") return ideaBody(S.idea);
     if (S.view === "index") return indexBody();
     if (S.view === "day") return dayBody(S.day);
     return "";
@@ -296,6 +331,7 @@ function make({ phone, watch, walks, textHref }) {
     if (S.view === "story") return S.story;
     if (S.view === "verdict" || S.view === "talks") return storyOfVerdict(S.verdict);
     if (S.view === "picks") return "orange";
+    if (S.view === "edge" || S.view === "idea") return "edge";
     return null;
   }
 
@@ -318,7 +354,7 @@ function make({ phone, watch, walks, textHref }) {
     if (wasHidden && !REDUCED) { void opened.offsetWidth; opened.classList.add("flood"); }   // the sheet floods in from the right
     after();
     const first = focusSel ? pick(focusSel)
-      : view === "index" ? $("#search2", opened) : view === "picks" ? $(".pt", opened) : view === "story" ? $(".vrow", opened)
+      : view === "index" ? $("#search2", opened) : view === "picks" ? $(".pt", opened) : view === "story" ? $(".vrow", opened) : view === "edge" ? $(".erow", opened)
       : view === "talks" ? $(".list .row", opened) : $(".otitle", opened);
     if (first) { first.focus({ preventScroll: true }); if (first.id === "search2") { const n = first.value.length; first.setSelectionRange(n, n); } }
   }
@@ -359,10 +395,14 @@ function make({ phone, watch, walks, textHref }) {
     if (S.view === "sheet") return;
     if (S.view === "talks") { show("verdict", null, ".primary"); return; }
     if (S.view === "verdict") { const v = S.verdict; show("story", { story: storyOfVerdict(v) }, `.vrow[data-verdict="${v}"]`); return; }
+    if (S.view === "idea") { show("edge", null, `.erow[data-idea="${S.idea}"]`); return; }
     show("sheet");
   }
-  function step(d) {     // previous / next inside a verdict's story, or a page of picks
-    if (S.view === "verdict") {
+  function step(d) {     // previous / next inside a verdict's story or the cutting edge's ideas, or a page of picks
+    if (S.view === "idea") {
+      const j = S.idea + d;
+      if (j >= 0 && j < EDGE.ideas.length) show("idea", { idea: j }, d > 0 ? ".pg.next|.pg.prev" : ".pg.prev|.pg.next");
+    } else if (S.view === "verdict") {
       const list = STORIES[storyOfVerdict(S.verdict)].verdicts, j = list.indexOf(S.verdict) + d;
       if (j >= 0 && j < list.length) show("verdict", { verdict: list[j] }, d > 0 ? ".pg.next|.pg.prev" : ".pg.prev|.pg.next");
     } else if (S.view === "picks") {
@@ -387,7 +427,7 @@ function make({ phone, watch, walks, textHref }) {
     const ink = inkOf(t);
     const stats = statIcons(t);
     return `<div class="scrim" data-act="unpeek"></div><div class="tcard ${ink}" role="dialog" aria-modal="true" aria-labelledby="peek-t">` +
-      `<div class="ph"><span class="ty">${esc(t.type)} &middot; ${dur(t.minutes)} &middot; ${esc(LEVEL[t.level] || t.level)}</span>${pickIds.has(t.id) ? `<span class="wf">${pickTag(t.id)}</span>` : ""}</div>` +
+      `<div class="ph"><span class="ty">${esc(t.type)} &middot; ${dur(t.minutes)} &middot; ${esc(LEVEL[t.level] || t.level)}</span>${pickIds.has(t.id) ? `<span class="wf">${pickTag(t.id)}</span>` : ""}${edgeIds.has(t.id) ? `<span class="wf edge">Cutting edge</span>` : ""}</div>` +
       `<div class="pin"><div class="pm1"><div class="pid"><h3 id="peek-t">${esc(t.title)}</h3><p class="by">${t.speakers.map((s) => `${esc(s.name)}${s.company ? ` <span>${esc(s.company)}</span>` : ""}`).join(", ")}</p>` +
       `<p class="where">${esc(t.room)} &middot; ${esc(when(t))}</p></div><button class="thumbbtn go" data-talk="${t.id}" data-go="1" aria-label="Watch it: ${esc(t.title)}">${thumb(t, ink, true)}<span class="play" aria-hidden="true"></span></button></div>` +
       `<p class="sum">${esc(t.tldr)}</p><p class="if"><b>Watch if</b>${esc(t.watchIf)}</p><div class="stats">${stats}${freshness()}</div>` +
@@ -420,7 +460,7 @@ function make({ phone, watch, walks, textHref }) {
 
   // ---- events
   menu.addEventListener("click", (e) => {
-    const el = e.target.closest("[data-story],[data-verdict],[data-talk],[data-act],[data-day],[data-sort],[data-ink],[data-try]");
+    const el = e.target.closest("[data-story],[data-verdict],[data-idea],[data-talk],[data-act],[data-day],[data-sort],[data-ink],[data-try]");
     if (!el || !menu.contains(el)) return;
     if (el.dataset.act === "unpeek") { hidePeek(false, true); return; }
     if (el.dataset.talk) {
@@ -440,6 +480,8 @@ function make({ phone, watch, walks, textHref }) {
     if (el.dataset.story) { show("story", { story: el.dataset.story }); return; }
     if (el.dataset.verdict) { const pg = el.classList.contains("pg"); show("verdict", { verdict: Number(el.dataset.verdict) }, pg ? (el.classList.contains("next") ? ".pg.next|.pg.prev" : ".pg.prev|.pg.next") : null); return; }
     if (a === "picks") { show("picks", { page: 0, sel: 0 }); return; }
+    if (a === "edge") { show("edge"); return; }
+    if (el.dataset.idea) { const pg = el.classList.contains("pg"); show("idea", { idea: Number(el.dataset.idea) }, pg ? (el.classList.contains("next") ? ".pg.next|.pg.prev" : ".pg.prev|.pg.next") : null); return; }
     if (a === "programme") { show("day", { day: DAYS[0][0] }); return; }
     if (el.dataset.day) { show("day", { day: el.dataset.day }, S.view === "day" ? `.day[data-day="${el.dataset.day}"]` : null); return; }
   });
@@ -467,13 +509,14 @@ function make({ phone, watch, walks, textHref }) {
     if (e.key === "/" && !typing) { e.preventDefault(); if (S.view === "sheet" || S.view === "index") { const s = opened.hidden ? $("#search") : $("#search2"); s.focus(); s.select(); } else show("index"); return; }
     if (typing || e.altKey || e.ctrlKey || e.metaKey) return;
     if (e.key === "w" || e.key === "W") { e.preventDefault(); if (S.view !== "picks") { if (S.view === "sheet") S.returnFocus = document.activeElement; show("picks", { page: 0, sel: 0 }); } return; }
+    if (e.key === "e" || e.key === "E") { e.preventDefault(); if (S.view !== "edge") { if (S.view === "sheet") S.returnFocus = $("#edgestk"); show("edge"); } return; }
     if (e.key === "p" || e.key === "P") { e.preventDefault(); if (S.view !== "day") { if (S.view === "sheet") S.returnFocus = $("#prog"); show("day", { day: DAYS[0][0] }); } return; }
     if ((e.key === "ArrowDown" || e.key === "ArrowUp") && S.view === "picks" && !PHONE) {
       const rows = $$(".prow", opened), i = rows.indexOf(document.activeElement);
       e.preventDefault(); const r = rows[i < 0 ? 0 : (i + (e.key === "ArrowDown" ? 1 : rows.length - 1)) % rows.length]; if (r) r.focus(); return;
     }
     if (e.key === "1" || e.key === "2" || e.key === "3") { e.preventDefault(); if (S.view === "sheet") S.returnFocus = $(`.band-open[data-story="${INKS[Number(e.key) - 1]}"]`); show("story", { story: INKS[Number(e.key) - 1] }); return; }
-    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && (S.view === "verdict" || S.view === "picks")) { e.preventDefault(); step(e.key === "ArrowRight" ? 1 : -1); return; }
+    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && (S.view === "verdict" || S.view === "idea" || S.view === "picks")) { e.preventDefault(); step(e.key === "ArrowRight" ? 1 : -1); return; }
     if ((e.key === "ArrowDown" || e.key === "ArrowUp") && S.view === "sheet") {
       const bands = $$(".band-open"); const i = bands.indexOf(document.activeElement);
       if (i >= 0) { e.preventDefault(); bands[(i + (e.key === "ArrowDown" ? 1 : bands.length - 1)) % bands.length].focus(); }

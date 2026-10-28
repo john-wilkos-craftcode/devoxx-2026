@@ -11,6 +11,11 @@
   new bottleneck". They carry an "Editor's pick" tag. The other six are still computed from the metrics and can change
   day to day. To add or change one, edit `EDITOR` in scripts/build_menu.py, then run build_menu.py and stamp_assets.py
   (the build fails if a pick sits under no verdict).
+- **Cutting edge (28/10, John):** a green sticker on the coding agents band (key E) opens the seven ideas from the
+  CodeConnect notes (codeconnect-oct-2026/devoxx-slot/cutting-edge.md): one row per idea with its talks' thumbnails on
+  green scraps, and per idea one card per talk with one plain fact. "Few saved it" marks talks in the bottom quarter for
+  schedule saves (computed live). Text in data/cutting_edge.json (build_menu.py checks the talk IDs), the green paper
+  from `make_paper.py --edge`. Not in the text version (/slop/).
 - **Metrics:** .github/workflows/metrics.yml at 04:17 and 15:47 UTC, through the YouTube Data API (repo secret
   `YT_API_KEY`); every run since 23/10 has passed. "Best rated" appears by itself once the CFP publishes /ratings/top.
 - **Dropped (John 26/10):** the laptop redesign mock-up (the three questions first on the laptop screen) was rejected;

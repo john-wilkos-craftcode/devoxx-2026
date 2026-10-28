@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """The data for the site's cinema menu (site/menu.js): every talk with its summary fields and its
 public signals, the conference recap (headline, verdicts, debates) and the "watch first" picks (John's editor's picks
-where he has one for a verdict, the rest from the signals). Inputs:
-site/data.js (talks, summaries, recap) and the newest snapshot in data/metrics/dvbe26/ (written by fetch_metrics.py:
+where he has one for a verdict, the rest from the signals) and the cutting edge (seven ideas, data/cutting_edge.json,
+John 28/10). Inputs: site/data.js (talks, summaries, recap), data/cutting_edge.json and the newest snapshot in data/metrics/dvbe26/ (written by fetch_metrics.py:
 YouTube views and likes, Devoxx hearts, attendee ratings when Devoxx publishes them).
   python3 scripts/build_menu.py   ->  site/menu.js  (window.MENU)
 """
@@ -77,12 +77,17 @@ for tr in site["recap"]["trends"]:
 missing = set(EDITOR) - {p["talkId"] for p in picks}
 assert not missing, f"editor's picks under no verdict (or without a video): {missing}"
 
+edge = json.loads((ROOT / "data/cutting_edge.json").read_text())   # hand-written from the CodeConnect notes
+unknown = {x["id"] for i in edge["ideas"] for x in i["talks"]} - set(by_id)
+assert not unknown, f"cutting edge talks not in the programme: {unknown}"
+
 out = {
     "event": "Devoxx Belgium 2026", "dates": "5-9 October 2026", "venue": "Kinepolis Antwerp",
     "signals": {"snapshot": snap_json["takenAt"], "hasRatings": has_ratings, "avgLikeRate": round(avg * 100, 2), "thinBelowLikes": THIN,
                 "note": "views = reach; likes per 100 views = approval, noise under 20 likes; hearts = interest before the talk"},
     "recap": site["recap"], "picks": picks, "picksNote": "editor's picks where marked, the rest from the signals",
+    "edge": {k: edge[k] for k in ("standfirst", "tableStakes", "ideas")},
     "talks": talks,
 }
 (ROOT / "site/menu.js").write_text("window.MENU = " + json.dumps(out, ensure_ascii=False) + ";\n")
-print(f"{len(talks)} talks, {len(picks)} picks, snapshot {snap_json['takenAt']}, ratings {has_ratings}")
+print(f"{len(talks)} talks, {len(picks)} picks, {len(edge['ideas'])} edge ideas, snapshot {snap_json['takenAt']}, ratings {has_ratings}")
