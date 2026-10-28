@@ -134,8 +134,8 @@
 }
 .inks .day:hover { background: rgba(17,17,17,.08); }
 .inks .day[aria-current="date"] { background: var(--black); color: var(--paper); }
-/* the text version: a quiet link in the pink band's top right, opposite the eyebrow */
-.inks .itextlink { position: absolute; z-index: 7; right: var(--pad); top: 16px; font: 600 16px/1.3 var(--text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+/* the text version: a quiet link up the pink band's left margin, beside the headline (John 28/10) */
+.inks .itextlink { position: absolute; z-index: 7; left: 9px; top: 56px; writing-mode: vertical-rl; transform: rotate(180deg); font: 600 15px/1.3 var(--text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
 .inks .itextlink:focus-visible::after { inset: -8px -10px; }
 
 /* ---------- print-in at load: the three plates are led in from the right, one after the other ---------- */
@@ -436,7 +436,7 @@
 .inks.is-phone .iprog { order: 3; width: 100%; height: 48px; font-size: 26px; }
 .inks.is-phone .sheet-search { order: 2; flex: none; height: 48px; }
 .inks.is-phone .isearch input { font-size: 18px; }
-.inks.is-phone .itextlink { top: auto; left: var(--pad); right: auto; bottom: 4px; font-size: 16px; padding: 8px 0; }
+.inks.is-phone .itextlink { top: auto; left: var(--pad); right: auto; bottom: 4px; writing-mode: horizontal-tb; transform: none; font-size: 16px; padding: 8px 0; }   /* no gutter for it on the phone: it stays under the foot */
 .inks.is-phone .ohead { height: auto; padding: 10px var(--pad); gap: 10px; }
 .inks.is-phone .ohead .back { height: 44px; }
 .inks.is-phone .ohead .back kbd { display: none; }
@@ -553,7 +553,7 @@
 
 /* ---------- the cutting edge (John 28/10): a sticker on the coding agents band, in the green overprint ---------- */
 .inks .edgestk {
-  position: absolute; z-index: 6; right: calc(var(--pad) + 36px); top: 50px; display: flex; align-items: baseline; gap: 14px;
+  position: absolute; z-index: 6; right: calc(var(--pad) + 6px); top: 16px; display: flex; align-items: baseline; gap: 14px;
   padding: 9px 16px 8px 18px; background: var(--edge-paper); border: 3px solid var(--black); box-shadow: 4px 4px 0 var(--black);
   transform: rotate(-3deg); transition: transform 140ms var(--ease), box-shadow 140ms var(--ease);
 }
