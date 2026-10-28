@@ -5,7 +5,7 @@
 // viewports get the phone shots (a schedule totem in the hall, the middle of the cinema screen from the seat). What
 // stands in front of the cinema screen (the "#DEVOXX" letters, the seats) is a separate cut-out laid over the talk.
 
-import { inksMenu } from "./menu.js?v=40089bafd8";
+import { inksMenu } from "./inks.js?v=40089bafd8";
 
 const TZ = "Europe/Brussels";
 const fmt = (o) => new Intl.DateTimeFormat("en-GB", { timeZone: TZ, ...o });
@@ -1940,7 +1940,7 @@ async function toOffFloor(t) {   // no seat to walk to (BOFs downstairs): the su
 
 // the hall screen: the Three Inks menu (menu.js). A talk's card asks first; WATCH IT walks you there
 const byTalk = new Map(talks.map((t) => [t.id, t]));
-const hallMenu = () => inksMenu({ phone: shape === "phone", textHref: "../",
+const hallMenu = () => inksMenu({ phone: shape === "phone", textHref: "slop/",
   walks: (id) => byTalk.has(id) && walkable.has(roomNo(byTalk.get(id))),
   watch: (id) => { const t = byTalk.get(id); if (t) goTalk(t); } });
 const open = (t, withWalk) => { setInk(t); setRoom(walkable.has(roomNo(t))); return walkable.has(roomNo(t)) ? toSeat(t, withWalk) : toOffFloor(t); };

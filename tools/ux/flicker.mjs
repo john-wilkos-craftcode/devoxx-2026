@@ -8,7 +8,7 @@ const browser = await chromium.launch({ executablePath: `${os.homedir()}/.cache/
 let bad = 0;
 for (const vp of [{ width: 1920, height: 1080 }, { width: 1920, height: 1032 }, { width: 1536, height: 864 }, { width: 1440, height: 900 }, { width: 1280, height: 720 }]) {
   const page = await (await browser.newContext({ viewport: vp })).newPage();
-  await page.goto(`http://localhost:8765/cinema/#talk-${talk}`, { waitUntil: "networkidle" });
+  await page.goto(`http://localhost:8765/#talk-${talk}`, { waitUntil: "networkidle" });
   await page.waitForSelector(".face.notes");
   await page.evaluate(() => { try { localStorage.setItem("cinema-laptop-hint", "1"); } catch (e) {} });
   const t = page.locator(`.notes .tabs .pill[data-tab="${tab}"]`);

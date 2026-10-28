@@ -4,7 +4,7 @@
 //   node tools/ux/overflow.mjs [baseUrl]
 import { chromium } from "playwright-core";
 import os from "node:os";
-const base = process.argv[2] || "http://localhost:8765/cinema/";
+const base = process.argv[2] || "http://localhost:8765/";
 const browser = await chromium.launch({ executablePath: `${os.homedir()}/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome`, args: ["--no-sandbox"] });
 for (const v of [{ name: "laptop", viewport: { width: 1440, height: 900 } }, { name: "phone", viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 }]) {
   const page = await (await browser.newContext(v)).newPage();

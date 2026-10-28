@@ -8,7 +8,7 @@ const browser = await chromium.launch({ executablePath: `${os.homedir()}/.cache/
 for (const vp of [{ width: 1440, height: 900 }, { width: 1280, height: 720 }, { width: 1920, height: 1080 }]) {
   const name = `${vp.width}x${vp.height}`;
   const page = await (await browser.newContext({ viewport: vp })).newPage();
-  await page.goto(`http://localhost:8765/cinema/#talk-${talk}`, { waitUntil: "networkidle" });
+  await page.goto(`http://localhost:8765/#talk-${talk}`, { waitUntil: "networkidle" });
   await page.waitForSelector(".face.notes");
   await page.evaluate(() => { try { localStorage.setItem("cinema-laptop-hint", "1"); } catch (e) {} });
   const shot = (s) => page.screenshot({ path: `${out}/${name}-${s}.png` });

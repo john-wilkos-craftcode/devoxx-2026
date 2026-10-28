@@ -36,7 +36,7 @@ Materials, colours and signage follow the photo-checked notes in
 
 ## Renders: textures, models and type
 
-The cinema page's stills and walks (`site/cinema/media/`) are rendered in Blender by `scripts/blender/build_scene.py`
+The cinema page's stills and walks (`site/media/`) are rendered in Blender by `scripts/blender/build_scene.py`
 from the venue model above. Nothing below is shipped as a file; it only appears in the rendered images.
 
 - Textures from [ambientCG](https://ambientcg.com) (Carpet016) and [Poly Haven](https://polyhaven.com) (terlenka),

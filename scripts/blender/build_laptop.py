@@ -1,4 +1,4 @@
-"""The laptop on your lap in the cinema seat (site/cinema/, laptops and desktops): a Dell Precision 5570, rendered alone
+"""The laptop on your lap in the cinema seat (site/, laptops and desktops): a Dell Precision 5570, rendered alone
 on a transparent background from the eyes of whoever sits there, so the page can lay it over the room like a
 first-person game draws the hands, and place it for each window size without ever covering the recording.
 
@@ -424,7 +424,7 @@ for sx in (-1, 1):
 # front, which is what a satin metal lid in a dark cinema mostly reflects (without it the lid reads black)
 area("ceiling-glow", (0, 7.5, 3.0), (8.0, 3.5), 45.0, (0.55, 0.62, 1.0), (0, 0.4, 0))
 area("behind", (0, -3.0, 2.6), (4.0, 2.0), 25.0, (0.6, 0.66, 1.0), (0, 0, 0.3))
-# (the lap under it is the page's: a soft darkness round its lower half, cinema/cinema.css .lap::before; modelled thighs
+# (the lap under it is the page's: a soft darkness round its lower half, site/cinema.css .lap::before; modelled thighs
 # read as pillars beyond the lid)
 # whoever is sitting there: a dark body just behind the camera, so the glass reflects a shape, not the void
 body = slab("you", rounded_outline(0.5, 0.35, 0.15, -0.38), 0.0, 0.75, [principled("you", 0x0B0C10, 0.8)] * 4, chamfer=0)

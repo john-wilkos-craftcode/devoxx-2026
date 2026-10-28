@@ -222,7 +222,7 @@ def render_stills():
     import pm_areas.door_totems as DT
     n, phone = args.room, args.variant == "phone"
     seats = json.loads((ROOT / "data" / "photomatch" / "seats.json").read_text())
-    published = json.loads((ROOT / "site" / "cinema" / "media" / "shots.json").read_text())
+    published = json.loads((ROOT / "site" / "media" / "shots.json").read_text())
     out = Path(args.out) / args.area / "stills"
     out.mkdir(parents=True, exist_ok=True)
 

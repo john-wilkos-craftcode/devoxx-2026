@@ -99,8 +99,8 @@ pass() {
   done
   # and onto the page as they come (John 19/10: commit and push as we go): a walk with the still it ends on
   p=$(python3 scripts/photomatch/publish.py 2>&1 | tail -1)
-  if [ -n "$(git status --porcelain site/cinema/media)" ]; then
-    git add site/cinema/media && git commit -qm "Cinema media: final ${p#published: }" -- site/cinema/media \
+  if [ -n "$(git status --porcelain site/media)" ]; then
+    git add site/media && git commit -qm "Cinema media: final ${p#published: }" -- site/media \
       && { git pull -q --rebase --autostash && git push -q; } && echo "  pushed ${p#published: } $(date +%H:%M)" \
       || echo "  PUBLISH: commit/push failed ($p)"
   fi

@@ -6,7 +6,7 @@ import fs from "node:fs";
 import os from "node:os";
 
 const out = process.argv[2];
-const base = process.argv[3] || "http://localhost:8765/cinema/";
+const base = process.argv[3] || "http://localhost:8765/";
 fs.mkdirSync(out, { recursive: true });
 const exe = `${os.homedir()}/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome`;
 const browser = await chromium.launch({ executablePath: exe, args: ["--no-sandbox", "--autoplay-policy=no-user-gesture-required"] });

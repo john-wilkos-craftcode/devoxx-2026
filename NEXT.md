@@ -205,7 +205,7 @@ A new modelling approach replaces build_scene.py's by-eye venue for the walk fro
 - Serve locally with `node tools/ux/serve.mjs` (byte ranges; Python's http.server can't seek videos).
 - Pushing to main deploys GitHub Pages; the page is unreleased, so push every change for John to review live.
 
-## The cinema page (`site/cinema/`), status
+## The cinema page (`site/`, the root URL since 28/10), status
 - Diegetic UI pinned onto Blender stills with a CSS matrix (2D when square on, so text is sharp): programme on
   the hall screen (laptop) / hall totem (phone); talk on the cinema screen from a seat (laptop) / on the totem
   at the room's door under a backlit room-number plate (phone).
@@ -213,7 +213,9 @@ A new modelling approach replaces build_scene.py's by-eye venue for the walk fro
   `tools/ux/shoot.mjs`): plateau at UX ~8 (laptop) / 7.5-8.5 (phone), art ~7 / 7-8. Score history in
   `tools/ux/RUBRIC.md`. What the art judges keep asking for: real cinema seats, real foliage, the screen
   lighting the room, more hall around the hall screen (conflicts with legibility at 1280).
-- Main site's "Enter the cinema" link points to `cinema/`. The WebGL `site/kino/` is retired (13/10).
+- 28/10 (John): the cinema is the root URL; the text version moved to `/slop/` (`site/slop/`), and `site/cinema/index.html`
+  only redirects old `/cinema/` links (hash kept). The hall menu module is `site/inks.js` + `inks.css` (was
+  `cinema/menu.js`, clashing with the data file `site/menu.js`). The WebGL `site/kino/` is retired (13/10).
 
 ## Earlier (12/10)
 Done:

@@ -3,10 +3,10 @@
 Every session of Devoxx Belgium 2026 (5 to 9 October, Kinepolis Antwerp), summarised from what the
 speakers actually said, as a static site styled like a cinema programme.
 
-Live at **https://john-wilkos-craftcode.github.io/devoxx-2026/**, with the cinema at
-[`/cinema/`](https://john-wilkos-craftcode.github.io/devoxx-2026/cinema/): the programme on a screen in
-the venue's Hollywood room, a walk to your seat, and the talk on the cinema screen (on phones,
-on the schedule totem at the room's door).
+Live at **https://john-wilkos-craftcode.github.io/devoxx-2026/**: the cinema, with the programme on a
+screen in the venue's Hollywood room, a walk to your seat, and the talk on the cinema screen (on phones,
+on the schedule totem at the room's door). The text version is at
+[`/slop/`](https://john-wilkos-craftcode.github.io/devoxx-2026/slop/); old `/cinema/` links redirect to the root.
 
 Locally, serve the `site/` folder:
 
@@ -44,17 +44,17 @@ python3 scripts/validate_summaries.py
 python3 scripts/build_site.py
 ```
 
-The site itself (`site/index.html`, `styles.css`, `app.js`) is plain HTML, CSS and JavaScript with
+The text version (`site/slop/`: `index.html`, `styles.css`, `app.js`) is plain HTML, CSS and JavaScript with
 no build step. Talk pages are addressable as `#talk-<id>`, in both the flat site and the cinema.
 
-The cinema (`site/cinema/`) is the page's HTML pinned onto pre-rendered photoreal stills and walk videos
+The cinema (`site/index.html`, `cinema.js`, `inks.js`) is the page's HTML pinned onto pre-rendered photoreal stills and walk videos
 of the venue, with a CSS perspective matrix per screen. They are rendered in Blender (Cycles) by
 `scripts/blender/build_scene.py`, which builds the venue from Loïc Magnette's Kinepolis model in the Devoxx
 Robot Games entry [Ghost Light](https://github.com/LoMagnette/ghost-light) (MIT; `data/venue/venue.json`,
 regenerated with `tools/venue/`, see `data/venue/THIRD_PARTY.md`), dressed after this year's photos with CC0
 textures and plant models from ambientCG and Poly Haven (`scripts/fetch_textures.py`, `scripts/fetch_models.py`).
 `scripts/blender/render_rooms.sh` renders every room overnight and `scripts/blender/publish_renders.py` turns
-the renders into `site/cinema/media/`. `tools/ux/` serves the site, screenshots the page for the review agents
+the renders into `site/media/`. `tools/ux/` serves the site, screenshots the page for the review agents
 and checks every talk and slot for text spilling out of its box (`overflow.mjs`).
 
 Pushing to `main` deploys `site/` to GitHub Pages (`.github/workflows/pages.yml`).

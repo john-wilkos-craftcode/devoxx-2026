@@ -16,7 +16,7 @@ await ctx.addInitScript(() => { try { sessionStorage.setItem("cinema-intro", "1"
 const page = await ctx.newPage();
 const t0 = Date.now(), marks = [];
 const mark = (what) => marks.push(`${((Date.now() - t0) / 1000).toFixed(2)} s  ${what}`);
-await page.goto("http://localhost:8765/cinema/", { waitUntil: "networkidle" });
+await page.goto("http://localhost:8765/", { waitUntil: "networkidle" });
 await page.waitForSelector(".face.prog .card");
 await page.waitForTimeout(1500);
 const card = page.locator(".face.prog .card:not(.is-off)").filter({ has: page.locator(".where b", { hasText: new RegExp(`^${room}$`) }) }).first();

@@ -1,4 +1,4 @@
-"""Turn render folders from build_scene.py into the cinema page's media (site/cinema/media/).
+"""Turn render folders from build_scene.py into the cinema page's media (site/media/).
 
     python3 scripts/blender/publish_renders.py /mnt/c/Users/wilkojo/kino-renders/final [more folders...]
 
@@ -22,7 +22,7 @@ import shutil
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-OUT = ROOT / "site" / "cinema" / "media"
+OUT = ROOT / "site" / "media"
 OUT.mkdir(parents=True, exist_ok=True)
 existing = OUT / "shots.json"
 shots = json.loads(existing.read_text()) if existing.exists() else {}

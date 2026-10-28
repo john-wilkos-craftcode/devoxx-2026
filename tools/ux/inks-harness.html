@@ -1,18 +1,18 @@
 <!doctype html>
-<!-- The cinema's hall-screen menu (site/cinema/menu.js) alone, with the cinema's own stylesheet loaded, so
+<!-- The cinema's hall-screen menu (site/inks.js) alone, with the cinema's own stylesheet loaded, so
      menu-capture can run design/menu-round3/three-inks/states.json against the integrated copy. Serve the repo root:
        python3 -m http.server 8770
        CAPTURE_URL=http://localhost:8770/tools/ux/inks-harness.html node tools/ux/menu-capture.mjs design/menu-round3/three-inks <outDir> -->
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Big+Shoulders+Display:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../site/cinema/cinema.css"><link rel="stylesheet" href="../../site/cinema/menu.css">
+<link rel="stylesheet" href="../../site/cinema.css"><link rel="stylesheet" href="../../site/inks.css">
 <style>html, body { overflow: auto; background: #141516; } body { display: grid; place-items: center; min-height: 100vh; }</style>
 </head><body>
 <script src="../../site/data.js"></script><script src="../../site/menu.js"></script>
 <script type="module">
-import { inksMenu } from "../../site/cinema/menu.js";
+import { inksMenu } from "../../site/inks.js";
 const phone = /[?&]shape=phone/.test(location.search);
-const m = inksMenu({ phone, textHref: "../../site/index.html", walks: (id) => { const t = window.MENU.talks.find((x) => x.id === id); return !!(t && t.seat); },
+const m = inksMenu({ phone, textHref: "../../site/slop/index.html", walks: (id) => { const t = window.MENU.talks.find((x) => x.id === id); return !!(t && t.seat); },
   watch: (id) => {   // the cinema walks; here the old printed ticket says where you'd go
     const t = window.MENU.talks.find((x) => x.id === id), toast = m.querySelector("#toast");
     toast.innerHTML = `<b>${t.seat ? "Walking to " + t.room : "Opening the summary"}</b><span class="tt">${t.title}</span>`;

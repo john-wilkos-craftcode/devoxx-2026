@@ -1,6 +1,6 @@
 # Devoxx cinema: UX and visual review rubric
 
-Used by the review agents that score the cinema page (`site/cinema/`) from screenshots taken by `shoot.mjs`.
+Used by the review agents that score the cinema page (`site/`) from screenshots taken by `shoot.mjs`.
 Each round, two fresh agents with no stake in the design review the same screenshots: a UX researcher (can people
 understand it, read it, get around) and an art director (does it look like real screens in a real room, is it
 beautiful and distinctive). The target is 9/10 from both, on laptop and on phone.

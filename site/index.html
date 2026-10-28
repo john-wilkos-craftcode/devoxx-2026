@@ -2,127 +2,45 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Devoxx Programme 2026</title>
-<meta name="description" content="Every Devoxx Belgium 2026 session, summarised from what the speakers actually said.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Devoxx Belgium 2026, at the cinema</title>
+<meta name="description" content="Every Devoxx Belgium 2026 session, summarised, in the Kinepolis where it happened: pick a talk on the hall screen and walk to your seat.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EEF0EC'/%3E%3Crect width='32' height='11' fill='%23FF48B0'/%3E%3Crect y='11' width='32' height='8' fill='%230078BF'/%3E%3Crect y='19' width='32' height='9' fill='%23FFE800'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=c3c5361961">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317122B'/%3E%3Ccircle cx='8' cy='8' r='3' fill='%23FFC93C'/%3E%3Ccircle cx='24' cy='8' r='3' fill='%23FFC93C'/%3E%3Ccircle cx='8' cy='24' r='3' fill='%23FFC93C'/%3E%3Ccircle cx='24' cy='24' r='3' fill='%23FFC93C'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Big+Shoulders+Display:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cinema.css?v=c305ddd2be">
+<link rel="stylesheet" href="inks.css?v=90df44cf95">
+<noscript><style>.loading, .walks { display: none; }</style></noscript>
 </head>
 <body>
-<a class="skip" href="#programme">Skip to the programme</a>
-
-<nav class="topbar" aria-label="Sections">
-  <a class="brand" href="#top">Devoxx BE 26</a>
-  <div class="topbar-links">
-    <a href="#recap">What we heard</a>
-    <a href="#favourites">Crowd favourites</a>
-    <a href="#missing">Not on YouTube</a>
-    <a href="#programme">Programme</a>
-    <a href="cinema/" id="kino-link">Enter the cinema</a>
-    <button class="lights" id="lights" type="button" aria-pressed="false">Lights up</button>
-  </div>
-</nav>
-
-<header class="hero" id="top">
-  <div class="marquee" id="marquee">
-    <div class="bulbs bulbs-a" aria-hidden="true"></div>
-    <div class="bulbs bulbs-b" aria-hidden="true"></div>
-    <div class="board">
-      <p class="board-sign">Now showing</p>
-      <h1 class="board-letters" id="board-letters" aria-label="Devoxx Belgium 2026, every talk summarised">Devoxx Belgium 2026</h1>
-      <p class="board-sub" id="board-sub" aria-hidden="true"></p>
+<nav class="seatbar" id="seatbar" hidden><button class="chip" id="toProg" type="button"><span aria-hidden="true">←</span> Programme</button></nav>
+<main class="stage" id="stage">
+  <img class="plate" id="plate" alt="">
+  <video class="plate" id="clip" muted playsinline preload="auto" hidden></video>
+  <div class="overlay" id="overlay"></div>
+  <img class="front" id="front" alt="" hidden>
+  <div class="tube" id="tube" hidden></div>
+  <div class="lap" id="lap" hidden>
+    <img class="lap-art" id="lapArt" alt="">
+    <div class="lid-hit" id="lidHit" aria-hidden="true" hidden></div>
+    <div class="lid-bar" id="lidBar" hidden>
+      <button class="chip lid-play" id="lidPlay" type="button" aria-keyshortcuts="K"><span class="glyph">▶ Play</span><kbd aria-hidden="true">K</kbd></button>
+      <button class="chip lap-lid" id="lapLid" type="button" aria-keyshortcuts="L">Open the laptop<kbd aria-hidden="true">L</kbd></button>
     </div>
   </div>
-  <div class="hero-copy">
-    <p class="lede" id="lede">Every session from Kinepolis Antwerp, 5 to 9 October, condensed from what the speakers actually said on stage. Skim the programme, read the gist, then press play on the ones worth your hour.</p>
-    <p class="hero-facts" id="hero-facts"></p>
-  </div>
-</header>
-
-<main>
-  <section class="recap" id="recap" aria-labelledby="recap-title" hidden>
-    <div class="wrap">
-      <h2 class="section-title" id="recap-title">What we heard this week</h2>
-      <p class="section-intro" id="recap-intro"></p>
-      <div class="trends" id="trends"></div>
-    </div>
-  </section>
-
-  <section class="favourites" id="favourites" aria-labelledby="fav-title">
-    <div class="wrap">
-      <h2 class="section-title" id="fav-title">Crowd favourites</h2>
-      <p class="section-intro">The ten sessions most bookmarked in the Devoxx app before the doors opened.</p>
-      <ol class="fav-list" id="fav-list"></ol>
-    </div>
-  </section>
-
-  <section class="missing" id="missing" aria-labelledby="missing-title">
-    <div class="wrap">
-      <h2 class="section-title" id="missing-title">Not on YouTube yet</h2>
-      <p class="section-intro" id="missing-intro"></p>
-      <div class="missing-cols" id="missing-cols"></div>
-    </div>
-  </section>
-
-  <section class="programme" id="programme" aria-labelledby="prog-title">
-    <div class="wrap">
-      <h2 class="section-title" id="prog-title">The full programme</h2>
-    </div>
-    <div class="toolbar" id="toolbar">
-      <div class="wrap toolbar-inner">
-        <label class="search">
-          <span class="visually-hidden">Search talks</span>
-          <input id="q" type="search" placeholder="Search talks, speakers, tools…" autocomplete="off">
-        </label>
-        <div class="days" role="group" aria-label="Day" id="days"></div>
-        <div class="selects">
-          <label><span class="visually-hidden">Theme</span><select id="theme"></select></label>
-          <label><span class="visually-hidden">Format</span><select id="format"></select></label>
-          <label><span class="visually-hidden">Sort</span>
-            <select id="sort">
-              <option value="time">By showtime</option>
-              <option value="fav">Most bookmarked</option>
-            </select>
-          </label>
-          <label><span class="visually-hidden">Recording</span>
-            <select id="recording">
-              <option value="">Any recording status</option>
-              <option value="yes">On YouTube</option>
-              <option value="no">Not on YouTube yet</option>
-            </select>
-          </label>
-        </div>
-      </div>
-    </div>
-    <div class="wrap">
-      <p class="result-count" id="count" aria-live="polite"></p>
-      <div id="listing"></div>
-    </div>
-  </section>
+  <div class="fade" id="fade"></div>
 </main>
-
-<footer class="footer">
-  <div class="wrap">
-    <p>Summaries were written by Claude from a transcript of each recording (made locally with Whisper, or YouTube's auto-captions for a few), or from the official abstract when no recording was available. They can get things wrong; the video is the source of truth.</p>
-    <p>Talk data from the Devoxx Belgium 2026 CFP. Recordings by Devoxx on YouTube. Not affiliated with Devoxx.</p>
-  </div>
-</footer>
-
-<dialog class="screen" id="screen" aria-labelledby="screen-title">
-  <div class="screen-bar">
-    <button type="button" class="close" id="close">Back to programme</button>
-    <div class="screen-nav">
-      <a id="prev" href="#">Previous</a>
-      <a id="next" href="#">Next</a>
-    </div>
-  </div>
-  <article id="screen-body"></article>
-</dialog>
-
+<noscript><p class="noscript">This page needs JavaScript. <a href="slop/">Read the text-only version of every talk</a>.</p></noscript>
+<div class="dock">
+  <span class="status" id="status" role="status" hidden></span>
+  <button class="skip" id="skip" type="button" aria-keyshortcuts="Escape" hidden>Skip the walk <kbd aria-hidden="true">Esc</kbd></button>
+</div>
+<button class="walks" id="walks" type="button" aria-pressed="true">Walks <span class="walks-state">on</span></button>
+<div class="loading" id="loading"><div class="loading-sheet"><span class="loading-inks" aria-hidden="true"><i></i><i></i><i></i></span><span class="loading-text">Opening the doors…</span></div></div>
 <script src="data.js?v=7df9aec1b2"></script>
-<script src="app.js?v=1f30db2398"></script>
+<script src="menu.js?v=349ae246e4"></script>
+<script type="module" src="cinema.js?v=330b39cef9"></script>
 </body>
 </html>

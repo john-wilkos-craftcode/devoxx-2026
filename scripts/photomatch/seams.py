@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageFilter
 
-MEDIA = Path(__file__).resolve().parents[2] / "site" / "cinema" / "media"
+MEDIA = Path(__file__).resolve().parents[2] / "site" / "media"
 MEAN_MAX, SHARE_MAX = 3.0, 0.005           # a seam passes below both
 
 ap = argparse.ArgumentParser()

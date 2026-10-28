@@ -1,4 +1,4 @@
-"""The photo-matched finals into the cinema page's media (site/cinema/media/), as they come (John 19/10: commit and
+"""The photo-matched finals into the cinema page's media (site/media/), as they come (John 19/10: commit and
 push as we go). Run it any time; it publishes only what's whole and newer than what's there.
 
     python3 scripts/photomatch/publish.py [final folder]     # default: kino-renders/photomatch/final
@@ -19,7 +19,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-OUT = ROOT / "site" / "cinema" / "media"
+OUT = ROOT / "site" / "media"
 FINAL = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("/mnt/c/Users/wilkojo/kino-renders/photomatch/final")
 STILLS = FINAL / "venue" / "stills"
 CODECS = {   # best first; at the same look AV1 is 1.1 MB per 10 s laptop walk, HEVC 1.5, H.264 2.6 (19/10, room 8)

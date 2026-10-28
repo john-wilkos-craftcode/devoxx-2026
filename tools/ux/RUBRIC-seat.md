@@ -1,6 +1,6 @@
 # Devoxx cinema, the seat: UX review rubric
 
-Used by the review agents that score the seat view on laptops (`site/cinema/`, from screenshots taken by
+Used by the review agents that score the seat view on laptops (`site/`, from screenshots taken by
 `shoot-seat.mjs`). A fresh agent each round, with no stake in the design. The target is **9/10 on every viewport**,
 which this rubric defines as: heuristics total ≥ 36/40, every requirement met, and no P0 or P1 issue left.
 

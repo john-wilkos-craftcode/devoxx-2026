@@ -6,7 +6,7 @@ import os from "node:os";
 const talk = process.argv[2] || "7011", out = process.argv[3] || "/tmp";
 const browser = await chromium.launch({ executablePath: `${os.homedir()}/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome`, args: ["--no-sandbox", "--autoplay-policy=no-user-gesture-required"] });
 const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
-await page.goto(`http://localhost:8765/cinema/#talk-${talk}`, { waitUntil: "networkidle" });
+await page.goto(`http://localhost:8765/#talk-${talk}`, { waitUntil: "networkidle" });
 await page.waitForSelector(".face.notes");
 await page.keyboard.press("k");
 await page.waitForTimeout(6000);

@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
-MEDIA = ROOT / "site/cinema/media"
+MEDIA = ROOT / "site/media"
 
 
 def coeffs(dst, src):

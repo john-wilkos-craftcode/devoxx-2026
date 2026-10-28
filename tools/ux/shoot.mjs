@@ -1,4 +1,4 @@
-// Screenshot the cinema page (site/cinema/) through its main states on laptop and phone viewports, for the UX
+// Screenshot the cinema page (site/) through its main states on laptop and phone viewports, for the UX
 // review agents (see RUBRIC.md). Serve the site first: node tools/ux/serve.mjs
 //   node tools/ux/shoot.mjs tools/ux/out/r1 [baseUrl]
 import { chromium } from "playwright-core";
@@ -6,7 +6,7 @@ import fs from "node:fs";
 import os from "node:os";
 
 const out = process.argv[2];
-const base = process.argv[3] || "http://localhost:8765/cinema/";
+const base = process.argv[3] || "http://localhost:8765/";
 fs.mkdirSync(out, { recursive: true });
 const exe = `${os.homedir()}/.cache/ms-playwright/chromium-1217/chrome-linux64/chrome`;
 const browser = await chromium.launch({ executablePath: exe, args: ["--no-sandbox", "--autoplay-policy=no-user-gesture-required"] });

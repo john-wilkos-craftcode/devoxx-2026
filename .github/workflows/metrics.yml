@@ -44,7 +44,7 @@ jobs:
           stamp=$(date -u +%Y-%m-%d_%H%M)
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/metrics site/menu.js site/index.html site/cinema/index.html site/cinema/cinema.js
+          git add data/metrics site/menu.js site/index.html site/slop/index.html site/cinema.js
           git commit -m "Metrics: snapshot $stamp"
           git pull --rebase origin main
           git push origin HEAD:main

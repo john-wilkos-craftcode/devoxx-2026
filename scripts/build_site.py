@@ -66,9 +66,9 @@ def main():
     (ROOT / "site").mkdir(exist_ok=True)
     (ROOT / "site" / "data.js").write_text(
         "window.DEVOXX = " + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
-    stamp_assets(ROOT / "site" / "index.html", ("styles.css", "app.js", "data.js"))
-    stamp_assets(ROOT / "site" / "cinema" / "cinema.js", ("./menu.js",))   # first: it changes cinema.js
-    stamp_assets(ROOT / "site" / "cinema" / "index.html", ("cinema.css", "menu.css", "cinema.js", "../data.js", "../menu.js"))
+    stamp_assets(ROOT / "site" / "slop" / "index.html", ("styles.css", "app.js", "../data.js"))
+    stamp_assets(ROOT / "site" / "cinema.js", ("./inks.js",))   # first: it changes cinema.js
+    stamp_assets(ROOT / "site" / "index.html", ("cinema.css", "inks.css", "cinema.js", "data.js", "menu.js"))
     print(f"site/data.js: {len(talks)} talks, {len(talks) - len(missing)} with summaries, "
           f"recap: {'yes' if recap else 'no'}")
     if missing:

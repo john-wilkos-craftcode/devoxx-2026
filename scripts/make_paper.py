@@ -2,8 +2,8 @@
 """The three construction papers (John 23/10): the menu's inks with the fibre of real construction paper, and torn
 scraps of them to lay under thumbnails. Source: "Construction paper backgrounds", CC0 scans by an OpenGameArt user
 (https://opengameart.org/content/construction-paper-backgrounds, conppr.tar.gz), unpacked into --src.
-  python3 scripts/make_paper.py --src <dir with conppr_*.jpg>   ->  site/cinema/paper/*.webp
-  python3 scripts/make_paper.py --paper                          ->  site/cinema/paper/{scrap-paper-1,2,swatch-paper}.webp
+  python3 scripts/make_paper.py --src <dir with conppr_*.jpg>   ->  site/paper/*.webp
+  python3 scripts/make_paper.py --paper                          ->  site/paper/{scrap-paper-1,2,swatch-paper}.webp
 (--paper: the fourth stock, the menu's bare newsprint (#EEF0EC), for talks outside the three inks; its fibre is read
 back from fibre.webp, so it needs no scan. In the dark theatre these pale scraps are what a "paper" talk's tag is.)
 Fibre is taken from each scan's own colour as detail around its mean (so the fibres keep their real light/dark
@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageFilter
 
-OUT = Path(__file__).resolve().parents[1] / "site" / "cinema" / "paper"
+OUT = Path(__file__).resolve().parents[1] / "site" / "paper"
 INKS = {"pink": (0xFF, 0x48, 0xB0), "blue": (0x00, 0x78, 0xBF), "yellow": (0xFF, 0xE8, 0x00)}
 SCAN = {"pink": "pink", "blue": "blue", "yellow": "yellow"}
 TILE = 512
